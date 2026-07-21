@@ -1,0 +1,38 @@
+{
+  "name": "Investbetz",
+  "version": "1.0.0",
+  "description": "Server application for Investbetz investment platform",
+  "main": "dist/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc",
+    "dev": "ts-node-dev --respawn ./src/server.ts",
+    "prod": "tsc && node ./dist/server.js"
+  },
+  "author": "Alex Imenwo",
+  "license": "ISC",
+  "dependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/cors": "^2.8.7",
+    "@types/express": "^4.17.7",
+    "@types/express-session": "^1.17.0",
+    "@types/mongoose": "^5.7.32",
+    "@types/passport": "^1.0.4",
+    "@types/passport-local": "^1.0.33",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "connect-mongo": "^3.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.21.2",
+    "express-session": "^1.17.1",
+    "express-validator": "^6.9.0",
+    "mongoose": "^5.9.26",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0"
+  },
+  "devDependencies": {
+    "ts-node-dev": "^1.0.0-pre.56",
+    "typescript": "^4.1.2"
+  }
+}

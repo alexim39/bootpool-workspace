@@ -1,0 +1,230 @@
+@use './app/core/styles/brand' as *;
+
+/* ==========================================
+   BetPool Global Styles
+   ========================================== */
+
+
+
+// Reset & Base
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  line-height: 1.6;
+  color: $white;
+  background: $deep-navy;
+  overflow-x: hidden;
+}
+
+a {
+  color: $emerald;
+  text-decoration: none;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $emerald-light;
+  }
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+// ==========================================
+// Brand Typography
+// ==========================================
+.brand-bet {
+  color: $emerald;
+}
+
+.brand-pool {
+  @include text-gradient-gold;
+}
+
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: $font-family-display;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+// ==========================================
+// Utility Classes
+// ==========================================
+.text-emerald { color: $emerald; }
+.text-gold { color: $gold; }
+.text-white { color: $white; }
+.text-muted { color: $white-muted; }
+.text-dim { color: $white-dim; }
+
+.bg-navy { background: $deep-navy; }
+.bg-navy-light { background: $deep-navy-light; }
+.bg-navy-card { background: $deep-navy-card; }
+
+.gradient-emerald { @include gradient-emerald; }
+.gradient-gold { @include gradient-gold; }
+.gradient-navy { @include gradient-navy; }
+
+// ==========================================
+// Material Overrides
+// ==========================================
+.mat-mdc-card {
+  background: $deep-navy-card !important;
+  color: $white !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: $radius-lg !important;
+  box-shadow: $shadow-md !important;
+}
+
+.mat-mdc-button, .mat-mdc-raised-button, .mat-mdc-stroked-button {
+  font-family: $font-family-base !important;
+}
+
+.mat-mdc-tab-header {
+  background: $deep-navy !important;
+}
+
+.mat-mdc-tab {
+  color: $white-muted !important;
+  font-family: $font-family-base !important;
+  font-weight: 600 !important;
+
+  &.mdc-tab--active {
+    color: $emerald !important;
+  }
+}
+
+.mat-mdc-tab-indicator {
+  background: $emerald !important;
+}
+
+.mat-mdc-form-field {
+  .mat-mdc-text-field-wrapper {
+    background: $deep-navy-lighter !important;
+    border-radius: $radius-md !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .mat-mdc-input-element {
+    color: $white !important;
+    caret-color: $emerald !important;
+  }
+
+  .mat-mdc-floating-label {
+    color: $white-muted !important;
+  }
+
+  .mat-mdc-form-field-label {
+    color: $white-muted !important;
+  }
+}
+
+.mat-mdc-progress-spinner {
+  circle {
+    stroke: $emerald !important;
+  }
+}
+
+.mat-mdc-snack-bar-container {
+  background: $deep-navy-lighter !important;
+  color: $white !important;
+  border: 1px solid rgba($emerald, 0.3) !important;
+  border-radius: $radius-md !important;
+}
+
+.mat-mdc-chip {
+  &.mat-primary {
+    background: rgba($emerald, 0.15) !important;
+    color: $emerald !important;
+  }
+  &.mat-accent {
+    background: rgba($gold, 0.15) !important;
+    color: $gold !important;
+  }
+  &.mat-warn {
+    background: rgba($error, 0.15) !important;
+    color: $error !important;
+  }
+}
+
+.mat-mdc-dialog-container {
+  background: $deep-navy-card !important;
+  color: $white !important;
+  border-radius: $radius-lg !important;
+}
+
+.mat-mdc-paginator {
+  background: transparent !important;
+  color: $white-muted !important;
+}
+
+.mat-mdc-table {
+  background: transparent !important;
+
+  th {
+    color: $white-dim !important;
+    font-weight: 600 !important;
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+  }
+
+  td {
+    color: $white !important;
+    border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+  }
+}
+
+.mat-mdc-select-panel {
+  background: $deep-navy-lighter !important;
+  color: $white !important;
+}
+
+.mat-mdc-option {
+  color: $white-muted !important;
+
+  &:hover {
+    background: rgba($emerald, 0.1) !important;
+    color: $white !important;
+  }
+}
+
+// Scrollbar
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+}
+
+// Selection
+::selection {
+  background: rgba($emerald, 0.3);
+  color: $white;
+}

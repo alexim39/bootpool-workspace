@@ -1,0 +1,154 @@
+@if (visible) {
+  <div class="topup-overlay" (click)="onOverlayClick()">
+    <div class="topup-modal" (click)="$event.stopPropagation()">
+      <div class="topup-handle"></div>
+
+      <div class="topup-gradient-bar"></div>
+
+      <div class="topup-header">
+        <div class="topup-header-left">
+          <div class="topup-icon-ring">
+            <mat-icon>account_balance_wallet</mat-icon>
+          </div>
+          <div>
+            <h2 class="topup-title">Deposit Funds</h2>
+            <p class="topup-subtitle">Add money to your betting wallet</p>
+          </div>
+        </div>
+        <button class="topup-close" (click)="close.emit()" aria-label="Close" matTooltip="Close">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="topup-divider"></div>
+
+      <div class="topup-body">
+        <div class="topup-balance-preview">
+          <div class="preview-item">
+            <span class="preview-label">Current Balance</span>
+            <span class="preview-value">{{ formatCurrency(currentBalance()) }}</span>
+          </div>
+          @if (isValidAmount()) {
+            <div class="preview-item preview-new">
+              <span class="preview-label">New Balance</span>
+              <span class="preview-value highlight">{{ formatCurrency(newBalanceAfter()) }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="topup-amount-section">
+          <label class="topup-label">Enter Amount</label>
+          <div class="topup-input-wrap" [class.focused]="amountControl.dirty">
+            <span class="topup-currency">₦</span>
+            <input
+              type="number"
+              class="topup-input"
+              placeholder="0"
+              [formControl]="amountControl"
+              (input)="onAmountInput($event)"
+              min="0"
+              step="100"
+              inputmode="numeric"
+            />
+            @if (amountValue() > 0) {
+              <button class="topup-clear" (click)="amountControl.setValue(null); amountControl.markAsPristine(); selectedAmount.set(null)">
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+          </div>
+          @if (amountControl.invalid && amountControl.dirty) {
+            <span class="topup-hint error">Enter an amount between ₦5,000 and ₦1,000,000</span>
+          } @else if (amountValue() > 0 && isValidAmount()) {
+            <span class="topup-hint valid">Amount accepted</span>
+          } @else {
+            <span class="topup-hint">Min ₦5,000 – Max ₦1,000,000</span>
+          }
+        </div>
+
+        <div class="topup-quick-section">
+          <label class="topup-label">Quick Select</label>
+          <div class="topup-quick-grid">
+            @for (amt of quickAmounts; track amt) {
+              <button
+                class="topup-quick-btn"
+                [class.active]="selectedAmount() === amt"
+                (click)="selectAmount(amt)"
+              >
+                <span class="quick-amount">₦{{ (amt / 1000).toFixed(0) }}K</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (error()) {
+          <div class="topup-error">
+            <mat-icon>error_outline</mat-icon>
+            <div class="error-content">
+              <span class="error-title">Payment Failed</span>
+              <span class="error-desc">{{ error() }}</span>
+            </div>
+            <button class="error-dismiss" (click)="error.set(null)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        }
+
+        <button
+          class="topup-pay-btn"
+          [disabled]="!isValidAmount() || processing()"
+          (click)="initiatePayment()"
+        >
+          @if (processing()) {
+            <mat-spinner diameter="22"></mat-spinner>
+            <span>Redirecting to Paystack...</span>
+          } @else {
+            <svg class="paystack-icon" viewBox="0 0 512 512" fill="none">
+              <rect width="512" height="512" rx="80" fill="currentColor"/>
+              <path d="M160 192h192l-48 192H208L160 192z" fill="#0A1428"/>
+              <circle cx="256" cy="144" r="32" fill="#0A1428" opacity="0.8"/>
+            </svg>
+            <span>Pay <strong>{{ formatCurrency(amountValue()) }}</strong></span>
+          }
+        </button>
+
+        <div class="topup-payment-methods">
+          <span class="methods-label">Accepted payment methods</span>
+          <div class="methods-icons">
+            <div class="method-icon">
+              <svg viewBox="0 0 24 24" width="32" height="32"><circle cx="12" cy="12" r="10" fill="#1A1F71"/><circle cx="12" cy="12" r="4" fill="#F79E1B"/></svg>
+            </div>
+            <div class="method-icon">
+              <svg viewBox="0 0 24 24" width="32" height="32"><rect x="2" y="4" width="20" height="16" rx="2" fill="#FF5F00"/><rect x="10" y="4" width="4" height="16" fill="#F79E1B"/></svg>
+            </div>
+            <div class="method-icon">
+              <svg viewBox="0 0 24 24" width="32" height="32"><rect x="2" y="4" width="20" height="16" rx="2" fill="#005BAA"/><circle cx="12" cy="12" r="4" fill="none" stroke="white" stroke-width="1.5"/></svg>
+            </div>
+            <div class="method-icon">
+              <svg viewBox="0 0 24 24" width="32" height="32"><rect x="2" y="4" width="20" height="16" rx="2" fill="#219653"/><text x="12" y="16" text-anchor="middle" font-size="8" font-weight="bold" fill="white">Verve</text></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="topup-footer">
+          <div class="topup-security">
+            <mat-icon>lock</mat-icon>
+            <div class="security-text">
+              <span class="security-title">Secured by Paystack</span>
+              <span class="security-desc">PCI-DSS compliant • 256-bit encrypted</span>
+            </div>
+          </div>
+          <div class="topup-features">
+            <div class="feature-badge">
+              <mat-icon>flash_on</mat-icon>
+              <span>Instant</span>
+            </div>
+            <div class="feature-badge">
+              <mat-icon>money_off</mat-icon>
+              <span>Zero fees</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

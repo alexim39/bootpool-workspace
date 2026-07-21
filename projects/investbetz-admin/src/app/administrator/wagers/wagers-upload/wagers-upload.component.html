@@ -1,0 +1,137 @@
+<div class="row">
+    <div class="title col s12 m11 offset-m1">
+      <header>
+          <h5>Daily Wager Uploader</h5>
+          <div class="grey-text">Set wager for the day</div>
+      </header>
+    </div>
+</div>
+
+<div class="wager-upload row">
+
+    <div class="col s12 m6 offset-m1">
+
+        <form [formGroup]="wagerForm" (ngSubmit)="onSubmit()" autocomplete="off">
+
+            <div class="row">
+                <p class="col s12 m4">
+                    <label>
+                      <input class="with-gap" formControlName="wagerSession" value="morning" type="radio" checked />
+                      <span>Set morning wager</span>
+                    </label>
+                </p>
+                <p class="col s12 m4">
+                    <label>
+                      <input class="with-gap" formControlName="wagerSession" value="noon" type="radio" />
+                      <span>Set afternoon wager</span>
+                    </label>
+                </p>
+                <p class="col s12 m4">
+                    <label>
+                      <input class="with-gap" formControlName="wagerSession" value="night" type="radio"  />
+                      <span>Set evening wager</span>
+                    </label>
+                </p>
+            </div>
+
+            <div class="row">
+                <div class="input-field col s12">
+                  <input id="odd" type="text" class="validate" formControlName="odd" required>
+                  <label for="odd">Enter odd value (Eg. 2.30)</label>
+                </div>
+            </div>
+
+            <!-- <div class="row">
+                <div class="input-field col s4">
+                    <input id="home" type="text" class="validate" formControlName="home" required>
+                    <label for="home">Home club</label>
+                </div>
+
+                <div class="vs col s1">VS</div>
+
+                <div class="input-field col s4">
+                    <input id="away" type="text" class="validate" formControlName="away" required>
+                    <label for="away">Away club</label>
+                </div>
+
+                <div class="input-field col s2">
+                    <input id="prediction" type="text" class="validate" formControlName="prediction" required>
+                    <label for="prediction">Prediction</label>
+                </div>
+            </div> -->
+
+            <div class="row" formArrayName="wagers">
+                <div *ngFor="let wager of wagers.controls; let i=index">
+                    <div [formGroupName]="i">
+                        <div class="input-field col s3">
+                            <input id="home" type="text" class="validate" formControlName="homeObj">
+                            <label for="home">Home club</label>
+                        </div>
+
+                        <div class="vs col s1">VS</div>
+
+                        <div class="input-field col s3">
+                            <input id="away" type="text" class="validate" formControlName="awayObj">
+                            <label for="away">Away club</label>
+                        </div>
+
+                        <div class="input-field col s2">
+                            <input id="gameType" type="text" class="validate" formControlName="gameType">
+                            <label for="gameType">Game type</label>
+                        </div>
+
+                        <div class="input-field col s2">
+                            <input id="prediction" type="text" class="validate" formControlName="predictionObj">
+                            <label for="prediction">Prediction</label>
+                        </div>
+
+                        <div (click)="removeWager(i)" class="add_filed col s1" title="Add more form field">
+                            <i class="small material-icons red-text text-darken-4">clear</i>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <button class="col s12 m6 btn btn-large waves-effect waves-red" type="submit" [disabled]="!wagerForm.valid">Submit</button>
+
+        </form>
+
+        <div class="row" title="Add games field">
+            <a class="btn-floating btn-large waves-effect waves-red red lighten-1 right" (click)="addWagers()"><i class="material-icons">add</i></a>
+        </div>
+
+    </div>
+
+    <div class="col s12 m4 offset-m1 grey-text">
+        <h6>Wager upload patterns</h6>
+        <p>Use below specimen to upload wagers</p>
+
+        <table>
+            <thead>
+              <tr>
+                  <th>Market</th>
+                  <th>Upload Partern</th>
+              </tr>
+            </thead>
+    
+            <tbody>
+                
+              <tr>
+                <td>Both Team To Score</td>
+                <td>BTC</td>
+              </tr>
+              <tr>
+                <td>Direct Win</td>
+                <td>Club Name</td>
+              </tr>
+              <tr>
+                <td>Over and Under</td>
+                <td>Over 1.5 or Under 4.5</td>
+              </tr>
+
+            </tbody>
+          </table>
+
+    </div>
+</div>

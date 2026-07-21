@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en-NG">
+<head>
+  <meta charset="utf-8">
+  <title>BetPool Nigeria — Bet on Sports Without Losing Your Stake | Risk-Free Betting</title>
+  <base href="/">
+
+  <meta name="description" content="BetPool lets you back predictions on real matches without risking your stake. If our pick loses, you get your money back. Join thousands betting smarter in Nigeria.">
+  <meta name="keywords" content="betting Nigeria, sports betting, BetPool, risk-free betting, stake refund, Nigerian betting platform">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://betpool.tech">
+
+  <!--Let browser know website is optimized for mobile-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#0A1428">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="BetPool Nigeria — Bet on Sports Without Losing Your Stake">
+  <meta property="og:description" content="Back predictions on real matches. If our pick loses, you get your money back.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://betpool.tech">
+  <meta property="og:image" content="https://betpool.tech/img/og-image.png">
+  <meta property="og:site_name" content="BetPool">
+  <meta property="og:locale" content="en_NG">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="BetPool Nigeria — Risk-Free Sports Betting">
+  <meta name="twitter:description" content="If our pick loses, you get your stake back. Join thousands betting smarter.">
+
+  <link rel="icon" type="image/x-icon" href="./favicon.ico">
+
+  <!-- Splash screen styles (shown before Angular boots) -->
+  <style type="text/css">
+    html, body { height: 100%; margin: 0; }
+    .app-loading {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #0A1428; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    /* Subtle dot-grid texture */
+    .app-loading::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 32px 32px; pointer-events: none;
+    }
+    /* Orb 1 - emerald, drifts top-right */
+    .app-loading .orb-1 {
+      position: absolute; top: -8%; right: -4%;
+      width: min(55vw, 520px); aspect-ratio: 1; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,230,118,0.08) 0%, transparent 60%);
+      animation: orbDrift1 7s ease-in-out infinite; pointer-events: none;
+    }
+    /* Orb 2 - gold, drifts bottom-left */
+    .app-loading .orb-2 {
+      position: absolute; bottom: -8%; left: -4%;
+      width: min(50vw, 460px); aspect-ratio: 1; border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,185,35,0.07) 0%, transparent 60%);
+      animation: orbDrift2 7s ease-in-out infinite; pointer-events: none;
+    }
+    /* Orb 3 - subtle center depth */
+    .app-loading .orb-center {
+      position: absolute; width: min(35vw, 260px); aspect-ratio: 1; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 50%);
+      animation: orbPulse 5s ease-in-out infinite; pointer-events: none;
+    }
+    @keyframes orbDrift1 {
+      0%, 100% { transform: translate(0,0) scale(1); opacity: 0.7; }
+      33% { transform: translate(-35px, 25px) scale(1.12); opacity: 1; }
+      66% { transform: translate(20px, -30px) scale(0.92); opacity: 0.8; }
+    }
+    @keyframes orbDrift2 {
+      0%, 100% { transform: translate(0,0) scale(1); opacity: 0.6; }
+      33% { transform: translate(30px, -20px) scale(1.15); opacity: 0.9; }
+      66% { transform: translate(-25px, 30px) scale(0.88); opacity: 0.7; }
+    }
+    @keyframes orbPulse {
+      0%, 100% { transform: scale(1); opacity: 0.4; }
+      50% { transform: scale(1.25); opacity: 0.7; }
+    }
+    /* Floating particles */
+    .app-loading .p { position: absolute; border-radius: 50%; pointer-events: none; background: rgba(255,255,255,0.04); }
+    .app-loading .p1 { width: 8px; height: 8px; top: 22%; left: 12%; animation: floatUp 9s ease-in-out infinite; }
+    .app-loading .p2 { width: 5px; height: 5px; top: 65%; left: 82%; animation: floatUp 11s ease-in-out infinite 2s; }
+    .app-loading .p3 { width: 6px; height: 6px; top: 28%; left: 72%; animation: floatUp 10s ease-in-out infinite 4s; }
+    .app-loading .p4 { width: 4px; height: 4px; top: 72%; left: 22%; animation: floatUp 12s ease-in-out infinite 1s; }
+    @keyframes floatUp {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0; }
+      15% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { transform: translateY(-130px) scale(0.4); opacity: 0; }
+    }
+    /* Logo container */
+    .app-loading .logo-wrap {
+      display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1;
+    }
+    .app-loading .logo {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.25rem; font-size: 2.5rem; font-weight: 800;
+    }
+    .app-loading .logo-bet {
+      background: linear-gradient(135deg, #00E676 0%, #00C853 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      opacity: 0; transform: scale(0.9) translateY(-8px);
+      animation: logoEnter 0.55s cubic-bezier(0.34,1.56,0.64,1) forwards;
+      filter: drop-shadow(0 0 18px rgba(0,230,118,0.18));
+    }
+    .app-loading .logo-pool {
+      background: linear-gradient(135deg, #E8B923 0%, #D4AF37 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      opacity: 0; transform: scale(0.9) translateY(-8px);
+      animation: logoEnter 0.55s cubic-bezier(0.34,1.56,0.64,1) 0.12s forwards;
+      filter: drop-shadow(0 0 18px rgba(232,185,35,0.18));
+    }
+    @keyframes logoEnter { to { opacity: 1; transform: scale(1) translateY(0); } }
+    .app-loading .underline {
+      width: 0; height: 3px;
+      background: linear-gradient(90deg, #00E676, #E8B923); border-radius: 2px;
+      margin-top: 1rem; animation: drawLine 0.7s cubic-bezier(0.22,1,0.36,1) 0.45s forwards;
+    }
+    @keyframes drawLine { to { width: 80px; } }
+    .app-loading .tagline {
+      color: rgba(255,255,255,0.65); font-size: 1.05rem; font-weight: 400;
+      letter-spacing: -0.3px; margin-top: 1rem;
+      opacity: 0; transform: translateY(8px);
+      animation: taglineEnter 0.5s ease 0.95s forwards;
+    }
+    @keyframes taglineEnter { to { opacity: 1; transform: translateY(0); letter-spacing: 0.3px; } }
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .app-loading .orb-1, .app-loading .orb-2, .app-loading .orb-center,
+      .app-loading .p { animation: none; }
+      .app-loading .logo-bet, .app-loading .logo-pool { animation: none; opacity: 1; transform: none; }
+      .app-loading .underline { animation: none; width: 80px; }
+      .app-loading .tagline { animation: none; opacity: 1; transform: none; letter-spacing: 0; }
+    }
+    @media (max-width: 480px) {
+      .app-loading .logo { font-size: 1.75rem; }
+      .app-loading .tagline { font-size: 0.9rem; letter-spacing: 0; }
+    }
+  </style>
+
+  <!--Import Google Icon Font-->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
+
+  <!-- FAQ Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How does BetPool make money if it refunds losses?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "BetPool earns its 30% fee only on winning bets. We manage risk by pooling stakes, applying strict limits on how much we take on per offer, and maintaining reserves set aside specifically to cover potential losses so refunds are always backed."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my stake guaranteed to be refunded?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. If the outcome doesn't go your way, your original stake amount is returned to your wallet in full."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is BetPool gambling?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "BetPool is a betting-support platform: you back predictions on real sporting outcomes with the added protection that you can't lose your stake. As with any betting activity, please participate responsibly and within your means."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why can't I place any bet I want on BetPool?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "BetPool deliberately curates a small number of odds and time windows. This isn't a limitation — it's part of how we manage risk responsibly and help you avoid impulsive betting decisions."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How fast can I withdraw from BetPool?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Withdrawals are processed to your linked bank account after identity verification (KYC), typically within 1-2 business days."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="mat-typography">
+  <app-root>
+    <div class="app-loading">
+      <div class="orb-1"></div>
+      <div class="orb-2"></div>
+      <div class="orb-center"></div>
+      <div class="p p1"></div>
+      <div class="p p2"></div>
+      <div class="p p3"></div>
+      <div class="p p4"></div>
+      <div class="logo-wrap">
+        <div class="logo">
+          <span class="logo-bet">Bet</span><span class="logo-pool">Pool</span>
+        </div>
+        <div class="underline"></div>
+        <div class="tagline">Your winning partner</div>
+      </div>
+    </div>
+  </app-root>
+</body>
+<noscript>Sorry, your browser does not support JavaScript!</noscript>
+</html>

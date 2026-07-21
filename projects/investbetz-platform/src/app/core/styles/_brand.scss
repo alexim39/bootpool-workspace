@@ -1,0 +1,267 @@
+// ==========================================
+// BetPool Brand Design Tokens
+// ==========================================
+
+// Colors
+$deep-navy: #0A1428;
+$deep-navy-light: #0F1B38;
+$deep-navy-lighter: #162245;
+$deep-navy-card: #0D1A30;
+
+$emerald: #00E676;
+$emerald-dark: #00C853;
+$emerald-light: #69F0AE;
+
+$gold: #E8B923;
+$gold-dark: #D4AF37;
+$gold-light: #F0D060;
+
+$white: #FFFFFF;
+$white-soft: #F0F4F8;
+$white-muted: rgba(255, 255, 255, 0.7);
+$white-dim: rgba(255, 255, 255, 0.5);
+
+$slate-100: #F1F5F9;
+$slate-200: #E2E8F0;
+$slate-300: #CBD5E1;
+$slate-400: #94A3B8;
+$slate-500: #64748B;
+$slate-600: #475569;
+$slate-700: #334155;
+$slate-800: #1E293B;
+
+$success: #00E676;
+$warning: #FFAB00;
+$error: #FF5252;
+$info: #2196F3;
+
+// Typography
+$font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$font-family-display: 'Exo-ExtraBold', 'Inter', sans-serif;
+$font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-2xl: 1.5rem;
+$font-size-3xl: 2rem;
+$font-size-4xl: 2.5rem;
+
+// Spacing
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+$spacing-2xl: 3rem;
+$spacing-3xl: 4rem;
+
+// Border Radius
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 16px;
+$radius-xl: 24px;
+$radius-full: 9999px;
+
+// Shadows
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
+$shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.3);
+$shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.4);
+$shadow-glow-emerald: 0 0 20px rgba(0, 230, 118, 0.3);
+$shadow-glow-gold: 0 0 20px rgba(232, 185, 35, 0.3);
+
+// Transitions
+$transition-fast: 0.15s ease;
+$transition-base: 0.2s ease;
+$transition-slow: 0.3s ease;
+
+// Z-index layers
+$z-dropdown: 100;
+$z-sticky: 200;
+$z-modal-backdrop: 900;
+$z-modal: 1000;
+$z-toast: 1100;
+
+// ==========================================
+// CSS Custom Properties (for runtime use)
+// ==========================================
+:root {
+  --deep-navy: #{$deep-navy};
+  --deep-navy-light: #{$deep-navy-light};
+  --deep-navy-lighter: #{$deep-navy-lighter};
+  --deep-navy-card: #{$deep-navy-card};
+  --emerald: #{$emerald};
+  --emerald-dark: #{$emerald-dark};
+  --emerald-light: #{$emerald-light};
+  --gold: #{$gold};
+  --gold-dark: #{$gold-dark};
+  --gold-light: #{$gold-light};
+  --white: #{$white};
+  --white-soft: #{$white-soft};
+  --white-muted: #{$white-muted};
+  --white-dim: #{$white-dim};
+  --success: #{$success};
+  --warning: #{$warning};
+  --error: #{$error};
+  --info: #{$info};
+  --font-family: #{$font-family-base};
+  --font-display: #{$font-family-display};
+  --shadow-sm: #{$shadow-sm};
+  --shadow-md: #{$shadow-md};
+  --shadow-lg: #{$shadow-lg};
+  --radius-sm: #{$radius-sm};
+  --radius-md: #{$radius-md};
+  --radius-lg: #{$radius-lg};
+}
+
+// ==========================================
+// Mixins
+// ==========================================
+@mixin gradient-emerald {
+  background: linear-gradient(135deg, $emerald 0%, $emerald-dark 100%);
+}
+
+@mixin gradient-gold {
+  background: linear-gradient(135deg, $gold 0%, $gold-dark 100%);
+}
+
+@mixin gradient-navy {
+  background: linear-gradient(135deg, $deep-navy 0%, $deep-navy-light 100%);
+}
+
+@mixin gradient-primary {
+  background: linear-gradient(135deg, $emerald 0%, darken($emerald, 10%) 100%);
+}
+
+@mixin text-gradient-emerald {
+  background: linear-gradient(135deg, $emerald 0%, $emerald-light 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@mixin text-gradient-gold {
+  background: linear-gradient(135deg, $gold 0%, $gold-light 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@mixin card-base {
+  background: $deep-navy-card;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+}
+
+@mixin button-emerald {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  background: linear-gradient(135deg, $emerald 0%, $emerald-dark 100%);
+  color: $deep-navy;
+  font-weight: 700;
+  font-size: $font-size-base;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-base;
+  box-shadow: 0 4px 16px rgba($emerald, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba($emerald, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+@mixin button-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  background: linear-gradient(135deg, $gold 0%, $gold-dark 100%);
+  color: $deep-navy;
+  font-weight: 700;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-base;
+  box-shadow: 0 4px 16px rgba($gold, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba($gold, 0.4);
+  }
+}
+
+@mixin button-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  background: transparent;
+  color: $white;
+  font-weight: 600;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    border-color: $emerald;
+    color: $emerald;
+    background: rgba($emerald, 0.1);
+  }
+}
+
+@mixin glass-effect {
+  background: rgba($deep-navy-lighter, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@mixin mobile-only {
+  @media (max-width: 767px) {
+    @content;
+  }
+}
+
+@mixin tablet-only {
+  @media (min-width: 768px) and (max-width: 1023px) {
+    @content;
+  }
+}
+
+@mixin desktop-only {
+  @media (min-width: 1024px) {
+    @content;
+  }
+}
+
+@mixin responsive-grid($cols-desktop: 3, $cols-tablet: 2, $cols-mobile: 1) {
+  display: grid;
+  grid-template-columns: repeat($cols-mobile, 1fr);
+  gap: $spacing-md;
+
+  @include tablet-only {
+    grid-template-columns: repeat($cols-tablet, 1fr);
+  }
+
+  @include desktop-only {
+    grid-template-columns: repeat($cols-desktop, 1fr);
+  }
+}

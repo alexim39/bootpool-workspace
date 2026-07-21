@@ -1,0 +1,100 @@
+<mat-card class="pod-card" [class.live]="pod().isLive" [class.closing-soon]="timeRemaining() < 300000" [class.closed]="isOfferClosed()">
+  <div class="card-glow"></div>
+
+  <mat-card-content>
+    <div class="card-top">
+      <div class="top-left">
+        <span class="sport-chip">{{ pod().sport }}</span>
+        @if (pod().league) {
+          <span class="league-chip">{{ pod().league }}</span>
+        }
+        @if (pod().isLive) {
+          <span class="live-badge">LIVE</span>
+        }
+      </div>
+      @if (timeRemaining() < 300000 && !isOfferClosed()) {
+        <span class="closing-badge">Closing Soon</span>
+      }
+    </div>
+
+    @if (pod().title) {
+      <h3 class="pod-title">{{ pod().title }}</h3>
+    }
+
+    <div class="selection-refund-row">
+      <span class="selection-badge">PICK: {{ pod().selection }}</span>
+      @if (pod().refundPercent) {
+        <span class="refund-badge">{{ pod().refundPercent }}% cash back</span>
+      }
+    </div>
+
+    <div class="gains-block">
+      <span class="gains-number">{{ pod().gainsMultiplier.toFixed(2) }}</span>
+      <span class="gains-label">x Gains</span>
+      <button class="add-to-slip-btn"
+        [class.selected]="selected()"
+        [disabled]="selectionDisabled() || isOfferClosed()"
+        (click)="onToggleSelect()"
+        [matTooltip]="selected() ? 'Remove from bet slip' : 'Add to bet slip'">
+        <mat-icon>{{ selected() ? 'check' : 'add' }}</mat-icon>
+      </button>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-item">
+        <mat-icon class="info-icon">timer</mat-icon>
+        <div class="info-text">
+          <span class="info-label">Staking Closes</span>
+          <span class="info-value timer" [class.urgent]="timeRemaining() < 60000">{{ formatCountdown(timeRemaining()) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="limits-row">
+      <div class="limit">
+        <span class="limit-label">Min</span>
+        <span class="limit-value">₦{{ pod().minStake.toLocaleString() }}</span>
+      </div>
+      <div class="limit-divider"></div>
+      <div class="limit">
+        <span class="limit-label">Max</span>
+        <span class="limit-value">₦{{ pod().maxStake.toLocaleString() }}</span>
+      </div>
+      <div class="limit-divider"></div>
+      <div class="limit">
+        <span class="limit-label">Gains</span>
+        <span class="limit-value gains">{{ pod().gainsMultiplier.toFixed(1) }}x</span>
+      </div>
+    </div>
+
+    @if (pod().maxTotalExposure) {
+      <div class="exposure-section">
+        <div class="exposure-header">
+          <span class="exposure-label">Pool filled</span>
+          <span class="exposure-pct">{{ exposurePercent().toFixed(0) }}%</span>
+        </div>
+        <div class="exposure-track">
+          <div class="exposure-fill" [style.width.%]="exposurePercent()" [class.warning]="exposurePercent() > 80"></div>
+        </div>
+      </div>
+    }
+
+    <button
+      mat-raised-button
+      class="stake-btn"
+      (click)="onPlaceStake()"
+      [disabled]="isOfferClosed()">
+      @if (isOfferClosed()) {
+        <ng-container>
+          <mat-icon>lock</mat-icon>
+          <span>Offer Closed</span>
+        </ng-container>
+      } @else {
+        <ng-container>
+          <mat-icon>bolt</mat-icon>
+          <span>Place Stake</span>
+        </ng-container>
+      }
+    </button>
+  </mat-card-content>
+</mat-card>

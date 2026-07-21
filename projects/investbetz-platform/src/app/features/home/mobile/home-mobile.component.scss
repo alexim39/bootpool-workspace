@@ -1,0 +1,344 @@
+.mobile-container {
+  min-height: 100vh;
+  background: #0A1428;
+  display: flex;
+  flex-direction: column;
+  color: #FFFFFF;
+  padding-bottom: 72px;
+}
+
+.mobile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #0A1428;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+.app-title {
+  display: flex;
+  gap: 0.25rem;
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0;
+  font-family: 'Exo-ExtraBold', 'Inter', sans-serif;
+  flex-shrink: 0;
+}
+
+.brand-bet {
+  background: linear-gradient(135deg, #00E676 0%, #69F0AE 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-right: -4px;
+}
+
+.brand-pool {
+  background: linear-gradient(135deg, #E8B923 0%, #F0D060 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.balance-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 9999px;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 40px;
+}
+
+.balance-chip mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #00E676;
+}
+
+.top-up-btn-mobile {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 12px;
+  height: 40px;
+  background: rgba(0, 230, 118, 0.08);
+  border: 1px solid rgba(0, 230, 118, 0.2);
+  border-radius: 9999px;
+  color: #00E676;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.top-up-btn-mobile mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.top-up-btn-mobile:active {
+  background: rgba(0, 230, 118, 0.16);
+  transform: scale(0.96);
+}
+
+.logout-btn { color: rgba(255,255,255,0.5); }
+.balance-chip:active {
+  background: rgba(255,255,255,0.1);
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #0A1428;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.search-bar-icon {
+  font-size: 20px;
+  color: rgba(255,255,255,0.3);
+  flex-shrink: 0;
+}
+
+.search-bar-input {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+}
+
+.search-bar-input::placeholder {
+  color: rgba(255,255,255,0.3);
+}
+
+.search-bar-clear {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 50%;
+}
+
+.search-bar-clear:active {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+}
+
+.search-bar-clear mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.sport-chips {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: #0A1428;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: sticky;
+  top: 68px;
+  z-index: 199;
+}
+
+.sport-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.sport-chip {
+  flex-shrink: 0;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: transparent;
+  color: rgba(255,255,255,0.6);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.sport-chip.active {
+  background: linear-gradient(135deg, #00E676 0%, #00C853 100%);
+  color: #0A1428;
+  font-weight: 700;
+  border-color: transparent;
+}
+
+.sport-chip:active {
+  transform: scale(0.96);
+}
+
+.feed-area {
+  flex: 1;
+  padding: 16px;
+}
+
+.loading-state, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+}
+
+.empty-state mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  color: rgba(255,255,255,0.7);
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.empty-state p {
+  font-size: 13px;
+  margin: 0;
+}
+
+.odds-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.load-more-section {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0 32px;
+}
+
+.load-more-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.04);
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.load-more-btn:active:not(:disabled) {
+  background: rgba(255,255,255,0.08);
+  transform: scale(0.98);
+}
+
+.load-more-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 300;
+  display: flex;
+  background: #0F1B38;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 6px 0;
+  padding-bottom: env(safe-area-inset-bottom, 6px);
+}
+
+.nav-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 0;
+  text-decoration: none;
+  color: rgba(255,255,255,0.4);
+  transition: color 0.2s ease;
+  min-height: 56px;
+  min-width: 44px;
+  cursor: pointer;
+}
+
+.nav-tab.active {
+  color: #00E676;
+}
+
+.nav-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-badge-mobile {
+  position: absolute;
+  top: -4px;
+  right: -10px;
+  background: #E8B923;
+  color: #0A1428;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 9999px;
+  min-width: 14px;
+  text-align: center;
+  line-height: 14px;
+}
+
+.nav-tab mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.nav-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}

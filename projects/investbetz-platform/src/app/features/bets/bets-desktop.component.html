@@ -1,0 +1,192 @@
+<div class="bets-container">
+  <header class="page-header">
+    <h1>My Bets</h1>
+    <button mat-icon-button routerLink="/home" matTooltip="Back to odds">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+  </header>
+
+  <div class="summary-cards">
+    <mat-card class="summary-card s-active">
+      <mat-card-content>
+        <div class="summary-icon active"><mat-icon>schedule</mat-icon></div>
+        <div class="summary-value">{{ activeCount() }}</div>
+        <div class="summary-label">Active</div>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="summary-card s-won">
+      <mat-card-content>
+        <div class="summary-icon won"><mat-icon>emoji_events</mat-icon></div>
+        <div class="summary-value">{{ wonCount() }}</div>
+        <div class="summary-label">Won</div>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="summary-card s-refunded">
+      <mat-card-content>
+        <div class="summary-icon refunded"><mat-icon>autorenew</mat-icon></div>
+        <div class="summary-value">{{ refundedCount() }}</div>
+        <div class="summary-label">Refunded</div>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="summary-card s-void">
+      <mat-card-content>
+        <div class="summary-icon void"><mat-icon>remove_circle</mat-icon></div>
+        <div class="summary-value">{{ voidCount() }}</div>
+        <div class="summary-label">Void</div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-tab-group class="bets-tabs">
+    <mat-tab label="Active">
+      <div class="tab-content">
+        @if (loading()) {
+          <div class="loading-center"><mat-spinner></mat-spinner></div>
+        } @else if (activeStakes().length === 0) {
+          <div class="empty-state">
+            <mat-icon>sports_esports</mat-icon>
+            <h3>No active bets</h3>
+            <p>Your active stakes will appear here</p>
+            <button mat-raised-button class="btn-emerald" routerLink="/home">
+              <mat-icon>casino</mat-icon> Browse Odds
+            </button>
+          </div>
+        } @else {
+          <div class="bets-list">
+            @for (stake of activeStakes(); track stake.id) {
+              <app-bet-card 
+                [stake]="stake" 
+                [showActions]="true"
+                (cashoutRequested)="requestCashout($event)">
+              </app-bet-card>
+            }
+          </div>
+        }
+      </div>
+    </mat-tab>
+
+    <mat-tab label="History">
+      <div class="tab-content">
+        @if (loadingHistory()) {
+          <div class="loading-center"><mat-spinner></mat-spinner></div>
+        } @else if (settledStakes().length === 0) {
+          <div class="empty-state">
+            <mat-icon>history</mat-icon>
+            <h3>No settled bets yet</h3>
+            <p>Your bet history will appear here once stakes are settled</p>
+          </div>
+        } @else {
+          <div class="table-container">
+            <table mat-table [dataSource]="settledStakes()" class="bets-table">
+              <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef>Date</th>
+                <td mat-cell *matCellDef="let stake">
+                  <div class="stake-date">
+                    <span class="stake-day">{{ formatDay(stake.createdAt) }}</span>
+                    <span class="stake-time">{{ formatTime(stake.createdAt) }}</span>
+                  </div>
+                </td>
+              </ng-container>
+
+                <ng-container matColumnDef="match">
+                <th mat-header-cell *matHeaderCellDef>Selection</th>
+                <td mat-cell *matCellDef="let stake">
+                  <div class="stake-match">
+                    <div class="match-teams">
+                      <span>{{ stake.pod?.homeTeam }}</span>
+                      <mat-icon>sports_soccer</mat-icon>
+                      <span>{{ stake.pod?.awayTeam }}</span>
+                    </div>
+                    <div class="match-selection">
+                      <span class="selection-value">{{ stake.pod?.selection }}</span>
+                      <span class="market-tag" *ngIf="stake.pod?.marketType">{{ stake.pod?.marketType }}</span>
+                      <span class="refund-tag" *ngIf="stake.pod?.refundPercent">{{ stake.pod?.refundPercent }}% back</span>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="odds">
+                <th mat-header-cell *matHeaderCellDef>Odds</th>
+                <td mat-cell *matCellDef="let stake">
+                  <span class="odds-value">{{ stake.pod?.gainsMultiplier?.toFixed(2) }}x</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="stake">
+                <th mat-header-cell *matHeaderCellDef>Stake</th>
+                <td mat-cell *matCellDef="let stake">
+                  <span class="stake-amount">{{ formatCurrency(stake.stakeAmount) }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="payout">
+                <th mat-header-cell *matHeaderCellDef>Potential</th>
+                <td mat-cell *matCellDef="let stake">
+                  <div class="payout-info">
+                    <span class="net-payout">{{ formatCurrency(stake.netPayout) }}</span>
+                    <span class="fee-info" *ngIf="stake.platformFee > 0">
+                      (Fee: {{ formatCurrency(stake.platformFee) }})
+                    </span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let stake">
+                  <mat-chip [class]="getStatusClass(stake.status)" selected>
+                    <mat-icon matChipAvatar>{{ getStatusIcon(stake.status) }}</mat-icon>
+                    {{ formatStatus(stake.status) }}
+                  </mat-chip>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="result">
+                <th mat-header-cell *matHeaderCellDef>Result</th>
+                <td mat-cell *matCellDef="let stake">
+                  <div class="result-info">
+                    @if (stake.status === 'won') {
+                      <span class="profit positive">+{{ formatCurrency(stake.profit!) }}</span>
+                    } @else if (stake.status === 'cashed_out') {
+                      <span class="profit neutral">{{ formatCurrency(stake.profit!) }}</span>
+                    } @else {
+                      <span class="profit neutral">{{ formatCurrency(stake.stakeAmount) }}</span>
+                    }
+                    <span class="settled-time" *ngIf="stake.settledAt">
+                      {{ formatTime(stake.settledAt) }}
+                    </span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let stake">
+                  <button mat-icon-button [matTooltip]="'View details'" (click)="viewStakeDetails(stake)">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+            </table>
+
+            <mat-paginator 
+              [length]="totalStakes()" 
+              [pageSize]="20" 
+              [pageSizeOptions]="[10, 20, 50]"
+              (page)="onPageChange($event)"
+              showFirstLastButtons>
+            </mat-paginator>
+          </div>
+        }
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+  @if (cashingOutStake()) {
+    <app-cashout-modal
+      [stake]="cashingOutStake()!"
+      (close)="cashingOutStake.set(null)"
+      (cashoutConfirmed)="onCashoutComplete()">
+    </app-cashout-modal>
+  }
+</div>

@@ -1,0 +1,45 @@
+<div class="users-container">
+    <div class="row">
+        <div class="col s12">
+            <table class="striped highlight">
+                <thead>
+                  <tr>
+                    <th>S/n</th>
+                    <th>Last name</th>
+                    <th>First name</th>
+                    <th>Email</th>
+                    <th>User type</th>
+                    <th>Bettor</th>
+                    <th>Start date</th>
+                    <th>Last sign in</th>
+                    <th>Account status</th>
+                    <th>Account no.</th>
+                    <th>Bank name</th>
+                    <th>Edit user</th>
+                    <th>Disable account</th>
+                    <th>Delete account</th>
+                  </tr>
+                </thead>
+        
+                <tbody>
+                  <tr *ngFor="let usr of usrs; let i = index;">
+                    <td>{{i + 1}} </td>
+                    <td>{{usr.lastName | titlecase}}</td>
+                    <td>{{usr.firstName | titlecase}}</td>
+                    <td>{{usr.email | lowercase}}</td>
+                    <td>{{usr.userType | titlecase}}</td>
+                    <td>{{usr.bettor}}</td>
+                    <td>{{usr.startDate | date}}</td>
+                    <td>{{usr.updateDate | date}}</td>
+                    <td>{{usr.active}}</td>
+                    <td>{{usr.accountNo | lowercase}}</td>
+                    <td>{{usr.bankName | titlecase}}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
+    </div>
+</div>

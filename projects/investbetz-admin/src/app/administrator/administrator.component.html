@@ -1,0 +1,83 @@
+  <!-- Dropdown Structure -->
+  <ul id="Wagers" class="dropdown-content">
+    <li><a [routerLink]="['./wagers/upload']">Upload daily wagers</a></li>
+    <li><a [routerLink]="['./wagers/update']">Update wager scores</a></li>
+    <!-- <li class="divider"></li>
+    <li><a href="#!">three</a></li -->
+  </ul>
+
+  <ul id="CopyBet" class="dropdown-content">
+    <li><a href="#!">one</a></li>
+    <li><a href="#!">two</a></li>
+    <li class="divider"></li>
+    <li><a href="#!">three</a></li>
+  </ul>
+
+  <!-- <ul id="Withdraws" class="dropdown-content">
+    <li><a href="#!">one</a></li>
+    <li><a href="#!">two</a></li>
+    <li class="divider"></li>
+    <li><a href="#!">three</a></li>
+  </ul> -->
+
+  <ul id="Message" class="dropdown-content">
+    <li><a [routerLink]="['']">View messages</a></li>
+    <!-- <li><a href="#!">two</a></li>
+    <li class="divider"></li>
+    <li><a href="#!">three</a></li> -->
+  </ul>
+
+  <ul id="Financial" class="dropdown-content">
+    <li><a [routerLink]="['./financials/deposit-mgt']">Deposit</a></li>
+    <li><a [routerLink]="['./financials/withdraw-mgt']">Withdraws</a></li>
+    <li class="divider"></li>
+    <li class="subheader">For loans</li>
+    <li class="divider"></li>
+    <li><a [routerLink]="['./financials/loan-mgt']">Loan requests</a></li>
+  </ul>
+
+  <!-- <ul id="User" class="dropdown-content">
+    <li><a href="#!">one</a></li>
+    <li><a href="#!">two</a></li>
+    <li class="divider"></li>
+    <li><a href="#!">three</a></li>
+  </ul> -->
+
+  <nav class="grey lighten-5 z-depth-0">
+    <div class="nav-wrapper">
+      <a [routerLink]="['./']"  class="brand-logo hide-on-med-and-down">Administrative Page</a>
+      <ul class="right">
+        <!-- Dropdown Trigger -->
+        <li><a class="dropdown-trigger" href="#!" data-target="Wagers">Wagers settings
+          <i class="material-icons right">arrow_drop_down</i></a>
+        </li>
+
+        <li><a class="dropdown-trigger" href="#!" data-target="CopyBet">CopyBet control
+          <i class="material-icons right">arrow_drop_down</i></a>
+        </li>
+
+        <!-- <li><a class="dropdown-trigger" href="#!" data-target="Withdraws">Withdraws
+          <i class="material-icons right">arrow_drop_down</i></a>
+        </li> -->
+
+        <li><a class="dropdown-trigger" href="#!" data-target="Message">Message center
+          <i class="material-icons right">arrow_drop_down</i></a>
+        </li>
+
+        <li><a class="dropdown-trigger" href="#!" data-target="Financial">Financial management
+          <i class="material-icons right">arrow_drop_down</i></a>
+        </li>
+        
+        <li><a [routerLink]="['./users']">User manager</a></li>
+      </ul>
+    </div>
+  </nav>
+      
+
+<div class="admin-container">
+  <div class="row">
+    <div class="col s12">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

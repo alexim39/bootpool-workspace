@@ -1,0 +1,142 @@
+<div class="modal-overlay" (click)="!disableClose && close.emit()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">
+        <mat-icon>casino</mat-icon>
+        <span>Place Stake</span>
+      </div>
+      <button mat-icon-button (click)="close.emit()" aria-label="Close" class="close-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <mat-stepper [linear]="true" [(selectedIndex)]="currentStepIndex" class="modal-stepper">
+      <!-- Step 1: Stake Amount -->
+      <mat-step [stepControl]="amountForm">
+        <ng-template matStepLabel>Amount</ng-template>
+
+        <form [formGroup]="amountForm" class="step-content">
+          <div class="pod-summary">
+            <div class="pod-summary-title">{{ pod().title || pod().sport }}</div>
+            <div class="pod-summary-gains">
+              <span class="gains-number">{{ pod().gainsMultiplier.toFixed(2) }}</span>
+              <span class="gains-multiplier">x Gains</span>
+            </div>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width stake-input">
+            <mat-label>Stake Amount (₦)</mat-label>
+            <input matInput type="number" formControlName="amount" placeholder="Enter amount" [min]="minStake" [max]="maxStake" step="100" inputmode="numeric">
+            <span matPrefix>₦</span>
+            <mat-error>{{ amountError() }}</mat-error>
+          </mat-form-field>
+
+          <div class="quick-amounts">
+            @for (amt of quickAmounts(); track amt) {
+              <button mat-stroked-button type="button" (click)="setQuickAmount(amt)" class="quick-btn" [class.active]="amountForm.get('amount')?.value === amt">
+                ₦{{ amt.toLocaleString() }}
+              </button>
+            }
+          </div>
+
+          <div class="balance-info">
+            <div class="balance-row">
+              <mat-icon>account_balance_wallet</mat-icon>
+              <span>Available: <strong>{{ formatAmount(availableBalance()) }}</strong></span>
+            </div>
+            @if (amountForm.get('amount')?.value > availableBalance()) {
+              <span class="balance-warning">
+                <mat-icon>warning_amber</mat-icon> Insufficient balance
+              </span>
+            }
+            @if (amountForm.get('amount')?.value > maxStake) {
+              <span class="balance-warning">
+                <mat-icon>warning_amber</mat-icon> Exceeds max stake of {{ formatAmount(maxStake) }}
+              </span>
+            }
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Step 2: Payout Preview -->
+      <mat-step [stepControl]="confirmForm">
+        <ng-template matStepLabel>Confirm</ng-template>
+
+        <form [formGroup]="confirmForm" class="step-content">
+          <div class="payout-preview">
+            <div class="payout-row">
+              <span class="payout-label">Stake Amount</span>
+              <span class="payout-value">{{ formatAmount(stakeAmount()) }}</span>
+            </div>
+            <div class="payout-row">
+              <span class="payout-label">Gains</span>
+              <span class="payout-value emerald">{{ pod().gainsMultiplier.toFixed(2) }}x</span>
+            </div>
+            <div class="payout-row">
+              <span class="payout-label">Est. Return</span>
+              <span class="payout-value">{{ formatAmount(estimatedPayout()) }}</span>
+            </div>
+            <div class="payout-row profit">
+              <span class="payout-label">Est. Profit</span>
+              <span class="payout-value profit-value">+{{ formatAmount(estimatedProfit()) }}</span>
+            </div>
+            <div class="payout-row fee">
+              <span class="payout-label">Platform Fee (10%)</span>
+              <span class="payout-value fee-amount">-{{ formatAmount(estimatedFee()) }}</span>
+            </div>
+            <div class="payout-divider"></div>
+            <div class="payout-row total">
+              <span class="payout-label">You Receive</span>
+              <span class="payout-value net">{{ formatAmount(estimatedNetPayout()) }}</span>
+            </div>
+          </div>
+
+          <div class="win-refund-box">
+            <div class="win-refund-row">
+              <mat-icon class="win-icon">check_circle</mat-icon>
+              <span>If this Pod wins: you receive <strong>{{ formatAmount(estimatedNetPayout()) }}</strong></span>
+            </div>
+            <div class="win-refund-row">
+              <mat-icon class="refund-icon">autorenew</mat-icon>
+              @if (pod().refundPercent) {
+                <span>If it doesn't win: <strong>{{ pod().refundPercent }}% refunded</strong> (₦{{ (stakeAmount() * (pod().refundPercent || 0) / 100) | number:'1.0-0' }})</span>
+              } @else {
+                <span>If it doesn't win: your <strong>{{ formatAmount(amountForm.get('amount')?.value) }}</strong> is refunded</span>
+              }
+            </div>
+          </div>
+
+          <div class="terms-confirm">
+            <mat-checkbox formControlName="confirmTerms" color="primary">
+              I accept the <a href="/terms" target="_blank">Terms & Conditions</a>
+            </mat-checkbox>
+          </div>
+        </form>
+      </mat-step>
+    </mat-stepper>
+
+    <div class="modal-actions">
+      @if (currentStepIndex() > 0) {
+        <button mat-button (click)="goBack()" class="back-btn">
+          <mat-icon>arrow_back</mat-icon> Back
+        </button>
+      }
+      @if (currentStepIndex() === 0 && amountForm.valid) {
+        <button mat-raised-button class="primary-action" (click)="goForward()" [disabled]="submitting()">
+          Next: Review Payout
+        </button>
+      }
+      @if (currentStepIndex() === 1 && confirmForm.valid) {
+        <button mat-raised-button class="primary-action" (click)="placeStake()" [disabled]="submitting()">
+          @if (submitting()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            <ng-container>
+              <mat-icon>check_circle</mat-icon> Confirm Stake
+            </ng-container>
+          }
+        </button>
+      }
+    </div>
+  </div>
+</div>

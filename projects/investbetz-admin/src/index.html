@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- inline spinner styles to be able to display spinner right away -->
+  <style type="text/css">
+    body, html {  height: 100%;  }
+    .app-loading {  position: relative;     display: flex;     flex-direction: column;     align-items: center;     justify-content: center;     height: 100%;   }
+    .app-loading .spinner {     height: 160px;      width: 160px;      animation: rotate 2s linear infinite;      transform-origin: center center;      position: absolute;      top: 0;      bottom: 0;      left: 0;
+      right: 0;      margin: auto;    }
+    .app-loading .spinner .path {      stroke-dasharray: 1, 200;      stroke-dashoffset: 0;      animation: dash 1.5s ease-in-out infinite;      stroke-linecap: round;      stroke: #00E676;    }
+    @keyframes rotate {      100% {        transform: rotate(360deg);      }    }
+    @keyframes dash {      0% {        stroke-dasharray: 1, 200;        stroke-dashoffset: 0;      }      50% {        stroke-dasharray: 89, 200;        stroke-dashoffset: -35px;      }
+      100% {        stroke-dasharray: 89, 200;        stroke-dashoffset: -124px;      }
+    }
+  </style>
+  <meta charset="utf-8">
+  <title>Investbetz - Let's bear the risk for you</title>
+  <base href="/">
+
+  <!--Let browser know website is optimized for mobile-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/x-icon" href="./favicon.ico">
+  <!--Import Google Icon Font-->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
+</head>
+<body class="mat-typography">
+  <app-root>
+    <!-- loading layout replaced by app after startupp -->
+    <div class="app-loading">
+      <div class="logo">Getting ready!</div>
+      <svg class="spinner" viewBox="25 25 50 50">
+        <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="1" stroke-miterlimit="10"/>
+      </svg>
+    </div>
+  </app-root>
+</body>
+<noscript>Sorry, your browser does not support JavaScript!</noscript>
+</html>

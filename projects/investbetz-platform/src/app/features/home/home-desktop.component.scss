@@ -1,0 +1,240 @@
+.home-container {
+  min-height: 100vh;
+  background: #0A1428;
+  display: flex;
+  flex-direction: column;
+  color: #FFFFFF;
+  padding-top: 60px;
+}
+
+.feed-layout {
+  display: flex;
+  gap: 20px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.bet-slip-sidebar {
+  flex-shrink: 0;
+  width: 320px;
+  position: sticky;
+  top: 110px;
+  align-self: flex-start;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+}
+
+@media (max-width: 1024px) {
+  .feed-layout {
+    max-width: 1000px;
+    flex-direction: column;
+  }
+  .bet-slip-sidebar {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    top: auto;
+    max-height: 70vh;
+  }
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  max-width: 1000px;
+  width: calc(100% - 64px);
+  margin: 12px auto 0;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  transition: border-color 0.2s;
+}
+
+.search-bar:focus-within {
+  border-color: rgba(255,255,255,0.25);
+}
+
+.search-bar-icon {
+  font-size: 20px;
+  color: rgba(255,255,255,0.3);
+  flex-shrink: 0;
+}
+
+.search-bar-input {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+}
+
+.search-bar-input::placeholder {
+  color: rgba(255,255,255,0.3);
+}
+
+.search-bar-clear {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 50%;
+}
+
+.search-bar-clear:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+}
+
+.search-bar-clear mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.sports-tabs {
+  position: sticky;
+  top: 60px;
+  z-index: 198;
+  background: #0A1428;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+::ng-deep .sports-tabs .mat-mdc-tab-header {
+  background: #0A1428;
+  border-bottom: none;
+}
+
+:host ::ng-deep .sports-tabs .mat-mdc-tab {
+  min-width: 72px;
+  height: 44px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.45);
+  opacity: 1;
+}
+
+:host ::ng-deep .sports-tabs .mat-mdc-tab.mdc-tab--active {
+  color: #FFFFFF;
+}
+
+:host ::ng-deep .sports-tabs .mat-mdc-tab-indicator {
+  background-color: #00E676;
+}
+
+:host ::ng-deep .sports-tabs .mat-mdc-tab-indicator__content {
+  border-top-width: 2px;
+  border-top-color: #00E676;
+  border-radius: 2px;
+}
+
+:host ::ng-deep .sports-tabs .mat-mdc-tab .mdc-tab__text-label {
+  color: rgba(255,255,255,0.45);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+:host ::ng-deep .sports-tabs .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.odds-feed {
+  flex: 1;
+  padding: 28px 0 100px;
+  min-width: 0;
+}
+
+.loading-state, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 16px;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+}
+
+.empty-state mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  color: rgba(255,255,255,0.7);
+  margin: 0 0 8px;
+}
+
+.odds-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+::ng-deep .mat-mdc-progress-spinner {
+  --mdc-circular-progress-active-indicator-color: #00E676 !important;
+}
+
+.load-more-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 0 48px;
+}
+
+.pod-count {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  font-weight: 500;
+}
+
+.load-more-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 36px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.04);
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  min-width: 160px;
+}
+
+.load-more-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.08);
+  border-color: #00E676;
+}
+
+.load-more-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .odds-feed {
+    padding: 16px;
+    max-width: 100%;
+  }
+}

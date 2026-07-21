@@ -1,0 +1,50 @@
+<div class="cashout-overlay" (click)="close.emit()">
+  <div class="cashout-modal" (click)="$event.stopPropagation()">
+    <div class="cashout-header">
+      <mat-icon class="cashout-icon">autorenew</mat-icon>
+      <h2>Cash Out This Stake?</h2>
+      <button mat-icon-button class="close-btn" (click)="close.emit()" aria-label="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <p class="cashout-description">
+      You're about to cash out before this Pod settles. A 10% fee applies to your staked amount.
+    </p>
+
+    <div class="cashout-breakdown">
+      <div class="breakdown-row">
+        <span>Your stake</span>
+        <span>{{ formatCurrency(stake.stakeAmount) }}</span>
+      </div>
+      <div class="breakdown-row fee">
+        <span>Cashout fee (10%)</span>
+        <span>-{{ formatCurrency(cashoutFee()) }}</span>
+      </div>
+      <div class="breakdown-divider"></div>
+      <div class="breakdown-row total">
+        <span>You'll receive</span>
+        <span class="receive-amount">{{ formatCurrency(cashoutPayout()) }}</span>
+      </div>
+    </div>
+
+    <p class="cashout-warning">This cannot be undone.</p>
+
+    <div class="cashout-actions">
+      <button mat-stroked-button class="cancel-btn" (click)="close.emit()" [disabled]="submitting()">
+        Cancel
+      </button>
+      <button 
+        mat-raised-button 
+        class="confirm-btn"
+        (click)="confirmCashout()"
+        [disabled]="submitting()">
+        @if (submitting()) {
+          <mat-spinner diameter="20"></mat-spinner>
+        } @else {
+          <span>Confirm Cash Out</span>
+        }
+      </button>
+    </div>
+  </div>
+</div>

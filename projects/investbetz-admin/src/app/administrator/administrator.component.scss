@@ -1,0 +1,38 @@
+nav {
+    .nav-wrapper {
+        .brand-logo {
+            margin-left: 1.2rem;
+            font-size: 1.3rem;
+            color: gray;
+        }
+        ul {
+            margin-right: 1.2rem;
+            li {
+                a {
+                    color: gray;
+                }
+                .subheader {
+                    font-style: italic;
+                    color: #ccc;
+                    font-size: 0.9rem;
+                    cursor: default;
+                    text-align: center;
+                    padding-top: 1rem;
+                }
+                .dropdown-content {
+                    a {
+                        font-size: 0.9rem;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.admin-container {
+    margin-top: 3em;
+   
+}
+
+ /* Extra small devices (phones, up to 480px) */
+ @media screen and (max-width: 767px) {}
