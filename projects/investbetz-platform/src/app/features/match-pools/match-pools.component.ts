@@ -86,7 +86,7 @@ type View = 'list' | 'my-stakes';
                       <strong>{{ p.eventTitle }}</strong>
                       <span class="mc-deadline">Closes {{ p.stakingClosesAt | date:'MMM d, h:mm a' }}</span>
                     </div>
-                    <div class="mc-h-right">\u20A6{{ p.totalPool | number }}</div>
+                    <div class="mc-h-right"><!-- \u20A6{{ p.totalPool | number }} --></div>
                   </div>
                   <div class="mc-markets">
                     @for (m of p.markets; track m.marketId) {
@@ -238,7 +238,7 @@ type View = 'list' | 'my-stakes';
                           <h3>{{ p.eventTitle }}</h3>
                           <span class="pc-deadline">Closes {{ p.stakingClosesAt | date:'MMM d, h:mm a' }}</span>
                         </div>
-                        <div class="pc-pool-total">\u20A6{{ p.totalPool | number }}</div>
+                        <div class="pc-pool-total"><!-- \u20A6{{ p.totalPool | number }} --></div>
                       </div>
                       <div class="pc-markets">
                         @for (m of p.markets; track m.marketId) {
