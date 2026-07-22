@@ -49,6 +49,12 @@
           },
           "configurations": {
             "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/investbetz-platform/src/environments/environment.ts",
+                  "with": "projects/investbetz-platform/src/environments/environment.prod.ts"
+                }
+              ],
               "budgets": [
                 {
                   "type": "initial",
@@ -153,6 +159,12 @@
           },
           "configurations": {
             "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/investbetz-admin/src/environments/environment.ts",
+                  "with": "projects/investbetz-admin/src/environments/environment.prod.ts"
+                }
+              ],
               "budgets": [
                 {
                   "type": "initial",
