@@ -96,7 +96,7 @@ type View = 'list' | 'my-stakes';
                         <div class="mc-m-bar" [style.width.%]="(m.totalStaked / (p.totalPool || 1)) * 100"></div>
                         <div class="mc-m-left">
                           <span class="mc-m-label">{{ m.label }}</span>
-                          <span class="mc-m-staked">\u20A6{{ m.totalStaked | number }}</span>
+                          <span class="mc-m-staked"><!-- \u20A6{{ m.totalStaked | number }} --></span>
                         </div>
                         <div class="mc-m-right">
                           @if (getMarketRank(p.markets, m.marketId) === 0) {
@@ -248,7 +248,7 @@ type View = 'list' | 'my-stakes';
                             <div class="pc-bar" [style.width.%]="(m.totalStaked / (p.totalPool || 1)) * 100"></div>
                             <div class="pm-left">
                               <span class="pm-label">{{ m.label }}</span>
-                              <span class="pm-staked">\u20A6{{ m.totalStaked | number }} staked</span>
+                              <span class="pm-staked"><!-- \u20A6{{ m.totalStaked | number }} staked --></span>
                             </div>
                             <div class="pm-right">
                               @if (getMarketRank(p.markets, m.marketId) === 0) {
