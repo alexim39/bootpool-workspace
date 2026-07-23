@@ -4,10 +4,11 @@ import { Injectable, OnDestroy } from '@angular/core';
 export class PollingService implements OnDestroy {
   private intervals: Map<string, any> = new Map();
 
-  start(id: string, fn: () => void, intervalMs: number = 30000) {
+  start(id: string, fn: () => void, intervalMs: number = 30000): () => void {
     this.stop(id);
     fn();
     this.intervals.set(id, setInterval(fn, intervalMs));
+    return () => this.stop(id);
   }
 
   stop(id: string) {

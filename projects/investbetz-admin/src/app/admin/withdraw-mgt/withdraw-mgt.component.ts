@@ -106,10 +106,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
         <div class="detail-header">
           <h3>Withdrawal Details</h3>
           <div class="detail-actions">
-            <button mat-stroked-button class="btn-approve" *ngIf="detail.status === 'processing'" (click)="approve(detail)" [disabled]="actionLoading">
-              <mat-icon>check_circle</mat-icon> Approve
+            <button mat-stroked-button class="btn-approve" *ngIf="detail.status === 'pending'" (click)="approve(detail)" [disabled]="actionLoading">
+              <mat-icon>check_circle</mat-icon> Approve & Process
             </button>
-            <button mat-stroked-button class="btn-reject" *ngIf="detail.status === 'processing'" (click)="showReject = true" [disabled]="actionLoading">
+            <button mat-stroked-button class="btn-reject" *ngIf="detail.status === 'pending'" (click)="showReject = true" [disabled]="actionLoading">
               <mat-icon>cancel</mat-icon> Reject
             </button>
             <button mat-icon-button (click)="detail = null; detailId = null"><mat-icon>close</mat-icon></button>

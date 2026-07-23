@@ -13,10 +13,13 @@ export interface PaginatedResponse<T> {
 
 export interface DashboardStats {
   totalUsers: number;
+  totalPods?: number;
   activePods: number;
   totalStakes: number;
   totalVolume: number;
-  dailyVolume: { date: string; volume: number }[];
+  totalPayouts?: number;
+  pendingSettlements?: number;
+  dailyVolume: { date: string; volume: number; count?: number }[];
   recentStakes: any[];
   podStatusBreakdown: { status: string; count: number }[];
 }

@@ -59,6 +59,10 @@ export const routes: Routes = [
         loadComponent: () => import('./admin/campaigns/campaigns.component').then(m => m.CampaignsComponent)
       },
       {
+        path: 'financials',
+        loadComponent: () => import('./admin/financials/financials.component').then(m => m.FinancialsComponent)
+      },
+      {
         path: 'deposit-mgt',
         loadComponent: () => import('./admin/deposit-mgt/deposit-mgt.component').then(m => m.DepositMgtComponent)
       },
