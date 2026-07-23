@@ -116,7 +116,7 @@ import { finalize } from 'rxjs/operators';
     .back-btn:active { background: rgba(255,255,255,0.05); }
     .header-logo { display: inline-flex; align-items: center; gap: 8px; font-size: 1.4rem; font-weight: 800; font-family: 'Exo-ExtraBold', 'Inter', sans-serif; line-height: 1; }
     .logo-image { height: 34px; width: 34px; object-fit: cover; display: block; border-radius: 10px; flex-shrink: 0; }
-    .logo-bet { background: linear-gradient(135deg, #00E676 0%, #00C853 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-bet { margin-right: -8px; background: linear-gradient(135deg, #00E676 0%, #00C853 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .logo-pool { background: linear-gradient(135deg, #E8B923 0%, #D4AF37 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .mobile-content { flex: 1; padding: 24px 20px; overflow-y: auto; }
     .page-title { color: #FFFFFF; font-size: 1.75rem; font-weight: 700; margin: 0 0 6px; }
