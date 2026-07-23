@@ -89,11 +89,13 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
           </div>
           <div class="section-title" *ngIf="s.items && s.items.length > 1">Parlay Legs ({{ s.items.length }})</div>
           <div class="detail-grid" *ngIf="s.items && s.items.length > 1">
-            <div class="detail-item parlay-leg-item" *ngFor="let item of s.items; let i = index">
-              <span class="label">Leg {{ i + 1 }} — {{ item.homeTeam }} vs {{ item.awayTeam }}</span>
-              <span class="value">{{ item.selection }} &#64; {{ item.gainsMultiplier.toFixed(2) }}x</span>
-              <span class="value" [style.color]="item.status === 'won' ? '#00E676' : item.status === 'lost' ? '#f44336' : '#888'">{{ item.status }}</span>
-            </div>
+            @for (item of s.items; track item; let i = $index) {
+              <div class="detail-item parlay-leg-item">
+                <span class="label">Leg {{ i + 1 }} — {{ item.homeTeam }} vs {{ item.awayTeam }}</span>
+                <span class="value">{{ item.selection }} &#64; {{ item.gainsMultiplier.toFixed(2) }}x</span>
+                <span class="value" [style.color]="item.status === 'won' ? '#00E676' : item.status === 'lost' ? '#f44336' : '#888'">{{ item.status }}</span>
+              </div>
+            }
           </div>
           <div class="settle-actions" *ngIf="canSettle(s)">
             <button mat-stroked-button class="action-win" (click)="settleStake(s._id || s.id, 'win')">Settle Win</button>
