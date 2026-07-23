@@ -1,0 +1,32 @@
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000;
+      display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto;
+    }
+    .modal-content { background: #0D1A30; border-radius: 12px; width: 100%; max-width: 720px; border: 1px solid rgba(255,255,255,0.08); }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .modal-header h2 { color: #fff; font-size: 18px; font-weight: 600; margin: 0; }
+    .modal-header button { color: rgba(255,255,255,0.5); }
+    .pod-form { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .form-row { display: flex; gap: 16px; }
+    .form-row.cols-2 > * { flex: 1; }
+    .form-row.cols-3 > * { flex: 1; }
+    .full-width { width: 100%; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .section-header h3 { color: #fff; font-size: 15px; font-weight: 600; margin: 0; }
+    .legs-section { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 16px; }
+    .leg-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 12px; }
+    .leg-fields { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
+    .leg-fields mat-form-field { flex: 1; min-width: 120px; }
+    .form-actions { display: flex; justify-content: flex-end; gap: 12px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .error-msg { color: #f44336; font-size: 13px; padding: 8px 12px; background: rgba(244,67,54,0.1); border-radius: 8px; }
+    ::ng-deep .pod-form .mdc-text-field--filled:not(.mdc-text-field--disabled) { background-color: rgba(255,255,255,0.08); border-radius: 6px 6px 0 0; }
+    ::ng-deep .pod-form .mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-floating-label { color: rgba(255,255,255,0.6); }
+    ::ng-deep .pod-form .mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-floating-label--float-above { color: rgba(255,255,255,0.45); }
+    ::ng-deep .pod-form .mdc-text-field__input { color: #fff !important; }
+    ::ng-deep .pod-form input.mat-mdc-input-element { color: #fff !important; }
+    ::ng-deep .pod-form .mat-mdc-select-value-text { color: #fff; }
+    ::ng-deep .pod-form .mat-mdc-select-arrow { color: rgba(255,255,255,0.5); }
+    ::ng-deep .pod-form .mat-mdc-slide-toggle .mdc-label { color: rgba(255,255,255,0.8); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  

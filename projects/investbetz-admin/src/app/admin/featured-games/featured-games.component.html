@@ -1,0 +1,121 @@
+
+    <div class="featured-page">
+      <div class="page-header">
+        <h1>Featured Games</h1>
+        <button class="btn-add" (click)="startCreate()">+ New Banner</button>
+      </div>
+
+      <div class="form-card" *ngIf="store.showForm()">
+        <div class="form-title">{{ store.editingId() ? 'Edit Banner' : 'Create Banner' }}</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Title *</label>
+            <input type="text" [(ngModel)]="form.title" placeholder="e.g. World Cup Final" maxlength="100" />
+          </div>
+          <div class="form-group">
+            <label>Subtitle</label>
+            <input type="text" [(ngModel)]="form.subtitle" placeholder="e.g. France vs Argentina" maxlength="150" />
+          </div>
+          <div class="form-group full-width">
+            <label>Description</label>
+            <div class="input-with-ai">
+              <input type="text" [(ngModel)]="form.description" placeholder="e.g. The biggest game of the year is here!" maxlength="300" />
+              <button class="btn-ora" (click)="generateDesc()" [disabled]="store.generating() || !form.title.trim()" title="Generate with Ora AI">
+                <span class="ora-dot"></span>
+                {{ store.generating() ? 'Thinking...' : 'Ora AI' }}
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Emoji</label>
+            <input type="text" [(ngModel)]="form.emoji" placeholder="🏆" maxlength="10" />
+          </div>
+          <div class="form-group">
+            <label>CTA Label</label>
+            <input type="text" [(ngModel)]="form.ctaLabel" placeholder="Bet Now" maxlength="30" />
+          </div>
+          <div class="form-group">
+            <label>CTA Link</label>
+            <input type="text" [(ngModel)]="form.ctaLink" placeholder="/home" />
+          </div>
+          <div class="form-group">
+            <label>Gradient Start</label>
+            <div class="color-input">
+              <input type="color" [(ngModel)]="form.gradientStart" />
+              <input type="text" [(ngModel)]="form.gradientStart" placeholder="#E8B923" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Gradient End</label>
+            <div class="color-input">
+              <input type="color" [(ngModel)]="form.gradientEnd" />
+              <input type="text" [(ngModel)]="form.gradientEnd" placeholder="#FF6B35" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Display Order</label>
+            <input type="number" [(ngModel)]="form.displayOrder" min="0" />
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="form.isActive" />
+              Active
+            </label>
+          </div>
+          <div class="form-group">
+            <label>Starts At</label>
+            <input type="datetime-local" [(ngModel)]="form.startsAt" />
+          </div>
+          <div class="form-group">
+            <label>Expires At</label>
+            <input type="datetime-local" [(ngModel)]="form.expiresAt" />
+          </div>
+        </div>
+
+        <div class="preview-card"
+          [style.--grad-start]="form.gradientStart || '#E8B923'"
+          [style.--grad-end]="form.gradientEnd || '#FF6B35'">
+          <div class="preview-emoji">{{ form.emoji || '🔥' }}</div>
+          <div class="preview-text">
+            <div class="preview-title">{{ form.title || 'Preview Title' }}</div>
+            <div class="preview-subtitle">{{ form.subtitle || 'Preview Subtitle' }}</div>
+          </div>
+          <div class="preview-cta">{{ form.ctaLabel || 'Bet Now' }}</div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-cancel" (click)="cancelForm()">Cancel</button>
+          <button class="btn-save" (click)="save()" [disabled]="store.saving() || !form.title.trim()">
+            {{ store.saving() ? 'Saving...' : (store.editingId() ? 'Update' : 'Create') }}
+          </button>
+        </div>
+      </div>
+
+      <div class="banners-list">
+        <div class="banner-item" *ngFor="let b of store.banners(); trackBy: trackById" [class.inactive]="!b.isActive">
+          <div class="banner-preview"
+            [style.--grad-start]="b.gradientStart"
+            [style.--grad-end]="b.gradientEnd">
+            <span class="banner-emoji">{{ b.emoji }}</span>
+          </div>
+          <div class="banner-info">
+            <div class="banner-title">{{ b.title }}</div>
+            <div class="banner-subtitle" *ngIf="b.subtitle">{{ b.subtitle }}</div>
+            <div class="banner-meta">
+              <span class="meta-badge" [class.active-badge]="b.isActive">
+                {{ b.isActive ? 'Active' : 'Inactive' }}
+              </span>
+              <span class="meta-order">Order: {{ b.displayOrder }}</span>
+            </div>
+          </div>
+          <div class="banner-actions">
+            <button class="btn-icon" title="Edit" (click)="startEdit(b)">✏️</button>
+            <button class="btn-icon btn-danger" title="Delete" (click)="remove(b._id)">🗑️</button>
+          </div>
+        </div>
+        <div class="empty-state" *ngIf="store.banners().length === 0">
+          <p>No featured games yet. Create your first banner above!</p>
+        </div>
+      </div>
+    </div>
+  

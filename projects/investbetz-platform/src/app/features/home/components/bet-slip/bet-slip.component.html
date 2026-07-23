@@ -1,0 +1,110 @@
+
+    <div class="bet-slip" [class.open]="open()">
+      <!-- Header -->
+      <div class="slip-header" (click)="togglePanel.emit()">
+        <div class="slip-header-left">
+          <mat-icon>receipt_long</mat-icon>
+          <span>Bet Slip</span>
+          @if (selections().length > 0) {
+            <span class="slip-count">{{ selections().length }}</span>
+          }
+        </div>
+        <button class="slip-clear-btn" *ngIf="selections().length > 0" (click)="clearAllSelections.emit(); $event.stopPropagation()">
+          Clear all
+        </button>
+        <button class="slip-toggle-btn" *ngIf="open()" (click)="closePanel.emit(); $event.stopPropagation()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <!-- Empty State -->
+      @if (selections().length === 0) {
+        <div class="slip-empty">
+          <mat-icon>touch_app</mat-icon>
+          <p>Tap the <mat-icon>add_2</mat-icon> on odds to add selections</p>
+        </div>
+      } @else {
+        <!-- Selections List -->
+        <div class="slip-selections">
+          @for (sel of selections(); track sel.id; let i = $index) {
+            <div class="slip-selection">
+              <div class="sel-header">
+                <span class="sel-num">{{ i + 1 }}</span>
+                <span class="sel-teams">{{ sel.homeTeam }} vs {{ sel.awayTeam }}</span>
+                <button class="sel-remove" (click)="remove.emit(sel.id)">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+              <div class="sel-details">
+                <span class="sel-market">{{ sel.selection }}</span>
+                <span class="sel-odds">{{ sel.gainsMultiplier.toFixed(2) }}x</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Combined Odds -->
+        <div class="slip-combined">
+          <span>Combined Odds</span>
+          <span class="combined-value">{{ combinedMultiplier().toFixed(2) }}x</span>
+        </div>
+
+        <!-- Stake Input -->
+        <div class="slip-stake">
+          <div class="stake-input-row">
+            <span class="stake-label">Stake</span>
+            <div class="stake-input-wrap">
+              <span class="stake-currency">₦</span>
+              <input
+                type="number"
+                class="stake-input"
+                [(ngModel)]="stakeAmount"
+                (input)="validateStake()"
+                placeholder="Enter amount"
+                min="100"
+                max="5000" />
+            </div>
+          </div>
+          <div class="quick-picks">
+            @for (amt of quickAmounts(); track amt) {
+              <button class="quick-pick" [class.active]="stakeAmount() === amt" (click)="setAmount(amt)">
+                ₦{{ amt | number }}
+              </button>
+            }
+          </div>
+          <div class="stake-error" *ngIf="stakeError()">{{ stakeError() }}</div>
+        </div>
+
+        <!-- Payout Preview -->
+        <div class="slip-payout">
+          <div class="payout-row">
+            <span>Potential Payout</span>
+            <span class="payout-value">{{ formatCurrency(potentialPayout()) }}</span>
+          </div>
+          <div class="payout-row fee">
+            <span>Platform Fee (10%)</span>
+            <span>{{ formatCurrency(platformFee()) }}</span>
+          </div>
+          <div class="payout-row net">
+            <span>Net Payout</span>
+            <span class="net-value">{{ formatCurrency(netPayout()) }}</span>
+          </div>
+        </div>
+
+        <!-- Place Bet -->
+        <button class="place-bet-btn" [disabled]="!canPlace()" (click)="placeBet()">
+          @if (submitting()) {
+            <span>Placing...</span>
+          } @else {
+            <span>Place Bet</span>
+            <span class="btn-sub">₦{{ stakeAmount() | number }}</span>
+          }
+        </button>
+      }
+
+      <!-- Mobile overlay -->
+      @if (open()) {
+        <div class="slip-overlay" (click)="closePanel.emit()"></div>
+      }
+    </div>
+  

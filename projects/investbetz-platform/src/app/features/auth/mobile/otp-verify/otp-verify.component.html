@@ -1,0 +1,58 @@
+
+    <div class="mobile-root">
+      <div class="mobile-header">
+        <button class="back-btn" (click)="goBack()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <span class="header-logo">
+          <img src="img/logo/logo.png" alt="BetPool Logo" class="logo-image">
+          <span class="logo-bet">Bet</span><span class="logo-pool">Pool</span>
+        </span>
+        <div style="width:44px"></div>
+      </div>
+
+      <div class="mobile-content">
+        <h1 class="page-title">Verify OTP</h1>
+        <p class="page-subtitle">Enter the code sent to {{ store.phone() }}</p>
+
+        <div class="otp-container">
+          @for (idx of [0,1,2,3,4,5]; track idx) {
+            <input
+              class="otp-box"
+              type="tel"
+              maxlength="1"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              (input)="onInput($event, idx)"
+              (keydown)="onKeydown($event, idx)"
+              (focus)="onFocus($event)"
+              [value]="otpDigits[idx] || ''"
+            />
+          }
+        </div>
+
+        <div class="resend-row">
+          @if (store.resendCountdown() > 0) {
+            <span class="resend-timer">Resend in {{ store.resendCountdown() }}s</span>
+          } @else {
+            <button class="resend-btn" (click)="resendOtp()" [disabled]="store.loading()">Resend OTP</button>
+          }
+        </div>
+
+
+
+        @if (store.error()) {
+          <div class="error-msg">{{ store.error() }}</div>
+        }
+      </div>
+
+      <div class="mobile-bottom">
+        <button class="btn-primary" (click)="verifyOtp()" [disabled]="otpDigits.join('').length < 6 || store.loading()">
+          @if (store.loading()) { <span class="spinner"></span> }
+          Verify OTP
+        </button>
+      </div>
+    </div>
+  

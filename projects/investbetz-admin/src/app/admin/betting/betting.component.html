@@ -1,0 +1,506 @@
+<div class="page">
+      <div class="page-header">
+        <div class="header-left">
+          <h1>{{ store.listStatus() === 'all' ? 'All Pods' : store.listStatus() === 'active' ? 'Pods Ready for Betting' : 'Settled Pods' }}</h1>
+          <div class="stats-row">
+            <span class="stat"><strong>{{ store.total() }}</strong> pods</span>
+            <span class="stat-divider"></span>
+            <span class="stat booked-stat"><strong>{{ store.bookedCount() }}</strong> booked</span>
+            <span class="stat-divider"></span>
+            <span class="stat">₦{{ store.totalExposure() | number }} total exposure</span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button mat-stroked-button class="btn-batch" *ngIf="store.selectedIds().size > 0"
+            (click)="store.batchToggleBooked()"
+            [disabled]="store.batchProcessing()">
+            <mat-icon>sync_alt</mat-icon>
+            {{ store.selectedCount() }} selected — {{ store.allSelectedBooked() ? 'Mark Not Booked' : 'Mark Booked' }}
+          </button>
+          <button mat-stroked-button class="btn-settle-all" (click)="store.aiSettleAll()" [disabled]="store.settlingAll()">
+            <mat-icon>fact_check</mat-icon>
+            <span *ngIf="!store.settlingAll()">Settle All</span>
+            <span *ngIf="store.settlingAll()">Settling...</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-select" style="min-width:120px;">
+          <select [ngModel]="store.listStatus()" (ngModelChange)="store.listStatus.set($event); store.onFilterChange()" class="filter-dropdown">
+            <option value="all">All</option>
+            <option value="active">Ready</option>
+            <option value="settled">Settled</option>
+          </select>
+        </div>
+        <div class="filter-search">
+          <mat-icon class="search-icon">search</mat-icon>
+          <input type="text" class="search-input" placeholder="Search pods, teams, sports..."
+            [ngModel]="store.searchTerm()" (ngModelChange)="store.searchTerm.set($event); store.onSearchChange()" />
+          <button class="search-clear" *ngIf="store.searchTerm()" (click)="store.clearSearch()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="filter-select">
+          <select [ngModel]="store.sportFilter()" (ngModelChange)="store.sportFilter.set($event); store.onFilterChange()" class="filter-dropdown">
+            <option value="">All Sports</option>
+            @for (s of store.sports(); track s) {
+              <option [value]="s">{{ s }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-select">
+          <select [ngModel]="store.bookedFilter()" (ngModelChange)="store.bookedFilter.set($event); store.onFilterChange()" class="filter-dropdown">
+            <option value="">All Booking Status</option>
+            <option value="not_booked">Not Booked</option>
+            <option value="booked">Booked</option>
+          </select>
+        </div>
+        <div class="filter-select" style="width:90px;">
+          <select [ngModel]="store.limit()" (ngModelChange)="store.limit.set($event); store.onFilterChange()" class="filter-dropdown">
+            <option [value]="20">20/page</option>
+            <option [value]="50">50/page</option>
+            <option [value]="100">100/page</option>
+          </select>
+        </div>
+      </div>
+
+      <mat-card class="table-card">
+        <div class="loading-bar" *ngIf="store.loading()" style="height:3px;background:rgba(0,230,118,0.15);overflow:hidden;">
+          <div class="loading-bar-fill"></div>
+        </div>
+
+        <table mat-table [dataSource]="store.pods()" class="admin-table" multiTemplateDataRows>
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef class="col-select">
+              <input type="checkbox" [checked]="store.allSelected()" [indeterminate]="store.someSelected()"
+                (change)="store.toggleSelectAll($event)" class="row-checkbox" />
+            </th>
+            <td mat-cell *matCellDef="let p" class="col-select">
+              <input type="checkbox" [checked]="store.selectedIds().has(p._id || p.id)"
+                (change)="store.toggleSelect(p)" class="row-checkbox" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef class="col-sortable" (click)="store.toggleSort('title')">
+              Pod
+              <span class="sort-icon" *ngIf="store.sortBy() === 'title'">{{ store.sortOrder() === 'asc' ? '\\25B2' : '\\25BC' }}</span>
+            </th>
+            <td mat-cell *matCellDef="let p">
+              <div class="pod-title">{{ p.title }}</div>
+              <div class="pod-sport">{{ p.sport }}{{ p.league ? ' \u2014 ' + p.league : '' }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="selection">
+            <th mat-header-cell *matHeaderCellDef>Selection</th>
+            <td mat-cell *matCellDef="let p">
+              <span class="selection-value">{{ p.selection }}</span>
+              <span class="odds-value">{{ p.gainsMultiplier?.toFixed(2) }}x</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="scores">
+            <th mat-header-cell *matHeaderCellDef>Scores</th>
+            <td mat-cell *matCellDef="let p">
+              <span class="scores-value" *ngIf="p.homeScore != null && p.awayScore != null; else noScores">
+                {{ p.homeScore }} : {{ p.awayScore }}
+              </span>
+              <ng-template #noScores><span class="scores-na">—</span></ng-template>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="outcome">
+            <th mat-header-cell *matHeaderCellDef>Outcome</th>
+            <td mat-cell *matCellDef="let p">
+              <div class="outcome-cell">
+                <span class="match-teams-sm">{{ p.homeTeam }} vs {{ p.awayTeam }}</span>
+                <span class="result-chip" *ngIf="p.settlementStatus === 'settled' || p.status === 'settled'" [class.win]="p.result === 'win'" [class.loss]="p.result === 'loss'" [class.void]="p.result === 'void'">
+                  {{ p.result?.toUpperCase() }}
+                </span>
+                <span class="match-status-text pending" *ngIf="p.settlementStatus !== 'settled' && p.status !== 'settled'">
+                  {{ isPastGame(p) ? 'Awaiting Settlement' : getGameStatus(p) }}
+                </span>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="games">
+            <th mat-header-cell *matHeaderCellDef>Games</th>
+            <td mat-cell *matCellDef="let p">
+              <div class="games-list">
+                @if (p.legs && p.legs.length > 0) {
+                  <div class="game-item">
+                    <span class="game-teams">{{ p.legs[0].homeTeam }} vs {{ p.legs[0].awayTeam }}</span>
+                    <span class="game-date">{{ p.legs[0].matchDate | date:'MMM d, HH:mm' }}</span>
+                  </div>
+                  <div class="game-more" *ngIf="p.legs.length > 1"
+                    [matTooltip]="getLegsTooltip(p.legs)" matTooltipPosition="after">
+                    +{{ p.legs.length - 1 }} more
+                  </div>
+                } @else {
+                  <div class="game-item">
+                    <span class="game-teams">{{ p.homeTeam }} vs {{ p.awayTeam }}</span>
+                    <span class="game-date">{{ p.matchDate | date:'MMM d, HH:mm' }}</span>
+                  </div>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="stakes">
+            <th mat-header-cell *matHeaderCellDef class="col-sortable" (click)="store.toggleSort('currentExposure')">
+              Total Stakes
+              <span class="sort-icon" *ngIf="store.sortBy() === 'currentExposure'">{{ store.sortOrder() === 'asc' ? '\\25B2' : '\\25BC' }}</span>
+            </th>
+            <td mat-cell *matCellDef="let p">
+              <span class="stakes-value">\u20A6{{ p.currentExposure | number }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="participants">
+            <th mat-header-cell *matHeaderCellDef class="col-sortable" (click)="store.toggleSort('currentParticipants')">
+              Bettors
+              <span class="sort-icon" *ngIf="store.sortBy() === 'currentParticipants'">{{ store.sortOrder() === 'asc' ? '\\25B2' : '\\25BC' }}</span>
+            </th>
+            <td mat-cell *matCellDef="let p">
+              <span>{{ p.currentParticipants }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="gameStatus">
+            <th mat-header-cell *matHeaderCellDef>Game</th>
+            <td mat-cell *matCellDef="let p">
+              <span class="game-status-chip" [class.live]="p.isLive" [class.about-to-start]="isAboutToStart(p)" [class.upcoming]="isUpcoming(p)" [class.finished]="isPastGame(p) && (p.settlementStatus === 'settled' || p.status === 'settled')" [class.awaiting]="isPastGame(p) && p.settlementStatus !== 'settled' && p.status !== 'settled'" [class.unknown-status]="true">
+                {{ p.isLive ? 'LIVE' : isAboutToStart(p) ? 'Starting Soon' : isUpcoming(p) ? 'Upcoming' : isPastGame(p) && (p.settlementStatus === 'settled' || p.status === 'settled') ? 'Finished' : isPastGame(p) ? 'Awaiting Settlement' : '—' }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="booked">
+            <th mat-header-cell *matHeaderCellDef class="col-sortable" (click)="store.toggleSort('bookedExternally')">
+              <span class="booked-header">
+                <mat-icon>check_circle</mat-icon> Booked
+                <span class="sort-icon" *ngIf="store.sortBy() === 'bookedExternally'">{{ store.sortOrder() === 'asc' ? '\\25B2' : '\\25BC' }}</span>
+              </span>
+            </th>
+            <td mat-cell *matCellDef="let p">
+              <label class="toggle-switch" [class.toggling]="store.togglingIds().has(p._id || p.id)"
+                [matTooltip]="p.bookedExternally ? 'Click to mark as not booked' : 'Click to mark as booked with external bookies'"
+                matTooltipPosition="left">
+                <input type="checkbox" [checked]="!!p.bookedExternally"
+                  [disabled]="store.togglingIds().has(p._id || p.id)"
+                  (change)="store.toggleBooked(p)" />
+                <span class="toggle-slider">
+                  <span class="toggle-check"><mat-icon>check</mat-icon></span>
+                </span>
+              </label>
+              <span class="booked-time" *ngIf="p.bookedExternally && p.bookedAt">
+                {{ p.bookedAt | date:'MMM d, HH:mm' }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="stakeRange">
+            <th mat-header-cell *matHeaderCellDef>Stake Range</th>
+            <td mat-cell *matCellDef="let p">
+              <span>\u20A6{{ p.minStake | number }} \u2014 \u20A6{{ p.maxStake | number }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="stakeAction">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let p" class="col-actions">
+              <button mat-stroked-button class="btn-external" (click)="store.openExternalBetting(p)"
+                matTooltip="View pod details & place bet" matTooltipPosition="left">
+                <mat-icon>open_in_new</mat-icon> Place Bet
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="columns; sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns;"
+            [class.row-booked]="row.bookedExternally"
+            [class.row-selected]="store.selectedIds().has(row._id || row.id)"
+            (click)="store.openExternalBetting(row)"></tr>
+        </table>
+
+        <div class="paginator" *ngIf="store.totalPages() > 0">
+          <div class="paginator-left">
+            <span class="page-info">Showing {{ store.pods().length ? (store.page() - 1) * store.limit() + 1 : 0 }}–{{ Math.min(store.page() * store.limit(), store.total()) }} of {{ store.total() }}</span>
+          </div>
+          <div class="paginator-center">
+            <button mat-icon-button class="page-btn" [disabled]="store.page() <= 1" (click)="store.goTo(1)" matTooltip="First page">
+              <mat-icon>first_page</mat-icon>
+            </button>
+            <button mat-icon-button class="page-btn" [disabled]="store.page() <= 1" (click)="store.goTo(store.page() - 1)" matTooltip="Previous">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            @for (p of store.visiblePages(); track p) {
+              <button class="page-num" [class.active]="p === store.page()" (click)="store.goTo(p)">{{ p }}</button>
+            }
+            <button mat-icon-button class="page-btn" [disabled]="store.page() >= store.totalPages()" (click)="store.goTo(store.page() + 1)" matTooltip="Next">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+            <button mat-icon-button class="page-btn" [disabled]="store.page() >= store.totalPages()" (click)="store.goTo(store.totalPages())" matTooltip="Last page">
+              <mat-icon>last_page</mat-icon>
+            </button>
+          </div>
+          <div class="paginator-right">
+            <span class="jump-label">Go to</span>
+            <input type="number" class="jump-input" [ngModel]="store.jumpPage()" (ngModelChange)="store.jumpPage.set($event)" (keydown.enter)="store.jumpToPage()"
+              [min]="1" [max]="store.totalPages()" />
+          </div>
+        </div>
+
+        <div class="empty-state" *ngIf="!store.loading() && store.pods().length === 0">
+          <mat-icon class="empty-icon">sports_esports</mat-icon>
+          <p class="empty-title">No pods ready for betting</p>
+          <span class="empty-desc">All active pods are still accepting stakes or none match your filters</span>
+        </div>
+      </mat-card>
+
+      <div class="detail-panel" *ngIf="store.detailPod()">
+        <div class="detail-header">
+          <div class="detail-header-left">
+            <h3>{{ store.detailPod()!.title }}</h3>
+            <span class="chip" [style.background]="statusColor(store.detailPod()!.status)">{{ store.detailPod()!.status }}</span>
+            <span class="chip" style="background:#2196f3" *ngIf="store.detailPod()!.settlementStatus">{{ store.detailPod()!.settlementStatus }}</span>
+            <span class="detail-badge" [class.badge-booked]="store.detailPod()!.bookedExternally">
+              {{ store.detailPod()!.bookedExternally ? 'Booked' : 'Not Booked' }}
+            </span>
+          </div>
+          <button mat-icon-button (click)="store.closeDetailPanel()"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-item"><span class="d-label">Sport</span><span class="d-value">{{ store.detailPod()!.sport }}</span></div>
+          <div class="detail-item"><span class="d-label">League</span><span class="d-value">{{ store.detailPod()!.league || '\u2014' }}</span></div>
+          <div class="detail-item"><span class="d-label">Selection</span><span class="d-value" style="color:#00E676">{{ store.detailPod()!.selection }}</span></div>
+          <div class="detail-item"><span class="d-label">Odds</span><span class="d-value" style="color:#E8B923">{{ store.detailPod()!.gainsMultiplier.toFixed(2) }}x</span></div>
+          <div class="detail-item"><span class="d-label">Total Stakes</span><span class="d-value" style="color:#00E676">\u20A6{{ store.detailPod()!.currentExposure | number }}</span></div>
+          <div class="detail-item"><span class="d-label">Bettors</span><span class="d-value">{{ store.detailPod()!.currentParticipants }}</span></div>
+          <div class="detail-item"><span class="d-label">Stake Range</span><span class="d-value">\u20A6{{ store.detailPod()!.minStake | number }} \u2014 \u20A6{{ store.detailPod()!.maxStake | number }}</span></div>
+          <div class="detail-item"><span class="d-label">Staking Closed</span><span class="d-value">{{ store.detailPod()!.stakingClosesAt | date:'MMM d, y HH:mm' }}</span></div>
+          <div class="detail-item"><span class="d-label">Est. Settlement</span><span class="d-value">{{ store.detailPod()!.settlementEstimateLabel || (store.detailPod()!.settlementEstimateAt | date:'MMM d, y') }}</span></div>
+          <div class="detail-item" *ngIf="store.detailPod()!.bookedAt">
+            <span class="d-label">Booked At</span>
+            <span class="d-value" style="color:#00E676">{{ store.detailPod()!.bookedAt | date:'MMM d, y HH:mm' }}</span>
+          </div>
+        </div>
+        <div class="detail-section">
+          <h4>Games</h4>
+          @if (store.detailPod()!.legs && store.detailPod()!.legs.length > 0) {
+            @for (leg of store.detailPod()!.legs; track leg) {
+              <div class="game-row">
+                <span>{{ leg.homeTeam }} vs {{ leg.awayTeam }}</span>
+                <span>{{ leg.matchDate | date:'MMM d, y HH:mm' }}</span>
+                <span class="league-tag">{{ leg.league || store.detailPod()!.league }}</span>
+              </div>
+            }
+          } @else {
+            <div class="game-row">
+              <span>{{ store.detailPod()!.homeTeam }} vs {{ store.detailPod()!.awayTeam }}</span>
+              <span>{{ store.detailPod()!.matchDate | date:'MMM d, y HH:mm' }}</span>
+            </div>
+          }
+        </div>
+        <div class="detail-actions" *ngIf="canManage(store.detailPod()!)">
+          <button mat-stroked-button class="action-settle" *ngIf="store.detailPod()!.status === 'active' || store.detailPod()!.status === 'published'" (click)="store.startSettle()">
+            <mat-icon>check_circle</mat-icon> Settle
+          </button>
+          <button mat-stroked-button class="action-ai-settle" *ngIf="store.detailPod()!.status === 'active' || store.detailPod()!.status === 'published'" (click)="store.aiCheckSettle()" [disabled]="store.checkingSettle()">
+            <mat-icon>auto_awesome</mat-icon>
+            {{ store.checkingSettle() ? 'Checking...' : 'AI Settle' }}
+          </button>
+        </div>
+        <div class="ai-settle-panel" *ngIf="store.settleCheck()">
+          <div class="ai-settle-header">
+            <mat-icon style="color:#CE93D8">auto_awesome</mat-icon>
+            <span>Ora Settlement Check</span>
+            <button mat-icon-button (click)="store.dismissSettleCheck()"><mat-icon>close</mat-icon></button>
+          </div>
+          <div class="ai-settle-body">
+            <div class="ai-settle-result" *ngIf="store.settleCheck()!.matchFound">
+              <div class="score-row">{{ store.settleCheck()!.homeTeam }} <strong>{{ store.settleCheck()!.homeScore ?? '?' }}</strong> - <strong>{{ store.settleCheck()!.awayScore ?? '?' }}</strong> {{ store.settleCheck()!.awayTeam }}</div>
+              <div class="status-row">Status: <span class="match-status">{{ store.settleCheck()!.matchStatus }}</span></div>
+            </div>
+            <div class="ai-settle-result" *ngIf="!store.settleCheck()!.matchFound">
+              <div class="no-data">No match data from sports API</div>
+            </div>
+            <div class="verdict-row">
+              <span class="verdict-label">Ora recommends:</span>
+              <span class="verdict-value" [class.win]="store.settleCheck()!.recommendedResult === 'win'" [class.loss]="store.settleCheck()!.recommendedResult === 'loss'" [class.void]="store.settleCheck()!.recommendedResult === 'void'" [class.unknown]="store.settleCheck()!.recommendedResult === 'cannot_determine'">
+                {{ store.settleCheck()!.recommendedResult === 'cannot_determine' ? 'Cannot determine' : store.settleCheck()!.recommendedResult.toUpperCase() }}
+              </span>
+              <span class="verdict-confidence">({{ store.settleCheck()!.confidence }}% confidence)</span>
+            </div>
+            <div class="reasoning-row">{{ store.settleCheck()!.reasoning }}</div>
+            <div class="settle-actions" *ngIf="store.settleCheck()!.recommendedResult !== 'cannot_determine'">
+              <button mat-raised-button color="primary" (click)="store.confirmAiSettle(store.settleCheck()!.recommendedResult)">
+                Confirm {{ store.settleCheck()!.recommendedResult }}
+              </button>
+              <button mat-button (click)="store.dismissSettleCheck()">Dismiss</button>
+            </div>
+          </div>
+        </div>
+        <div class="settle-form" *ngIf="store.settleTarget()">
+          <h4>Settle Pod</h4>
+          <div class="settle-actions">
+            <button mat-raised-button color="primary" (click)="store.confirmSettle('win')">Win</button>
+            <button mat-raised-button class="btn-loss" (click)="store.confirmSettle('loss')">Loss</button>
+            <button mat-raised-button class="btn-void" (click)="store.confirmSettle('void')">Void</button>
+            <button mat-button (click)="store.cancelSettle()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settle-all-panel" *ngIf="store.settleAllResult()">
+        <div class="settle-all-header">
+          <mat-icon [style.color]="store.settleAllResult()!.errors.length === 0 ? '#00E676' : '#E8B923'">fact_check</mat-icon>
+          <span>AI Settle All: {{ store.settleAllResult()!.settled }} settled
+            <span *ngIf="store.settleAllResult()!.disputed > 0" class="disputed-badge">{{ store.settleAllResult()!.disputed }} disputed</span>
+            <span *ngIf="store.settleAllResult()!.stuck > 0" class="stuck-badge">{{ store.settleAllResult()!.stuck }} need review</span>
+          </span>
+          <button mat-icon-button (click)="store.settleAllResult.set(null)"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="settle-all-body">
+          <div class="settle-all-error" *ngFor="let e of store.settleAllResult()!.errors">{{ e }}</div>
+          <div class="settle-all-item" *ngFor="let r of store.settleAllResult()!.results.slice(0, 10)">
+            <div class="settle-item-info">
+              <span class="settle-item-teams">{{ r.homeTeam }} vs {{ r.awayTeam }}</span>
+              <span class="settle-item-reason" *ngIf="r.recommendedResult === 'cannot_determine' || r.disputed">{{ r.reasoning }}</span>
+              <span class="settle-item-scores" *ngIf="r.homeScore != null && r.awayScore != null">{{ r.homeScore }} : {{ r.awayScore }}</span>
+            </div>
+            <span class="settle-item-verdict" [class.win]="r.recommendedResult === 'win'" [class.loss]="r.recommendedResult === 'loss'" [class.disputed]="r.disputed" [class.stuck]="r.recommendedResult === 'cannot_determine' && !r.disputed" [class.unknown]="r.recommendedResult === 'cannot_determine'">
+              <span *ngIf="r.disputed">DISPUTED</span>
+              <span *ngIf="!r.disputed && r.recommendedResult === 'cannot_determine'">STUCK</span>
+              <span *ngIf="!r.disputed && r.recommendedResult !== 'cannot_determine'">{{ r.recommendedResult }}</span>
+            </span>
+          </div>
+          <div class="settle-more" *ngIf="store.settleAllResult()!.results.length > 10">+{{ store.settleAllResult()!.results.length - 10 }} more</div>
+          <div class="settle-all-actions">
+            <button mat-stroked-button class="btn-dispute-review" *ngIf="store.settleAllResult()!.disputed > 0" (click)="store.loadDisputed()">
+              <mat-icon>gavel</mat-icon> Review {{ store.settleAllResult()!.disputed }} Disputed
+            </button>
+            <button mat-stroked-button class="btn-stuck-review" *ngIf="store.settleAllResult()!.stuck > 0" (click)="store.loadStuck()">
+              <mat-icon>help_outline</mat-icon> Review {{ store.settleAllResult()!.stuck }} Stuck
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="disputed-panel" *ngIf="store.showDisputedPanel()">
+        <div class="disputed-header">
+          <mat-icon style="color:#E8B923">gavel</mat-icon>
+          <span>Disputed Settlements ({{ store.disputedPods().length }})</span>
+          <div class="disputed-header-actions">
+            <button mat-stroked-button class="btn-batch-resolve" *ngIf="store.selectedDisputedIds().size > 0" (click)="store.startBatchResolve()">
+              <mat-icon>done_all</mat-icon> Resolve {{ store.selectedDisputedIds().size }} Selected
+            </button>
+            <button mat-icon-button (click)="store.dismissDisputedPanel()"><mat-icon>close</mat-icon></button>
+          </div>
+        </div>
+        <div class="disputed-body">
+          <div class="disputed-empty" *ngIf="store.disputedPods().length === 0">No disputed settlements.</div>
+          <div class="disputed-item" *ngFor="let p of store.disputedPods()" [class.selected]="store.selectedDisputedIds().has(p._id || p.id)">
+            <div class="disputed-item-header">
+              <mat-checkbox class="disputed-checkbox" (change)="store.toggleDisputedSelection(p._id || p.id)" [checked]="store.selectedDisputedIds().has(p._id || p.id)"></mat-checkbox>
+              <span class="disputed-teams">{{ p.homeTeam }} vs {{ p.awayTeam }}</span>
+              <span class="disputed-selection">{{ p.selection }} ({{ p.gainsMultiplier }}x)</span>
+            </div>
+            <div class="disputed-reason">{{ p.settlementDisputedReason || 'No reason provided' }}</div>
+            <div class="disputed-actions">
+              <button mat-stroked-button class="btn-resolve" (click)="store.startResolveDispute(p)">Resolve</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stuck-panel" *ngIf="store.showStuckPanel()">
+        <div class="stuck-header">
+          <mat-icon style="color:#90CAF9">help_outline</mat-icon>
+          <span>Needs Review — Stuck ({{ store.stuckPods().length }})</span>
+          <button mat-icon-button (click)="store.dismissStuckPanel()"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="stuck-body">
+          <div class="stuck-empty" *ngIf="store.stuckPods().length === 0">All pods have linked fixtures.</div>
+          <div class="stuck-item" *ngFor="let p of store.stuckPods()">
+            <div class="stuck-item-header">
+              <span class="stuck-teams">{{ p.homeTeam }} vs {{ p.awayTeam }}</span>
+              <span class="stuck-selection">{{ p.selection }} ({{ p.gainsMultiplier }}x)</span>
+            </div>
+            <div class="stuck-reason">{{ p.settlementStuckReason || 'No linked fixture — cannot auto-settle.' }} Settle manually using the pod detail panel.</div>
+            <div class="stuck-actions">
+              <button mat-stroked-button class="btn-settle-manual" (click)="store.selectPodAndSettle(p)">Manual Settle</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="resolve-modal" *ngIf="store.resolveTarget()">
+        <div class="resolve-overlay" (click)="store.cancelResolveDispute()"></div>
+        <div class="resolve-card">
+          <div class="resolve-header">
+            <h3>Resolve Dispute</h3>
+            <button mat-icon-button (click)="store.cancelResolveDispute()"><mat-icon>close</mat-icon></button>
+          </div>
+          <div class="resolve-body">
+            <p class="resolve-pod-title">{{ store.resolveTarget()!.pod.homeTeam }} vs {{ store.resolveTarget()!.pod.awayTeam }}</p>
+            <p class="resolve-dispute-reason">{{ store.resolveTarget()!.pod.settlementDisputedReason }}</p>
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Override Result</mat-label>
+              <mat-select [ngModel]="store.resolveTarget()?.result" (ngModelChange)="store.setResolveResult($event)" required>
+                <mat-option value="win">Win</mat-option>
+                <mat-option value="loss">Loss</mat-option>
+                <mat-option value="void">Void</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Review Note (required)</mat-label>
+              <textarea matInput [ngModel]="store.resolveTarget()?.note" (ngModelChange)="store.setResolveNote($event)" rows="3" required placeholder="Explain why this override was made..."></textarea>
+            </mat-form-field>
+            <div class="resolve-actions">
+              <button mat-button (click)="store.cancelResolveDispute()">Cancel</button>
+              <button mat-raised-button color="primary" (click)="store.confirmResolveDispute()"
+                [disabled]="!store.resolveTarget()?.result || !store.resolveTarget()?.note?.trim()">
+                Confirm Override
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="resolve-modal" *ngIf="store.batchResolveTarget()">
+        <div class="resolve-overlay" (click)="store.cancelBatchResolve()"></div>
+        <div class="resolve-card">
+          <div class="resolve-header">
+            <h3>Batch Resolve ({{ store.batchResolveTarget()!.podIds.length }} pods)</h3>
+            <button mat-icon-button (click)="store.cancelBatchResolve()"><mat-icon>close</mat-icon></button>
+          </div>
+          <div class="resolve-body">
+            <p class="resolve-info">Apply the same result and note to all {{ store.batchResolveTarget()!.podIds.length }} selected disputed pods.</p>
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Override Result</mat-label>
+              <mat-select [ngModel]="store.batchResolveTarget()?.result" (ngModelChange)="store.setBatchResolveResult($event)" required>
+                <mat-option value="win">Win</mat-option>
+                <mat-option value="loss">Loss</mat-option>
+                <mat-option value="void">Void</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Review Note (required)</mat-label>
+              <textarea matInput [ngModel]="store.batchResolveTarget()?.note" (ngModelChange)="store.setBatchResolveNote($event)" rows="3" required placeholder="Explain why this override was made..."></textarea>
+            </mat-form-field>
+            <div class="resolve-actions">
+              <button mat-button (click)="store.cancelBatchResolve()">Cancel</button>
+              <button mat-raised-button color="primary" (click)="store.confirmBatchResolve()"
+                [disabled]="!store.batchResolveTarget()?.result || !store.batchResolveTarget()?.note?.trim()">
+                Batch Resolve {{ store.batchResolveTarget()!.podIds.length }} Pods
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  

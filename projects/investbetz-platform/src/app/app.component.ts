@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
-import { AuthService } from './core/services/auth.service';
+import { AuthService } from './core/services';
 import { RouteLoaderComponent } from './shared/services-module/loader/route-loader.component';
 
 @Component({

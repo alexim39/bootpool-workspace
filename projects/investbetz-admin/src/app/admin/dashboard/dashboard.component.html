@@ -1,0 +1,382 @@
+<div class="dashboard">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+      </div>
+
+      <div class="stat-cards">
+        <div class="stat-card" *ngFor="let stat of store.statCards()">
+          <div class="stat-icon" [style.background]="stat.iconBg">
+            <mat-icon>{{ stat.icon }}</mat-icon>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stat.value | number }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>Daily Volume (7 days)</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="bar-chart">
+              <div class="bar-item" *ngFor="let d of store.dailyVolume()">
+                <div class="bar-label">{{ d.date | slice:5:10 }}</div>
+                <div class="bar-track">
+                  <div class="bar-fill" [style.height.%]="barHeight(d.volume)"></div>
+                </div>
+                <div class="bar-value">{{ d.volume | number }}</div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>Pod Status Breakdown</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="status-list">
+              <div class="status-item" *ngFor="let s of store.podStatusBreakdown()">
+                <div class="status-label">
+                  <span class="status-dot" [style.background]="statusColor(s.status)"></span>
+                  <span>{{ s.status }}</span>
+                </div>
+                <div class="status-bar-track">
+                  <div class="status-bar-fill" [style.width.%]="statusPercent(s.count)" [style.background]="statusColor(s.status)"></div>
+                </div>
+                <span class="status-count">{{ s.count }}</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <div class="charts-row">
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>Recent Stakes</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <table mat-table [dataSource]="store.recentStakes()" class="admin-table">
+              <ng-container matColumnDef="user">
+                <th mat-header-cell *matHeaderCellDef>User</th>
+                <td mat-cell *matCellDef="let s">{{ s.user?.fullName || s.user?.phone || 'N/A' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="pod">
+                <th mat-header-cell *matHeaderCellDef>Pod</th>
+                <td mat-cell *matCellDef="let s">{{ s.podId?.title || 'N/A' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="amount">
+                <th mat-header-cell *matHeaderCellDef>Amount</th>
+                <td mat-cell *matCellDef="let s">\u20A6{{ s.stakeAmount | number }}</td>
+              </ng-container>
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let s">
+                  <span class="chip" [style.background]="stakeStatusColor(s.status)">{{ s.status }}</span>
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="store.stakeColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: store.stakeColumns;"></tr>
+            </table>
+            <div class="empty-state" *ngIf="store.recentStakes().length === 0">No recent stakes</div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <div class="forecast-row" *ngIf="store.forecast()">
+        <mat-card class="forecast-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon style="vertical-align:middle;margin-right:6px;color:#CE93D8">trending_up</mat-icon>
+              Ora Financial Forecast
+              <span class="forecast-badge" [style.background]="store.forecast()!.revenue.changePercent >= 0 ? 'rgba(0,230,118,0.2)' : 'rgba(244,67,54,0.2)'"
+                    [style.color]="store.forecast()!.revenue.changePercent >= 0 ? '#00E676' : '#f44336'">
+                Next {{ store.forecast()!.days }} days
+              </span>
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="forecast-summary">{{ store.forecast()!.summary }}</div>
+            <div class="forecast-grid">
+              <div class="forecast-item">
+                <span class="f-label">Revenue</span>
+                <span class="f-current">\u20A6{{ store.forecast()!.revenue.current | number }}</span>
+                <span class="f-arrow" [style.color]="store.forecast()!.revenue.changePercent >= 0 ? '#00E676' : '#f44336'">
+                  {{ store.forecast()!.revenue.changePercent >= 0 ? '↑' : '↓' }} {{ Math.abs(store.forecast()!.revenue.changePercent) }}%
+                </span>
+                <span class="f-next">→ \u20A6{{ store.forecast()!.revenue.projectedNext | number }}</span>
+                <span class="f-confidence" [style.color]="store.forecast()!.revenue.confidence === 'high' ? '#00E676' : store.forecast()!.revenue.confidence === 'medium' ? '#E8B923' : '#f44336'">
+                  {{ store.forecast()!.revenue.confidence }}
+                </span>
+              </div>
+              <div class="forecast-item">
+                <span class="f-label">Stakes</span>
+                <span class="f-current">{{ store.forecast()!.stakes.current | number }}</span>
+                <span class="f-arrow" [style.color]="store.forecast()!.stakes.changePercent >= 0 ? '#00E676' : '#f44336'">
+                  {{ store.forecast()!.stakes.changePercent >= 0 ? '↑' : '↓' }} {{ Math.abs(store.forecast()!.stakes.changePercent) }}%
+                </span>
+                <span class="f-next">→ {{ store.forecast()!.stakes.projectedNext | number }}</span>
+                <span class="f-confidence" [style.color]="store.forecast()!.stakes.confidence === 'high' ? '#00E676' : store.forecast()!.stakes.confidence === 'medium' ? '#E8B923' : '#f44336'">
+                  {{ store.forecast()!.stakes.confidence }}
+                </span>
+              </div>
+              <div class="forecast-item">
+                <span class="f-label">New Users</span>
+                <span class="f-current">{{ store.forecast()!.newUsers.current | number }}</span>
+                <span class="f-arrow" [style.color]="store.forecast()!.newUsers.changePercent >= 0 ? '#00E676' : '#f44336'">
+                  {{ store.forecast()!.newUsers.changePercent >= 0 ? '↑' : '↓' }} {{ Math.abs(store.forecast()!.newUsers.changePercent) }}%
+                </span>
+                <span class="f-next">→ {{ store.forecast()!.newUsers.projectedNext | number }}</span>
+                <span class="f-confidence" [style.color]="store.forecast()!.newUsers.confidence === 'high' ? '#00E676' : store.forecast()!.newUsers.confidence === 'medium' ? '#E8B923' : '#f44336'">
+                  {{ store.forecast()!.newUsers.confidence }}
+                </span>
+              </div>
+              <div class="forecast-item">
+                <span class="f-label">Net Profit</span>
+                <span class="f-current" [style.color]="store.forecast()!.netProfit.current >= 0 ? '#00E676' : '#f44336'">\u20A6{{ store.forecast()!.netProfit.current | number }}</span>
+                <span class="f-arrow" [style.color]="store.forecast()!.netProfit.changePercent >= 0 ? '#00E676' : '#f44336'">
+                  {{ store.forecast()!.netProfit.changePercent >= 0 ? '↑' : '↓' }} {{ Math.abs(store.forecast()!.netProfit.changePercent) }}%
+                </span>
+                <span class="f-next">→ \u20A6{{ store.forecast()!.netProfit.projectedNext | number }}</span>
+                <span class="f-confidence" [style.color]="store.forecast()!.netProfit.confidence === 'high' ? '#00E676' : store.forecast()!.netProfit.confidence === 'medium' ? '#E8B923' : '#f44336'">
+                  {{ store.forecast()!.netProfit.confidence }}
+                </span>
+              </div>
+            </div>
+            <div class="forecast-footer">
+              <a routerLink="/admin/bi-reports" class="forecast-link">View Full BI Reports →</a>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <mat-card class="t4-card" *ngIf="store.t4Advisory()">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon style="vertical-align:middle;margin-right:6px;color:#CE93D8">monitor_heart</mat-icon>
+            T4 Financial Health Advisory
+          </mat-card-title>
+          <div class="t4-header-actions">
+            <button mat-stroked-button class="btn-refresh-risk" (click)="store.loadT4Advisory()">
+              <mat-icon>refresh</mat-icon> Refresh
+            </button>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="t4-score-row">
+            <div class="t4-gauge">
+              <div class="t4-gauge-value" [style.color]="t4ScoreColor(store.t4Advisory()!.healthLabel)">{{ store.t4Advisory()!.healthScore }}%</div>
+              <div class="t4-gauge-label">Health Score</div>
+              <div class="t4-gauge-bar">
+                <div class="t4-gauge-fill" [style.width.%]="store.t4Advisory()!.healthScore" [style.background]="t4ScoreColor(store.t4Advisory()!.healthLabel)"></div>
+              </div>
+              <div class="t4-gauge-level" [style.color]="t4ScoreColor(store.t4Advisory()!.healthLabel)">
+                {{ store.t4Advisory()!.healthLabel === 'needs_attention' ? 'NEEDS ATTENTION' : store.t4Advisory()!.healthLabel.toUpperCase() }}
+              </div>
+              <div class="t4-change" [style.color]="store.t4Advisory()!.healthChange === 'improving' ? '#00E676' : store.t4Advisory()!.healthChange === 'deteriorating' ? '#f44336' : '#E8B923'">
+                {{ store.t4Advisory()!.healthChange === 'improving' ? '↑ Improving' : store.t4Advisory()!.healthChange === 'deteriorating' ? '↓ Deteriorating' : '→ Stable' }}
+              </div>
+            </div>
+            <div class="t4-metrics">
+              <div class="t4-metric" *ngFor="let m of store.t4MetricList()">
+                <span class="t4-metric-label">{{ m.label }}</span>
+                <span class="t4-metric-value" [style.color]="m.status === 'good' ? '#00E676' : m.status === 'warning' ? '#E8B923' : '#f44336'">
+                  {{ m.display }}
+                </span>
+                <span class="t4-metric-dot" [style.background]="m.status === 'good' ? '#00E676' : m.status === 'warning' ? '#E8B923' : '#f44336'"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="t4-warnings" *ngIf="store.t4Advisory()!.warnings.length">
+            <div class="t4-section-title">Warnings</div>
+            <div class="t4-warning" *ngFor="let w of store.t4Advisory()!.warnings">
+              <mat-icon style="font-size:14px;color:#E8B923">warning_amber</mat-icon>
+              <span>{{ w }}</span>
+            </div>
+          </div>
+          <div class="t4-recommendations" *ngIf="store.t4Advisory()!.recommendations.length">
+            <div class="t4-section-title">Recommendations</div>
+            <div class="t4-rec" *ngFor="let r of store.t4Advisory()!.recommendations">
+              <mat-icon style="font-size:14px;color:#CE93D8">auto_awesome</mat-icon>
+              <span>{{ r }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="risk-card" *ngIf="store.riskReport()">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon style="vertical-align:middle;margin-right:6px;color:#CE93D8">shield</mat-icon>
+            Ora Risk Dashboard
+          </mat-card-title>
+          <div class="risk-header-actions">
+            <button mat-stroked-button class="btn-refresh-risk" (click)="store.loadRiskReport()">
+              <mat-icon>refresh</mat-icon> Refresh
+            </button>
+            <button mat-stroked-button class="btn-auto-cap" (click)="store.applyCaps()" [disabled]="store.capping()">
+              <mat-icon>auto_awesome</mat-icon>
+              {{ store.capping() ? 'Applying...' : 'Apply Auto-Caps' }}
+            </button>
+            <button mat-stroked-button class="btn-restore-caps" (click)="store.restoreCaps()" [disabled]="store.restoring()">
+              <mat-icon>restart_alt</mat-icon>
+              {{ store.restoring() ? 'Restoring...' : 'Restore Caps' }}
+            </button>
+            <button mat-stroked-button class="btn-run-escalation" (click)="store.runEscalation()" [disabled]="store.escalating()">
+              <mat-icon>play_arrow</mat-icon>
+              {{ store.escalating() ? 'Running...' : 'Run Escalation Check' }}
+            </button>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="risk-meter-row">
+            <div class="risk-gauge">
+              <div class="gauge-value" [style.color]="riskColor(store.riskReport()!.riskLevel)">{{ store.riskReport()!.riskRatioPercent }}%</div>
+              <div class="gauge-label">Risk Ratio</div>
+              <div class="gauge-bar">
+                <div class="gauge-fill" [style.width.%]="Math.min(store.riskReport()!.riskRatioPercent, 100)" [style.background]="riskColor(store.riskReport()!.riskLevel)"></div>
+              </div>
+              <div class="gauge-level" [style.color]="riskColor(store.riskReport()!.riskLevel)">
+                {{ store.riskReport()!.riskLevel === 'high' ? 'HIGH RISK' : store.riskReport()!.riskLevel === 'medium' ? 'MEDIUM RISK' : 'LOW RISK' }}
+              </div>
+            </div>
+            <div class="risk-metrics">
+              <div class="metric"><span class="metric-label">Total Reserves</span><span class="metric-value">\u20A6{{ store.riskReport()!.totalReserves | number }}</span></div>
+              <div class="metric"><span class="metric-label">Total Exposure</span><span class="metric-value">\u20A6{{ store.riskReport()!.totalExposure | number }}</span></div>
+              <div class="metric"><span class="metric-label">Potential Payout</span><span class="metric-value">\u20A6{{ store.riskReport()!.totalPotentialPayout | number }}</span></div>
+              <div class="metric"><span class="metric-label">Active Pods</span><span class="metric-value">{{ store.riskReport()!.activePodsCount }}</span></div>
+              <div class="metric"><span class="metric-label">Active Users</span><span class="metric-value">{{ store.riskReport()!.activeUsersCount }}</span></div>
+              <div class="metric"><span class="metric-label">Auto-Cap</span><span class="metric-value" [style.color]="store.riskReport()!.autoCapActive ? '#E8B923' : '#00E676'">{{ store.riskReport()!.autoCapActive ? 'ACTIVE' : 'Inactive' }}</span></div>
+            </div>
+          </div>
+
+          <div class="reserve-section" *ngIf="store.riskReport()!.reserveProjection">
+            <div class="risk-section-title">Reserve Projection</div>
+            <div class="reserve-grid">
+              <div class="reserve-item">
+                <span class="reserve-label">Net Available Reserves</span>
+                <span class="reserve-value">\u20A6{{ store.riskReport()!.reserveProjection.netAvailableReserves | number }}</span>
+              </div>
+              <div class="reserve-item">
+                <span class="reserve-label">Projected Reserve Needed</span>
+                <span class="reserve-value">\u20A6{{ store.riskReport()!.reserveProjection.projectedReserveNeeded | number }}</span>
+              </div>
+              <div class="reserve-item">
+                <span class="reserve-label">Reserve Deficit</span>
+                <span class="reserve-value" [style.color]="store.riskReport()!.reserveProjection.reserveDeficit > 0 ? '#f44336' : '#00E676'">
+                  {{ store.riskReport()!.reserveProjection.reserveDeficit > 0 ? '\u20A6' + (store.riskReport()!.reserveProjection.reserveDeficit | number) : 'None' }}
+                </span>
+              </div>
+              <div class="reserve-item">
+                <span class="reserve-label">Coverage Ratio</span>
+                <span class="reserve-value" [style.color]="store.riskReport()!.reserveProjection.reserveDeficitPercent > 20 ? '#f44336' : '#00E676'">
+                  {{ 100 - store.riskReport()!.reserveProjection.reserveDeficitPercent }}%
+                </span>
+              </div>
+              <div class="reserve-item">
+                <span class="reserve-label">Suggested Top-Up</span>
+                <span class="reserve-value" *ngIf="store.riskReport()!.reserveProjection.suggestedTopUp > 0">\u20A6{{ store.riskReport()!.reserveProjection.suggestedTopUp | number }}</span>
+                <span class="reserve-value" *ngIf="store.riskReport()!.reserveProjection.suggestedTopUp === 0" style="color:#00E676">None needed</span>
+              </div>
+              <div class="reserve-item">
+                <span class="reserve-label">Historical Win Rate</span>
+                <span class="reserve-value">{{ store.riskReport()!.reserveProjection.historicalWinRate }}%</span>
+              </div>
+              <div class="reserve-item">
+                <span class="reserve-label">Trend</span>
+                <span class="reserve-value" [style.color]="store.riskReport()!.reserveProjection.recentTrend === 'deteriorating' ? '#f44336' : store.riskReport()!.reserveProjection.recentTrend === 'improving' ? '#00E676' : '#E8B923'">
+                  {{ store.riskReport()!.reserveProjection.recentTrend }}
+                </span>
+              </div>
+            </div>
+            <div class="reserve-trend-note" *ngIf="store.riskReport()!.reserveProjection.trendDescription">
+              {{ store.riskReport()!.reserveProjection.trendDescription }}
+            </div>
+          </div>
+
+          <div class="escalation-section" *ngIf="store.riskReport()!.escalation">
+            <div class="risk-section-title">Auto-Escalation State</div>
+            <div class="escalation-grid">
+              <div class="escalation-item">
+                <span class="escalation-label">Level</span>
+                <span class="escalation-badge" [style.background]="store.riskReport()!.escalation.escalationLevel === 'critical' ? 'rgba(244,67,54,0.2)' : store.riskReport()!.escalation.escalationLevel === 'warning' ? 'rgba(232,185,35,0.2)' : store.riskReport()!.escalation.escalationLevel === 'caution' ? 'rgba(255,152,0,0.2)' : 'rgba(0,230,118,0.2)'"
+                      [style.color]="store.riskReport()!.escalation.escalationLevel === 'critical' ? '#f44336' : store.riskReport()!.escalation.escalationLevel === 'warning' ? '#E8B923' : store.riskReport()!.escalation.escalationLevel === 'caution' ? '#FF9800' : '#00E676'">
+                  {{ store.riskReport()!.escalation.escalationLevel }}
+                </span>
+              </div>
+              <div class="escalation-item">
+                <span class="escalation-label">Creation Frozen</span>
+                <span class="escalation-value" [style.color]="store.riskReport()!.escalation.creationFrozen ? '#f44336' : '#00E676'">
+                  {{ store.riskReport()!.escalation.creationFrozen ? 'YES' : 'No' }}
+                </span>
+              </div>
+              <div class="escalation-item">
+                <span class="escalation-label">Pods Suspended</span>
+                <span class="escalation-value" [style.color]="store.riskReport()!.escalation.podsSuspended > 0 ? '#f44336' : '#00E676'">{{ store.riskReport()!.escalation.podsSuspended }}</span>
+              </div>
+              <div class="escalation-item">
+                <span class="escalation-label">Auto-Caps Applied</span>
+                <span class="escalation-value">{{ store.riskReport()!.escalation.autoCapAppliedCount }}</span>
+              </div>
+              <div class="escalation-item" *ngIf="store.riskReport()!.escalation.frozenAt">
+                <span class="escalation-label">Frozen At</span>
+                <span class="escalation-value">{{ store.riskReport()!.escalation.frozenAt | date:'medium' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="risk-warnings" *ngIf="store.riskReport()!.warnings.length">
+            <div class="risk-section-title">Warnings</div>
+            <div class="risk-warning" *ngFor="let w of store.riskReport()!.warnings">
+              <mat-icon style="font-size:14px;color:#E8B923">warning_amber</mat-icon>
+              <span>{{ w }}</span>
+            </div>
+          </div>
+          <div class="risk-recommendations" *ngIf="store.riskReport()!.recommendations.length">
+            <div class="risk-section-title">Recommendations</div>
+            <div class="risk-rec" *ngFor="let r of store.riskReport()!.recommendations">
+              <mat-icon style="font-size:14px;color:#CE93D8">auto_awesome</mat-icon>
+              <span>{{ r }}</span>
+            </div>
+          </div>
+          <div class="risk-pods" *ngIf="store.riskReport()!.podsAtRisk.length">
+            <div class="risk-section-title">Pod Risk Breakdown</div>
+            <table mat-table [dataSource]="store.riskReport()!.podsAtRisk" class="admin-table risk-table">
+              <ng-container matColumnDef="title">
+                <th mat-header-cell *matHeaderCellDef>Title</th>
+                <td mat-cell *matCellDef="let p">
+                  {{ p.title }}
+                  <span class="suspend-badge" *ngIf="p.riskSuspended" style="background:rgba(244,67,54,0.2);color:#f44336;font-size:10px;font-weight:700;padding:0 6px;border-radius:4px;margin-left:6px;">SUSPENDED</span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="exposure">
+                <th mat-header-cell *matHeaderCellDef>Exposure</th>
+                <td mat-cell *matCellDef="let p">\u20A6{{ p.currentExposure | number }} / \u20A6{{ p.maxTotalExposure | number }}</td>
+              </ng-container>
+              <ng-container matColumnDef="risk">
+                <th mat-header-cell *matHeaderCellDef>Risk</th>
+                <td mat-cell *matCellDef="let p">
+                  <span class="risk-badge" [style.background]="p.exposurePercent >= 80 ? 'rgba(244,67,54,0.2)' : p.exposurePercent >= 50 ? 'rgba(232,185,35,0.2)' : 'rgba(0,230,118,0.2)'"
+                        [style.color]="p.exposurePercent >= 80 ? '#f44336' : p.exposurePercent >= 50 ? '#E8B923' : '#00E676'">
+                    {{ p.exposurePercent }}%
+                  </span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="payout">
+                <th mat-header-cell *matHeaderCellDef>Pot. Payout</th>
+                <td mat-cell *matCellDef="let p">\u20A6{{ p.potentialPayout | number }}</td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="store.riskColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: store.riskColumns;"></tr>
+            </table>
+            <div class="empty-state" *ngIf="store.riskReport()!.podsAtRisk.length === 0">No active pods</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  

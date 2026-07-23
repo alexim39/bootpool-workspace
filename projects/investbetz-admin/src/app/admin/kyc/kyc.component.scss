@@ -1,0 +1,59 @@
+
+    .page { max-width: 1400px; }
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { color: #fff; font-size: 24px; font-weight: 600; margin: 0; }
+    .filter-card { background: #0D1A30; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; padding: 8px 16px; }
+    .filters { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .search-field { flex: 1; min-width: 200px; }
+    .filter-field { width: 200px; }
+    .table-card { background: #0D1A30; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); position: relative; }
+    .admin-table { width: 100%; }
+    ::ng-deep .admin-table .mat-mdc-header-cell { color: rgba(255,255,255,0.5) !important; font-size: 12px !important; font-weight: 600 !important; text-transform: uppercase !important; border-bottom-color: rgba(255,255,255,0.08) !important; }
+    ::ng-deep .admin-table .mat-mdc-cell { color: rgba(255,255,255,0.8) !important; font-size: 13px !important; border-bottom-color: rgba(255,255,255,0.05) !important; }
+    ::ng-deep .mat-mdc-paginator { background: transparent !important; color: rgba(255,255,255,0.7) !important; border-top: 1px solid rgba(255,255,255,0.06); }
+    ::ng-deep .mat-mdc-paginator .mat-mdc-paginator-navigation-button { color: rgba(255,255,255,0.6) !important; }
+    ::ng-deep .mat-mdc-paginator .mat-mdc-select-value-text { color: rgba(255,255,255,0.7) !important; }
+    .chip { padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; color: #fff; text-transform: capitalize; }
+    .empty-state { padding: 32px; text-align: center; color: rgba(255,255,255,0.3); font-size: 14px; }
+    .loading-shim { position: absolute; inset: 0; background: rgba(10,20,40,0.6); z-index: 10; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
+    .spinner { width: 32px; height: 32px; border: 3px solid rgba(0,230,118,0.2); border-top-color: #00E676; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+    .modal-content { background: #0D1A30; border-radius: 12px; width: 100%; max-width: 560px; border: 1px solid rgba(255,255,255,0.08); max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .modal-header h2 { color: #fff; font-size: 18px; font-weight: 600; margin: 0; }
+    .modal-header button { color: rgba(255,255,255,0.5); }
+    .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .info-item { display: flex; flex-direction: column; gap: 2px; }
+    .info-item .label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; font-weight: 600; }
+    .info-item .value { font-size: 14px; color: #fff; font-weight: 500; }
+    .review-notes { padding: 12px; background: rgba(244,67,54,0.1); border-radius: 8px; }
+    .review-notes h4 { color: #f44336; font-size: 13px; margin: 0 0 4px; }
+    .review-notes p { color: rgba(255,255,255,0.7); font-size: 13px; margin: 0; }
+    .action-buttons { display: flex; gap: 8px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .action-verify { background: #00E676 !important; color: #0A1428 !important; font-weight: 600; }
+    .action-reject { color: #f44336 !important; border-color: #f44336 !important; }
+    .reject-section { padding: 12px; background: rgba(244,67,54,0.05); border-radius: 8px; display: flex; flex-direction: column; gap: 8px; }
+    .full-width { width: 100%; }
+    .reject-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .action-ai-review { color: #CE93D8 !important; border-color: #CE93D8 !important; }
+    .ai-review-panel { background: rgba(206,147,216,0.08); border: 1px solid rgba(206,147,216,0.2); border-radius: 8px; overflow: hidden; }
+    .ai-review-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #fff; font-size: 13px; font-weight: 500; }
+    .ai-review-header button { margin-left: auto; color: rgba(255,255,255,0.4); }
+    .ai-review-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+    .ai-review-verdict { display: flex; align-items: center; gap: 8px; }
+    .verdict-badge { font-size: 12px; font-weight: 700; padding: 3px 12px; border-radius: 4px; }
+    .verdict-badge.approve { background: rgba(0,230,118,0.15); color: #00E676; }
+    .verdict-badge.reject { background: rgba(244,67,54,0.15); color: #f44336; }
+    .verdict-badge.manual { background: rgba(255,152,0,0.15); color: #FF9800; }
+    .verdict-confidence { color: rgba(255,255,255,0.4); font-size: 11px; }
+    .ai-review-reasoning { color: rgba(255,255,255,0.7); font-size: 12px; line-height: 1.4; }
+    .risk-flags { display: flex; flex-direction: column; gap: 4px; }
+    .risk-flag { display: flex; align-items: center; gap: 6px; color: #E8B923; font-size: 12px; }
+    .ai-review-details { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; }
+    .detail-row { display: flex; flex-direction: column; gap: 1px; }
+    .detail-label { font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; font-weight: 600; }
+    .detail-value { font-size: 13px; color: #fff; }
+    .ai-review-actions { display: flex; gap: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); }
+  

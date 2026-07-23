@@ -1,0 +1,43 @@
+
+    <div class="mobile-root">
+      <div class="mobile-header">
+        <button class="back-btn" (click)="goBack()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <span class="header-logo"><span class="logo-bet">Bet</span><span class="logo-pool">Pool</span></span>
+        <div style="width:44px"></div>
+      </div>
+
+      <div class="mobile-content">
+        <h1 class="page-title">Set Up PIN</h1>
+        <p class="page-subtitle">Create a 4-digit PIN to secure your account</p>
+
+        <div class="field">
+          <label class="field-label">Create PIN</label>
+          <input class="field-input" type="password" [(ngModel)]="pin" placeholder="Create 4-digit PIN" maxlength="4" inputmode="numeric" />
+        </div>
+
+        <div class="field">
+          <label class="field-label">Confirm PIN</label>
+          <input class="field-input" type="password" [(ngModel)]="confirmPin" placeholder="Re-enter your PIN" maxlength="4" inputmode="numeric" />
+        </div>
+
+        @if (pinMismatch) {
+          <div class="error-msg">PINs do not match</div>
+        }
+
+        @if (store.error()) {
+          <div class="error-msg">{{ store.error() }}</div>
+        }
+      </div>
+
+      <div class="mobile-bottom">
+        <button class="btn-primary" (click)="submitPin()" [disabled]="!canSubmit || store.loading()">
+          @if (store.loading()) { <span class="spinner"></span> }
+          Complete Setup
+        </button>
+      </div>
+    </div>
+  

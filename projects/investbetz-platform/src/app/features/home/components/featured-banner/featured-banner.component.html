@@ -1,0 +1,52 @@
+
+    <div class="banner-root" *ngIf="banners().length > 0">
+      <div class="carousel-track" #track [style.transform]="'translateX(-' + currentIndex() * 100 + '%)'">
+        <a
+          *ngFor="let banner of banners(); trackBy: trackById"
+          [routerLink]="banner.ctaLink"
+          class="featured-card"
+          [style.--grad-start]="banner.gradientStart"
+          [style.--grad-end]="banner.gradientEnd"
+          (touchstart)="onTouchStart($event)"
+          (touchmove)="onTouchMove($event)"
+          (touchend)="onTouchEnd($event)"
+        >
+          <div class="card-shine"></div>
+          <div class="card-bg-emoji">{{ banner.emoji }}</div>
+          <div class="card-grid"></div>
+
+          <div class="card-badge">
+            <span class="badge-dot"></span>
+            Featured
+          </div>
+
+          <div class="card-body">
+            <div class="card-text">
+              <div class="card-title">{{ banner.title }}</div>
+              <div class="card-subtitle" *ngIf="banner.subtitle">{{ banner.subtitle }}</div>
+              <div class="card-desc" *ngIf="banner.description">{{ banner.description }}</div>
+            </div>
+
+            <div class="card-cta">
+              <span class="cta-btn">
+                <span>{{ banner.ctaLabel }}</span>
+                <svg class="cta-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M5 3L9 7L5 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="carousel-dots" *ngIf="banners().length > 1">
+        <button
+          *ngFor="let b of banners(); let i = index"
+          class="dot"
+          [class.active]="i === currentIndex()"
+          (click)="currentIndex.set(i)"
+          attr.aria-label="Slide {{ i + 1 }}"
+        ></button>
+      </div>
+    </div>
+  

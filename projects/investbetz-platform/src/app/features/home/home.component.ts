@@ -1,8 +1,8 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DeviceService } from '../../core/services/device.service';
-import { HomeDesktopComponent } from './home-desktop.component';
-import { HomeMobileComponent } from './mobile/home-mobile.component';
+import { DeviceService } from '../../core/services';
+import { HomeDesktopComponent } from './pages/home-desktop/home-desktop.component';
+import { HomeMobileComponent } from './pages/home-mobile/home-mobile.component';
 
 @Component({
   selector: 'app-home',

@@ -1,0 +1,72 @@
+
+    <div class="users-page">
+      <div class="page-header">
+        <h1>Users</h1>
+      </div>
+
+      <mat-card class="filter-card">
+        <mat-form-field appearance="fill" class="search-field">
+          <mat-label>Search users...</mat-label>
+          <input matInput [ngModel]="store.searchQuery()" (ngModelChange)="store.searchQuery.set($event); store.onSearchInput()" placeholder="Phone, name, email...">
+        </mat-form-field>
+      </mat-card>
+
+      <mat-card class="table-card">
+          <div class="loading-shim" *ngIf="store.loading()">
+          <div class="spinner"></div>
+        </div>
+        <table mat-table [dataSource]="store.items()" class="admin-table">
+          <ng-container matColumnDef="phone">
+            <th mat-header-cell *matHeaderCellDef>Phone</th>
+            <td mat-cell *matCellDef="let u" class="clickable" (click)="viewUser(u)">{{ u.phone }}</td>
+          </ng-container>
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let u" class="clickable" (click)="viewUser(u)">{{ u.fullName }}</td>
+          </ng-container>
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let u">{{ u.email || '-' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let u">
+              <span class="chip" [style.background]="u.isSuspended ? '#f44336' : '#00E676'">
+                {{ u.isSuspended ? 'Suspended' : 'Active' }}
+              </span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="kyc">
+            <th mat-header-cell *matHeaderCellDef>KYC</th>
+            <td mat-cell *matCellDef="let u">
+              <span class="chip" [style.background]="u.kycVerified ? '#00E676' : '#666'">
+                {{ u.kycVerified ? 'Verified' : 'Pending' }}
+              </span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let u">
+              <button mat-icon-button (click)="store.toggleStatus(u)" [matTooltip]="u.isSuspended ? 'Activate' : 'Suspend'">
+                <mat-icon>{{ u.isSuspended ? 'check_circle' : 'block' }}</mat-icon>
+              </button>
+              <button mat-icon-button (click)="store.verifyKyc(u)" matTooltip="Toggle KYC">
+                <mat-icon>verified</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="store.columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: store.columns;"></tr>
+        </table>
+        <div class="empty-state" *ngIf="!store.loading() && store.items().length === 0">No users found</div>
+        <mat-paginator *ngIf="store.totalPages() > 1"
+          [length]="store.total()"
+          [pageSize]="store.limit()"
+          [pageIndex]="store.page() - 1"
+          [pageSizeOptions]="[10, 20, 50, 100]"
+          (page)="store.onPageChange($event.pageIndex, $event.pageSize)"
+          showFirstLastButtons>
+        </mat-paginator>
+      </mat-card>
+    </div>
+  

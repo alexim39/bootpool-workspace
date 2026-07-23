@@ -1,0 +1,74 @@
+
+    <header class="app-nav">
+      <div class="nav-inner">
+        <div class="nav-left">
+          <a routerLink="/home" class="nav-logo">
+            <!-- <div class="logo-icon">
+              <span class="logo-symbol">B</span>
+            </div> -->
+            <img src="img/logo/logo.png" alt="BetPool Logo" class="logo-icon">
+            <span class="logo-text">
+              <span class="brand-bet">Bet</span><span class="brand-pool">Pool</span>
+            </span>
+          </a>
+        </div>
+
+        <nav class="nav-center">
+          <a routerLink="/home" routerLinkActive="active" class="nav-link" [routerLinkActiveOptions]="{ exact: true }" #rla="routerLinkActive">
+            <mat-icon>home</mat-icon>
+            <span>Home</span>
+            @if (rla.isActive) {
+              <span class="link-indicator"></span>
+            }
+          </a>
+          <a routerLink="/bets" routerLinkActive="active" class="nav-link" #rla2="routerLinkActive">
+            <mat-icon>sports_esports</mat-icon>
+            <span>Bets</span>
+            @if (activeBetsCount() > 0) {
+              <span class="nav-badge">{{ activeBetsCount() }}</span>
+            }
+            @if (rla2.isActive) {
+              <span class="link-indicator"></span>
+            }
+          </a>
+          <a routerLink="/wallet" routerLinkActive="active" class="nav-link" #rla3="routerLinkActive">
+            <mat-icon>account_balance_wallet</mat-icon>
+            <span>Wallet</span>
+            @if (rla3.isActive) {
+              <span class="link-indicator"></span>
+            }
+          </a>
+          <a routerLink="/match-pools" routerLinkActive="active" class="nav-link" #rlam="routerLinkActive">
+            <mat-icon>pool</mat-icon>
+            <span>Pools</span>
+            @if (rlam.isActive) {
+              <span class="link-indicator"></span>
+            }
+          </a>
+          <a routerLink="/profile" routerLinkActive="active" class="nav-link" #rla4="routerLinkActive">
+            <mat-icon>person</mat-icon>
+            <span>Profile</span>
+            @if (rla4.isActive) {
+              <span class="link-indicator"></span>
+            }
+          </a>
+        </nav>
+
+        <div class="nav-right">
+          <div class="wallet-pill">
+            <mat-icon>account_balance_wallet</mat-icon>
+            <span class="wallet-amount">{{ formatFull(walletBalance()) }}</span>
+          </div>
+          <button mat-stroked-button class="top-up-btn" (click)="showTopUp.set(true)">
+            <mat-icon>add</mat-icon>
+            Top Up
+          </button>
+          <app-notification-bell />
+          <button mat-icon-button (click)="auth.logout()" class="logout-btn">
+            <mat-icon>logout</mat-icon>
+          </button>
+        </div>
+      </div>
+    </header>
+    <app-top-up-modal [visible]="showTopUp()" [disableClose]="true" (close)="showTopUp.set(false)" />
+  

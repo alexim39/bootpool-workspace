@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { SignupComponent } from './signup.component';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from '../../../core/services';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -122,9 +122,9 @@ describe('SignupComponent', () => {
     component.termsAccepted = true;
 
     component.createAccount();
-    expect(component.loading()).toBeTrue();
+    expect(component.store.loading()).toBeTrue();
     tick();
-    expect(component.loading()).toBeFalse();
+    expect(component.store.loading()).toBeFalse();
   }));
 
   it('sets error on API failure', fakeAsync(() => {
@@ -138,6 +138,6 @@ describe('SignupComponent', () => {
     component.createAccount();
     tick();
 
-    expect(component.error()).toBe('Phone already registered');
+    expect(component.store.error()).toBe('Phone already registered');
   }));
 });

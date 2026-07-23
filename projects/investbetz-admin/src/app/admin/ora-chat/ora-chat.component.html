@@ -1,0 +1,138 @@
+
+    <div class="page">
+      <div class="page-header">
+        <div class="header-left">
+          <h1><mat-icon class="header-icon">smart_toy</mat-icon> ORA Chat History</h1>
+          <p class="subtitle">Monitor and manage AI assistant conversations</p>
+        </div>
+      </div>
+
+      <div class="stats-row" *ngIf="store.stats()">
+        <div class="stat-card total" (click)="store.statusFilter.set(''); store.loadSessions()">
+          <div class="stat-value">{{ store.stats()!.total }}</div>
+          <div class="stat-label">Total</div>
+        </div>
+        <div class="stat-card active" (click)="store.statusFilter.set('active'); store.loadSessions()">
+          <div class="stat-value">{{ store.stats()!.active }}</div>
+          <div class="stat-label">Active</div>
+        </div>
+        <div class="stat-card escalated" (click)="store.statusFilter.set('escalated'); store.loadSessions()">
+          <div class="stat-value">{{ store.stats()!.escalated }}</div>
+          <div class="stat-label">Escalated</div>
+        </div>
+        <div class="stat-card resolved" (click)="store.statusFilter.set('resolved'); store.loadSessions()">
+          <div class="stat-value">{{ store.stats()!.resolved }}</div>
+          <div class="stat-label">Resolved</div>
+        </div>
+      </div>
+
+      <mat-card class="filter-card">
+        <div class="filters">
+          <mat-form-field appearance="fill" class="filter-field search-field">
+            <mat-icon matPrefix>search</mat-icon>
+            <mat-label>Search by name, phone or email</mat-label>
+            <input matInput [ngModel]="store.searchQuery()" (ngModelChange)="store.searchQuery.set($event); store.onSearchChange()" placeholder="Search users...">
+            <button matSuffix mat-icon-button *ngIf="store.searchQuery()" (click)="store.searchQuery.set(''); store.loadSessions()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+          <mat-form-field appearance="fill" class="filter-field">
+            <mat-label>Status</mat-label>
+            <mat-select [ngModel]="store.statusFilter()" (ngModelChange)="store.statusFilter.set($event)" (selectionChange)="store.loadSessions()">
+              <mat-option value="">All</mat-option>
+              <mat-option value="active">Active</mat-option>
+              <mat-option value="escalated">Escalated</mat-option>
+              <mat-option value="resolved">Resolved</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card>
+
+      <div class="loading-state" *ngIf="store.loading()">
+        <mat-spinner diameter="32"></mat-spinner>
+        <span>Loading conversations...</span>
+      </div>
+
+      <div class="content-split" *ngIf="!store.loading()">
+        <div class="session-list" [class.has-selected]="store.selectedSession()">
+          <div class="session-item" *ngFor="let s of store.sessions()"
+               [class.selected]="store.selectedId() === s._id"
+               (click)="store.selectSession(s._id)">
+            <div class="session-avatar">{{ getInitials(s.user) }}</div>
+            <div class="session-info">
+              <div class="session-user">{{ s.user.fullName || s.user.phone || 'Unknown' }}</div>
+              <div class="session-msg">{{ (s.lastMessage || '') | slice:0:80 }}{{ (s.lastMessage || '').length > 80 ? '...' : '' }}</div>
+            </div>
+            <div class="session-meta">
+              <span class="session-time">{{ s.lastActivity | date:'MMM d, h:mm a' }}</span>
+              <span class="chip status-{{ s.status }}">{{ s.status }}</span>
+              <span class="msg-count">{{ s.messageCount }} msgs</span>
+            </div>
+            <div class="session-badge escalated-badge" *ngIf="s.status === 'escalated' && !s.escalatedNotified" matTooltip="Notified about escalation">
+              <mat-icon>notifications_active</mat-icon>
+            </div>
+          </div>
+
+          <div class="empty-state" *ngIf="store.sessions().length === 0">
+            <mat-icon class="empty-icon">chat_bubble_outline</mat-icon>
+            <p>No conversations found</p>
+          </div>
+
+          <mat-paginator *ngIf="store.totalPages() > 1"
+            [length]="store.totalItems()"
+            [pageSize]="store.pageSize()"
+            [pageIndex]="store.currentPage() - 1"
+            (page)="onPageChange($event)"
+            [showFirstLastButtons]="true">
+          </mat-paginator>
+        </div>
+
+        <div class="detail-panel" *ngIf="store.selectedSession()">
+          <div class="panel-header">
+            <div class="panel-user">
+              <div class="panel-avatar">{{ getInitials(store.selectedSession()!.user) }}</div>
+              <div>
+                <div class="panel-name">{{ store.selectedSession()!.user.fullName || store.selectedSession()!.user.phone || 'Unknown' }}</div>
+                <div class="panel-phone">{{ store.selectedSession()!.user.phone }}<span *ngIf="store.selectedSession()!.user.email"> &middot; {{ store.selectedSession()!.user.email }}</span></div>
+              </div>
+            </div>
+            <div class="panel-actions">
+              <span class="chip status-{{ store.selectedSession()!.status }}" *ngIf="!store.selectedSession()!.escalationReason">{{ store.selectedSession()!.status }}</span>
+              <span class="chip escalation-chip" *ngIf="store.selectedSession()!.escalationReason" matTooltip="Keyword: {{ store.selectedSession()!.escalationReason }}">
+                Escalated: "{{ store.selectedSession()!.escalationReason }}"
+              </span>
+              <button mat-stroked-button class="resolve-btn" *ngIf="store.selectedSession()!.status !== 'resolved'" (click)="resolveSession()">
+                <mat-icon>check_circle</mat-icon> Mark Resolved
+              </button>
+              <button mat-icon-button (click)="store.selectedId.set(null); store.selectedSession.set(null)">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="messages-container">
+            <div class="message" *ngFor="let msg of store.selectedSession()!.messages"
+                 [class.user-msg]="msg.role === 'user'"
+                 [class.assistant-msg]="msg.role === 'assistant'"
+                 [class.system-msg]="msg.role === 'system'">
+              <div class="msg-avatar">
+                <mat-icon *ngIf="msg.role === 'assistant'">smart_toy</mat-icon>
+                <mat-icon *ngIf="msg.role === 'user'">person</mat-icon>
+                <mat-icon *ngIf="msg.role === 'system'">settings</mat-icon>
+              </div>
+              <div class="msg-bubble">
+                <div class="msg-role-label">{{ msg.role === 'assistant' ? 'ORA AI' : (msg.role === 'user' ? 'User' : 'System') }}</div>
+                <div class="msg-content">{{ msg.content }}</div>
+                <div class="msg-time">{{ msg.timestamp | date:'MMM d, y h:mm:ss a' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-placeholder" *ngIf="!store.selectedSession() && store.sessions().length > 0">
+          <mat-icon>chat</mat-icon>
+          <p>Select a conversation to view messages</p>
+        </div>
+      </div>
+    </div>
+  

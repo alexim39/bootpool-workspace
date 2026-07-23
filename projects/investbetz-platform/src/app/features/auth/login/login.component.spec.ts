@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { LoginComponent } from './login.component';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from '../../../core/services';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -35,7 +35,7 @@ describe('LoginComponent', () => {
   });
 
   it('has OTP and PIN tab switcher', () => {
-    expect(component.loginMode()).toBe('otp');
+    expect(component.store.loginMode()).toBe('otp');
     const buttons = fixture.nativeElement.querySelectorAll('.tab-btn');
     expect(buttons.length).toBe(2);
     expect(buttons[0].textContent).toContain('OTP Login');
@@ -43,7 +43,7 @@ describe('LoginComponent', () => {
   });
 
   it('switches to PIN mode on tab click', () => {
-    component.loginMode.set('pin');
+    component.store.loginMode.set('pin');
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.tab-btn.active').textContent).toContain('PIN Login');
   });
@@ -95,7 +95,7 @@ describe('LoginComponent', () => {
     component.sendOtp();
     tick();
 
-    expect(component.error()).toBe('Too many requests');
+    expect(component.store.error()).toBe('Too many requests');
   }));
 
   it('shows loading state while sending OTP', fakeAsync(() => {
@@ -103,13 +103,13 @@ describe('LoginComponent', () => {
     component.phone = '1234567890';
 
     component.sendOtp();
-    expect(component.loading()).toBeTrue();
+    expect(component.store.loading()).toBeTrue();
     tick();
-    expect(component.loading()).toBeFalse();
+    expect(component.store.loading()).toBeFalse();
   }));
 
   it('validates PIN login - disables button when PIN < 4 chars', () => {
-    component.loginMode.set('pin');
+    component.store.loginMode.set('pin');
     component.phone = '1234567890';
     component.pin = '123';
     fixture.detectChanges();
@@ -118,7 +118,7 @@ describe('LoginComponent', () => {
   });
 
   it('enables PIN login button with valid phone and PIN', () => {
-    component.loginMode.set('pin');
+    component.store.loginMode.set('pin');
     component.phone = '1234567890';
     component.pin = '1234';
     fixture.detectChanges();
@@ -130,7 +130,7 @@ describe('LoginComponent', () => {
     mockAuthService.loginWithPin.and.returnValue(
       of({ success: true, data: { token: 'tok', user: { id: 'u1' } as any }, token: 'tok', user: { id: 'u1' } as any }).pipe(delay(0))
     );
-    component.loginMode.set('pin');
+    component.store.loginMode.set('pin');
     component.phone = '1234567890';
     component.pin = '1234';
 
@@ -144,7 +144,7 @@ describe('LoginComponent', () => {
     mockAuthService.loginWithPin.and.returnValue(
       of({ success: true, data: { token: 'tok', user: { id: 'u1', phone: '1234567890', fullName: 'Test', phoneVerified: true, kycVerified: false, referralCode: '', createdAt: '' } }, token: 'tok', user: { id: 'u1', phone: '1234567890', fullName: 'Test', phoneVerified: true, kycVerified: false, referralCode: '', createdAt: '' } }).pipe(delay(0))
     );
-    component.loginMode.set('pin');
+    component.store.loginMode.set('pin');
     component.phone = '1234567890';
     component.pin = '1234';
 

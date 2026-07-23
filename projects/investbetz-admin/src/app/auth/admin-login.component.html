@@ -1,0 +1,85 @@
+
+    <div class="login-page">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="logo"><span class="logo-icon">B</span></div>
+          <h1>BetPool Admin</h1>
+          <p class="subtitle">Secure administration panel</p>
+        </div>
+
+        <!-- Step 1: Email -->
+        <div class="login-body" *ngIf="step() === 'email'">
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Email address</mat-label>
+            <input matInput type="email" [(ngModel)]="email" placeholder="admin@betpool.tech" (keyup.enter)="sendToken()" (input)="error.set('')">
+          </mat-form-field>
+          <button mat-raised-button class="btn-primary full-width" (click)="sendToken()" [disabled]="!email || loading()">
+            <span *ngIf="!loading()">Send Token</span>
+            <span *ngIf="loading()">Sending...</span>
+          </button>
+          <div class="action-links">
+            <button mat-button class="link-btn" (click)="step.set('pin'); error.set('')">Sign in with PIN instead</button>
+          </div>
+          <div class="error-msg" *ngIf="error()">{{ error() }}</div>
+        </div>
+
+        <!-- Step 2: Token -->
+        <div class="login-body" *ngIf="step() === 'token'">
+          <div class="step-hint">Token sent to {{ email }}</div>
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Enter 6-digit token</mat-label>
+            <input matInput type="text" [(ngModel)]="token" placeholder="******" maxlength="6" inputmode="numeric" (keyup.enter)="verifyToken()" (input)="error.set('')">
+          </mat-form-field>
+          <button mat-raised-button class="btn-primary full-width" (click)="verifyToken()" [disabled]="(token||'').length < 6 || loading()">
+            <span *ngIf="!loading()">Verify & Sign In</span>
+            <span *ngIf="loading()">Verifying...</span>
+          </button>
+          <div class="action-links">
+            <button mat-button class="link-btn" (click)="step.set('email'); token=''; error.set('')">Use a different email</button>
+            <button mat-button class="link-btn" (click)="resendToken()" [disabled]="loading()">Resend token</button>
+          </div>
+          <div class="error-msg" *ngIf="error()">{{ error() }}</div>
+        </div>
+
+        <!-- Step 3: PIN (alternative) -->
+        <div class="login-body" *ngIf="step() === 'pin'">
+          <div class="step-hint">{{ email }}</div>
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Enter your PIN (4-6 digits)</mat-label>
+            <input matInput type="password" [(ngModel)]="pin" placeholder="******" maxlength="6" inputmode="numeric" (keyup.enter)="loginWithPin()" (input)="error.set('')">
+          </mat-form-field>
+          <button mat-raised-button class="btn-primary full-width" (click)="loginWithPin()" [disabled]="(pin||'').length < 4 || loading()">
+            <span *ngIf="!loading()">Sign In</span>
+            <span *ngIf="loading()">Verifying...</span>
+          </button>
+          <div class="action-links">
+            <button mat-button class="link-btn" (click)="requestOtp()">Forgot PIN? Use OTP instead</button>
+            <button mat-button class="link-btn" (click)="step.set('email'); error.set('')">Back to email login</button>
+          </div>
+          <div class="error-msg" *ngIf="error()">{{ error() }}</div>
+        </div>
+
+        <!-- Step 4: OTP (fallback) -->
+        <div class="login-body" *ngIf="step() === 'otp'">
+          <div class="step-hint">Code sent to {{ email }}</div>
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Enter 6-digit code</mat-label>
+            <input matInput type="text" [(ngModel)]="code" placeholder="******" maxlength="6" (keyup.enter)="loginWithOtp()" (input)="error.set('')">
+          </mat-form-field>
+          <button mat-raised-button class="btn-primary full-width" (click)="loginWithOtp()" [disabled]="(code||'').length < 4 || loading()">
+            <span *ngIf="!loading()">Verify & Sign In</span>
+            <span *ngIf="loading()">Verifying...</span>
+          </button>
+          <div class="action-links">
+            <button mat-button class="link-btn" (click)="step.set('pin'); error.set('')">Back to PIN login</button>
+          </div>
+          <div class="error-msg" *ngIf="error()">{{ error() }}</div>
+        </div>
+
+        <div class="login-footer">
+          <span class="lock-icon"><mat-icon>lock</mat-icon></span>
+          <span>Email token / PIN login &bull; JWT secured</span>
+        </div>
+      </div>
+    </div>
+  

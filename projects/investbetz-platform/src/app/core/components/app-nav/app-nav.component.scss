@@ -1,0 +1,208 @@
+
+    :host {
+      display: block;
+    }
+    .app-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      background: rgba(10, 20, 40, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .app-nav::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,230,118,0.15), rgba(232,185,35,0.15), transparent);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 32px;
+      height: 60px;
+    }
+
+    .nav-left { display: flex; align-items: center; }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      //background: linear-gradient(135deg, #00E676, #00C853);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 800;
+      color: #0A1428;
+      font-family: 'Exo-ExtraBold', 'Inter', sans-serif;
+      flex-shrink: 0;
+      margin-right: -5px;
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 800;
+      font-family: 'Exo-ExtraBold', 'Inter', sans-serif;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-bet {
+      background: linear-gradient(135deg, #00E676 0%, #69F0AE 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .brand-pool {
+      background: linear-gradient(135deg, #E8B923 0%, #F0D060 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-center {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: rgba(255,255,255,0.5);
+      font-size: 13.5px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .nav-link:hover {
+      color: rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .nav-link.active {
+      color: #FFFFFF;
+      background: rgba(0,230,118,0.08);
+    }
+
+    .nav-link mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .link-indicator {
+      position: absolute;
+      bottom: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 2px;
+      border-radius: 2px;
+      background: #00E676;
+    }
+
+    .nav-badge {
+      background: #E8B923;
+      color: #0A1428;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 9999px;
+      min-width: 16px;
+      text-align: center;
+      line-height: 16px;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .wallet-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      color: rgba(255,255,255,0.6);
+      font-size: 13px;
+    }
+
+    .wallet-pill mat-icon {
+      font-size: 17px;
+      width: 17px;
+      height: 17px;
+      color: #00E676;
+    }
+
+    .wallet-amount {
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .top-up-btn {
+      height: 34px;
+      padding: 0 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #00E676 !important;
+      border: 1px solid rgba(0,230,118,0.25) !important;
+      border-radius: 8px !important;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .top-up-btn mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    .top-up-btn:hover {
+      background: rgba(0,230,118,0.1) !important;
+      border-color: rgba(0,230,118,0.5) !important;
+    }
+
+    .logout-btn {
+      color: rgba(255,255,255,0.3);
+      transition: color 0.2s ease;
+    }
+
+    .logout-btn:hover {
+      color: #f44336;
+    }
+
+    @media (max-width: 768px) {
+      .app-nav { display: none; }
+    }
+  

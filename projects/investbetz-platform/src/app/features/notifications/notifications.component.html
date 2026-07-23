@@ -1,0 +1,54 @@
+
+    <div class="notif-page" [class.mobile]="device.isMobile()">
+      <div class="notif-header">
+        <a routerLink="/home" class="back-btn"><mat-icon>arrow_back</mat-icon></a>
+        <h1>Notifications</h1>
+        @if (notifService.notifications().length > 0) {
+          <button class="mark-all-link" (click)="markAllRead()">Mark all read</button>
+        }
+      </div>
+
+      <div class="notif-tabs">
+        <button class="tab" [class.active]="filter() === 'all'" (click)="filter.set('all'); page.set(1); load()">All</button>
+        <button class="tab" [class.active]="filter() === 'unread'" (click)="filter.set('unread'); page.set(1); load()">Unread</button>
+      </div>
+
+      <div class="notif-list">
+        @if (loading() && notifications().length === 0) {
+          <div class="state-msg"><mat-icon>hourglass_empty</mat-icon><span>Loading...</span></div>
+        } @else if (notifications().length === 0) {
+          <div class="state-msg"><mat-icon>notifications_none</mat-icon><span>No notifications</span></div>
+        }
+        @for (notif of notifications(); track notif._id) {
+          <div class="notif-item" [class.unread]="!notif.read" [class.mobile]="device.isMobile()">
+            <div class="notif-left">
+              <div class="notif-icon" [style.--notif-color]="notifService.getNotificationColor(notif.type)">
+                <mat-icon>{{ notifService.getNotificationIcon(notif.type) }}</mat-icon>
+              </div>
+            </div>
+            <div class="notif-body">
+              <div class="notif-title">{{ notif.title }}</div>
+              <div class="notif-message">{{ notif.message }}</div>
+              <div class="notif-time">{{ notifService.timeAgo(notif.createdAt) }}</div>
+            </div>
+            <div class="notif-actions">
+              @if (notif.read) {
+                <button class="action-btn" (click)="markUnread(notif._id)" matTooltip="Mark unread"><mat-icon>mark_email_unread</mat-icon></button>
+              } @else {
+                <button class="action-btn" (click)="markRead(notif._id)" matTooltip="Mark read"><mat-icon>done</mat-icon></button>
+              }
+              <button class="action-btn delete" (click)="deleteNotif(notif._id)" matTooltip="Delete"><mat-icon>delete</mat-icon></button>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (totalPages() > 1) {
+        <div class="pagination">
+          <button class="page-btn" [disabled]="page() <= 1" (click)="page.set(page() - 1); load()"><mat-icon>chevron_left</mat-icon></button>
+          <span class="page-info">{{ page() }} / {{ totalPages() }}</span>
+          <button class="page-btn" [disabled]="page() >= totalPages()" (click)="page.set(page() + 1); load()"><mat-icon>chevron_right</mat-icon></button>
+        </div>
+      }
+    </div>
+  

@@ -2,7 +2,7 @@ import { Component, inject, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LandingDesktopComponent } from './landing-desktop.component';
 import { LandingMobileComponent } from './mobile/landing-mobile.component';
-import { DeviceService } from '../../core/services/device.service';
+import { DeviceService } from '../../core/services';
 
 @Component({
   selector: 'app-landing',

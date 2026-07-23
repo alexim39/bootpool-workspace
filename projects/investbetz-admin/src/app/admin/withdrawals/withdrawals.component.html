@@ -1,0 +1,115 @@
+
+    <div class="page">
+      <div class="page-header">
+        <h1>Withdrawals</h1>
+      </div>
+
+      <mat-card class="filter-card">
+        <div class="filters">
+          <mat-form-field appearance="fill" class="filter-field">
+            <mat-label>Status</mat-label>
+            <mat-select [ngModel]="store.statusFilter()" (ngModelChange)="store.statusFilter.set($event); store.onFilterChange()">
+              <mat-option value="">All</mat-option>
+              <mat-option value="pending">Pending</mat-option>
+              <mat-option value="processing">Processing</mat-option>
+              <mat-option value="completed">Completed</mat-option>
+              <mat-option value="failed">Failed</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card>
+
+      <div class="detail-panel" *ngIf="store.selectedWdr() as w">
+        <div class="panel-header">
+          <h3>Withdrawal Details</h3>
+          <button mat-icon-button (click)="store.selectedWdr.set(null)"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="panel-body">
+          <div class="detail-grid">
+            <div class="detail-item"><span class="label">Reference</span><span class="value">{{ w.reference }}</span></div>
+            <div class="detail-item"><span class="label">User</span><span class="value">{{ w.user?.phone || w.user?.fullName || w.userId }}</span></div>
+            <div class="detail-item"><span class="label">Amount</span><span class="value">\u20A6{{ w.amount | number }}</span></div>
+            <div class="detail-item"><span class="label">Fee</span><span class="value">\u20A6{{ w.fee | number }}</span></div>
+            <div class="detail-item"><span class="label">Status</span><span class="value"><span class="chip" [style.background]="statusColor(w.status)">{{ w.status }}</span></span></div>
+            <div class="detail-item"><span class="label">Bank</span><span class="value">{{ w.metadata?.accountName || '-' }} / {{ w.metadata?.accountNumber || '-' }}</span></div>
+            <div class="detail-item"><span class="label">Created</span><span class="value">{{ w.createdAt | date:'medium' }}</span></div>
+            <div class="detail-item" *ngIf="w.failureReason"><span class="label">Reason</span><span class="value" style="color:#f44336">{{ w.failureReason }}</span></div>
+          </div>
+          <div class="action-buttons" *ngIf="w.status === 'processing'">
+            <button mat-raised-button class="action-approve" (click)="store.approve(w)">
+              <mat-icon>check_circle</mat-icon> Approve
+            </button>
+            <button mat-stroked-button class="action-reject" (click)="store.rejectTarget.set(w)">
+              <mat-icon>cancel</mat-icon> Reject
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="reject-form" *ngIf="store.rejectTarget() as rt">
+        <div class="reject-content">
+          <h3>Reject Withdrawal</h3>
+          <p style="color:rgba(255,255,255,0.6);font-size:13px;margin:0 0 12px">
+            Rejecting withdrawal for {{ rt.user?.phone || rt.userId }} &mdash; \u20A6{{ rt.amount | number }}
+          </p>
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Reason for rejection</mat-label>
+            <textarea matInput [ngModel]="store.rejectReason()" (ngModelChange)="store.rejectReason.set($event)" rows="2" placeholder="e.g. Suspicious activity, bank details mismatch"></textarea>
+          </mat-form-field>
+          <div class="reject-actions">
+            <button mat-button (click)="store.rejectTarget.set(null); store.rejectReason.set('')">Cancel</button>
+            <button mat-raised-button color="warn" (click)="store.reject(rt)" [disabled]="!store.rejectReason().trim()">Reject &amp; Refund</button>
+          </div>
+        </div>
+      </div>
+
+      <mat-card class="table-card">
+        <div class="loading-shim" *ngIf="store.loading()">
+          <div class="spinner"></div>
+        </div>
+        <table mat-table [dataSource]="store.items()" class="admin-table">
+          <ng-container matColumnDef="reference">
+            <th mat-header-cell *matHeaderCellDef>Reference</th>
+            <td mat-cell *matCellDef="let w" class="clickable" (click)="store.selectWdr(w)">{{ w.reference | slice:0:14 }}...</td>
+          </ng-container>
+          <ng-container matColumnDef="user">
+            <th mat-header-cell *matHeaderCellDef>User</th>
+            <td mat-cell *matCellDef="let w" class="clickable" (click)="store.selectWdr(w)">{{ w.user?.phone || w.user?.fullName || w.userId | slice:0:10 }}</td>
+          </ng-container>
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef>Amount</th>
+            <td mat-cell *matCellDef="let w" class="clickable" (click)="store.selectWdr(w)">\u20A6{{ w.amount | number }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let w">
+              <span class="chip" [style.background]="statusColor(w.status)">{{ w.status }}</span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let w" class="clickable" (click)="store.selectWdr(w)">{{ w.createdAt | date:'short' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let w">
+              <button mat-icon-button (click)="store.selectWdr(w)" matTooltip="View"><mat-icon>visibility</mat-icon></button>
+              <button mat-icon-button *ngIf="w.status === 'processing'" (click)="store.approve(w)" matTooltip="Approve" style="color:#00E676"><mat-icon>check_circle</mat-icon></button>
+              <button mat-icon-button *ngIf="w.status === 'processing'" (click)="store.rejectTarget.set(w)" matTooltip="Reject" style="color:#f44336"><mat-icon>cancel</mat-icon></button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="store.columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: store.columns;"></tr>
+        </table>
+        <div class="empty-state" *ngIf="!store.loading() && store.items().length === 0">No withdrawals found</div>
+        <mat-paginator *ngIf="store.totalPages() > 1"
+          [length]="store.total()"
+          [pageSize]="store.limit()"
+          [pageIndex]="store.page() - 1"
+          [pageSizeOptions]="[10, 20, 50, 100]"
+          (page)="store.onPageChange($event.pageIndex, $event.pageSize)"
+          showFirstLastButtons>
+        </mat-paginator>
+      </mat-card>
+    </div>
+  

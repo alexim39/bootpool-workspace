@@ -1,0 +1,16 @@
+
+    <div class="faq-section">
+      <h2 class="faq-title">Frequently Asked Questions</h2>
+      @for (item of items; track item.question) {
+        <div class="faq-item" [class.open]="item.open">
+          <button class="faq-question" (click)="toggle(item)">
+            <span>{{ item.question }}</span>
+            <mat-icon>{{ item.open ? 'remove' : 'add' }}</mat-icon>
+          </button>
+          @if (item.open) {
+            <div class="faq-answer">{{ item.answer }}</div>
+          }
+        </div>
+      }
+    </div>
+  

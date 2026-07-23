@@ -1,0 +1,104 @@
+
+    <mat-card class="bet-card" [class.settled]="stake.isSettled">
+      <mat-card-content>
+        <div class="bet-header">
+          <div class="bet-status">
+            <mat-chip [class]="getStatusClass(stake.status)" selected>
+              <mat-icon matChipAvatar>{{ getStatusIcon(stake.status) }}</mat-icon>
+              {{ formatStatus(stake.status) }}
+            </mat-chip>
+            @if (stake.status === 'confirmed' && !stake.isSettled) {
+              <mat-chip class="chip-cashout" selected>
+                <mat-icon matChipAvatar>autorenew</mat-icon>
+                Cashout Available
+              </mat-chip>
+            }
+          </div>
+          <div class="bet-date">{{ formatDay(stake.createdAt) }}</div>
+        </div>
+
+        @if (stake.isParlay && stake.items) {
+          <div class="parlay-badge">ACCUMULATOR ({{ stake.items.length }} legs)</div>
+          <div class="parlay-legs">
+            @for (item of stake.items; track item.pod) {
+              <div class="parlay-leg">
+                <span class="leg-teams">{{ item.homeTeam }} vs {{ item.awayTeam }}</span>
+                <span class="leg-odds">{{ item.gainsMultiplier.toFixed(2) }}x</span>
+                <span class="leg-selection">{{ item.selection }}</span>
+              </div>
+            }
+          </div>
+          <div class="bet-selection">
+            <span class="odds parlay-odds">{{ stake.combinedMultiplier?.toFixed(2) }}x</span>
+            <span class="parlay-label">Combined Odds</span>
+          </div>
+        } @else {
+          <div class="bet-match">
+            <div class="match-teams">
+              <span class="team home">{{ stake.pod.homeTeam }}</span>
+              <mat-icon>sports_soccer</mat-icon>
+              <span class="team away">{{ stake.pod.awayTeam }}</span>
+            </div>
+            <div class="match-info">
+              <span class="league" *ngIf="stake.pod.league">{{ stake.pod.league }}</span>
+              <span class="market-type" *ngIf="stake.pod.marketType">{{ stake.pod.marketType }}</span>
+              <span class="refund-chip" *ngIf="stake.pod.refundPercent">{{ stake.pod.refundPercent }}% cash back</span>
+              <span class="match-time" *ngIf="stake.pod.matchDate">
+                {{ formatMatchTime(stake.pod.matchDate) }}
+              </span>
+            </div>
+          </div>
+
+          @if (stake.isSettled) {
+            <div class="bet-selection">
+              <span class="selection">{{ stake.pod.selection }}</span>
+              <span class="odds">{{ stake.pod.gainsMultiplier.toFixed(2) }}x</span>
+            </div>
+          } @else {
+            <div class="bet-selection">
+              <span class="odds">{{ stake.pod.gainsMultiplier.toFixed(2) }}x</span>
+            </div>
+          }
+        }
+
+        <mat-divider></mat-divider>
+
+        <div class="bet-details">
+          <div class="detail-row">
+            <span class="detail-label">Stake</span>
+            <span class="detail-value stake-amount">{{ formatCurrency(stake.stakeAmount) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Potential Payout</span>
+            <span class="detail-value payout">{{ formatCurrency(stake.netPayout) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Platform Fee</span>
+            <span class="detail-value fee">{{ formatCurrency(stake.platformFee) }}</span>
+          </div>
+        </div>
+
+        <div class="bet-actions" *ngIf="showActions && !stake.isSettled && !stake.isParlay">
+          <button mat-stroked-button class="btn-cashout-action" (click)="onCashout(stake.id)">
+            <mat-icon>autorenew</mat-icon> Request Cashout
+          </button>
+        </div>
+
+        <div class="settled-result" *ngIf="stake.isSettled">
+          @if (stake.status === 'won') {
+            <div class="result-label">Won</div>
+            <div class="profit positive">+{{ formatCurrency(stake.profit!) }}</div>
+          } @else if (stake.status === 'cashed_out') {
+            <div class="result-label">Cashed Out</div>
+            <div class="profit neutral">{{ formatCurrency(stake.profit!) }}</div>
+          } @else {
+            <div class="result-label">Refunded</div>
+            <div class="profit neutral">{{ formatCurrency(stake.stakeAmount) }}</div>
+          }
+          <div class="settled-time" *ngIf="stake.settledAt">
+            Settled {{ formatTime(stake.settledAt) }}
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  

@@ -1,0 +1,406 @@
+<app-nav />
+    <div class="profile-container">
+      <div class="profile-body">
+      <div class="page-header"><h1>Profile</h1></div>
+
+      <mat-card class="profile-header-card">
+        <mat-card-content>
+          <div class="profile-avatar">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="profile-info">
+            <h2>{{ store.user()?.fullName || 'User' }}</h2>
+            <p class="profile-phone">{{ store.formatPhone(store.user()?.phone) }}</p>
+            <div class="verification-badges">
+              <mat-chip class="chip-phone-v" selected>
+                <mat-icon matChipAvatar>{{ store.user()?.phoneVerified ? 'verified' : 'phone_android' }}</mat-icon>
+                Phone {{ store.user()?.phoneVerified ? 'Verified' : 'Not Verified' }}
+              </mat-chip>
+              <mat-chip class="chip-kyc-v" selected>
+                <mat-icon matChipAvatar>{{ store.user()?.kycVerified ? 'verified_user' : 'badge' }}</mat-icon>
+                KYC {{ store.user()?.kycVerified ? 'Verified' : 'Pending' }}
+              </mat-chip>
+            </div>
+          </div>
+          <button mat-icon-button routerLink="/wallet" matTooltip="Go to Wallet">
+            <mat-icon>account_balance_wallet</mat-icon>
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      <div class="stats-row">
+        <mat-card class="stat-card">
+          <mat-card-content>
+            <div class="stat-icon referral"><mat-icon>share</mat-icon></div>
+            <div class="stat-value">{{ store.user()?.referralCode || 'N/A' }}</div>
+            <div class="stat-label">Referral Code</div>
+          </mat-card-content>
+        </mat-card>
+        <mat-card class="stat-card">
+          <mat-card-content>
+            <div class="stat-icon member"><mat-icon>calendar_today</mat-icon></div>
+            <div class="stat-value">{{ store.formatJoinDate(store.user()?.createdAt) }}</div>
+            <div class="stat-label">Member Since</div>
+          </mat-card-content>
+        </mat-card>
+        <mat-card class="stat-card">
+          <mat-card-content>
+            <div class="stat-icon email"><mat-icon>email</mat-icon></div>
+            <div class="stat-value">{{ store.user()?.email || 'Not set' }}</div>
+            <div class="stat-label">Email</div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <mat-tab-group class="settings-tabs">
+        <mat-tab label="Personal Info">
+          <div class="tab-content">
+            <form [formGroup]="store.profileForm" (ngSubmit)="updateProfile()" class="settings-form">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Full Name</mat-label>
+                <input matInput formControlName="fullName" autocomplete="name">
+                <mat-icon matPrefix>person</mat-icon>
+                @if (store.profileForm.get('fullName')?.hasError('required')) {
+                  <mat-error>Full name is required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Email Address</mat-label>
+                <input matInput formControlName="email" type="email" autocomplete="email">
+                <mat-icon matPrefix>email</mat-icon>
+                @if (store.profileForm.get('email')?.hasError('email')) {
+                  <mat-error>Enter a valid email</mat-error>
+                }
+              </mat-form-field>
+
+              <div class="readonly-field">
+                <label>Phone Number</label>
+                <div class="readonly-value">{{ store.formatPhone(store.user()?.phone) }}</div>
+                <mat-hint>Contact support to change phone number</mat-hint>
+              </div>
+
+              <button mat-raised-button 
+                class="btn-emerald" 
+                type="submit" 
+                [disabled]="store.profileForm.invalid || store.profileForm.pristine || store.savingProfile()">
+                
+                @if (store.savingProfile()) { 
+                  <mat-spinner diameter="20"></mat-spinner> 
+                } @else { 
+                  <ng-container>
+                    <mat-icon>save</mat-icon> 
+                    Save Changes
+                  </ng-container>
+                } 
+              </button>
+              
+            </form>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Security">
+          <div class="tab-content">
+            <div class="security-section">
+              <h3>PIN Management</h3>
+              <p class="section-desc">Your 6-digit PIN secures your account and authorizes transactions</p>
+              <div class="security-actions">
+                <button mat-stroked-button class="btn-gold" (click)="store.showPinChange.set(true)">
+                  <mat-icon>lock</mat-icon> Change PIN
+                </button>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="security-section">
+              <h3>Phone Verification</h3>
+              <p class="section-desc">Verified phone numbers receive OTP for login and sensitive actions</p>
+              @if (!store.user()?.phoneVerified) {
+                @if (!store.showPhoneOtp()) {
+                  <button mat-raised-button class="btn-emerald" (click)="requestPhoneVerification()">
+                    <mat-icon>phone</mat-icon> Verify Phone Number
+                  </button>
+                } @else {
+                  <div class="phone-otp-row">
+                    <mat-form-field appearance="outline" class="otp-field">
+                      <mat-label>Enter 6-digit code</mat-label>
+                      <input matInput [formControl]="store.phoneOtpCode" placeholder="000000" maxlength="6" inputmode="numeric">
+                    </mat-form-field>
+                    <button mat-raised-button class="btn-emerald" (click)="confirmPhoneVerification()" [disabled]="store.phoneOtpCode.invalid || store.verifyingPhone()">
+                      @if (store.verifyingPhone()) {
+                        <mat-spinner diameter="18"></mat-spinner>
+                      } @else {
+                        <ng-container><mat-icon>check</mat-icon> Confirm</ng-container>
+                      }
+                    </button>
+                    <button mat-button class="btn-cancel-otp" (click)="store.showPhoneOtp.set(false); store.phoneOtpCode.reset()">Cancel</button>
+                  </div>
+                }
+              } @else {
+                <mat-chip class="chip-phone-v" selected>
+                  <mat-icon matChipAvatar>verified</mat-icon> Phone Verified
+                </mat-chip>
+              }
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="security-section">
+              <h3>KYC Verification</h3>
+              <p class="section-desc">Complete KYC to unlock higher limits and faster withdrawals</p>
+              <div class="kyc-steps">
+                <div class="kyc-step" [class.completed]="store.user()?.kycVerified">
+                  <div class="step-icon" [class.done]="store.user()?.kycVerified">
+                    <mat-icon>{{ store.user()?.kycVerified ? 'check' : '1' }}</mat-icon>
+                  </div>
+                  <div class="step-info">
+                    <span class="step-title">Basic Verification</span>
+                    <span class="step-desc">Phone number verification</span>
+                  </div>
+                  <mat-chip class="chip-phone-v" selected>{{ store.user()?.phoneVerified ? 'Complete' : 'Pending' }}</mat-chip>
+                </div>
+
+                <div class="kyc-step" [class.completed]="store.user()?.kycVerified">
+                  <div class="step-icon" [class.done]="store.user()?.kycVerified">
+                    <mat-icon>{{ store.user()?.kycVerified ? 'check' : '2' }}</mat-icon>
+                  </div>
+                  <div class="step-info">
+                    <span class="step-title">Identity Verification</span>
+                    <span class="step-desc">Verify your identity with BVN or NIN</span>
+                  </div>
+                  @if (store.user()?.kycVerified) {
+                    <mat-chip class="chip-phone-v" selected>Complete</mat-chip>
+                  } @else {
+                    <div class="kyc-form-inline">
+                      <div class="kyc-type-toggle">
+                        <button class="type-btn-sm" [class.active]="store.kycType() === 'bvn'" (click)="store.kycType.set('bvn')">BVN</button>
+                        <button class="type-btn-sm" [class.active]="store.kycType() === 'nin'" (click)="store.kycType.set('nin')">NIN</button>
+                      </div>
+                      <div class="kyc-input-row">
+                        <mat-form-field appearance="outline" class="kyc-field">
+                          <mat-label>{{ store.kycType() === 'bvn' ? 'BVN Number' : 'NIN Number' }}</mat-label>
+                          <input matInput [formControl]="store.kycNumberCtrl" placeholder="11-digit number" maxlength="11" inputmode="numeric">
+                        </mat-form-field>
+                        <button mat-stroked-button class="btn-kyc-submit" (click)="submitKyc()" [disabled]="store.kycNumberCtrl.invalid || store.submittingKyc()">
+                          @if (store.submittingKyc()) {
+                            <mat-spinner diameter="18"></mat-spinner>
+                          } @else {
+                            <ng-container><mat-icon>verified_user</mat-icon> Submit</ng-container>
+                          }
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <div class="kyc-step" [class.completed]="store.user()?.kycVerified">
+                  <div class="step-icon" [class.done]="store.user()?.kycVerified">
+                    <mat-icon>{{ store.user()?.kycVerified ? 'check' : '3' }}</mat-icon>
+                  </div>
+                  <div class="step-info">
+                    <span class="step-title">Address Verification</span>
+                    <span class="step-desc">Utility bill/bank statement (coming soon)</span>
+                  </div>
+                  <mat-chip class="chip-gray" selected>Locked</mat-chip>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Referral">
+          <div class="tab-content">
+            <mat-card class="referral-card">
+              <mat-card-content>
+                <div class="referral-header">
+                  <mat-icon>card_giftcard</mat-icon>
+                  <div>
+                    <h3>Refer & Earn</h3>
+                    <p>Share your code, earn bonuses when friends join and bet</p>
+                  </div>
+                </div>
+
+                <div class="referral-code-display">
+                  <span class="code">{{ store.user()?.referralCode }}</span>
+                  <button mat-icon-button (click)="copyReferralCode()" matTooltip="Copy code">
+                    <mat-icon>content_copy</mat-icon>
+                  </button>
+                </div>
+
+                <div class="referral-actions">
+                  <button mat-raised-button class="btn-emerald" (click)="shareReferral()">
+                    <mat-icon>share</mat-icon> Share Referral
+                  </button>
+                  <button mat-stroked-button class="btn-gold" (click)="copyReferralCode()">
+                    <mat-icon>link</mat-icon> Copy Link
+                  </button>
+                </div>
+
+                <mat-divider></mat-divider>
+
+                <div class="referral-stats">
+                  <div class="stat">
+                    <div class="stat-value">{{ store.referralStats()?.totalReferrals || 0 }}</div>
+                    <div class="stat-label">Referrals</div>
+                  </div>
+                  <div class="stat">
+                    <div class="stat-value">₦{{ store.referralStats()?.referralBonus?.toLocaleString() || '0' }}</div>
+                    <div class="stat-label">Earned</div>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="referral-info-card">
+              <mat-card-header>
+                <mat-card-title>How it works</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <ul class="referral-steps">
+                  <li><strong>Share</strong> your referral code with friends</li>
+                  <li><strong>They sign up</strong> using your code</li>
+                  <li><strong>They bet</strong> and you earn commission</li>
+                  <li><strong>Withdraw</strong> earnings to your wallet</li>
+                </ul>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Support">
+          <div class="tab-content">
+            <mat-card>
+              <mat-card-header>
+                <mat-card-title>Help & Support</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="support-options">
+                  <button mat-stroked-button class="support-option" (click)="openFaq()">
+                    <mat-icon>help_outline</mat-icon>
+                    <div>
+                      <span class="option-title">FAQ</span>
+                      <span class="option-desc">Find answers to common questions</span>
+                    </div>
+                    <mat-icon>chevron_right</mat-icon>
+                  </button>
+
+                  <button mat-stroked-button class="support-option" (click)="openOraChat()">
+                    <mat-icon>smart_toy</mat-icon>
+                    <div>
+                      <span class="option-title">Ora AI</span>
+                      <span class="option-desc">Ask Ora, your AI assistant</span>
+                    </div>
+                    <mat-icon>chevron_right</mat-icon>
+                  </button>
+
+                  <button mat-stroked-button class="support-option" (click)="sendEmail()">
+                    <mat-icon>email</mat-icon>
+                    <div>
+                      <span class="option-title">Email Support</span>
+                      <span class="option-desc">support&#64;betpool.tech</span>
+                    </div>
+                    <mat-icon>chevron_right</mat-icon>
+                  </button>
+
+                  <!-- <button mat-stroked-button class="support-option" (click)="callSupport()">
+                    <mat-icon>phone</mat-icon>
+                    <div>
+                      <span class="option-title">Call Us</span>
+                      <span class="option-desc">0800-INVESTBETZ</span>
+                    </div>
+                    <mat-icon>chevron_right</mat-icon>
+                  </button> -->
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="legal-links">
+              <mat-card-content>
+                <a routerLink="/terms" mat-stroked-button class="legal-link">
+                  <mat-icon>description</mat-icon> Terms of Service
+                </a>
+                <a routerLink="/privacy" mat-stroked-button class="legal-link">
+                  <mat-icon>privacy_tip</mat-icon> Privacy Policy
+                </a>
+                <a routerLink="/cookies" mat-stroked-button class="legal-link">
+                  <mat-icon>cookie</mat-icon> Cookie Policy
+                </a>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+
+      @if (store.showPinChange()) {
+        <div class="modal-overlay" (click)="store.showPinChange.set(false)">
+          <div class="modal-container" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h3>Change PIN</h3>
+              <button mat-icon-button (click)="store.showPinChange.set(false)">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+            <form [formGroup]="store.pinForm" (ngSubmit)="changePin()" class="modal-form">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Current PIN</mat-label>
+                <input matInput formControlName="currentPin" type="password" maxlength="6" autocomplete="off">
+                <mat-icon matPrefix>lock</mat-icon>
+                @if (store.pinForm.get('currentPin')?.hasError('required')) {
+                  <mat-error>Current PIN required</mat-error>
+                }
+                @if (store.pinForm.get('currentPin')?.hasError('pattern')) {
+                  <mat-error>PIN must be 6 digits</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>New PIN</mat-label>
+                <input matInput formControlName="newPin" type="password" maxlength="6" autocomplete="new-password">
+                <mat-icon matPrefix>lock_outline</mat-icon>
+                @if (store.pinForm.get('newPin')?.hasError('required')) {
+                  <mat-error>New PIN required</mat-error>
+                }
+                @if (store.pinForm.get('newPin')?.hasError('pattern')) {
+                  <mat-error>PIN must be 6 digits</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Confirm New PIN</mat-label>
+                <input matInput formControlName="confirmPin" type="password" maxlength="6" autocomplete="new-password">
+                <mat-icon matPrefix>lock_outline</mat-icon>
+                @if (store.pinForm.hasError('pinMismatch')) {
+                  <mat-error>PINs do not match</mat-error>
+                }
+              </mat-form-field>
+
+              <div class="modal-actions">
+                <button mat-button type="button" (click)="store.showPinChange.set(false)">Cancel</button>
+                <button mat-raised-button class="btn-emerald" type="submit" [disabled]="store.pinForm.invalid || store.changingPin()">
+                  @if (store.changingPin()) {
+                    <mat-spinner diameter="20"></mat-spinner>
+                  } @else {
+                    Change PIN
+                  }
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      }
+
+      @if (store.showOraChat()) {
+        <app-ora-chat (close)="store.showOraChat.set(false)" />
+      }
+
+      @if (store.showFaq()) {
+        <div class="faq-overlay">
+          <div class="faq-modal">
+            <button class="faq-back" (click)="store.showFaq.set(false)"><mat-icon>arrow_back</mat-icon> Back</button>
+            <app-faq-section />
+          </div>
+        </div>
+      }
+      </div>
+    </div>

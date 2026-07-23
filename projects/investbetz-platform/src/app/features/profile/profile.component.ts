@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
-import { DeviceService } from '../../core/services/device.service';
-import { ProfileDesktopComponent } from './profile-desktop.component';
-import { ProfileMobileComponent } from './mobile/profile-mobile.component';
+import { DeviceService } from '../../core/services';
+import { ProfileDesktopComponent } from './pages/profile-desktop/profile-desktop.component';
+import { ProfileMobileComponent } from './pages/profile-mobile/profile-mobile.component';
 
 @Component({
   selector: 'app-profile',

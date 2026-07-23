@@ -1,0 +1,58 @@
+
+    <div class="page">
+      <div class="page-header">
+        <h1>Ora Campaigns</h1>
+        <button mat-stroked-button class="btn-refresh" (click)="store.loadSegments()"><mat-icon>refresh</mat-icon> Refresh</button>
+      </div>
+
+      <div class="segment-cards" *ngIf="store.segments()">
+        <div class="segment-card" *ngFor="let s of store.segmentList()" (click)="store.selectSegment(s.key)" [class.selected]="store.selectedSegment() === s.key">
+          <div class="sc-icon"><mat-icon>{{ s.icon }}</mat-icon></div>
+          <div class="sc-count">{{ s.count }}</div>
+          <div class="sc-label">{{ s.label }}</div>
+        </div>
+      </div>
+
+      <div class="campaign-panel" *ngIf="store.selectedSegment()">
+        <div class="campaign-actions">
+          <button mat-raised-button class="btn-generate" (click)="store.generate()" [disabled]="store.generating()">
+            <mat-icon>auto_awesome</mat-icon>
+            {{ store.generating() ? 'Generating...' : 'Generate AI Messages' }}
+          </button>
+        </div>
+
+        <div class="preview-list" *ngIf="store.campaignResult() as campaignResult">
+          <div class="preview-header">
+            <span>{{ campaignResult.messages.length }} messages generated</span>
+            <span class="preview-errors" *ngIf="campaignResult.errors.length">{{ campaignResult.errors.length }} errors</span>
+            <button mat-stroked-button class="btn-send" (click)="store.sendAll()" [disabled]="store.sending()">
+              <mat-icon>send</mat-icon>
+              {{ store.sending() ? 'Sending...' : 'Send All (In-App + SMS)' }}
+            </button>
+          </div>
+
+          <div class="preview-card" *ngFor="let msg of campaignResult.messages; let i = index">
+            <div class="preview-user">
+              <span class="pu-name">{{ msg.fullName || msg.phone }}</span>
+              <span class="pu-phone">{{ msg.phone }}</span>
+              <span class="pu-badge" *ngIf="msg.email">email</span>
+            </div>
+            <div class="preview-subject">{{ msg.subject }}</div>
+            <div class="preview-body">
+              <div class="preview-channel">
+                <span class="channel-label">In-App:</span>
+                <span>{{ msg.inAppTitle }} — {{ msg.inAppMessage }}</span>
+              </div>
+              <div class="preview-channel">
+                <span class="channel-label">SMS:</span>
+                <span>{{ msg.smsText }}</span>
+              </div>
+            </div>
+            <div class="preview-status" [class.pending]="!store.msgSent()[i]" [class.sent]="store.msgSent()[i]">
+              {{ store.msgSent()[i] ? 'Sent' : 'Ready' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  

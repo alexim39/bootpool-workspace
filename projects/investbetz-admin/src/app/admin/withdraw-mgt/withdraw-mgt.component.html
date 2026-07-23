@@ -1,0 +1,130 @@
+
+    <div class="page">
+      <div class="page-header">
+        <h1>Withdrawal Management</h1>
+        <span class="header-count">{{ store.total() }} withdrawals</span>
+      </div>
+
+      <mat-card class="filter-card">
+        <div class="filter-row">
+          <mat-form-field appearance="outline" class="filter-select">
+            <mat-label>Status</mat-label>
+            <mat-select [ngModel]="store.statusFilter()" (ngModelChange)="store.statusFilter.set($event); store.onFilterChange()">
+              <mat-option value="">All</mat-option>
+              <mat-option value="pending">Pending</mat-option>
+              <mat-option value="processing">Processing</mat-option>
+              <mat-option value="completed">Completed</mat-option>
+              <mat-option value="failed">Failed</mat-option>
+              <mat-option value="cancelled">Cancelled</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div class="filter-spacer"></div>
+          <button mat-stroked-button class="btn-refresh" (click)="store.load()">
+            <mat-icon>refresh</mat-icon> Refresh
+          </button>
+        </div>
+      </mat-card>
+
+      <mat-card class="table-card">
+        <div class="loading-overlay" *ngIf="store.loading()">
+          <div class="spinner"></div>
+        </div>
+        <table mat-table [dataSource]="store.withdrawals()" class="admin-table">
+          <ng-container matColumnDef="user">
+            <th mat-header-cell *matHeaderCellDef>User</th>
+            <td mat-cell *matCellDef="let w">{{ w.user?.phone || w.user?.fullName || '—' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef>Amount</th>
+            <td mat-cell *matCellDef="let w" class="cell-amount">₦{{ w.amount | number }}</td>
+          </ng-container>
+          <ng-container matColumnDef="fee">
+            <th mat-header-cell *matHeaderCellDef>Fee</th>
+            <td mat-cell *matCellDef="let w">₦{{ w.fee | number }}</td>
+          </ng-container>
+          <ng-container matColumnDef="bank">
+            <th mat-header-cell *matHeaderCellDef>Bank</th>
+            <td mat-cell *matCellDef="let w">{{ w.metadata?.bankName || '—' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="account">
+            <th mat-header-cell *matHeaderCellDef>Account</th>
+            <td mat-cell *matCellDef="let w">{{ w.metadata?.accountNumber || '—' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let w">
+              <span class="chip" [style.background]="statusColor(w.status) + '33'" [style.color]="statusColor(w.status)">
+                {{ w.status }}
+              </span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let w">{{ w.createdAt | date:'MMM d, y HH:mm' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let w">
+              <button mat-icon-button (click)="store.toggleDetail(w)" matTooltip="View details">
+                <mat-icon>{{ store.detailId() === w._id ? 'expand_less' : 'expand_more' }}</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="store.columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: store.columns;" class="clickable-row" (click)="store.toggleDetail(row)"></tr>
+        </table>
+
+        <div class="paginator" *ngIf="store.totalPages() > 1">
+          <button mat-button [disabled]="store.page() <= 1" (click)="store.goTo(store.page() - 1)">Previous</button>
+          <span class="page-info">Page {{ store.page() }} of {{ store.totalPages() }}</span>
+          <button mat-button [disabled]="store.page() >= store.totalPages()" (click)="store.goTo(store.page() + 1)">Next</button>
+        </div>
+
+        <div class="empty-state" *ngIf="!store.loading() && store.withdrawals().length === 0">
+          No withdrawals found
+        </div>
+      </mat-card>
+
+      <div class="detail-panel" *ngIf="store.detail() as detail">
+        <div class="detail-header">
+          <h3>Withdrawal Details</h3>
+          <div class="detail-actions">
+            <button mat-stroked-button class="btn-approve" *ngIf="detail.status === 'pending'" (click)="store.approve(detail)" [disabled]="store.actionLoading()">
+              <mat-icon>check_circle</mat-icon> Approve & Process
+            </button>
+            <button mat-stroked-button class="btn-reject" *ngIf="detail.status === 'pending'" (click)="store.showReject.set(true)" [disabled]="store.actionLoading()">
+              <mat-icon>cancel</mat-icon> Reject
+            </button>
+            <button mat-icon-button (click)="store.detail.set(null); store.detailId.set(null)"><mat-icon>close</mat-icon></button>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-item"><span class="d-label">Reference</span><span class="d-value">{{ detail.reference }}</span></div>
+          <div class="detail-item"><span class="d-label">User</span><span class="d-value">{{ detail.user?.phone || '—' }} {{ detail.user?.fullName ? '(' + (detail.user?.fullName || '') + ')' : '' }}</span></div>
+          <div class="detail-item"><span class="d-label">Amount</span><span class="d-value">₦{{ detail.amount | number }}</span></div>
+          <div class="detail-item"><span class="d-label">Fee</span><span class="d-value">₦{{ detail.fee | number }}</span></div>
+          <div class="detail-item"><span class="d-label">Net</span><span class="d-value">₦{{ (detail.amount - detail.fee) | number }}</span></div>
+          <div class="detail-item"><span class="d-label">Bank</span><span class="d-value">{{ detail.metadata?.bankName || '—' }}</span></div>
+          <div class="detail-item"><span class="d-label">Account Name</span><span class="d-value">{{ detail.metadata?.accountName || '—' }}</span></div>
+          <div class="detail-item"><span class="d-label">Account Number</span><span class="d-value">{{ detail.metadata?.accountNumber || '—' }}</span></div>
+          <div class="detail-item"><span class="d-label">Status</span><span class="d-value"><span class="chip" [style.background]="statusColor(detail.status) + '33'" [style.color]="statusColor(detail.status)">{{ detail.status }}</span></span></div>
+          <div class="detail-item"><span class="d-label">Created</span><span class="d-value">{{ detail.createdAt | date:'MMM d, y HH:mm:ss' }}</span></div>
+          <div class="detail-item"><span class="d-label">Completed</span><span class="d-value">{{ detail.completedAt ? (detail.completedAt | date:'MMM d, y HH:mm:ss') : '—' }}</span></div>
+          <div class="detail-item" *ngIf="detail.failureReason"><span class="d-label">Failure Reason</span><span class="d-value" style="color:#f44336">{{ detail.failureReason }}</span></div>
+        </div>
+
+        <div class="reject-form" *ngIf="store.showReject()">
+          <mat-form-field appearance="outline" class="reject-input">
+            <mat-label>Rejection reason</mat-label>
+            <input matInput [ngModel]="store.rejectReason()" (ngModelChange)="store.rejectReason.set($event)" placeholder="Enter reason for rejection">
+          </mat-form-field>
+          <div class="reject-actions">
+            <button mat-stroked-button class="btn-cancel" (click)="store.showReject.set(false)">Cancel</button>
+            <button mat-stroked-button class="btn-reject" (click)="store.reject(detail)" [disabled]="!store.rejectReason().trim()">
+              Confirm Reject
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  

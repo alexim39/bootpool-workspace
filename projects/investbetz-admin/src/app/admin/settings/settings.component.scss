@@ -1,0 +1,21 @@
+
+    .settings-page { padding: 20px; max-width: 800px; }
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { color: #fff; font-size: 22px; font-weight: 600; margin: 0; }
+    .settings-card { background: #0D1A30; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); padding: 20px; margin-bottom: 16px; }
+    .setting-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+    .setting-info { flex: 1; }
+    .setting-label { color: #fff; font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .setting-desc { color: rgba(255,255,255,0.5); font-size: 13px; line-height: 1.5; }
+    .setting-input-group { display: flex; align-items: center; gap: 4px; min-width: 200px; }
+    .input-currency { color: rgba(255,255,255,0.4); font-size: 18px; font-weight: 600; }
+    .setting-input { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 16px; font-weight: 600; width: 100%; outline: none; transition: border-color 0.2s; }
+    .setting-input:focus { border-color: #E8B923; }
+    .setting-input::placeholder { color: rgba(255,255,255,0.2); }
+    .setting-actions { display: flex; align-items: center; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .btn-save { background: #E8B923; color: #0A1428; border: none; border-radius: 8px; padding: 10px 24px; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+    .btn-save:hover { opacity: 0.9; }
+    .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+    .save-message { font-size: 13px; font-weight: 500; }
+    .save-message.error { color: #f44336; }
+  

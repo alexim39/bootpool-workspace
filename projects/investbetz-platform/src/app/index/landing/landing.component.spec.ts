@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, signal, WritableSignal } from '@angular/core';
 import { LandingComponent } from './landing.component';
-import { DeviceService } from '../../core/services/device.service';
+import { DeviceService } from '../../core/services';
 import { LandingDesktopComponent } from './landing-desktop.component';
 import { LandingMobileComponent } from './mobile/landing-mobile.component';
 

@@ -1,0 +1,22 @@
+
+    <div class="callback-page">
+      <div class="callback-card">
+        @if (status() === 'verifying') {
+          <div class="callback-spinner"></div>
+          <h2>Verifying Payment</h2>
+          <p>Please wait while we confirm your deposit...</p>
+        } @else if (status() === 'success') {
+          <div class="callback-icon success">✓</div>
+          <h2>Deposit Successful</h2>
+          <p>{{ message() }}</p>
+          <p class="callback-redirect">Redirecting to wallet...</p>
+          <a routerLink="/wallet" class="callback-btn">Go to Wallet</a>
+        } @else if (status() === 'error') {
+          <div class="callback-icon error">✕</div>
+          <h2>Deposit Failed</h2>
+          <p>{{ message() }}</p>
+          <a routerLink="/wallet" class="callback-btn">Back to Wallet</a>
+        }
+      </div>
+    </div>
+  

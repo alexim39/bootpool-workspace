@@ -1,0 +1,316 @@
+<app-nav />
+    @if (device.isMobile()) {
+      <div class="mp-mobile">
+        <header class="mobile-header">
+          <button mat-icon-button routerLink="/home"><mat-icon>arrow_back</mat-icon></button>
+          <h1>Match Pools</h1>
+          <button mat-icon-button class="info-btn" (click)="store.showGuide.set(!store.showGuide())" matTooltip="How it works">
+            <mat-icon>info_outline</mat-icon>
+          </button>
+          <button mat-icon-button (click)="store.logout()" matTooltip="Logout"><mat-icon>logout</mat-icon></button>
+        </header>
+
+        @if (store.showGuide()) {
+          <div class="guide-bar-mobile">
+            <div class="guide-step"><span class="step-num">1</span> Pick a pool &amp; choose a market you predict will win</div>
+            <div class="guide-step"><span class="step-num">2</span> Your payout is proportional to your stake share</div>
+            <div class="guide-step"><span class="step-num">3</span> Winning market splits the pool among its backers</div>
+            <div class="guide-footnote">Losing stakes are not refunded.</div>
+          </div>
+        }
+
+        <div class="msummary-row">
+          <div class="msummary-item">
+            <span class="ms-val">{{ store.mSummary().open }}</span>
+            <span class="ms-lbl">Open</span>
+          </div>
+          <div class="msummary-item">
+            <span class="ms-val gold">\u20A6{{ store.mSummary().poolTotal | number }}</span>
+            <span class="ms-lbl">Pool</span>
+          </div>
+          <div class="msummary-item">
+            <span class="ms-val blue">{{ store.mSummary().myStakes }}</span>
+            <span class="ms-lbl">My Stakes</span>
+          </div>
+        </div>
+
+        <div class="mtabs">
+          <button class="mtab" [class.active]="store.view() === 'list'" (click)="store.switchView('list')">Open Pools</button>
+          <button class="mtab" [class.active]="store.view() === 'my-stakes'" (click)="store.switchView('my-stakes')">My Stakes</button>
+        </div>
+
+        @if (store.view() === 'list') {
+          @if (store.loading()) {
+            <div class="m-loader"><mat-spinner diameter="24" /></div>
+          } @else if (store.openPools().length === 0) {
+            <div class="m-empty">
+              <mat-icon>water_pool</mat-icon>
+              <span>No open pools right now</span>
+            </div>
+          } @else {
+            <div class="mcard-stack">
+              @for (p of store.openPools(); track p._id) {
+                <div class="mcard" [class.expanded]="store.selectedPoolId() === p._id">
+                  <div class="mc-header" (click)="store.togglePoolExpand(p._id)">
+                    <div class="mc-h-left">
+                      <strong>{{ p.eventTitle }}</strong>
+                      <span class="mc-deadline">Closes {{ p.stakingClosesAt | date:'MMM d, h:mm a' }}</span>
+                    </div>
+                    <div class="mc-h-right"><!-- \u20A6{{ p.totalPool | number }} --></div>
+                  </div>
+                  <div class="mc-markets">
+                    @for (m of p.markets; track m.marketId) {
+                      <div class="mc-market"
+                        [class.selected]="store.selectedPoolId() === p._id && store.selectedMarket() === m.marketId"
+                        (click)="$event.stopPropagation(); store.selectMarketOnPool(p._id, m.marketId)">
+                        <div class="mc-m-bar" [style.width.%]="(m.totalStaked / (p.totalPool || 1)) * 100"></div>
+                        <div class="mc-m-left">
+                          <span class="mc-m-label">{{ m.label }}</span>
+                          <span class="mc-m-staked"><!-- \u20A6{{ m.totalStaked | number }} --></span>
+                        </div>
+                        <div class="mc-m-right">
+                          @if (store.getMarketRank(p.markets, m.marketId) === 0) {
+                            <mat-icon class="rank-icon rank-1st" matTooltip="Leading">emoji_events</mat-icon>
+                          } @else if (store.getMarketRank(p.markets, m.marketId) === 1) {
+                            <mat-icon class="rank-icon rank-2nd" matTooltip="2nd">workspace_premium</mat-icon>
+                          } @else if (store.getMarketRank(p.markets, m.marketId) === p.markets.length - 1) {
+                            <mat-icon class="rank-icon rank-last" matTooltip="Trailing">arrow_downward</mat-icon>
+                          }
+                          <span class="mc-m-pct">{{ (m.totalStaked / (p.totalPool || 1)) | percent:'1.0-1' }}</span>
+                          <mat-icon class="mc-m-check">check_circle</mat-icon>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                  @if (store.selectedPoolId() === p._id && store.selectedMarket()) {
+                    <div class="mc-stake">
+                      <mat-form-field appearance="outline" class="mc-stake-input">
+                        <mat-label>Stake (\u20A6{{ p.minStake }} \u2013 \u20A6{{ p.maxStake | number }})</mat-label>
+                        <input matInput type="number" [(ngModel)]="store.stakeAmount">
+                      </mat-form-field>
+                      <button mat-raised-button class="mc-stake-btn" (click)="store.placeStake(p._id)"
+                        [disabled]="!store.stakeAmount || store.stakeAmount < p.minStake || store.stakeAmount > p.maxStake || store.staking()">
+                        @if (store.staking()) { <mat-spinner diameter="18" /> }
+                        @else { Place Stake }
+                      </button>
+                      @if (store.stakeError()) { <div class="mc-err">{{ store.stakeError() }}</div> }
+                      @if (store.stakeSuccess()) { <div class="mc-ok">Stake placed!</div> }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        }
+
+        @if (store.view() === 'my-stakes') {
+          @if (store.myStakesLoading()) {
+            <div class="m-loader"><mat-spinner diameter="24" /></div>
+          } @else if (store.myStakes().length === 0) {
+            <div class="m-empty">
+              <mat-icon>casino</mat-icon>
+              <span>No stakes yet</span>
+            </div>
+          } @else {
+            <div class="mcard-stack">
+              @for (s of store.myStakes(); track s._id) {
+                <div class="mcard">
+                  <div class="s-row">
+                    <div class="s-left">
+                      <strong>{{ s.matchPool?.eventTitle || 'Unknown Event' }}</strong>
+                      <span class="s-market">{{ store.formatMarketName(s.marketId) }}</span>
+                    </div>
+                    <span class="s-amount">\u20A6{{ s.amount | number }}</span>
+                  </div>
+                  <div class="s-bottom">
+                    <span class="s-chip" [class.won]="s.status === 'won'" [class.lost]="s.status === 'lost'">
+                      <mat-icon class="s-chip-icon">{{ s.status === 'won' ? 'emoji_events' : s.status === 'lost' ? 'autorenew' : 'schedule' }}</mat-icon>
+                      {{ s.status }}
+                    </span>
+                    @if (s.payoutAmount) {
+                      <span class="s-payout">Payout: \u20A6{{ s.payoutAmount | number }}</span>
+                    }
+                    <span class="s-date">{{ s.createdAt | date:'MMM d' }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+    } @else {
+      <div class="mp-container">
+        <div class="page-header">
+          <h1>Match Pools
+            <button mat-icon-button class="info-btn" (click)="store.showGuide.set(!store.showGuide())" matTooltip="How it works">
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </h1>
+        </div>
+
+        @if (store.showGuide()) {
+          <div class="guide-bar">
+            <div class="guide-step"><span class="step-num">1</span> Pick a match pool &amp; choose a market you predict will win</div>
+            <div class="guide-step"><span class="step-num">2</span> Place your stake — bigger stake means a bigger payout</div>
+            <div class="guide-step"><span class="step-num">3</span> If your market wins, you earn a proportional share of the pool</div>
+            <div class="guide-footnote">Losing stakes are not refunded. Payout = (your stake \u00F7 winning market total) \u00D7 distributable pool.</div>
+          </div>
+        }
+
+        <div class="summary-cards">
+          <mat-card class="summary-card">
+            <mat-card-content>
+              <div class="summary-icon active"><mat-icon>water_pool</mat-icon></div>
+              <div class="summary-value">{{ store.summary().total }}</div>
+              <div class="summary-label">Total Pools</div>
+            </mat-card-content>
+          </mat-card>
+          <mat-card class="summary-card">
+            <mat-card-content>
+              <div class="summary-icon open"><mat-icon>play_circle</mat-icon></div>
+              <div class="summary-value">{{ store.summary().open }}</div>
+              <div class="summary-label">Open Pools</div>
+            </mat-card-content>
+          </mat-card>
+          <mat-card class="summary-card">
+            <mat-card-content>
+              <div class="summary-icon pool-val"><mat-icon>account_balance</mat-icon></div>
+              <div class="summary-value">\u20A6{{ store.summary().poolTotal | number }}</div>
+              <div class="summary-label">Combined Pool</div>
+            </mat-card-content>
+          </mat-card>
+          <mat-card class="summary-card">
+            <mat-card-content>
+              <div class="summary-icon my-stakes"><mat-icon>casino</mat-icon></div>
+              <div class="summary-value">{{ store.summary().myStakes }}</div>
+              <div class="summary-label">My Stakes</div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <mat-tab-group class="content-tabs" (selectedTabChange)="store.onTabChange($event)">
+          <mat-tab label="Open Pools">
+            <div class="tab-body">
+              @if (store.loading()) {
+                <div class="loading-center"><mat-spinner /></div>
+              } @else if (store.openPools().length === 0) {
+                <div class="empty-state">
+                  <mat-icon>water_pool</mat-icon>
+                  <h3>No open pools</h3>
+                  <p>Check back later for new match pools</p>
+                </div>
+              } @else {
+                <div class="pool-grid">
+                  @for (p of store.openPools(); track p._id) {
+                    <mat-card class="pool-card" [class.expanded]="store.selectedPoolId() === p._id">
+                      <div class="pc-header" (click)="store.togglePoolExpand(p._id)">
+                        <div class="pc-title-area">
+                          <h3>{{ p.eventTitle }}</h3>
+                          <span class="pc-deadline">Closes {{ p.stakingClosesAt | date:'MMM d, h:mm a' }}</span>
+                        </div>
+                        <div class="pc-pool-total"><!-- \u20A6{{ p.totalPool | number }} --></div>
+                      </div>
+                      <div class="pc-markets">
+                        @for (m of p.markets; track m.marketId) {
+                          <div class="pc-market"
+                            [class.selected]="store.selectedPoolId() === p._id && store.selectedMarket() === m.marketId"
+                            (click)="$event.stopPropagation(); store.selectMarketOnPool(p._id, m.marketId)">
+                            <div class="pc-bar" [style.width.%]="(m.totalStaked / (p.totalPool || 1)) * 100"></div>
+                            <div class="pm-left">
+                              <span class="pm-label">{{ m.label }}</span>
+                              <span class="pm-staked"><!-- \u20A6{{ m.totalStaked | number }} staked --></span>
+                            </div>
+                            <div class="pm-right">
+                              @if (store.getMarketRank(p.markets, m.marketId) === 0) {
+                                <mat-icon class="rank-icon rank-1st" matTooltip="Leading">emoji_events</mat-icon>
+                              } @else if (store.getMarketRank(p.markets, m.marketId) === 1) {
+                                <mat-icon class="rank-icon rank-2nd" matTooltip="2nd">workspace_premium</mat-icon>
+                              } @else if (store.getMarketRank(p.markets, m.marketId) === p.markets.length - 1) {
+                                <mat-icon class="rank-icon rank-last" matTooltip="Trailing">arrow_downward</mat-icon>
+                              }
+                              <span class="pm-pct">{{ (m.totalStaked / (p.totalPool || 1)) | percent:'1.0-1' }}</span>
+                              <mat-icon class="pm-check">check_circle</mat-icon>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                      @if (store.selectedPoolId() === p._id && store.selectedMarket()) {
+                        <div class="pc-stake-form">
+                          <div class="psf-row">
+                            <mat-form-field appearance="outline" class="psf-input">
+                              <mat-label>Stake (\u20A6{{ p.minStake | number }} \u2013 \u20A6{{ p.maxStake | number }})</mat-label>
+                              <input matInput type="number" [(ngModel)]="store.stakeAmount">
+                            </mat-form-field>
+                            <button mat-raised-button class="btn-emerald" (click)="store.placeStake(p._id)"
+                              [disabled]="!store.stakeAmount || store.stakeAmount < p.minStake || store.stakeAmount > p.maxStake || store.staking()">
+                              @if (store.staking()) { <mat-spinner diameter="20" /> }
+                              @else { <ng-container><mat-icon>bolt</mat-icon> Place Stake</ng-container> }
+                            </button>
+                          </div>
+                          @if (store.stakeError()) { <div class="psf-error">{{ store.stakeError() }}</div> }
+                          @if (store.stakeSuccess()) { <div class="psf-success">Stake placed!</div> }
+                        </div>
+                      }
+                    </mat-card>
+                  }
+                </div>
+              }
+            </div>
+          </mat-tab>
+
+          <mat-tab label="My Stakes">
+            <div class="tab-body">
+              @if (store.myStakesLoading()) {
+                <div class="loading-center"><mat-spinner /></div>
+              } @else if (store.myStakes().length === 0) {
+                <div class="empty-state">
+                  <mat-icon>casino</mat-icon>
+                  <h3>No stakes yet</h3>
+                  <p>Place your first stake in an open match pool</p>
+                </div>
+              } @else {
+                <div class="stakes-table-wrap">
+                  <table mat-table [dataSource]="store.myStakes()" class="stakes-table">
+                    <ng-container matColumnDef="event">
+                      <th mat-header-cell *matHeaderCellDef>Event</th>
+                      <td mat-cell *matCellDef="let s">{{ s.matchPool?.eventTitle || 'Unknown Event' }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="market">
+                      <th mat-header-cell *matHeaderCellDef>Market</th>
+                      <td mat-cell *matCellDef="let s">{{ store.formatMarketName(s.marketId) }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="amount">
+                      <th mat-header-cell *matHeaderCellDef>Stake</th>
+                      <td mat-cell *matCellDef="let s">\u20A6{{ s.amount | number }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="payout">
+                      <th mat-header-cell *matHeaderCellDef>Payout</th>
+                      <td mat-cell *matCellDef="let s">
+                        @if (s.payoutAmount) { \u20A6{{ s.payoutAmount | number }} }
+                        @else { \u2014 }
+                      </td>
+                    </ng-container>
+                    <ng-container matColumnDef="status">
+                      <th mat-header-cell *matHeaderCellDef>Status</th>
+                      <td mat-cell *matCellDef="let s">
+                        <mat-chip [class]="s.status === 'won' ? 'chip-emerald' : s.status === 'lost' ? 'chip-gray' : 'chip-gold'" selected>
+                          <mat-icon matChipAvatar>{{ s.status === 'won' ? 'emoji_events' : s.status === 'lost' ? 'autorenew' : 'schedule' }}</mat-icon>
+                          {{ s.status }}
+                        </mat-chip>
+                      </td>
+                    </ng-container>
+                    <ng-container matColumnDef="date">
+                      <th mat-header-cell *matHeaderCellDef>Date</th>
+                      <td mat-cell *matCellDef="let s">{{ s.createdAt | date:'MMM d, h:mm a' }}</td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="store.stakeColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: store.stakeColumns;"></tr>
+                  </table>
+                </div>
+              }
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    }
+    <app-mobile-nav />

@@ -1,0 +1,52 @@
+
+    .bet-card { margin-bottom: 12px; border-radius: 14px; background: #0D1A30; border: 1px solid rgba(255,255,255,0.06); color: #FFFFFF; }
+    .bet-card.settled { opacity: 0.7; }
+    .bet-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .bet-status { display: flex; flex-direction: column; gap: 4px; }
+    .bet-status mat-chip { font-size: 10px; height: 24px; padding: 0 8px; border-radius: 12px; font-weight: 500; }
+    .bet-status mat-chip mat-icon { font-size: 14px; width: 14px; height: 14px; color: #00E676; }
+    .chip-cashout { font-size: 10px; height: 24px; background: rgba(0,230,118,0.15) !important; --mdc-chip-label-text-color: #00E676; color: #00E676; }
+    .bet-date { font-size: 11px; color: rgba(255,255,255,0.4); }
+    .bet-match { margin-bottom: 8px; }
+    .match-teams { display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 14px; margin-bottom: 4px; color: #FFFFFF; }
+    .match-teams mat-icon { font-size: 16px; width: 16px; height: 16px; color: rgba(255,255,255,0.3); }
+    .match-info { display: flex; justify-content: center; gap: 12px; font-size: 11px; color: rgba(255,255,255,0.5); }
+    .league { background: rgba(0,230,118,0.1); color: #00E676; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
+    .market-type { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); padding: 2px 6px; border-radius: 4px; font-weight: 500; }
+    .refund-chip { background: rgba(232,185,35,0.15); color: #E8B923; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+    .parlay-badge { text-align: center; font-size: 11px; font-weight: 700; color: #CE93D8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .parlay-legs { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+    .parlay-leg { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 4px 8px; background: rgba(255,255,255,0.03); border-radius: 6px; }
+    .leg-teams { color: #FFFFFF; font-weight: 500; }
+    .leg-odds { color: #E8B923; font-weight: 600; }
+    .leg-selection { color: #00E676; font-size: 11px; }
+    .parlay-odds { color: #CE93D8; }
+    .parlay-label { display: block; font-size: 10px; color: rgba(255,255,255,0.4); text-align: right; }
+    .bet-selection { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .selection { font-size: 13px; font-weight: 500; color: #00E676; display: block; }
+    .odds { font-size: 18px; font-weight: 700; color: #E8B923; }
+    .bet-details { display: flex; flex-direction: column; gap: 8px; padding: 10px 0; }
+    .detail-row { display: flex; justify-content: space-between; font-size: 13px; }
+    .detail-label { color: rgba(255,255,255,0.5); }
+    .detail-value { font-weight: 500; color: #FFFFFF; }
+    .detail-value.stake-amount { color: #00E676; }
+    .detail-value.payout { color: #00E676; }
+    .detail-value.fee { color: #f44336; font-size: 11px; }
+    .bet-actions { margin-top: 12px; width: 100%; }
+    .bet-actions button { width: 100%; }
+    .btn-cashout-action { border-color: #00E676 !important; color: #00E676 !important; font-weight: 600; }
+    .settled-result { text-align: center; padding-top: 12px; }
+    .result-label { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+    .profit { font-size: 20px; font-weight: 700; margin: 4px 0; }
+    .profit.positive { color: #00E676; }
+    .profit.negative { color: rgba(255,255,255,0.5); }
+    .profit.neutral { color: rgba(255,255,255,0.5); }
+    .settled-time { font-size: 11px; color: rgba(255,255,255,0.4); }
+    mat-card-content { padding: 16px; }
+    ::ng-deep .mat-mdc-chip.mat-mdc-standard-chip { background: transparent; }
+    ::ng-deep .chip-emerald { background: rgba(0,230,118,0.15) !important; --mdc-chip-label-text-color: #00E676; }
+    ::ng-deep .chip-gold { background: rgba(232,185,35,0.15) !important; --mdc-chip-label-text-color: #E8B923; }
+    ::ng-deep .chip-gray { background: rgba(255,255,255,0.08) !important; --mdc-chip-label-text-color: rgba(255,255,255,0.6); }
+    ::ng-deep .chip-blue { background: rgba(100,181,246,0.15) !important; --mdc-chip-label-text-color: #64B5F6; }
+    ::ng-deep .mat-divider { border-top-color: rgba(255,255,255,0.06) !important; }
+  

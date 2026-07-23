@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { WalletService } from '../../services/wallet.service';
+import { WalletService } from '../../services';
 
 @Component({
   selector: 'app-top-up-modal',

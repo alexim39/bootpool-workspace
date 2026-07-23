@@ -1,0 +1,34 @@
+
+    <div class="auth-root">
+      <div class="auth-card">
+        <div class="logo">
+          <span class="logo-bet">Bet</span><span class="logo-pool">Pool</span>
+        </div>
+        <h1 class="auth-title">Set Up PIN</h1>
+        <p class="auth-subtitle">Create a 4-digit PIN to secure your account</p>
+
+        <div class="field">
+          <label class="field-label">Create PIN</label>
+          <input class="field-input" type="password" [(ngModel)]="pin" placeholder="Enter 4-digit PIN" maxlength="4" inputmode="numeric" />
+        </div>
+
+        <div class="field">
+          <label class="field-label">Confirm PIN</label>
+          <input class="field-input" type="password" [(ngModel)]="confirmPin" placeholder="Re-enter PIN" maxlength="4" inputmode="numeric" />
+        </div>
+
+        @if (pinMismatch) {
+          <div class="error-msg">PINs do not match</div>
+        }
+
+        <button class="btn-primary" (click)="submitPin()" [disabled]="!canSubmit || store.loading()">
+          @if (store.loading()) { <span class="spinner"></span> }
+          Complete Setup
+        </button>
+
+        @if (store.error()) {
+          <div class="error-msg">{{ store.error() }}</div>
+        }
+      </div>
+    </div>
+  

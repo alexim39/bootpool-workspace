@@ -8,9 +8,10 @@
       "schematics": {
         "@schematics/angular:component": {
           "style": "scss",
-          "inlineTemplate": true,
-          "inlineStyle": true,
-          "skipTests": true
+          "inlineTemplate": false,
+          "inlineStyle": false,
+          "skipTests": false,
+          "standalone": true
         }
       },
       "root": "projects/investbetz-platform",
@@ -124,9 +125,10 @@
       "schematics": {
         "@schematics/angular:component": {
           "style": "scss",
-          "inlineTemplate": true,
-          "inlineStyle": true,
-          "skipTests": true,
+          "inlineTemplate": false,
+          "inlineStyle": false,
+          "skipTests": false,
+          "standalone": true,
           "selector": "async"
         }
       },

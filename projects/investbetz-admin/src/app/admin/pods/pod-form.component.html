@@ -1,0 +1,150 @@
+
+    <div class="modal-overlay" (click)="close.emit()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ isEdit() ? 'Edit Pod' : 'Create Pod' }}</h2>
+          <button mat-icon-button (click)="close.emit()"><mat-icon>close</mat-icon></button>
+        </div>
+
+        <form #podForm="ngForm" class="pod-form" (ngSubmit)="save()">
+          <div class="form-row">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Title</mat-label>
+              <input matInput [(ngModel)]="formData.title" name="title" required>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row cols-2">
+            <mat-form-field appearance="fill">
+              <mat-label>Sport</mat-label>
+              <mat-select [(ngModel)]="formData.sport" name="sport" required>
+                <mat-option *ngFor="let s of sportsList" [value]="s">{{ s }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>League</mat-label>
+              <input matInput [(ngModel)]="formData.league" name="league">
+            </mat-form-field>
+          </div>
+
+          <div class="form-row cols-2">
+            <mat-form-field appearance="fill">
+              <mat-label>Home Team</mat-label>
+              <input matInput [(ngModel)]="formData.homeTeam" name="homeTeam" required>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Away Team</mat-label>
+              <input matInput [(ngModel)]="formData.awayTeam" name="awayTeam" required>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row cols-3">
+            <mat-form-field appearance="fill">
+              <mat-label>Match Date</mat-label>
+              <input matInput [matDatepicker]="matchPicker" [(ngModel)]="formData.matchDateObj" name="matchDateObj" required>
+              <mat-datepicker-toggle matSuffix [for]="matchPicker"></mat-datepicker-toggle>
+              <mat-datepicker #matchPicker></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Time</mat-label>
+              <input matInput type="time" [(ngModel)]="formData.matchTime" name="matchTime" required>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Market Type</mat-label>
+              <mat-select [(ngModel)]="formData.marketType" name="marketType" required (selectionChange)="onMarketTypeChange()">
+                <mat-option *ngFor="let mt of marketTypes" [value]="mt.value">{{ mt.label }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row cols-3">
+            <mat-form-field appearance="fill">
+              <mat-label>Selection</mat-label>
+              <mat-select [(ngModel)]="formData.selection" name="selection" required>
+                <mat-option *ngFor="let sel of selectionOptions" [value]="sel">{{ sel }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Multiplier</mat-label>
+              <input matInput type="number" step="0.01" [(ngModel)]="formData.gainsMultiplier" name="gainsMultiplier" required>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Refund %</mat-label>
+              <input matInput type="number" min="0" max="100" [(ngModel)]="formData.refundPercent" name="refundPercent">
+              <mat-hint>Auto-calc: {{ getAutoRefundPercent() }}%</mat-hint>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Min Stake</mat-label>
+              <input matInput type="number" [(ngModel)]="formData.minStake" name="minStake" required>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row cols-3">
+            <mat-form-field appearance="fill">
+              <mat-label>Max Stake</mat-label>
+              <input matInput type="number" [(ngModel)]="formData.maxStake" name="maxStake" required>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Max Total Exposure</mat-label>
+              <input matInput type="number" [(ngModel)]="formData.maxTotalExposure" name="maxTotalExposure" required>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Staking Closes</mat-label>
+              <input matInput [matDatepicker]="closesPicker" [(ngModel)]="formData.stakingClosesDateObj" name="stakingClosesDateObj" required>
+              <mat-datepicker-toggle matSuffix [for]="closesPicker"></mat-datepicker-toggle>
+              <mat-datepicker #closesPicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row cols-3">
+            <mat-form-field appearance="fill">
+              <mat-label>Close Time</mat-label>
+              <input matInput type="time" [(ngModel)]="formData.stakingClosesTime" name="stakingClosesTime" required>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Settlement Estimate</mat-label>
+              <input matInput [(ngModel)]="formData.settlementEstimateLabel" name="settlementEstimateLabel">
+            </mat-form-field>
+            <mat-slide-toggle [(ngModel)]="formData.isLive" name="isLive" color="primary">Live</mat-slide-toggle>
+          </div>
+
+          <div class="legs-section">
+            <div class="section-header">
+              <h3>Legs</h3>
+              <button mat-icon-button type="button" (click)="addLeg()" color="primary"><mat-icon>add</mat-icon></button>
+            </div>
+            <div class="leg-item" *ngFor="let leg of formData.legs; let i = index">
+              <div class="leg-fields">
+                <mat-form-field appearance="fill">
+                  <mat-label>Home</mat-label>
+                  <input matInput [(ngModel)]="leg.homeTeam" [name]="'legHome' + i" required>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>Away</mat-label>
+                  <input matInput [(ngModel)]="leg.awayTeam" [name]="'legAway' + i" required>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>Date</mat-label>
+                  <input matInput type="date" [(ngModel)]="leg.matchDateObj" [name]="'legDate' + i" required>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>League</mat-label>
+                  <input matInput [(ngModel)]="leg.league" [name]="'legLeague' + i">
+                </mat-form-field>
+              </div>
+              <button mat-icon-button type="button" color="warn" (click)="removeLeg(i)"><mat-icon>delete</mat-icon></button>
+            </div>
+          </div>
+
+          <div class="error-msg" *ngIf="saveError">{{ saveError }}</div>
+          <div class="form-actions">
+            <button mat-button type="button" (click)="close.emit()" [disabled]="saving()">Cancel</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="podForm.invalid || saving()">
+              <span *ngIf="!saving()">{{ isEdit() ? 'Update' : 'Create' }} Pod</span>
+              <span *ngIf="saving()"><mat-icon style="font-size: 18px; vertical-align: middle; animation: spin 0.8s linear infinite;">sync</mat-icon> Saving...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  

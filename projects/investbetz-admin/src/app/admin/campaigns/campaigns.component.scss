@@ -1,0 +1,33 @@
+
+    .page { max-width: 1400px; }
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .page-header h1 { color: #fff; font-size: 24px; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 8px; }
+    .btn-refresh { color: #90caf9 !important; border-color: #90caf9 !important; }
+    .segment-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .segment-card { background: #0D1A30; border-radius: 12px; padding: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.06); cursor: pointer; transition: all 0.15s; }
+    .segment-card:hover { border-color: rgba(206,147,216,0.4); }
+    .segment-card.selected { border-color: #CE93D8; background: rgba(206,147,216,0.08); }
+    .segment-card .sc-icon mat-icon { font-size: 28px; width: 28px; height: 28px; color: #CE93D8; }
+    .segment-card .sc-count { font-size: 28px; font-weight: 700; color: #fff; margin: 4px 0; }
+    .segment-card .sc-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; font-weight: 600; }
+    .campaign-panel { margin-bottom: 24px; }
+    .campaign-actions { margin-bottom: 16px; }
+    .btn-generate { background: #CE93D8 !important; color: #0A1428 !important; font-weight: 600; }
+    .btn-send { color: #00E676 !important; border-color: #00E676 !important; }
+    .preview-header { display: flex; align-items: center; gap: 12px; padding: 8px 0 12px; color: rgba(255,255,255,0.6); font-size: 14px; }
+    .preview-header button { margin-left: auto; }
+    .preview-errors { color: #E8B923; font-size: 12px; }
+    .preview-card { background: #0D1A30; border-radius: 10px; padding: 16px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 8px; }
+    .preview-user { display: flex; align-items: center; gap: 8px; }
+    .pu-name { color: #fff; font-weight: 600; font-size: 14px; }
+    .pu-phone { color: rgba(255,255,255,0.4); font-size: 12px; }
+    .pu-badge { font-size: 10px; background: rgba(33,150,243,0.15); color: #2196f3; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+    .preview-subject { color: #CE93D8; font-size: 14px; font-weight: 500; }
+    .preview-body { display: flex; flex-direction: column; gap: 6px; }
+    .preview-channel { display: flex; gap: 6px; font-size: 12px; color: rgba(255,255,255,0.6); }
+    .channel-label { color: rgba(255,255,255,0.35); font-weight: 600; min-width: 50px; text-transform: uppercase; font-size: 10px; }
+    .preview-status { font-size: 11px; font-weight: 600; text-align: right; }
+    .preview-status.pending { color: rgba(255,255,255,0.3); }
+    .preview-status.sent { color: #00E676; }
+    ::ng-deep .mat-mdc-form-field .mdc-text-field--filled { background: rgba(255,255,255,0.05) !important; }
+  

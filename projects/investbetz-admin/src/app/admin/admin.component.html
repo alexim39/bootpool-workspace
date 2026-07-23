@@ -1,0 +1,47 @@
+
+    <div class="admin-shell">
+      <aside class="sidebar" [class.collapsed]="sidebarCollapsed()">
+        <div class="sidebar-header">
+          <div class="logo">
+            <span class="logo-icon">B</span>
+            <span class="logo-text" *ngIf="!sidebarCollapsed()">BetPool</span>
+          </div>
+          <button mat-icon-button class="toggle-btn" (click)="sidebarCollapsed.set(!sidebarCollapsed())">
+            <mat-icon>{{ sidebarCollapsed() ? 'menu' : 'close' }}</mat-icon>
+          </button>
+        </div>
+
+        <nav class="nav-list">
+          <a *ngFor="let item of navItems" class="nav-item"
+             [routerLink]="item.path"
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{ exact: item.exact }"
+             [title]="item.label">
+            <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+            <span class="nav-label" *ngIf="!sidebarCollapsed()">{{ item.label }}</span>
+            <span class="nav-badge" *ngIf="item.badge && pendingTotal > 0 && !sidebarCollapsed()">{{ pendingTotal }}</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="user-info" *ngIf="!sidebarCollapsed()">
+            <div class="avatar">{{ (user()?.fullName || 'A')[0] }}</div>
+            <div class="user-details">
+              <div class="user-name">{{ user()?.fullName || 'Admin' }}</div>
+              <div class="user-role">Administrator</div>
+            </div>
+          </div>
+          <button mat-icon-button class="logout-btn" title="Logout" (click)="auth.logout()">
+            <mat-icon>logout</mat-icon>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content" [class.expanded]="sidebarCollapsed()">
+        <div class="route-loader" *ngIf="routeLoading()">
+          <mat-spinner diameter="32"></mat-spinner>
+        </div>
+        <router-outlet />
+      </main>
+    </div>
+  

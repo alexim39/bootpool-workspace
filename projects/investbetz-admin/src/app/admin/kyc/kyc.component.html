@@ -1,0 +1,160 @@
+
+    <div class="page">
+      <div class="page-header">
+        <h1>KYC Management</h1>
+      </div>
+
+      <mat-card class="filter-card">
+        <div class="filters">
+          <mat-form-field appearance="fill" class="filter-field">
+            <mat-label>Status</mat-label>
+            <mat-select [ngModel]="store.statusFilter()" (ngModelChange)="store.statusFilter.set($event); store.onFilterChange()">
+              <mat-option value="">All</mat-option>
+              <mat-option value="pending">Pending</mat-option>
+              <mat-option value="verified">Verified</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="fill" class="search-field">
+            <mat-label>Search users...</mat-label>
+            <input matInput [ngModel]="store.searchQuery()" (ngModelChange)="store.searchQuery.set($event); store.onSearchInput()" placeholder="Phone, name, email...">
+          </mat-form-field>
+        </div>
+      </mat-card>
+
+      <mat-card class="table-card">
+        <div class="loading-shim" *ngIf="store.loading()">
+          <div class="spinner"></div>
+        </div>
+        <table mat-table [dataSource]="store.items()" class="admin-table">
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let u">{{ u.fullName || '-' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="phone">
+            <th mat-header-cell *matHeaderCellDef>Phone</th>
+            <td mat-cell *matCellDef="let u">{{ u.phone }}</td>
+          </ng-container>
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>KYC Type</th>
+            <td mat-cell *matCellDef="let u">{{ kycTypeLabel(u) }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let u">
+              <span class="chip" [style.background]="u.kycVerified ? '#00E676' : '#E8B923'">
+                {{ u.kycVerified ? 'Verified' : 'Pending' }}
+              </span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="submitted">
+            <th mat-header-cell *matHeaderCellDef>Submitted</th>
+            <td mat-cell *matCellDef="let u">{{ kycDateLabel(u) }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let u">
+              <button mat-icon-button (click)="store.selectUser(u)" matTooltip="View Details"><mat-icon>visibility</mat-icon></button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="store.columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: store.columns;"></tr>
+        </table>
+        <div class="empty-state" *ngIf="!store.loading() && store.items().length === 0">No users found</div>
+        <mat-paginator *ngIf="store.totalPages() > 1"
+          [length]="store.total()"
+          [pageSize]="store.limit()"
+          [pageIndex]="store.page() - 1"
+          [pageSizeOptions]="[10, 20, 50, 100]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons>
+        </mat-paginator>
+      </mat-card>
+    </div>
+
+    <div class="modal-overlay" *ngIf="store.selectedUser()" (click)="store.closeUserDetail()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>KYC Details &mdash; {{ store.selectedUser()!.fullName }}</h2>
+          <button mat-icon-button (click)="store.closeUserDetail()"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="modal-body">
+          <div class="info-grid">
+            <div class="info-item"><span class="label">Phone</span><span class="value">{{ store.selectedUser()!.phone }}</span></div>
+            <div class="info-item"><span class="label">Email</span><span class="value">{{ store.selectedUser()!.email || '-' }}</span></div>
+            <div class="info-item"><span class="label">KYC Type</span><span class="value">{{ (store.selectedUser()!.kycType || 'N/A') | uppercase }}</span></div>
+            <div class="info-item"><span class="label">KYC Number</span><span class="value">{{ store.selectedUser()!.kycNumber || '-' }}</span></div>
+            <div class="info-item"><span class="label">Status</span><span class="value">
+              <span class="chip" [style.background]="store.selectedUser()!.kycVerified ? '#00E676' : '#E8B923'">
+                {{ store.selectedUser()!.kycVerified ? 'Verified' : 'Pending' }}
+              </span>
+            </span></div>
+            <div class="info-item"><span class="label">Submitted</span><span class="value">{{ store.selectedUser()!.kycSubmittedAt ? (store.selectedUser()!.kycSubmittedAt | date:'medium') : '-' }}</span></div>
+            <div class="info-item" *ngIf="store.selectedUser()!.kycData?.bvnVerifiedName"><span class="label">BVN Name</span><span class="value">{{ store.selectedUser()!.kycData!.bvnVerifiedName }}</span></div>
+            <div class="info-item" *ngIf="store.selectedUser()!.kycData?.ninVerifiedName"><span class="label">NIN Name</span><span class="value">{{ store.selectedUser()!.kycData!.ninVerifiedName }}</span></div>
+          </div>
+          <div class="review-notes" *ngIf="store.selectedUser()!.kycReviewNote">
+            <h4>Review Note</h4>
+            <p>{{ store.selectedUser()!.kycReviewNote }}</p>
+          </div>
+          <div class="action-buttons" *ngIf="!store.selectedUser()!.kycVerified">
+            <button mat-raised-button class="action-verify" (click)="store.verifyKyc(store.selectedUser()!)">
+              <mat-icon>verified</mat-icon> Approve KYC
+            </button>
+            <button mat-stroked-button class="action-reject" (click)="store.showRejectForm.set(true)">
+              <mat-icon>cancel</mat-icon> Reject
+            </button>
+            <button mat-stroked-button class="action-ai-review" (click)="store.aiReview()" [disabled]="store.reviewing()">
+              <mat-icon>auto_awesome</mat-icon>
+              {{ store.reviewing() ? 'Reviewing...' : 'Ora Review' }}
+            </button>
+          </div>
+          <div class="ai-review-panel" *ngIf="store.kycReview()">
+            <div class="ai-review-header">
+              <mat-icon style="color:#CE93D8">auto_awesome</mat-icon>
+              <span>Ora KYC Review</span>
+              <button mat-icon-button (click)="store.kycReview.set(null)"><mat-icon>close</mat-icon></button>
+            </div>
+            <div class="ai-review-body">
+              <div class="ai-review-verdict">
+                <span class="verdict-badge" [class.approve]="store.kycReview()!.recommendedAction === 'approve'" [class.reject]="store.kycReview()!.recommendedAction === 'reject'" [class.manual]="store.kycReview()!.recommendedAction === 'manual_review'">
+                  {{ store.kycReview()!.recommendedAction === 'manual_review' ? 'Manual Review' : store.kycReview()!.recommendedAction.toUpperCase() }}
+                </span>
+                <span class="verdict-confidence">{{ store.kycReview()!.confidence }}% confidence</span>
+              </div>
+              <div class="ai-review-reasoning">{{ store.kycReview()!.reasoning }}</div>
+              <div class="risk-flags" *ngIf="store.kycReview()!.riskFlags.length">
+                <div class="risk-flag" *ngFor="let f of store.kycReview()!.riskFlags">
+                  <mat-icon style="font-size:14px;color:#E8B923">warning_amber</mat-icon>
+                  <span>{{ f }}</span>
+                </div>
+              </div>
+              <div class="ai-review-details">
+                <div class="detail-row"><span class="detail-label">Verified Name</span><span class="detail-value">{{ store.kycReview()!.verifiedName || 'N/A' }}</span></div>
+                <div class="detail-row"><span class="detail-label">Names Match</span><span class="detail-value">{{ store.kycReview()!.namesMatch ? 'Yes' : 'No' }}</span></div>
+                <div class="detail-row"><span class="detail-label">Account Age</span><span class="detail-value">{{ store.kycReview()!.accountAgeDays }} day(s)</span></div>
+                <div class="detail-row"><span class="detail-label">Has Stakes</span><span class="detail-value">{{ store.kycReview()!.hasStakes ? 'Yes (\u20A6' + (store.kycReview()!.totalStakeVolume | number) + ')' : 'No' }}</span></div>
+                <div class="detail-row" *ngIf="store.kycReview()!.duplicateBvnNin"><span class="detail-label">Duplicate {{ store.kycReview()!.kycType?.toUpperCase() }}</span><span class="detail-value" style="color:#f44336">{{ store.kycReview()!.duplicateAccountCount }} other account(s)</span></div>
+              </div>
+              <div class="ai-review-actions" *ngIf="store.kycReview()!.recommendedAction !== 'manual_review'">
+                <button mat-raised-button [class.action-verify]="store.kycReview()!.recommendedAction === 'approve'" [class.action-reject]="store.kycReview()!.recommendedAction === 'reject'" (click)="store.executeAiVerdict()">
+                  <mat-icon>{{ store.kycReview()!.recommendedAction === 'approve' ? 'verified' : 'cancel' }}</mat-icon>
+                  Execute {{ store.kycReview()!.recommendedAction === 'approve' ? 'Approve' : 'Reject' }}
+                </button>
+                <button mat-button (click)="store.kycReview.set(null)">Dismiss</button>
+              </div>
+            </div>
+          </div>
+          <div class="reject-section" *ngIf="store.showRejectForm()">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Rejection reason</mat-label>
+              <textarea matInput [ngModel]="store.rejectNote()" (ngModelChange)="store.rejectNote.set($event)" rows="2" placeholder="e.g. Invalid document, name mismatch"></textarea>
+            </mat-form-field>
+            <div class="reject-actions">
+              <button mat-button (click)="store.showRejectForm.set(false); store.rejectNote.set('')">Cancel</button>
+              <button mat-raised-button color="warn" (click)="store.rejectKyc(store.selectedUser()!)">Confirm Reject</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  

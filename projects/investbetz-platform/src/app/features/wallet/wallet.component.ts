@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
-import { DeviceService } from '../../core/services/device.service';
-import { WalletDesktopComponent } from './wallet-desktop.component';
-import { WalletMobileComponent } from './mobile/wallet-mobile.component';
+import { DeviceService } from '../../core/services';
+import { WalletDesktopComponent } from './pages/wallet-desktop/wallet-desktop.component';
+import { WalletMobileComponent } from './pages/wallet-mobile/wallet-mobile.component';
 
 @Component({
   selector: 'app-wallet',

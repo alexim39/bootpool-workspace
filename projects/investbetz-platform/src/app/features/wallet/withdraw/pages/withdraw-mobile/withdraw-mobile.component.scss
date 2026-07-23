@@ -1,0 +1,77 @@
+
+    .mobile-withdraw { background: #0A1428; min-height: 100vh; color: #FFFFFF; padding-bottom: 40px; }
+    .mobile-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #0D1A30; border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 0; z-index: 10; }
+    .mobile-header h1 { flex: 1; margin: 0; font-size: 18px; font-weight: 700; }
+    .mobile-header button { color: rgba(255,255,255,0.7); }
+    .balance-bar { display: flex; justify-content: space-between; align-items: center; margin: 12px 16px; padding: 14px 18px; background: linear-gradient(135deg, rgba(0,230,118,0.1), rgba(0,200,83,0.05)); border: 1px solid rgba(0,230,118,0.2); border-radius: 12px; }
+    .bb-label { font-size: 13px; color: rgba(255,255,255,0.6); }
+    .bb-value { font-size: 20px; font-weight: 700; color: #00E676; }
+    .form-body { margin: 0 16px; display: flex; flex-direction: column; gap: 16px; }
+    .full-width { width: 100%; }
+    ::ng-deep .mat-mdc-form-field-outline { background: #162245 !important; border-radius: 8px; }
+    ::ng-deep .mat-mdc-text-field-wrapper { background: #162245 !important; border-radius: 8px !important; height: 50px !important; }
+    ::ng-deep .mdc-text-field--outlined .mdc-notched-outline__leading,
+    ::ng-deep .mdc-text-field--outlined .mdc-notched-outline__notch,
+    ::ng-deep .mdc-text-field--outlined .mdc-notched-outline__trailing { border-color: rgba(255,255,255,0.1) !important; }
+    ::ng-deep .mat-mdc-input-element { color: #FFFFFF !important; caret-color: #00E676; font-size: 16px !important; }
+    ::ng-deep .mat-mdc-select-value-text { color: #FFFFFF !important; }
+    ::ng-deep .mat-mdc-select-arrow { color: rgba(255,255,255,0.5) !important; }
+    ::ng-deep .mdc-floating-label { color: rgba(255,255,255,0.5) !important; }
+    .bank-search-field ::ng-deep .mat-mdc-form-field-icon-suffix { color: rgba(255,255,255,0.4); }
+    .bank-option-text { font-size: 14px; }
+    .no-results { font-size: 13px; color: rgba(255,255,255,0.4); padding: 8px 0; display: block; }
+    ::ng-deep .mat-mdc-autocomplete-panel { background: #0D1A30 !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 8px !important; }
+    ::ng-deep .mat-mdc-autocomplete-panel .mat-mdc-option { color: rgba(255,255,255,0.85) !important; font-size: 14px !important; min-height: 44px !important; }
+    ::ng-deep .mat-mdc-autocomplete-panel .mat-mdc-option:hover:not(.mdc-list-item--disabled) { background: rgba(0,230,118,0.08) !important; }
+    ::ng-deep .mat-mdc-autocomplete-panel .mat-mdc-option.mat-mdc-option-active { background: rgba(0,230,118,0.12) !important; }
+    ::ng-deep .mat-mdc-autocomplete-panel .mat-mdc-option .mdc-list-item__primary-text { color: inherit !important; }
+    ::ng-deep .cdk-overlay-pane:has(.mat-mdc-autocomplete-panel) { margin-top: 4px; }
+    ::ng-deep .mat-mdc-form-field-subscript-wrapper { display: none; }
+    .quick-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .quick-chip { padding: 7px 16px; background: #162245; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 500; cursor: pointer; }
+    .quick-chip.active { background: rgba(0,230,118,0.15); border-color: rgba(0,230,118,0.3); color: #00E676; }
+    .acct-status { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 10px; font-size: 13px; }
+    .acct-status.load { background: rgba(232,185,35,0.1); border: 1px solid rgba(232,185,35,0.2); color: #E8B923; }
+    .acct-status.ok { display: flex; align-items: center; gap: 8px; background: rgba(0,230,118,0.1); border: 1px solid rgba(0,230,118,0.25); color: #00E676; }
+    .acct-status.ok mat-icon { flex-shrink: 0; font-size: 18px; }
+    .acct-info-wrap { flex: 1; }
+    .m-save-toggle { margin-left: auto; }
+    .m-toggle-label { font-size: 10px; color: rgba(255,255,255,0.4); }
+    ::ng-deep .m-save-toggle .mdc-switch__track { border-radius: 12px !important; }
+    ::ng-deep .m-save-toggle .mdc-switch { width: 32px !important; height: 18px !important; }
+    ::ng-deep .m-save-toggle .mdc-switch__track { width: 32px !important; height: 18px !important; }
+    ::ng-deep .m-save-toggle .mdc-switch__thumb { width: 14px !important; height: 14px !important; }
+    ::ng-deep .m-save-toggle .mdc-switch--selected .mdc-switch__thumb { background-color: #00E676 !important; }
+    ::ng-deep .m-save-toggle .mdc-switch--selected .mdc-switch__track { background-color: rgba(0,230,118,0.3) !important; }
+    .saved-section { margin: 8px 16px 0; }
+    .sa-mheader { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .sa-mlist { display: flex; flex-direction: column; gap: 6px; }
+    .sa-mcard { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #162245; border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; cursor: pointer; transition: all 0.2s; width: 100%; text-align: left; color: #fff; font-family: inherit; }
+    .sa-mcard.active { border-color: #00E676; background: rgba(0,230,118,0.06); }
+    .sa-mbadge { width: 30px; height: 30px; border-radius: 7px; background: #0D1A30; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #E8B923; flex-shrink: 0; }
+    .sa-mbadge.default { background: linear-gradient(135deg, #00E676, #00C853); color: #0A1428; }
+    .sa-mdetails { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+    .sa-mbank { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sa-mnumber { font-size: 10px; color: rgba(255,255,255,0.35); }
+    .sa-mdefault { font-size: 8px; font-weight: 600; text-transform: uppercase; color: #00E676; background: rgba(0,230,118,0.1); padding: 1px 5px; border-radius: 3px; flex-shrink: 0; }
+    .sa-mdel { background: none; border: none; color: rgba(255,255,255,0.2); cursor: pointer; padding: 2px; display: flex; align-items: center; }
+    .sa-mdel mat-icon { font-size: 14px; width: 14px; height: 14px; }
+    .acct-status.err { background: rgba(244,67,54,0.1); border: 1px solid rgba(244,67,54,0.25); color: #f44336; }
+    .acct-name { font-weight: 600; font-size: 14px; }
+    .acct-num { font-size: 11px; opacity: 0.7; }
+    .fee-summary { background: #162245; border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+    .fee-row { display: flex; justify-content: space-between; font-size: 13px; color: rgba(255,255,255,0.6); }
+    .fee-row.total { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 6px; font-weight: 700; color: #FFFFFF; font-size: 14px; }
+    .pin-section { text-align: center; padding: 8px 0; }
+    .pin-label { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 10px; }
+    .pin-row { display: flex; justify-content: center; gap: 10px; }
+    .pin-box { width: 44px; height: 50px; text-align: center; font-size: 22px; font-weight: 700; background: #162245; border: 2px solid rgba(255,255,255,0.12); border-radius: 10px; color: #FFFFFF; outline: none; caret-color: #00E676; }
+    .pin-box:focus { border-color: #00E676; }
+    .pin-box:disabled { opacity: 0.5; }
+    .pin-err-row { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 6px; color: #f44336; font-size: 12px; }
+    .btn-submit { width: 100%; height: 50px; font-size: 15px; font-weight: 600; border-radius: 12px; background: linear-gradient(135deg, #00E676, #00C853); color: #0A1428; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-submit mat-spinner { width: 18px !important; height: 18px !important; }
+    .limits-note { text-align: center; font-size: 11px; color: rgba(255,255,255,0.35); padding: 4px 0; }
+    ::ng-deep .mat-mdc-snack-bar-container { --mdc-snackbar-supporting-text-color: #FFFFFF; --mdc-snackbar-container-color: #0D1A30; }
+  

@@ -30,7 +30,7 @@ export const routes: Routes = [
   },
   {
     path: 'wallet/deposit/callback',
-    loadComponent: () => import('./features/wallet/deposit-callback.component').then(m => m.DepositCallbackComponent)
+    loadComponent: () => import('./features/wallet/pages/deposit-callback/deposit-callback.component').then(m => m.DepositCallbackComponent)
   },
   {
     path: 'bets',

@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
-import { DeviceService } from '../../core/services/device.service';
+import { DeviceService } from '../../core/services';
 
 const isDesktop = () => {
   const device = inject(DeviceService);

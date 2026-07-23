@@ -1,0 +1,31 @@
+
+    .user-detail { max-width: 1200px; }
+    .page-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .page-header h1 { color: #fff; font-size: 24px; font-weight: 600; margin: 0; }
+    .back-btn { color: rgba(255,255,255,0.6); }
+    .detail-grid { display: flex; flex-direction: column; gap: 16px; }
+    mat-card { background: #0D1A30; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); }
+    mat-card-title { color: #fff !important; font-size: 16px; }
+    .info-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 12px; }
+    .info-row .label { color: rgba(255,255,255,0.4); font-size: 12px; font-weight: 600; text-transform: uppercase; width: 100px; flex-shrink: 0; }
+    .info-row .value { color: #fff; font-size: 14px; }
+    .chip { padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; color: #fff; text-transform: capitalize; }
+    mat-card-actions { padding: 8px 16px 16px; display: flex; gap: 8px; }
+    .wallet-balance { font-size: 32px; font-weight: 700; color: #00E676; padding: 16px 0; }
+    .wallet-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .wallet-item { display: flex; flex-direction: column; gap: 2px; }
+    .wallet-item .label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+    .wallet-item .value { font-size: 16px; color: #fff; font-weight: 600; }
+    .stakes-content { padding: 0 !important; }
+    .stakes-table-wrap { display: flex; flex-direction: column; }
+    .sth-row { display: flex; background: #162245; padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sth-cell { flex: 1; color: rgba(255,255,255,0.6); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .st-row { display: flex; align-items: center; padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.15s; }
+    .st-row:last-child { border-bottom: none; }
+    .st-row:hover { background: rgba(255,255,255,0.03); }
+    .st-cell { flex: 1; color: #fff; font-size: 13px; font-weight: 500; }
+    .st-pod { color: rgba(255,255,255,0.8); }
+    .st-amount { color: #00E676; font-weight: 600; }
+    .st-date { color: rgba(255,255,255,0.4); font-size: 12px; }
+    .empty-state { padding: 32px 16px; text-align: center; color: rgba(255,255,255,0.4); font-size: 13px; }
+  

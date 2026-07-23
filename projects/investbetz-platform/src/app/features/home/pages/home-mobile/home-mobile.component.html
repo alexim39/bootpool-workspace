@@ -1,0 +1,120 @@
+<div class="mobile-container">
+  <header class="mobile-header">
+    <h1 class="app-title">
+      <img src="img/logo/logo.png" alt="BetPool Logo" class="logo-image" width="42" height="42">
+      <span class="brand-bet">Bet</span>
+      <span class="brand-pool">Pool</span>
+    </h1>
+    <div class="header-actions">
+      <button class="balance-chip" routerLink="/wallet">
+        <mat-icon>account_balance_wallet</mat-icon>
+        <span>{{ formatCurrency(store.walletBalance()) }}</span>
+      </button>
+      <button class="top-up-btn-mobile" (click)="showTopUp.set(true)">
+        <mat-icon>add</mat-icon>
+        <span>Top Up</span>
+      </button>
+      <button mat-icon-button (click)="store.auth.logout()" class="logout-btn">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </header>
+
+  <app-featured-banner />
+
+  <div class="search-bar">
+    <mat-icon class="search-bar-icon">search</mat-icon>
+    <input class="search-bar-input" [value]="store.searchQuery()" (input)="store.onSearchInput($any($event.target).value)" placeholder="Search teams, leagues..." />
+    <button class="search-bar-clear" *ngIf="store.isSearching()" (click)="store.clearSearch()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="sport-chips">
+    <button
+      class="sport-chip"
+      [class.active]="!store.selectedSport()"
+      (click)="store.selectSport(null)">
+      All
+    </button>
+    @for (sport of store.sports(); track sport) {
+      <button
+        class="sport-chip"
+        [class.active]="store.selectedSport() === sport"
+        (click)="store.selectSport(sport)">
+        {{ sport }}
+      </button>
+    }
+  </div>
+
+  <main class="feed-area">
+    @if (store.pods.loading()) {
+      <div class="loading-state">
+        <mat-spinner diameter="32"></mat-spinner>
+        <p>Loading odds...</p>
+      </div>
+    } @else if (store.displayedPods().length === 0 && !store.isSearching()) {
+      <div class="empty-state">
+        <mat-icon>event_busy</mat-icon>
+        <h3>No active odds</h3>
+        <p>Check back later</p>
+      </div>
+    } @else if (store.noSearchResults()) {
+      <div class="empty-state">
+        <mat-icon>search_off</mat-icon>
+        <h3>No results found</h3>
+        <p>Try a different search term</p>
+      </div>
+    } @else {
+      <div class="odds-list">
+        @for (pod of store.displayedPods(); track pod.id) {
+          <app-pod-card
+            [pod]="pod"
+            [selected]="store.isSelected(pod.id)"
+            [selectionDisabled]="store.isSelectionDisabled()"
+            (placeStake)="openStakeModal($event)"
+            (toggleSelect)="toggleSelection($event)">
+          </app-pod-card>
+        }
+      </div>
+      @if (store.pods.hasMorePods()) {
+        <div class="load-more-section">
+          <button
+            class="load-more-btn"
+            (click)="store.loadMore()"
+            [disabled]="store.pods.loadingMore()">
+            @if (store.pods.loadingMore()) {
+              <mat-spinner diameter="16"></mat-spinner>
+              <span>Loading...</span>
+            } @else {
+              <span>Load More ({{ store.displayedPods().length }}/{{ store.pods.totalPods() }})</span>
+            }
+          </button>
+        </div>
+      }
+    }
+  </main>
+
+  @if (store.selectedPod()) {
+    <app-stake-modal
+      [pod]="store.selectedPod()!"
+      [disableClose]="true"
+      (close)="store.closeStakeModal()"
+      (stakePlaced)="onStakePlaced()">
+    </app-stake-modal>
+  }
+
+  <app-top-up-modal [visible]="showTopUp()" [disableClose]="true" (close)="showTopUp.set(false)" />
+
+  <app-bet-slip
+    [selections]="store.betSlipSelections()"
+    [open]="store.betSlipOpen()"
+    (remove)="store.removeFromSlip($event)"
+    (clearAllSelections)="store.clearSelections()"
+    (closePanel)="closeSlip()"
+    (togglePanel)="store.toggleSlip()"
+    (placeBetRequest)="onPlaceAccumulator($event)">
+  </app-bet-slip>
+
+  <app-mobile-nav />
+</div>

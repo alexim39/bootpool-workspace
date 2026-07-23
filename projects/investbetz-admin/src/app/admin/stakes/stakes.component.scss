@@ -1,0 +1,38 @@
+
+    .stakes-page { max-width: 1400px; }
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { color: #fff; font-size: 24px; font-weight: 600; margin: 0; }
+    .filter-card { background: #0D1A30; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; padding: 8px 16px; }
+    .filters { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .search-field { flex: 1; min-width: 200px; }
+    .filter-field { width: 200px; }
+    .table-card { background: #0D1A30; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); position: relative; }
+    .admin-table { width: 100%; }
+    ::ng-deep .admin-table .mat-mdc-header-cell { color: rgba(255,255,255,0.5) !important; font-size: 12px !important; font-weight: 600 !important; text-transform: uppercase !important; border-bottom-color: rgba(255,255,255,0.08) !important; }
+    ::ng-deep .admin-table .mat-mdc-cell { color: rgba(255,255,255,0.8) !important; font-size: 13px !important; border-bottom-color: rgba(255,255,255,0.05) !important; }
+    ::ng-deep .mat-mdc-paginator { background: transparent !important; color: rgba(255,255,255,0.7) !important; border-top: 1px solid rgba(255,255,255,0.06); }
+    ::ng-deep .mat-mdc-paginator .mat-mdc-paginator-navigation-button { color: rgba(255,255,255,0.6) !important; }
+    ::ng-deep .mat-mdc-paginator .mat-mdc-select-value-text { color: rgba(255,255,255,0.7) !important; }
+    .clickable { cursor: pointer; }
+    .clickable:hover { color: #00E676; }
+    .chip { padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; color: #fff; text-transform: capitalize; }
+    .empty-state { padding: 32px; text-align: center; color: rgba(255,255,255,0.3); font-size: 14px; }
+    .loading-shim { position: absolute; inset: 0; background: rgba(10,20,40,0.6); z-index: 10; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
+    .spinner { width: 32px; height: 32px; border: 3px solid rgba(0,230,118,0.2); border-top-color: #00E676; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .detail-panel { background: #0D1A30; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 16px; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .panel-header h3 { color: #fff; font-size: 16px; font-weight: 600; margin: 0; }
+    .panel-header button { color: rgba(255,255,255,0.5); }
+    .panel-body { padding: 16px 20px; }
+    .section-title { font-size: 11px; color: #00E676; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .section-title:first-of-type { margin-top: 0; }
+    .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+    .detail-item { display: flex; flex-direction: column; gap: 2px; }
+    .detail-item .label { font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px; }
+    .detail-item .value { font-size: 13px; color: #fff; font-weight: 500; word-break: break-all; }
+    .settle-actions { display: flex; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .action-win { color: #00E676 !important; border-color: #00E676 !important; }
+    .action-loss { color: #f44336 !important; border-color: #f44336 !important; }
+    .action-void { color: #888 !important; border-color: #888 !important; }
+  

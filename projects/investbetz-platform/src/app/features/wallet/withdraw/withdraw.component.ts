@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
-import { DeviceService } from '../../../core/services/device.service';
-import { WithdrawDesktopComponent } from './withdraw-desktop.component';
-import { WithdrawMobileComponent } from './withdraw-mobile.component';
+import { DeviceService } from '../../../core/services';
+import { WithdrawDesktopComponent } from './pages/withdraw-desktop/withdraw-desktop.component';
+import { WithdrawMobileComponent } from './pages/withdraw-mobile/withdraw-mobile.component';
 
 @Component({
   selector: 'app-withdraw',

@@ -1,0 +1,134 @@
+
+    <div class="stakes-page">
+      <div class="page-header">
+        <h1>Stakes</h1>
+      </div>
+
+      <mat-card class="filter-card">
+        <div class="filters">
+          <mat-form-field appearance="fill" class="filter-field">
+            <mat-label>Status</mat-label>
+            <mat-select [ngModel]="store.statusFilter()" (ngModelChange)="store.statusFilter.set($event)" (selectionChange)="store.onFilterChange()">
+              <mat-option value="">All</mat-option>
+              <mat-option value="pending">Pending</mat-option>
+              <mat-option value="confirmed">Confirmed</mat-option>
+              <mat-option value="active">Active</mat-option>
+              <mat-option value="won">Won</mat-option>
+              <mat-option value="lost">Lost</mat-option>
+              <mat-option value="void">Void</mat-option>
+              <mat-option value="cashed_out">Cashed Out</mat-option>
+              <mat-option value="cancelled">Cancelled</mat-option>
+              <mat-option value="refunded">Refunded</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="fill" class="search-field">
+            <mat-label>Search by user or pod...</mat-label>
+            <input matInput [ngModel]="store.searchQuery()" (ngModelChange)="store.searchQuery.set($event); store.onSearchInput()">
+          </mat-form-field>
+        </div>
+      </mat-card>
+
+      <div class="detail-panel" *ngIf="store.selectedStake() as s">
+        <div class="panel-header">
+          <h3>Stake Details</h3>
+          <button mat-icon-button (click)="store.selectedStake.set(null)"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="panel-body">
+          <div class="section-title">User</div>
+          <div class="detail-grid">
+            <div class="detail-item"><span class="label">Phone</span><span class="value">{{ s.user?.phone }}</span></div>
+            <div class="detail-item"><span class="label">Name</span><span class="value">{{ s.user?.fullName || s.user?.name }}</span></div>
+            <div class="detail-item"><span class="label">Email</span><span class="value">{{ s.user?.email }}</span></div>
+            <div class="detail-item"><span class="label">User ID</span><span class="value">{{ s.userId }}</span></div>
+          </div>
+          <div class="section-title">Stake</div>
+          <div class="detail-grid">
+            <div class="detail-item"><span class="label">Stake ID</span><span class="value">{{ s._id || s.id }}</span></div>
+            <div class="detail-item"><span class="label">Status</span><span class="value"><span class="chip" [style.background]="statusColor(s.status)">{{ s.status }}</span></span></div>
+            <div class="detail-item"><span class="label">Amount</span><span class="value">\u20A6{{ s.stakeAmount | number }}</span></div>
+            <div class="detail-item"><span class="label">Potential Payout</span><span class="value">\u20A6{{ s.potentialPayout | number }}</span></div>
+            <div class="detail-item" *ngIf="s.netPayout"><span class="label">Net Payout</span><span class="value">\u20A6{{ s.netPayout | number }}</span></div>
+            <div class="detail-item" *ngIf="s.platformFee"><span class="label">Platform Fee (35%)</span><span class="value">\u20A6{{ s.platformFee | number }}</span></div>
+            <div class="detail-item" *ngIf="s.isSettled"><span class="label">Settled</span><span class="value">{{ s.settledAt | date:'medium' }}</span></div>
+            <div class="detail-item"><span class="label">Created</span><span class="value">{{ s.createdAt | date:'medium' }}</span></div>
+            <div class="detail-item" *ngIf="s.settlementNotes"><span class="label">Notes</span><span class="value">{{ s.settlementNotes }}</span></div>
+          </div>
+          <div class="section-title">Pod</div>
+          <div class="detail-grid">
+            <div class="detail-item"><span class="label">Title</span><span class="value">{{ s.pod?.title || s.podId }}</span></div>
+            <div class="detail-item" *ngIf="s.pod?.sport"><span class="label">Sport</span><span class="value">{{ s.pod.sport }}</span></div>
+            <div class="detail-item" *ngIf="s.pod?.league"><span class="label">League</span><span class="value">{{ s.pod.league }}</span></div>
+            <div class="detail-item" *ngIf="s.pod?.marketType"><span class="label">Market</span><span class="value">{{ s.pod.marketType }}</span></div>
+            <div class="detail-item" *ngIf="s.pod?.odds"><span class="label">Odds</span><span class="value">{{ s.pod.odds }}</span></div>
+            <div class="detail-item" *ngIf="s.pod?.minStake"><span class="label">Min Stake</span><span class="value">\u20A6{{ s.pod.minStake | number }}</span></div>
+            <div class="detail-item" *ngIf="s.pod?.maxStake"><span class="label">Max Stake</span><span class="value">\u20A6{{ s.pod.maxStake | number }}</span></div>
+            <div class="detail-item" *ngIf="s.pod?.selection"><span class="label">Selection</span><span class="value">{{ s.pod.selection }}</span></div>
+            <div class="detail-item" *ngIf="s.pod?.participants?.length"><span class="label">Participants</span><span class="value">{{ s.pod.participants.join(' vs ') }}</span></div>
+            <div class="detail-item" *ngIf="s.combinedMultiplier"><span class="label">Combined Odds</span><span class="value" style="color:#CE93D8">{{ s.combinedMultiplier.toFixed(2) }}x</span></div>
+          </div>
+          <div class="section-title" *ngIf="s.items && s.items.length > 1">Parlay Legs ({{ s.items.length }})</div>
+          <div class="detail-grid" *ngIf="s.items && s.items.length > 1">
+            @for (item of s.items; track item; let i = $index) {
+              <div class="detail-item parlay-leg-item">
+                <span class="label">Leg {{ i + 1 }} — {{ item.homeTeam }} vs {{ item.awayTeam }}</span>
+                <span class="value">{{ item.selection }} &#64; {{ item.gainsMultiplier.toFixed(2) }}x</span>
+                <span class="value" [style.color]="item.status === 'won' ? '#00E676' : item.status === 'lost' ? '#f44336' : '#888'">{{ item.status }}</span>
+              </div>
+            }
+          </div>
+          <div class="settle-actions" *ngIf="canSettle(s)">
+            <button mat-stroked-button class="action-win" (click)="store.settleStake(s._id || s.id, 'win')">Settle Win</button>
+            <button mat-stroked-button class="action-loss" (click)="store.settleStake(s._id || s.id, 'loss')">Settle Loss</button>
+            <button mat-stroked-button class="action-void" (click)="store.settleStake(s._id || s.id, 'void')">Void</button>
+          </div>
+        </div>
+      </div>
+
+      <mat-card class="table-card">
+        <div class="loading-shim" *ngIf="store.loading()">
+          <div class="spinner"></div>
+        </div>
+        <table mat-table [dataSource]="store.stakes()" class="admin-table">
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>ID</th>
+            <td mat-cell *matCellDef="let s" class="clickable" (click)="store.selectStake(s)">{{ (s._id || s.id) | slice:0:8 }}...</td>
+          </ng-container>
+          <ng-container matColumnDef="user">
+            <th mat-header-cell *matHeaderCellDef>User</th>
+            <td mat-cell *matCellDef="let s" class="clickable" (click)="store.selectStake(s)">{{ s.user?.phone || s.userId | slice:0:10 }}</td>
+          </ng-container>
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef>Amount</th>
+            <td mat-cell *matCellDef="let s" class="clickable" (click)="store.selectStake(s)">\u20A6{{ s.stakeAmount | number }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let s">
+              <span class="chip" [style.background]="statusColor(s.status)">{{ s.status }}</span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let s" class="clickable" (click)="store.selectStake(s)">{{ s.createdAt | date:'short' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let s">
+              <button mat-icon-button (click)="store.selectStake(s)" matTooltip="View"><mat-icon>visibility</mat-icon></button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+        </table>
+        <div class="empty-state" *ngIf="!store.loading() && store.stakes().length === 0">No stakes found</div>
+        <mat-paginator *ngIf="store.totalPages() > 1"
+          [length]="store.total()"
+          [pageSize]="store.limit()"
+          [pageIndex]="store.page() - 1"
+          [pageSizeOptions]="[10, 20, 50, 100]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons>
+        </mat-paginator>
+      </mat-card>
+    </div>
+  

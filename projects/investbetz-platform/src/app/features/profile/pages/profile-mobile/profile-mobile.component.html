@@ -1,0 +1,304 @@
+    <div class="mobile-profile">
+      <header class="mobile-header">
+        <button mat-icon-button routerLink="/home"><mat-icon>arrow_back</mat-icon></button>
+        <h1>Profile</h1>
+        <button mat-icon-button (click)="store.logout()"><mat-icon>logout</mat-icon></button>
+      </header>
+
+      <div class="profile-card">
+        <div class="avatar">
+          <mat-icon>person</mat-icon>
+        </div>
+        <div class="info">
+          <h2>{{ store.user()?.fullName || 'User' }}</h2>
+          <span class="phone">{{ store.formatPhone(store.user()?.phone) }}</span>
+        </div>
+        <div class="badges">
+          <span class="badge" [class.verified]="store.user()?.phoneVerified">
+            <mat-icon>{{ store.user()?.phoneVerified ? 'verified' : 'phone_android' }}</mat-icon>
+            {{ store.user()?.phoneVerified ? 'Verified' : 'Verify Phone' }}
+          </span>
+          <span class="badge" [class.verified]="store.user()?.kycVerified">
+            <mat-icon>{{ store.user()?.kycVerified ? 'verified_user' : 'badge' }}</mat-icon>
+            KYC {{ store.user()?.kycVerified ? 'Verified' : 'Pending' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <mat-icon class="box-icon gold">share</mat-icon>
+          <span class="box-val">{{ store.user()?.referralCode || 'N/A' }}</span>
+          <span class="box-lbl">Referral Code</span>
+        </div>
+        <div class="stat-box">
+          <mat-icon class="box-icon emerald">calendar_today</mat-icon>
+          <span class="box-val">{{ store.formatJoinDate(store.user()?.createdAt) }}</span>
+          <span class="box-lbl">Member Since</span>
+        </div>
+        <div class="stat-box">
+          <mat-icon class="box-icon emerald">email</mat-icon>
+          <span class="box-val">{{ store.user()?.email || 'Not set' }}</span>
+          <span class="box-lbl">Email</span>
+        </div>
+      </div>
+
+      <div class="menu-section">
+        <button class="menu-item" (click)="store.activeTab.set('personal')">
+          <mat-icon class="menu-icon emerald">person</mat-icon>
+          <div class="menu-text">
+            <span class="menu-title">Personal Info</span>
+            <span class="menu-desc">Name, email, phone</span>
+          </div>
+          <mat-icon class="chevron">chevron_right</mat-icon>
+        </button>
+
+        <button class="menu-item" (click)="store.activeTab.set('security')">
+          <mat-icon class="menu-icon gold">lock</mat-icon>
+          <div class="menu-text">
+            <span class="menu-title">Security & PIN</span>
+            <span class="menu-desc">PIN, phone verification, KYC</span>
+          </div>
+          <mat-icon class="chevron">chevron_right</mat-icon>
+        </button>
+
+        <button class="menu-item" (click)="store.activeTab.set('referral')">
+          <mat-icon class="menu-icon gold">card_giftcard</mat-icon>
+          <div class="menu-text">
+            <span class="menu-title">Referral</span>
+            <span class="menu-desc">Share & earn bonuses</span>
+          </div>
+          <mat-icon class="chevron">chevron_right</mat-icon>
+        </button>
+
+        <button class="menu-item" (click)="store.activeTab.set('support')">
+          <mat-icon class="menu-icon emerald">help_outline</mat-icon>
+          <div class="menu-text">
+            <span class="menu-title">Support</span>
+            <span class="menu-desc">FAQ, live chat, contact</span>
+          </div>
+          <mat-icon class="chevron">chevron_right</mat-icon>
+        </button>
+      </div>
+
+      @if (store.activeTab() === 'personal') {
+        <div class="sheet-overlay" (click)="store.activeTab.set('')">
+          <div class="bottom-sheet" (click)="$event.stopPropagation()">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+              <h3>Personal Info</h3>
+              <button mat-icon-button (click)="store.activeTab.set('')"><mat-icon>close</mat-icon></button>
+            </div>
+            <form [formGroup]="store.profileForm" class="sheet-form">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Full Name</mat-label>
+                <input matInput formControlName="fullName" autocomplete="name">
+                <mat-icon matPrefix>person</mat-icon>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Email Address</mat-label>
+                <input matInput formControlName="email" type="email" autocomplete="email">
+                <mat-icon matPrefix>email</mat-icon>
+              </mat-form-field>
+              <div class="readonly-phone">
+                <label>Phone Number</label>
+                <div>{{ store.formatPhone(store.user()?.phone) }}</div>
+              </div>
+              <button class="btn-emerald full-width btn-lg" (click)="updateProfile()" [disabled]="store.profileForm.invalid || store.profileForm.pristine || store.savingProfile()">
+                @if (store.savingProfile()) { <mat-spinner diameter="20"></mat-spinner> }
+                @else { <mat-icon>save</mat-icon> Save Changes }
+              </button>
+            </form>
+          </div>
+        </div>
+      }
+
+      @if (store.activeTab() === 'security') {
+        <div class="sheet-overlay" (click)="store.activeTab.set('')">
+          <div class="bottom-sheet" (click)="$event.stopPropagation()">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+              <h3>Security & PIN</h3>
+              <button mat-icon-button (click)="store.activeTab.set('')"><mat-icon>close</mat-icon></button>
+            </div>
+            <div class="sheet-body">
+              <div class="sec-section">
+                <h4>PIN Management</h4>
+                <p>Your 6-digit PIN secures your account</p>
+                <button class="btn-gold-outline" (click)="store.showPinChange.set(true)"><mat-icon>lock</mat-icon> Change PIN</button>
+              </div>
+              <div class="sec-section">
+                <h4>Phone Verification</h4>
+                <p>Receive OTP for login and sensitive actions</p>
+                @if (!store.user()?.phoneVerified) {
+                  @if (!store.showPhoneOtp()) {
+                    <button class="btn-emerald btn-lg full-width" (click)="requestPhoneVerification()"><mat-icon>phone</mat-icon> Verify Phone</button>
+                  } @else {
+                    <div class="phone-otp-mobile">
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Enter 6-digit code</mat-label>
+                        <input matInput [formControl]="store.phoneOtpCode" placeholder="000000" maxlength="6" inputmode="numeric">
+                      </mat-form-field>
+                      <button class="btn-emerald btn-lg full-width" (click)="confirmPhoneVerification()" [disabled]="store.phoneOtpCode.invalid || store.verifyingPhone()">
+                        @if (store.verifyingPhone()) { <mat-spinner diameter="20"></mat-spinner> }
+                        @else { <mat-icon>check</mat-icon> Confirm Code }
+                      </button>
+                      <button class="btn-cancel-otp-mobile" (click)="store.showPhoneOtp.set(false); store.phoneOtpCode.reset()">Cancel</button>
+                    </div>
+                  }
+                } @else {
+                  <span class="badge-verified"><mat-icon>verified</mat-icon> Phone Verified</span>
+                }
+              </div>
+              <div class="sec-section">
+                <h4>KYC Verification</h4>
+                <p>Verify your identity with BVN or NIN</p>
+                @if (store.user()?.kycVerified) {
+                  <span class="badge-verified"><mat-icon>verified_user</mat-icon> KYC Verified</span>
+                } @else {
+                  <div class="kyc-form">
+                    <div class="kyc-type-toggle">
+                      <button class="type-btn" [class.active]="store.kycType() === 'bvn'" (click)="store.kycType.set('bvn')">BVN</button>
+                      <button class="type-btn" [class.active]="store.kycType() === 'nin'" (click)="store.kycType.set('nin')">NIN</button>
+                    </div>
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>{{ store.kycType() === 'bvn' ? 'BVN Number' : 'NIN Number' }}</mat-label>
+                      <input matInput [formControl]="store.kycNumberCtrl" placeholder="11-digit number" maxlength="11" inputmode="numeric">
+                    </mat-form-field>
+                    <button class="btn-emerald full-width btn-lg" (click)="submitKyc()" [disabled]="store.kycNumberCtrl.invalid || store.submittingKyc()">
+                      @if (store.submittingKyc()) { <mat-spinner diameter="20"></mat-spinner> }
+                      @else { <mat-icon>verified_user</mat-icon> Submit for Verification }
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (store.activeTab() === 'referral') {
+        <div class="sheet-overlay" (click)="store.activeTab.set('')">
+          <div class="bottom-sheet" (click)="$event.stopPropagation()">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+              <h3>Refer & Earn</h3>
+              <button mat-icon-button (click)="store.activeTab.set('')"><mat-icon>close</mat-icon></button>
+            </div>
+            <div class="sheet-body">
+              <div class="ref-code">
+                <span class="ref-label">Your Code</span>
+                <div class="ref-value">
+                  <span>{{ store.user()?.referralCode }}</span>
+                  <button mat-icon-button (click)="copyReferralCode()"><mat-icon>content_copy</mat-icon></button>
+                </div>
+              </div>
+              <div class="ref-actions">
+                <button class="btn-emerald btn-lg full-width" (click)="shareReferral()"><mat-icon>share</mat-icon> Share Referral</button>
+                <button class="btn-gold-outline btn-lg full-width" (click)="copyReferralCode()"><mat-icon>link</mat-icon> Copy Link</button>
+              </div>
+              <div class="ref-stats">
+                <div class="ref-stat"><strong>{{ store.referralStats()?.totalReferrals || 0 }}</strong><span>Referrals</span></div>
+                <div class="ref-stat"><strong>₦{{ store.referralStats()?.referralBonus?.toLocaleString() || '0' }}</strong><span>Earned</span></div>
+              </div>
+              @if ((store.referralStats()?.referrals?.length || 0) > 0) {
+                <div class="ref-list">
+                  <div class="ref-list-title">Your Referrals</div>
+                  @for (ref of store.referralStats()?.referrals || []; track ref) {
+                    <div class="ref-item">
+                      <mat-icon>person</mat-icon>
+                      <span>{{ ref.fullName }}</span>
+                      <span class="ref-date">{{ store.formatJoinDate(ref.createdAt) }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (store.activeTab() === 'support') {
+        <div class="sheet-overlay" (click)="store.activeTab.set('')">
+          <div class="bottom-sheet" (click)="$event.stopPropagation()">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+              <h3>Help & Support</h3>
+              <button mat-icon-button (click)="store.activeTab.set('')"><mat-icon>close</mat-icon></button>
+            </div>
+            <div class="sheet-body">
+              <button class="support-item" (click)="openFaq()">
+                <mat-icon>help_outline</mat-icon>
+                <div><strong>FAQ</strong><span>Find answers to common questions</span></div>
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+              <button class="support-item" (click)="openOraChat()">
+                <mat-icon>auto_awesome</mat-icon>
+                <div><strong>Ora AI</strong><span>Ask Ora, your AI assistant</span></div>
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+              <button class="support-item" (click)="sendEmail()">
+                <mat-icon>email</mat-icon>
+                <div><strong>Email Support</strong><span>support&#64;betpool.tech</span></div>
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+              <!-- <button class="support-item" (click)="callSupport()">
+                <mat-icon>phone</mat-icon>
+                <div><strong>Call Us</strong><span>0800-INVESTBETZ</span></div>
+                <mat-icon>chevron_right</mat-icon>
+              </button> -->
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (store.showPinChange()) {
+        <div class="sheet-overlay" (click)="store.showPinChange.set(false)">
+          <div class="bottom-sheet" (click)="$event.stopPropagation()">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+              <h3>Change PIN</h3>
+              <button mat-icon-button (click)="store.showPinChange.set(false)"><mat-icon>close</mat-icon></button>
+            </div>
+            <form [formGroup]="store.pinForm" class="sheet-form">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Current PIN</mat-label>
+                <input matInput formControlName="currentPin" type="password" maxlength="6" autocomplete="off">
+                <mat-icon matPrefix>lock</mat-icon>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>New PIN</mat-label>
+                <input matInput formControlName="newPin" type="password" maxlength="6" autocomplete="new-password">
+                <mat-icon matPrefix>lock_outline</mat-icon>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Confirm New PIN</mat-label>
+                <input matInput formControlName="confirmPin" type="password" maxlength="6" autocomplete="new-password">
+                <mat-icon matPrefix>lock_outline</mat-icon>
+              </mat-form-field>
+              <button class="btn-emerald full-width btn-lg" (click)="changePin()" [disabled]="store.pinForm.invalid || store.changingPin()">
+                @if (store.changingPin()) { <mat-spinner diameter="20"></mat-spinner> }
+                @else { <ng-container><mat-icon>lock</mat-icon> Change PIN</ng-container> }
+              </button>
+            </form>
+          </div>
+        </div>
+      }
+
+      <div class="bottom-spacer"></div>
+
+      @if (store.showOraChat()) {
+        <app-ora-chat (close)="store.showOraChat.set(false)" />
+      }
+
+      @if (store.showFaq()) {
+        <div class="faq-overlay">
+          <div class="faq-modal">
+            <button class="faq-back" (click)="store.showFaq.set(false)"><mat-icon>arrow_back</mat-icon> Back</button>
+            <app-faq-section />
+          </div>
+        </div>
+      }
+
+      <app-mobile-nav />
+    </div>

@@ -1,0 +1,92 @@
+<app-nav />
+<div class="home-container">
+
+  <app-featured-banner />
+
+  <div class="search-bar">
+    <mat-icon class="search-bar-icon">search</mat-icon>
+    <input class="search-bar-input" [value]="store.searchQuery()" (input)="store.onSearchInput($any($event.target).value)" placeholder="Search teams, leagues, sports..." />
+    <button class="search-bar-clear" *ngIf="store.isSearching()" (click)="store.clearSearch()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-tab-group class="sports-tabs" (selectedTabChange)="store.onSportChange($event.index)">
+    <mat-tab label="All"><!-- All --></mat-tab>
+    @for (sport of store.sports(); track sport) {
+      <mat-tab [label]="sport"><!-- {{ sport }} --></mat-tab>
+    }
+  </mat-tab-group>
+
+  <div class="feed-layout">
+    <main class="odds-feed">
+      @if (store.pods.loading()) {
+        <div class="loading-state">
+          <mat-spinner></mat-spinner>
+          <p>Loading odds...</p>
+        </div>
+      } @else if (store.displayedPods().length === 0 && !store.isSearching()) {
+        <div class="empty-state">
+          <mat-icon>event_busy</mat-icon>
+          <h3>No active odds</h3>
+          <p>Check back later for new betting opportunities</p>
+        </div>
+      } @else if (store.noSearchResults()) {
+        <div class="empty-state">
+          <mat-icon>search_off</mat-icon>
+          <h3>No results found</h3>
+          <p>Try a different search term</p>
+        </div>
+      } @else {
+        <div class="odds-list">
+          @for (pod of store.displayedPods(); track pod.id) {
+            <app-pod-card
+              [pod]="pod"
+              [selected]="store.isSelected(pod.id)"
+              [selectionDisabled]="store.isSelectionDisabled()"
+              (placeStake)="openStakeModal($event)"
+              (toggleSelect)="toggleSelection($event)">
+            </app-pod-card>
+          }
+        </div>
+        @if (store.pods.hasMorePods()) {
+          <div class="load-more-section">
+            <span class="pod-count">{{ store.displayedPods().length }} of {{ store.pods.totalPods() }} pods</span>
+            <button
+              class="load-more-btn"
+              (click)="store.loadMore()"
+              [disabled]="store.pods.loadingMore()">
+              @if (store.pods.loadingMore()) {
+                <mat-spinner diameter="18"></mat-spinner>
+                <span>Loading...</span>
+              } @else {
+                <span>Load More</span>
+              }
+            </button>
+          </div>
+        }
+      }
+    </main>
+
+    <aside class="bet-slip-sidebar" *ngIf="store.betSlipSelections().length > 0 || store.betSlipOpen()">
+      <app-bet-slip
+        [selections]="store.betSlipSelections()"
+        [open]="store.betSlipOpen()"
+        (remove)="store.removeFromSlip($event)"
+        (clearAllSelections)="store.clearSelections()"
+        (closePanel)="closeSlip()"
+        (togglePanel)="store.toggleSlip()"
+        (placeBetRequest)="onPlaceAccumulator($event)">
+      </app-bet-slip>
+    </aside>
+  </div>
+
+  @if (store.selectedPod()) {
+    <app-stake-modal
+      [pod]="store.selectedPod()!"
+      [disableClose]="true"
+      (close)="store.closeStakeModal()"
+      (stakePlaced)="onStakePlaced()">
+    </app-stake-modal>
+  }
+</div>

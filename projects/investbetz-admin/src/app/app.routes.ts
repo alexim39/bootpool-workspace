@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { adminAuthGuard } from './auth/admin-auth.guard';
+import { adminAuthGuard } from './auth';
 
 export const routes: Routes = [
   {

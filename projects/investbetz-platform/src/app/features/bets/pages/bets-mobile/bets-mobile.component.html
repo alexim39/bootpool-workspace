@@ -1,0 +1,205 @@
+
+    <div class="mobile-bets">
+      <header class="mobile-header">
+        <button mat-icon-button routerLink="/home"><mat-icon>arrow_back</mat-icon></button>
+        <h1>My Bets</h1>
+        <button mat-icon-button (click)="store.auth.logout()"><mat-icon>logout</mat-icon></button>
+      </header>
+
+      <div class="stats-row">
+        <div class="stat-pill s-active">
+          <span class="stat-num">{{ store.activeCount() }}</span>
+          <span class="stat-lbl">Active</span>
+        </div>
+        <div class="stat-pill s-won">
+          <span class="stat-num">{{ store.wonCount() }}</span>
+          <span class="stat-lbl">Won</span>
+        </div>
+        <div class="stat-pill s-refunded">
+          <span class="stat-num">{{ store.refundedCount() }}</span>
+          <span class="stat-lbl">Refunded</span>
+        </div>
+        <div class="stat-pill s-void">
+          <span class="stat-num">{{ store.voidCount() }}</span>
+          <span class="stat-lbl">Void</span>
+        </div>
+      </div>
+
+      <div class="tab-bar">
+        <button class="tab-btn" [class.active]="activeTab() === 'active'" (click)="activeTab.set('active')">
+          <mat-icon>schedule</mat-icon> Active
+        </button>
+        <button class="tab-btn" [class.active]="activeTab() === 'history'" (click)="activeTab.set('history')">
+          <mat-icon>history</mat-icon> History
+        </button>
+      </div>
+
+      @if (activeTab() === 'active') {
+        <div class="list-content">
+          @if (store.loading()) {
+            <div class="loading-center"><mat-spinner diameter="24"></mat-spinner></div>
+          } @else if (store.activeStakes().length === 0) {
+            <div class="empty-state">
+              <mat-icon>sports_esports</mat-icon>
+              <p>No active bets</p>
+              <button class="btn-emerald" routerLink="/home">
+                <mat-icon>casino</mat-icon> Browse Odds
+              </button>
+            </div>
+          } @else {
+            @for (stake of store.activeStakes(); track stake.id) {
+              <div class="bet-card-mobile">
+                <div class="bet-card-header">
+                  <span class="bet-status" [class]="stake.status">{{ store.formatStatus(stake.status) }}</span>
+                  <span class="bet-date">{{ store.formatDay(stake.createdAt) }}</span>
+                </div>
+                <div class="bet-teams">
+                  <span>{{ stake.pod.homeTeam }}</span>
+                  <mat-icon>sports_soccer</mat-icon>
+                  <span>{{ stake.pod.awayTeam }}</span>
+                </div>
+                <div class="bet-meta">
+                  <span class="bet-market" *ngIf="stake.pod.marketType">{{ stake.pod.marketType }}</span>
+                  <span class="bet-refund" *ngIf="stake.pod.refundPercent">{{ stake.pod.refundPercent }}% cash back</span>
+                </div>
+                <div class="bet-pick">
+                  @if (stake.isSettled) {
+                    <span class="pick-label">Pick:</span>
+                    <span class="pick-value">{{ stake.pod.selection }}</span>
+                  }
+                  @if (stake.isParlay && stake.combinedMultiplier) {
+                    <span class="pick-odds">{{ stake.combinedMultiplier.toFixed(2) }}x</span>
+                  } @else {
+                    <span class="pick-odds">{{ stake.pod.gainsMultiplier.toFixed(2) }}x</span>
+                  }
+                </div>
+                @if (stake.isParlay && stake.items) {
+                  <div class="parlay-legs">
+                    @for (item of stake.items; track item.pod) {
+                      <div class="parlay-leg">
+                        <span class="leg-teams">{{ item.homeTeam }} vs {{ item.awayTeam }}</span>
+                        <span class="leg-detail">{{ item.selection }} &#64; {{ item.gainsMultiplier.toFixed(2) }}x</span>
+                        <span class="leg-status" [class.won]="item.status === 'won'" [class.lost]="item.status === 'lost'" [class.void]="item.status === 'void'">
+                          {{ item.status }}
+                        </span>
+                      </div>
+                    }
+                  </div>
+                }
+                <div class="bet-card-footer">
+                  <div class="bet-amounts">
+                    <span>Stake: <strong>{{ store.formatCurrency(stake.stakeAmount) }}</strong></span>
+                    <span>Payout: <strong class="emerald">{{ store.formatCurrency(stake.netPayout) }}</strong></span>
+                  </div>
+                  @if (!stake.isSettled && !stake.isParlay) {
+                    <button class="btn-cashout" (click)="store.requestCashout(stake.id)">
+                      <mat-icon>autorenew</mat-icon>
+                    </button>
+                  }
+                </div>
+                @if (stake.isSettled) {
+                  <div class="bet-result">
+                    @if (stake.status === 'won') {
+                      <span>Won</span>
+                      <span class="positive">+{{ store.formatCurrency(stake.profit!) }}</span>
+                    } @else if (stake.status === 'cashed_out') {
+                      <span>Cashed Out</span>
+                      <span class="neutral">{{ store.formatCurrency(stake.profit!) }}</span>
+                    } @else {
+                      <span>Refunded</span>
+                      <span class="neutral">{{ store.formatCurrency(stake.stakeAmount) }}</span>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          }
+        </div>
+      }
+
+      @if (activeTab() === 'history') {
+        <div class="list-content">
+          @if (store.loadingHistory()) {
+            <div class="loading-center"><mat-spinner diameter="24"></mat-spinner></div>
+          } @else if (store.settledStakes().length === 0) {
+            <div class="empty-state">
+              <mat-icon>history</mat-icon>
+              <p>No settled bets yet</p>
+            </div>
+          } @else {
+            @for (stake of store.settledStakes(); track stake.id) {
+              <div class="bet-card-mobile settled">
+                <div class="bet-card-header">
+                  <span class="bet-status" [class]="stake.status">{{ store.formatStatus(stake.status) }}</span>
+                  <span class="bet-date">{{ store.formatDay(stake.createdAt) }}</span>
+                </div>
+                <div class="bet-teams">
+                  <span>{{ stake.pod.homeTeam }}</span>
+                  <mat-icon>sports_soccer</mat-icon>
+                  <span>{{ stake.pod.awayTeam }}</span>
+                </div>
+                <div class="bet-meta">
+                  <span class="bet-market" *ngIf="stake.pod.marketType">{{ stake.pod.marketType }}</span>
+                  <span class="bet-refund" *ngIf="stake.pod.refundPercent">{{ stake.pod.refundPercent }}% cash back</span>
+                </div>
+                <div class="bet-pick">
+                  @if (stake.isSettled) {
+                    <span class="pick-label">Pick:</span>
+                    <span class="pick-value">{{ stake.pod.selection }}</span>
+                  }
+                  @if (stake.isParlay && stake.combinedMultiplier) {
+                    <span class="pick-odds">{{ stake.combinedMultiplier.toFixed(2) }}x</span>
+                  } @else {
+                    <span class="pick-odds">{{ stake.pod.gainsMultiplier.toFixed(2) }}x</span>
+                  }
+                </div>
+                @if (stake.isParlay && stake.items) {
+                  <div class="parlay-legs">
+                    @for (item of stake.items; track item.pod) {
+                      <div class="parlay-leg">
+                        <span class="leg-teams">{{ item.homeTeam }} vs {{ item.awayTeam }}</span>
+                        <span class="leg-detail">{{ item.selection }} &#64; {{ item.gainsMultiplier.toFixed(2) }}x</span>
+                        <span class="leg-status" [class.won]="item.status === 'won'" [class.lost]="item.status === 'lost'" [class.void]="item.status === 'void'">
+                          {{ item.status }}
+                        </span>
+                      </div>
+                    }
+                  </div>
+                }
+                <div class="bet-card-footer">
+                  <div class="bet-amounts">
+                    <span>Stake: <strong>{{ store.formatCurrency(stake.stakeAmount) }}</strong></span>
+                    <span>Payout: <strong class="emerald">{{ store.formatCurrency(stake.netPayout) }}</strong></span>
+                  </div>
+                </div>
+                <div class="bet-result">
+                  @if (stake.status === 'won') {
+                    <span>Won</span>
+                    <span class="positive">+{{ store.formatCurrency(stake.profit!) }}</span>
+                  } @else if (stake.status === 'cashed_out') {
+                    <span>Cashed Out</span>
+                    <span class="neutral">{{ store.formatCurrency(stake.profit!) }}</span>
+                  } @else {
+                    <span>Refunded</span>
+                    <span class="neutral">{{ store.formatCurrency(stake.stakeAmount) }}</span>
+                  }
+                </div>
+              </div>
+            }
+          }
+        </div>
+      }
+
+      <div class="bottom-spacer"></div>
+
+      @if (store.cashingOutStake()) {
+        <app-cashout-modal
+          [stake]="store.cashingOutStake()!"
+          (close)="store.dismissCashout()"
+          (cashoutConfirmed)="store.onCashoutComplete()">
+        </app-cashout-modal>
+      }
+
+      <app-mobile-nav />
+    </div>
+  

@@ -1,0 +1,619 @@
+<div class="pods-page">
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>Pods</h1>
+          <div class="stat-group">
+            <span class="stat-item draft-dot">Draft {{ store.draftCount() }}</span>
+            <span class="stat-item pub-dot">Publish {{ store.publishedCount() }}</span>
+            <span class="stat-item act-dot">Live {{ store.activeCount() }}</span>
+            <span class="stat-item past-dot">Past {{ store.settledCount() + store.cancelledCount() }}</span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button mat-stroked-button class="btn-sync" (click)="store.syncFromApi()" [disabled]="store.syncing()">
+            <mat-icon>sync</mat-icon>
+            <span *ngIf="!store.syncing()">Sync</span>
+            <span *ngIf="store.syncing()">Syncing...</span>
+          </button>
+          <button mat-stroked-button class="btn-settle-all" (click)="store.aiSettleAll()" [disabled]="store.settlingAll()">
+            <mat-icon>fact_check</mat-icon>
+            <span *ngIf="!store.settlingAll()">Settle All</span>
+            <span *ngIf="store.settlingAll()">Settling...</span>
+          </button>
+          <button mat-raised-button class="btn-create" (click)="store.openCreateForm()">
+            <mat-icon>add</mat-icon> Create Pod
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="tabs">
+          <button class="tab-btn" [class.active]="store.activeTab() === 'active'" (click)="store.switchTab('active')">
+            <mat-icon>rocket_launch</mat-icon> Active
+
+          </button>
+          <button class="tab-btn" [class.active]="store.activeTab() === 'past'" (click)="store.switchTab('past')">
+            <mat-icon>history</mat-icon> Past
+          </button>
+          <button class="tab-btn" [class.active]="store.activeTab() === 'disputed'" (click)="store.switchTab('disputed')">
+            <mat-icon>gavel</mat-icon> Disputed
+            <span class="tab-badge warn" *ngIf="store.disputedCount()">{{ store.disputedCount() }}</span>
+          </button>
+        </div>
+        <div class="filter-controls">
+          <div class="search-wrapper">
+            <mat-icon class="search-icon">search</mat-icon>
+            <input class="search-input" [ngModel]="store.searchQuery()" (ngModelChange)="store.setSearchQuery($event)" placeholder="Search pods..." />
+          </div>
+          <div class="date-range">
+            <input class="date-input" type="date" [ngModel]="store.dateFrom()" (ngModelChange)="store.setDateFrom($event); store.onFilterChange()" title="Match date from" />
+            <span class="date-sep">–</span>
+            <input class="date-input" type="date" [ngModel]="store.dateTo()" (ngModelChange)="store.setDateTo($event); store.onFilterChange()" title="Match date to" />
+            <button class="date-clear" *ngIf="store.dateFrom() || store.dateTo()" (click)="store.clearDates(); store.onFilterChange()" matTooltip="Clear dates">✕</button>
+          </div>
+          <div class="sub-filters" *ngIf="store.activeTab() !== 'disputed'">
+            <button class="sub-chip" [class.active]="store.statusFilter() === ''" (click)="store.setStatusFilter(''); store.onFilterChange()">All</button>
+            <button class="sub-chip draft" *ngIf="store.activeTab() === 'active'" [class.active]="store.statusFilter() === 'draft'" (click)="store.setStatusFilter('draft'); store.onFilterChange()">Draft</button>
+            <button class="sub-chip published" *ngIf="store.activeTab() === 'active'" [class.active]="store.statusFilter() === 'published'" (click)="store.setStatusFilter('published'); store.onFilterChange()">Published</button>
+            <button class="sub-chip active" *ngIf="store.activeTab() === 'active'" [class.active]="store.statusFilter() === 'active'" (click)="store.setStatusFilter('active'); store.onFilterChange()">Active</button>
+            <button class="sub-chip settled" *ngIf="store.activeTab() === 'past'" [class.active]="store.statusFilter() === 'settled'" (click)="store.setStatusFilter('settled'); store.onFilterChange()">Settled</button>
+            <button class="sub-chip cancelled" *ngIf="store.activeTab() === 'past'" [class.active]="store.statusFilter() === 'cancelled'" (click)="store.setStatusFilter('cancelled'); store.onFilterChange()">Cancelled</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pod-detail-panel" *ngIf="store.selectedPod()">
+        <div class="panel-header">
+          <h3>{{ store.selectedPod()!.title }}</h3>
+          <div class="panel-header-meta">
+            <span class="chip" [style.background]="statusColor(store.selectedPod()!.status)">{{ store.selectedPod()!.status }}</span>
+            <span class="chip" style="background:#2196f3" *ngIf="store.selectedPod()!.settlementStatus">{{ store.selectedPod()!.settlementStatus }}</span>
+          </div>
+          <button mat-icon-button (click)="store.selectedPod.set(null)"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="panel-body">
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="label">Match</span>
+              <span class="value">{{ store.selectedPod()!.homeTeam }} vs {{ store.selectedPod()!.awayTeam }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Match Date</span>
+              <span class="value">{{ store.selectedPod()!.matchDate | date:'MMM d, y HH:mm' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Sport</span>
+              <span class="value">{{ store.selectedPod()!.sport }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">League</span>
+              <span class="value">{{ store.selectedPod()!.league || '—' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Market Type</span>
+              <span class="value">{{ store.selectedPod()!.marketType || '1X2' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Selection / Pick</span>
+              <span class="value" style="color:#00E676;font-weight:600">{{ store.selectedPod()!.selection }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Adj. Odds</span>
+              <span class="value" style="color:#E8B923;font-size:18px;font-weight:700">{{ store.selectedPod()!.gainsMultiplier }}x</span>
+            </div>
+            <div class="detail-item" *ngIf="store.selectedPod()!.marketOdds != null">
+              <span class="label">Market Odds (Reach Match)</span>
+              <span class="value" style="color:rgba(255,255,255,0.6);font-size:16px">{{ store.selectedPod()!.marketOdds }}x</span>
+            </div>
+            <div class="detail-item" *ngIf="store.selectedPod()!.refundPercent != null">
+              <span class="label">Refund %</span>
+              <span class="value" style="color:#E8B923;font-size:16px;font-weight:600">{{ store.selectedPod()!.refundPercent }}%</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Stake Range</span>
+              <span class="value">\u20A6{{ store.selectedPod()!.minStake | number }} – \u20A6{{ store.selectedPod()!.maxStake | number }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Total Staked</span>
+              <span class="value">\u20A6{{ store.selectedPod()!.currentExposure | number }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Max Exposure</span>
+              <span class="value">\u20A6{{ store.selectedPod()!.maxTotalExposure | number }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Exposure Used</span>
+              <span class="value">
+                <span class="exposure-pct" [style.color]="getExposurePercent(store.selectedPod()!) >= 80 ? '#f44336' : getExposurePercent(store.selectedPod()!) >= 50 ? '#E8B923' : '#00E676'">
+                  {{ getExposurePercent(store.selectedPod()!) }}%
+                </span>
+                <div class="exposure-bar-bg" style="margin-top:4px"><div class="exposure-bar-fill" [style.width.%]="getExposurePercent(store.selectedPod()!)" [style.background]="getExposurePercent(store.selectedPod()!) >= 80 ? '#f44336' : getExposurePercent(store.selectedPod()!) >= 50 ? '#E8B923' : '#00E676'"></div></div>
+              </span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Participants</span>
+              <span class="value">{{ store.selectedPod()!.currentParticipants }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Staking Opens</span>
+              <span class="value">{{ store.selectedPod()!.opensAt | date:'MMM d, y HH:mm' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Staking Closes</span>
+              <span class="value" [style.color]="isStakingClosed(store.selectedPod()!) ? '#f44336' : '#00E676'">{{ store.selectedPod()!.stakingClosesAt | date:'MMM d, y HH:mm' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Est. Settlement</span>
+              <span class="value">{{ store.selectedPod()!.settlementEstimateLabel || (store.selectedPod()!.settlementEstimateAt | date:'MMM d, y') }}</span>
+            </div>
+            <div class="detail-item" *ngIf="store.selectedPod()!.metadata?.oraCurated">
+              <span class="label">Ora Confidence</span>
+              <span class="value">
+                <span class="confidence-badge" [style.background]="(store.selectedPod()!.metadata?.oraConfidence || 0) >= 70 ? 'rgba(0,230,118,0.2)' : (store.selectedPod()!.metadata?.oraConfidence || 0) >= 45 ? 'rgba(232,185,35,0.2)' : 'rgba(244,67,54,0.2)'" [style.color]="(store.selectedPod()!.metadata?.oraConfidence || 0) >= 70 ? '#00E676' : (store.selectedPod()!.metadata?.oraConfidence || 0) >= 45 ? '#E8B923' : '#f44336'">
+                  {{ store.selectedPod()!.metadata?.oraConfidence }}%
+                </span>
+              </span>
+            </div>
+          </div>
+          <div class="detail-actions" *ngIf="canManage(store.selectedPod()!)">
+            <button mat-stroked-button class="action-publish" *ngIf="store.selectedPod()!.status === 'draft'" (click)="store.publishPod(store.selectedPod()!.id)">
+              <mat-icon>publish</mat-icon> Publish
+            </button>
+            <button mat-stroked-button class="action-activate" *ngIf="store.selectedPod()!.status === 'published'" (click)="store.activatePod(store.selectedPod()!.id)">
+              <mat-icon>play_arrow</mat-icon> Activate
+            </button>
+            <button mat-stroked-button class="action-settle" *ngIf="store.selectedPod()!.status === 'active' || store.selectedPod()!.status === 'published'" (click)="store.startSettle()">
+              <mat-icon>check_circle</mat-icon> Settle
+            </button>
+            <button mat-stroked-button class="action-ai-settle" *ngIf="store.selectedPod()!.status === 'active' || store.selectedPod()!.status === 'published'" (click)="store.aiCheckSettle()" [disabled]="store.checkingSettle()">
+              <mat-icon>auto_awesome</mat-icon>
+              {{ store.checkingSettle() ? 'Checking...' : 'AI Settle' }}
+            </button>
+            <button mat-stroked-button class="action-cancel" *ngIf="['draft','published','active'].includes(store.selectedPod()!.status)" (click)="store.cancelPod(store.selectedPod()!.id)">
+              <mat-icon>cancel</mat-icon> Cancel
+            </button>
+          </div>
+          <div class="ai-settle-panel" *ngIf="store.settleCheck()">
+            <div class="ai-settle-header">
+              <mat-icon style="color:#CE93D8">auto_awesome</mat-icon>
+              <span>Ora Settlement Check</span>
+              <button mat-icon-button (click)="store.dismissSettleCheck()"><mat-icon>close</mat-icon></button>
+            </div>
+            <div class="ai-settle-body">
+              <div class="ai-settle-result" *ngIf="store.settleCheck()!.matchFound">
+                <div class="score-row">{{ store.settleCheck()!.homeTeam }} <strong>{{ store.settleCheck()!.homeScore ?? '?' }}</strong> - <strong>{{ store.settleCheck()!.awayScore ?? '?' }}</strong> {{ store.settleCheck()!.awayTeam }}</div>
+                <div class="status-row">Status: <span class="match-status">{{ store.settleCheck()!.matchStatus }}</span></div>
+              </div>
+              <div class="ai-settle-result" *ngIf="!store.settleCheck()!.matchFound">
+                <div class="no-data">No match data from sports API</div>
+              </div>
+              <div class="verdict-row">
+                <span class="verdict-label">Ora recommends:</span>
+                <span class="verdict-value" [class.win]="store.settleCheck()!.recommendedResult === 'win'" [class.loss]="store.settleCheck()!.recommendedResult === 'loss'" [class.void]="store.settleCheck()!.recommendedResult === 'void'" [class.unknown]="store.settleCheck()!.recommendedResult === 'cannot_determine'">
+                  {{ store.settleCheck()!.recommendedResult === 'cannot_determine' ? 'Cannot determine' : store.settleCheck()!.recommendedResult.toUpperCase() }}
+                </span>
+                <span class="verdict-confidence">({{ store.settleCheck()!.confidence }}% confidence)</span>
+              </div>
+              <div class="reasoning-row">{{ store.settleCheck()!.reasoning }}</div>
+              <div class="settle-actions" *ngIf="store.settleCheck()!.recommendedResult !== 'cannot_determine'">
+                <button mat-raised-button color="primary" (click)="store.confirmAiSettle(store.settleCheck()!.recommendedResult)">
+                  Confirm {{ store.settleCheck()!.recommendedResult }}
+                </button>
+                <button mat-button (click)="store.dismissSettleCheck()">Dismiss</button>
+              </div>
+            </div>
+          </div>
+          <div class="settle-form" *ngIf="store.settleTarget()">
+            <h4>Settle Pod</h4>
+            <div class="settle-actions">
+              <button mat-raised-button color="primary" (click)="store.confirmSettle('win')">Win</button>
+              <button mat-raised-button class="btn-loss" (click)="store.confirmSettle('loss')">Loss</button>
+              <button mat-raised-button class="btn-void" (click)="store.confirmSettle('void')">Void</button>
+              <button mat-button (click)="store.cancelSettle()">Cancel</button>
+            </div>
+          </div>
+          <div class="legs-list" *ngIf="store.selectedPod()!.legs?.length">
+            <h4>Legs ({{ store.selectedPod()!.legs.length }})</h4>
+            <div class="leg-item" *ngFor="let leg of store.selectedPod()!.legs; let i = index">
+              <span class="leg-num">{{ i + 1 }}</span>
+              <span class="leg-teams">{{ leg.homeTeam }} vs {{ leg.awayTeam }}</span>
+              <span class="leg-date">{{ leg.matchDate | date:'mediumDate' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settle-all-panel" *ngIf="store.settleAllResult()">
+        <div class="settle-all-header">
+          <mat-icon [style.color]="store.settleAllResult()!.errors.length === 0 ? '#00E676' : '#E8B923'">fact_check</mat-icon>
+          <span>AI Settle All: {{ store.settleAllResult()!.settled }} settled
+            <span *ngIf="store.settleAllResult()!.disputed > 0" class="disputed-badge">{{ store.settleAllResult()!.disputed }} disputed</span>
+            <span *ngIf="store.settleAllResult()!.stuck > 0" class="stuck-badge">{{ store.settleAllResult()!.stuck }} need review</span>
+          </span>
+          <button mat-icon-button (click)="store.dismissSettleAllResult()"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="settle-all-body">
+          <div class="settle-all-error" *ngFor="let e of store.settleAllResult()!.errors">{{ e }}</div>
+          <div class="settle-all-item" *ngFor="let r of store.settleAllResult()!.results.slice(0, 10)">
+            <span class="settle-item-teams">{{ r.homeTeam }} vs {{ r.awayTeam }}</span>
+            <span class="settle-item-verdict" [class.win]="r.recommendedResult === 'win'" [class.loss]="r.recommendedResult === 'loss'" [class.disputed]="r.disputed" [class.stuck]="r.recommendedResult === 'cannot_determine' && !r.disputed" [class.unknown]="r.recommendedResult === 'cannot_determine'">
+              <span *ngIf="r.disputed">DISPUTED</span>
+              <span *ngIf="!r.disputed && r.recommendedResult === 'cannot_determine'">STUCK</span>
+              <span *ngIf="!r.disputed && r.recommendedResult !== 'cannot_determine'">{{ r.recommendedResult }}</span>
+            </span>
+          </div>
+          <div class="settle-more" *ngIf="store.settleAllResult()!.results.length > 10">+{{ store.settleAllResult()!.results.length - 10 }} more</div>
+          <div class="settle-all-actions">
+            <button mat-stroked-button class="btn-dispute-review" *ngIf="store.settleAllResult()!.disputed > 0" (click)="store.loadDisputed()">
+              <mat-icon>gavel</mat-icon> Review {{ store.settleAllResult()!.disputed }} Disputed
+            </button>
+            <button mat-stroked-button class="btn-stuck-review" *ngIf="store.settleAllResult()!.stuck > 0" (click)="store.loadStuck()">
+              <mat-icon>help_outline</mat-icon> Review {{ store.settleAllResult()!.stuck }} Stuck
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="disputed-panel" *ngIf="store.showDisputedPanel()">
+        <div class="disputed-header">
+          <mat-icon style="color:#E8B923">gavel</mat-icon>
+          <span>Disputed Settlements ({{ store.disputedPods().length }})</span>
+          <div class="disputed-header-actions">
+            <button mat-stroked-button class="btn-batch-resolve" *ngIf="store.selectedDisputedIds().size > 0" (click)="store.startBatchResolve()">
+              <mat-icon>done_all</mat-icon> Resolve {{ store.selectedDisputedIds().size }} Selected
+            </button>
+            <button mat-icon-button (click)="store.dismissDisputedPanel()"><mat-icon>close</mat-icon></button>
+          </div>
+        </div>
+        <div class="disputed-body">
+          <div class="disputed-empty" *ngIf="store.disputedPods().length === 0">No disputed settlements.</div>
+          <div class="disputed-item" *ngFor="let p of store.disputedPods()" [class.selected]="store.selectedDisputedIds().has(p._id || p.id)">
+            <div class="disputed-item-header">
+              <mat-checkbox class="disputed-checkbox" (change)="store.toggleDisputedSelection(p._id || p.id)" [checked]="store.selectedDisputedIds().has(p._id || p.id)"></mat-checkbox>
+              <span class="disputed-teams">{{ p.homeTeam }} vs {{ p.awayTeam }}</span>
+              <span class="disputed-selection">{{ p.selection }} ({{ p.gainsMultiplier }}x)</span>
+            </div>
+            <div class="disputed-reason">{{ p.settlementDisputedReason || 'No reason provided' }}</div>
+            <div class="disputed-actions">
+              <button mat-stroked-button class="btn-resolve" (click)="store.startResolveDispute(p)">Resolve</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stuck-panel" *ngIf="store.showStuckPanel()">
+        <div class="stuck-header">
+          <mat-icon style="color:#90CAF9">help_outline</mat-icon>
+          <span>Needs Review — No Linked Fixture ({{ store.stuckPods().length }})</span>
+          <button mat-icon-button (click)="store.dismissStuckPanel()"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="stuck-body">
+          <div class="stuck-empty" *ngIf="store.stuckPods().length === 0">All pods have linked fixtures.</div>
+          <div class="stuck-item" *ngFor="let p of store.stuckPods()">
+            <div class="stuck-item-header">
+              <span class="stuck-teams">{{ p.homeTeam }} vs {{ p.awayTeam }}</span>
+              <span class="stuck-selection">{{ p.selection }} ({{ p.gainsMultiplier }}x)</span>
+            </div>
+            <div class="stuck-reason">No linked fixture — cannot auto-settle. Settle manually using the pod detail panel.</div>
+            <div class="stuck-actions">
+              <button mat-stroked-button class="btn-settle-manual" (click)="store.selectPodAndSettle(p)">Manual Settle</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="resolve-modal" *ngIf="store.resolveTarget()">
+        <div class="resolve-overlay" (click)="store.cancelResolveDispute()"></div>
+        <div class="resolve-card">
+          <div class="resolve-header">
+            <h3>Resolve Dispute</h3>
+            <button mat-icon-button (click)="store.cancelResolveDispute()"><mat-icon>close</mat-icon></button>
+          </div>
+          <div class="resolve-body">
+            <p class="resolve-pod-title">{{ store.resolveTarget()!.pod.homeTeam }} vs {{ store.resolveTarget()!.pod.awayTeam }}</p>
+            <p class="resolve-dispute-reason">{{ store.resolveTarget()!.pod.settlementDisputedReason }}</p>
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Override Result</mat-label>
+              <mat-select [ngModel]="store.resolveTarget()?.result" (ngModelChange)="store.setResolveResult($event)" required>
+                <mat-option value="win">Win</mat-option>
+                <mat-option value="loss">Loss</mat-option>
+                <mat-option value="void">Void</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Review Note (required)</mat-label>
+              <textarea matInput [ngModel]="store.resolveTarget()?.note" (ngModelChange)="store.setResolveNote($event)" rows="3" required placeholder="Explain why this override was made..."></textarea>
+            </mat-form-field>
+            <div class="resolve-actions">
+              <button mat-button (click)="store.cancelResolveDispute()">Cancel</button>
+              <button mat-raised-button color="primary" (click)="store.confirmResolveDispute()"
+                [disabled]="!store.resolveTarget()?.result || !store.resolveTarget()?.note?.trim()">
+                Confirm Override
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="resolve-modal" *ngIf="store.batchResolveTarget()">
+        <div class="resolve-overlay" (click)="store.cancelBatchResolve()"></div>
+        <div class="resolve-card">
+          <div class="resolve-header">
+            <h3>Batch Resolve ({{ store.batchResolveTarget()!.podIds.length }} pods)</h3>
+            <button mat-icon-button (click)="store.cancelBatchResolve()"><mat-icon>close</mat-icon></button>
+          </div>
+          <div class="resolve-body">
+            <p class="resolve-info">Apply the same result and note to all {{ store.batchResolveTarget()!.podIds.length }} selected disputed pods.</p>
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Override Result</mat-label>
+              <mat-select [ngModel]="store.batchResolveTarget()?.result" (ngModelChange)="store.setBatchResolveResult($event)" required>
+                <mat-option value="win">Win</mat-option>
+                <mat-option value="loss">Loss</mat-option>
+                <mat-option value="void">Void</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Review Note (required)</mat-label>
+              <textarea matInput [ngModel]="store.batchResolveTarget()?.note" (ngModelChange)="store.setBatchResolveNote($event)" rows="3" required placeholder="Explain why this override was made..."></textarea>
+            </mat-form-field>
+            <div class="resolve-actions">
+              <button mat-button (click)="store.cancelBatchResolve()">Cancel</button>
+              <button mat-raised-button color="primary" (click)="store.confirmBatchResolve()"
+                [disabled]="!store.batchResolveTarget()?.result || !store.batchResolveTarget()?.note?.trim()">
+                Batch Resolve {{ store.batchResolveTarget()!.podIds.length }} Pods
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sync-result" *ngIf="store.syncResult()">
+        <div class="sync-header">
+          <mat-icon [style.color]="store.syncResult()!.success ? '#00E676' : '#f44336'">{{ store.syncResult()!.success ? 'check_circle' : 'error' }}</mat-icon>
+          <span>Sync: {{ store.syncResult()!.created }} pods created ({{ store.syncResult()!.skipped }} skipped)</span>
+          <button mat-icon-button (click)="store.dismissSyncResult()"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="sync-details" *ngIf="store.syncResult()!.details.length">
+          <div class="sync-log" *ngFor="let d of store.syncResult()!.details">{{ d }}</div>
+        </div>
+        <div class="sync-details" *ngIf="store.syncResult()!.apiLog.length">
+          <div class="sync-section-label">API calls</div>
+          <div class="sync-log" *ngFor="let a of store.syncResult()!.apiLog">{{ a }}</div>
+        </div>
+        <div class="sync-details" *ngIf="store.syncResult()!.errors.length">
+          <div class="sync-section-label">Errors</div>
+          <div class="sync-error" *ngFor="let e of store.syncResult()!.errors">{{ e }}</div>
+        </div>
+        <div class="sync-details" *ngIf="store.syncResult()!.successes.length">
+          <div class="sync-section-label">Created pods</div>
+          <div class="sync-success-item" *ngFor="let s of store.syncResult()!.successes.slice(0, 5)">
+            {{ s.homeTeam }} vs {{ s.awayTeam }} &mdash; {{ s.pods }} pods
+          </div>
+          <div class="sync-more" *ngIf="store.syncResult()!.successes.length > 5">+{{ store.syncResult()!.successes.length - 5 }} more</div>
+        </div>
+      </div>
+
+      <div class="reserve-bar" *ngIf="store.reserve()">
+        <div class="reserve-header">
+          <div class="reserve-title">
+            <mat-icon style="font-size:18px;color:#E8B923">account_balance</mat-icon>
+            <span>Reserve Risk</span>
+            <span class="reserve-amount">₦{{ store.reserve()!.reserveAmount | number }}</span>
+          </div>
+          <div class="reserve-stats">
+            <span class="stat" [class.text-green]="store.reserve()!.netIfAllLose >= 0" [class.text-red]="store.reserve()!.netIfAllLose < 0">
+              If all lose: <strong>₦{{ store.reserve()!.refundIfAllLose | number }}</strong> refunds
+              <span class="net-badge" [class.positive]="store.reserve()!.netIfAllLose >= 0" [class.negative]="store.reserve()!.netIfAllLose < 0">
+                net +₦{{ store.reserve()!.netIfAllLose | number }}
+              </span>
+            </span>
+            <span class="stat-divider">|</span>
+            <span class="stat" [class.text-green]="store.reserve()!.netIfAllWin >= 0" [class.text-red]="store.reserve()!.netIfAllWin < 0">
+              If all win: <strong>₦{{ store.reserve()!.payoutIfAllWin | number }}</strong> payouts
+              <span class="net-badge" [class.positive]="store.reserve()!.netIfAllWin >= 0" [class.negative]="store.reserve()!.netIfAllWin < 0">
+                net {{ store.reserve()!.netIfAllWin >= 0 ? '+' : '' }}₦{{ store.reserve()!.netIfAllWin | number }}
+              </span>
+            </span>
+            <span class="stat-divider">|</span>
+            <span class="stat">{{ store.reserve()!.activePodsCount }} active pod{{ store.reserve()!.activePodsCount !== 1 ? 's' : '' }}</span>
+          </div>
+        </div>
+        <div class="reserve-bar-track">
+          <div class="reserve-bar-fill" [style.width.%]="store.reserve()!.consumptionPercent" [class.danger]="store.reserve()!.consumptionPercent >= 75" [class.warning]="store.reserve()!.consumptionPercent >= 50 && store.reserve()!.consumptionPercent < 75" [class.safe]="store.reserve()!.consumptionPercent < 50">
+            <span class="bar-label" *ngIf="store.reserve()!.consumptionPercent >= 15">{{ store.reserve()!.consumptionPercent }}%</span>
+          </div>
+        </div>
+        <div class="reserve-bar-ticks">
+          <span>₦0</span>
+          <span>₦250K</span>
+          <span>₦500K</span>
+          <span>₦750K</span>
+          <span>₦1M</span>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="loading-shim" *ngIf="store.loading()">
+          <div class="spinner"></div>
+        </div>
+        <div class="empty-state" *ngIf="!store.loading() && store.tabPods().length === 0 && store.activeTab() !== 'disputed'">
+          <mat-icon style="font-size:40px;opacity:0.25;margin-bottom:8px">sports_soccer</mat-icon>
+          <div>No {{ store.activeTab() }} pods to show</div>
+        </div>
+        <table mat-table [dataSource]="store.tabPods()" class="admin-table" *ngIf="store.tabPods().length > 0">
+          <ng-container matColumnDef="match">
+            <th mat-header-cell *matHeaderCellDef>Match</th>
+            <td mat-cell *matCellDef="let p">
+              <div class="match-cell">
+                <span class="match-teams">{{ p.homeTeam }} vs {{ p.awayTeam }}</span>
+                <span class="match-date">{{ p.matchDate | date:'MMM d, HH:mm' }}</span>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let p">
+              <div class="status-group">
+                <span class="chip" [style.background]="statusColor(p.status)">{{ p.status }}</span>
+                <span class="chip settlement" *ngIf="p.settlementStatus" [style.background]="settlementColor(p)">{{ p.settlementStatus }}</span>
+                <span class="live-pill" *ngIf="p.isLive">LIVE</span>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="pick">
+            <th mat-header-cell *matHeaderCellDef>Pick</th>
+            <td mat-cell *matCellDef="let p">
+              <span class="pick-value">{{ p.selection }}</span>
+              <span class="pick-odds">{{ p.gainsMultiplier }}x</span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="exposure">
+            <th mat-header-cell *matHeaderCellDef>Exposure</th>
+            <td mat-cell *matCellDef="let p">
+              <div class="exposure-cell">
+                <span class="exposure-amount">\u20A6{{ p.currentExposure | number }} / \u20A6{{ p.maxTotalExposure | number }}</span>
+                <div class="exposure-track">
+                  <div class="exposure-fill" [style.width.%]="getExposurePercent(p)" [style.background]="getExposurePercent(p) >= 80 ? '#f44336' : getExposurePercent(p) >= 50 ? '#E8B923' : '#00E676'"></div>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="stakeRange">
+            <th mat-header-cell *matHeaderCellDef>Range</th>
+            <td mat-cell *matCellDef="let p" class="range-cell">\u20A6{{ p.minStake | number }} – \u20A6{{ p.maxStake | number }}</td>
+          </ng-container>
+          <ng-container matColumnDef="refund">
+            <th mat-header-cell *matHeaderCellDef>Refund</th>
+            <td mat-cell *matCellDef="let p">
+              <span *ngIf="p.refundPercent != null" style="color:#E8B923;font-weight:600">{{ p.refundPercent }}%</span>
+              <span *ngIf="p.refundPercent == null" style="color:rgba(255,255,255,0.3)">—</span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let p">
+              <div class="row-actions">
+                <button mat-icon-button (click)="store.viewPodDialog(p); $event.stopPropagation()" matTooltip="Details"><mat-icon>visibility</mat-icon></button>
+                <button mat-icon-button (click)="store.editPod(p); $event.stopPropagation()" matTooltip="Edit" *ngIf="canManage(p)"><mat-icon>edit</mat-icon></button>
+                <button mat-icon-button *ngIf="p.status === 'draft'" (click)="store.publishPod(p.id); $event.stopPropagation()" matTooltip="Publish"><mat-icon>publish</mat-icon></button>
+                <button mat-icon-button *ngIf="p.status === 'published'" (click)="store.activatePod(p.id); $event.stopPropagation()" matTooltip="Activate"><mat-icon>play_arrow</mat-icon></button>
+                <button mat-icon-button *ngIf="['published','active'].includes(p.status) && store.activeTab() !== 'past'" (click)="store.startSettle(); $event.stopPropagation()" matTooltip="Settle"><mat-icon>check_circle</mat-icon></button>
+                <button mat-icon-button *ngIf="canManage(p)" (click)="store.cancelPod(p.id); $event.stopPropagation()" matTooltip="Cancel"><mat-icon>cancel</mat-icon></button>
+              </div>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="tabColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: tabColumns;" class="clickable-row" [class.past-row]="store.activeTab() === 'past' || isMatchPassed(row)" [class.active-row]="store.activeTab() === 'active' && !isMatchPassed(row)" (click)="store.selectAndFetch(row)"></tr>
+        </table>
+        <mat-paginator *ngIf="store.totalPages() > 1"
+          [length]="store.total()"
+          [pageSize]="store.limit()"
+          [pageIndex]="store.page() - 1"
+          [pageSizeOptions]="[10, 20, 50, 100]"
+          (page)="store.onPageChange($event)"
+          showFirstLastButtons>
+        </mat-paginator>
+      </div>
+    </div>
+
+    <div class="detail-dialog" *ngIf="store.detailDialogPod()">
+      <div class="detail-overlay" (click)="store.closeDetailDialog()"></div>
+      <div class="detail-dialog-card">
+        <div class="detail-dialog-header">
+          <h3>{{ store.detailDialogPod()!.title }}</h3>
+          <div class="detail-dialog-header-meta">
+            <span class="chip" [style.background]="statusColor(store.detailDialogPod()!.status)">{{ store.detailDialogPod()!.status }}</span>
+            <span class="chip" style="background:#2196f3" *ngIf="store.detailDialogPod()!.settlementStatus">{{ store.detailDialogPod()!.settlementStatus }}</span>
+          </div>
+          <button class="detail-dialog-close" (click)="store.closeDetailDialog()">&times;</button>
+        </div>
+        <div class="detail-dialog-body">
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="label">Match</span>
+              <span class="value">{{ store.detailDialogPod()!.homeTeam }} vs {{ store.detailDialogPod()!.awayTeam }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Match Date</span>
+              <span class="value">{{ store.detailDialogPod()!.matchDate | date:'MMM d, y HH:mm' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Sport</span>
+              <span class="value">{{ store.detailDialogPod()!.sport }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">League</span>
+              <span class="value">{{ store.detailDialogPod()!.league || '—' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Market Type</span>
+              <span class="value">{{ store.detailDialogPod()!.marketType || '1X2' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Selection</span>
+              <span class="value" style="color:#00E676;font-weight:600">{{ store.detailDialogPod()!.selection }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Adj. Odds</span>
+              <span class="value" style="color:#E8B923;font-size:18px;font-weight:700">{{ store.detailDialogPod()!.gainsMultiplier }}x</span>
+            </div>
+            <div class="detail-item" *ngIf="store.detailDialogPod()!.marketOdds != null">
+              <span class="label">Market Odds</span>
+              <span class="value" style="color:rgba(255,255,255,0.6);font-size:16px">{{ store.detailDialogPod()!.marketOdds }}x</span>
+            </div>
+            <div class="detail-item" *ngIf="store.detailDialogPod()!.refundPercent != null">
+              <span class="label">Refund %</span>
+              <span class="value" style="color:#E8B923;font-size:16px;font-weight:600">{{ store.detailDialogPod()!.refundPercent }}%</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Stake Range</span>
+              <span class="value">\u20A6{{ store.detailDialogPod()!.minStake | number }} – \u20A6{{ store.detailDialogPod()!.maxStake | number }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Total Staked</span>
+              <span class="value">\u20A6{{ store.detailDialogPod()!.currentExposure | number }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Max Exposure</span>
+              <span class="value">\u20A6{{ store.detailDialogPod()!.maxTotalExposure | number }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Participants</span>
+              <span class="value">{{ store.detailDialogPod()!.currentParticipants }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Staking Opens</span>
+              <span class="value">{{ store.detailDialogPod()!.opensAt | date:'MMM d, y HH:mm' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Staking Closes</span>
+              <span class="value" [style.color]="isStakingClosed(store.detailDialogPod()!) ? '#f44336' : '#00E676'">{{ store.detailDialogPod()!.stakingClosesAt | date:'MMM d, y HH:mm' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Est. Settlement</span>
+              <span class="value">{{ store.detailDialogPod()!.settlementEstimateLabel || (store.detailDialogPod()!.settlementEstimateAt | date:'MMM d, y') }}</span>
+            </div>
+          </div>
+          <div class="detail-dialog-actions" *ngIf="canManage(store.detailDialogPod()!)">
+            <button mat-stroked-button class="action-publish" *ngIf="store.detailDialogPod()!.status === 'draft'" (click)="store.publishPod(store.detailDialogPod()!.id)">
+              <mat-icon>publish</mat-icon> Publish
+            </button>
+            <button mat-stroked-button class="action-activate" *ngIf="store.detailDialogPod()!.status === 'published'" (click)="store.activatePod(store.detailDialogPod()!.id)">
+              <mat-icon>play_arrow</mat-icon> Activate
+            </button>
+            <button mat-stroked-button class="action-settle" *ngIf="store.detailDialogPod()!.status === 'active' || store.detailDialogPod()!.status === 'published'" (click)="store.startSettle()">
+              <mat-icon>check_circle</mat-icon> Settle
+            </button>
+            <button mat-stroked-button class="action-cancel" *ngIf="['draft','published','active'].includes(store.detailDialogPod()!.status)" (click)="store.cancelPod(store.detailDialogPod()!.id)">
+              <mat-icon>cancel</mat-icon> Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <app-pod-form *ngIf="store.showCreateForm() || store.editPodTarget()"
+      [pod]="store.editPodTarget()"
+      (close)="store.closeCreateForm()"
+      (saved)="store.onPodSaved()" />
+  

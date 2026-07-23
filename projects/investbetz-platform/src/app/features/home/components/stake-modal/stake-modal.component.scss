@@ -1,0 +1,560 @@
+@use '../../../../core/styles/brand' as *;
+
+/* ─── Overlay ─── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: $z-modal;
+  padding: 0;
+  backdrop-filter: blur(4px);
+}
+
+/* ─── Container ─── */
+.modal-container {
+  width: 100%;
+  max-width: 420px;
+  max-height: 92vh;
+  background: $deep-navy;
+  border-radius: $radius-xl $radius-xl 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5), 0 0 60px rgba($emerald, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: none;
+}
+
+@keyframes modalSlideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ─── Header ─── */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: $deep-navy-light;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: $white;
+}
+
+.modal-title mat-icon {
+  color: $emerald;
+  font-size: 1.3rem;
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.close-btn {
+  color: $white-muted;
+  transition: color $transition-fast;
+}
+
+.close-btn:hover {
+  color: $white;
+}
+
+/* ─── Stepper ─── */
+.modal-stepper {
+  flex: 1;
+  overflow-y: auto;
+  background: transparent;
+}
+
+/* All stepper surfaces */
+.modal-stepper,
+.modal-stepper .mat-horizontal-stepper-header-container,
+.modal-stepper .mat-horizontal-content-container,
+.modal-stepper .mat-mdc-step,
+.modal-stepper .mat-mdc-step-header,
+.modal-stepper .mat-mdc-step-content,
+.modal-stepper .mat-mdc-stepper-content {
+  background: transparent !important;
+}
+
+/* Step header row */
+.modal-stepper .mat-horizontal-stepper-header-container {
+  padding: 0.75rem 1.25rem 0.5rem;
+  background: $deep-navy !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* Step headers */
+.modal-stepper .mat-mdc-step-header {
+  padding: 0.5rem 0 !important;
+  cursor: default !important;
+}
+
+.modal-stepper .mat-mdc-step-label {
+  color: $white-dim !important;
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.modal-stepper .mat-mdc-step-header[aria-selected="true"] .mat-mdc-step-label {
+  color: $emerald !important;
+}
+
+/* Step icons */
+.modal-stepper .mat-mdc-step-icon {
+  background: transparent !important;
+  border: 2px solid rgba(255, 255, 255, 0.12) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  width: 28px !important;
+  height: 28px !important;
+  font-size: 0.75rem !important;
+  line-height: 24px !important;
+  border-radius: 50% !important;
+  transition: all $transition-base;
+}
+
+.modal-stepper .mat-mdc-step-header[aria-selected="true"] .mat-mdc-step-icon {
+  border-color: $emerald !important;
+  background: rgba($emerald, 0.12) !important;
+  color: $emerald !important;
+}
+
+.modal-stepper .mat-mdc-step-icon-state-done {
+  background: $emerald !important;
+  border-color: $emerald !important;
+  color: $deep-navy !important;
+}
+
+.modal-stepper .mat-mdc-step-icon-state-done .mat-mdc-step-icon-content {
+  color: $deep-navy !important;
+}
+
+.modal-stepper .mat-mdc-step-icon-state-edit {
+  color: $emerald !important;
+}
+
+/* Connector line between steps */
+.modal-stepper .mat-stepper-horizontal-line {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Content area */
+.modal-stepper .mat-horizontal-content-container {
+  padding: 0 !important;
+}
+
+/* ─── Step Content ─── */
+.step-content {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ─── Pod Summary Card ─── */
+.pod-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  background: rgba($emerald, 0.04);
+  border: 1px solid rgba($emerald, 0.08);
+  border-radius: $radius-md;
+}
+
+.pod-summary-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: $white;
+  line-height: 1.3;
+  flex: 1;
+}
+
+.pod-summary-gains {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.pod-summary-gains .gains-number {
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1;
+  @include text-gradient-emerald;
+}
+
+.pod-summary-gains .gains-multiplier {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: $white-dim;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ─── Form Field ─── */
+.stake-input {
+  width: 100%;
+}
+
+.stake-input ::ng-deep .mat-mdc-text-field-wrapper {
+  background: $deep-navy-lighter !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: $radius-md;
+}
+
+.stake-input ::ng-deep .mat-mdc-text-field-wrapper.mdc-text-field--focused {
+  border-color: $emerald;
+}
+
+.stake-input ::ng-deep .mdc-text-field__input {
+  color: $white !important;
+  caret-color: $emerald;
+}
+
+.stake-input ::ng-deep .mat-mdc-floating-label {
+  color: $white-muted !important;
+}
+
+.stake-input ::ng-deep .mat-mdc-floating-label.mdc-floating-label--float-above {
+  color: $emerald !important;
+}
+
+.stake-input ::ng-deep .mat-mdc-form-field-error-wrapper {
+  color: $error;
+}
+
+.mat-mdc-form-field-error {
+  color: $error !important;
+  font-size: 0.75rem;
+}
+
+/* ─── Quick Amounts ─── */
+.quick-amounts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.quick-btn {
+  flex: 1;
+  min-width: calc(33% - 0.5rem);
+  padding: 0.55rem 0.5rem !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: $radius-sm !important;
+  color: $white-muted !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  transition: all $transition-fast;
+}
+
+.quick-btn:hover {
+  background: rgba($emerald, 0.08) !important;
+  border-color: rgba($emerald, 0.2) !important;
+  color: $emerald !important;
+}
+
+.quick-btn.active {
+  background: rgba($emerald, 0.12) !important;
+  border-color: $emerald !important;
+  color: $emerald !important;
+}
+
+/* ─── Balance Info ─── */
+.balance-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.7rem 0.85rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: $radius-md;
+}
+
+.balance-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: $white-muted;
+}
+
+.balance-row mat-icon {
+  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
+  color: $emerald;
+}
+
+.balance-row strong {
+  color: $white;
+  font-weight: 700;
+}
+
+.balance-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: $error;
+  font-weight: 600;
+}
+
+.balance-warning mat-icon {
+  font-size: 0.9rem;
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+/* ─── Payout Preview ─── */
+.payout-preview {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: $radius-md;
+}
+
+.payout-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.payout-label {
+  font-size: 0.8rem;
+  color: $white-muted;
+}
+
+.payout-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $white;
+  font-variant-numeric: tabular-nums;
+}
+
+.payout-value.emerald {
+  color: $emerald;
+}
+
+.payout-value.profit-value {
+  color: $emerald-light;
+}
+
+.payout-row.profit .payout-label {
+  color: $white-dim;
+}
+
+.payout-row.fee .payout-value {
+  color: $error;
+}
+
+.payout-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 0.3rem 0;
+}
+
+.payout-row.total {
+  padding-top: 0.75rem;
+}
+
+.payout-row.total .payout-label {
+  font-weight: 700;
+  color: $white;
+}
+
+.payout-row.total .payout-value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: $emerald;
+}
+
+/* ─── Win/Refund Box ─── */
+.win-refund-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  background: rgba($emerald, 0.03);
+  border: 1px solid rgba($emerald, 0.06);
+  border-radius: $radius-md;
+}
+
+.win-refund-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  color: $white-muted;
+  line-height: 1.4;
+}
+
+.win-refund-row strong {
+  color: $white;
+  font-weight: 700;
+}
+
+.win-icon {
+  color: $emerald;
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+}
+
+.refund-icon {
+  color: $white-dim;
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+}
+
+/* ─── Terms ─── */
+.terms-confirm {
+  padding: 0.25rem 0;
+}
+
+.terms-confirm .mdc-checkbox__background {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.terms-confirm .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background {
+  background-color: $emerald !important;
+  border-color: $emerald !important;
+}
+
+.terms-confirm .mat-mdc-checkbox .mdc-label,
+.terms-confirm .mat-mdc-checkbox label {
+  color: $white !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.01em;
+}
+
+.terms-confirm a {
+  color: $emerald;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.terms-confirm a:hover {
+  text-decoration: underline;
+}
+
+/* ─── Actions ─── */
+.modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: $deep-navy-light;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: $white-muted !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  transition: color $transition-fast;
+  flex-shrink: 0;
+}
+
+.back-btn:hover {
+  color: $white !important;
+}
+
+.back-btn mat-icon {
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.primary-action {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 3rem;
+  padding: 0 1.5rem;
+  background: linear-gradient(135deg, $emerald 0%, $emerald-dark 100%) !important;
+  color: $deep-navy !important;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-base;
+  box-shadow: 0 4px 16px rgba($emerald, 0.25);
+}
+
+.primary-action:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba($emerald, 0.4);
+}
+
+.primary-action:disabled {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: $white-dim !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+}
+
+/* ─── Spinner inside button ─── */
+.primary-action .mat-mdc-spinner {
+  --mdc-circular-progress-active-indicator-color: $deep-navy !important;
+}
+
+/* ─── Scrollbar inside modal ─── */
+.modal-stepper::-webkit-scrollbar {
+  width: 4px;
+}
+
+.modal-stepper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-stepper::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+/* ─── Responsive ─── */
+@media (min-width: 768px) {
+  .modal-overlay {
+    align-items: center;
+  }
+
+  .modal-container {
+    max-width: 440px;
+    max-height: 85vh;
+    border-radius: $radius-xl;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    animation: modalFadeIn 0.3s ease;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba($emerald, 0.04);
+  }
+
+  @keyframes modalFadeIn {
+    from { transform: translateY(20px) scale(0.97); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+  }
+}

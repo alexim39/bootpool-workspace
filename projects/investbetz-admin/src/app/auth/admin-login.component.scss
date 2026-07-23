@@ -1,0 +1,21 @@
+
+    .login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0A1428; padding: 16px; }
+    .login-card { background: #0D1A30; border-radius: 16px; width: 100%; max-width: 400px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; }
+    .login-header { text-align: center; padding: 32px 24px 16px; }
+    .logo { margin-bottom: 16px; }
+    .logo-icon { width: 56px; height: 56px; background: #00E676; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 26px; color: #0A1428; }
+    .login-header h1 { color: #fff; font-size: 22px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { color: rgba(255,255,255,0.4); font-size: 13px; margin: 0; }
+    .login-body { padding: 0 24px 24px; display: flex; flex-direction: column; gap: 12px; }
+    .full-width { width: 100%; }
+    .step-hint { color: rgba(255,255,255,0.5); font-size: 13px; text-align: center; padding: 4px 0; word-break: break-all; }
+    .btn-primary { background: #00E676 !important; color: #0A1428 !important; font-weight: 600; height: 48px; font-size: 15px; }
+    .btn-primary:disabled { opacity: 0.4; }
+    .action-links { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .link-btn { color: rgba(255,255,255,0.5) !important; font-size: 12px !important; }
+    .error-msg { color: #f44336; font-size: 13px; text-align: center; padding: 8px; background: rgba(244,67,54,0.1); border-radius: 8px; }
+    .login-footer { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); font-size: 12px; }
+    .login-footer mat-icon { font-size: 14px; width: 14px; height: 14px; }
+    .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(10,20,40,0.2); border-top-color: #0A1428; border-radius: 50%; animation: spin 0.6s linear infinite; margin-left: 8px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  

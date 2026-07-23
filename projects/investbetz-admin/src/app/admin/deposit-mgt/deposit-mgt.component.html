@@ -1,0 +1,104 @@
+
+    <div class="page">
+      <div class="page-header">
+        <h1>Deposit Management</h1>
+        <span class="header-count">{{ store.total() }} deposits</span>
+      </div>
+
+      <mat-card class="filter-card">
+        <div class="filter-row">
+          <mat-form-field appearance="outline" class="filter-select">
+            <mat-label>Status</mat-label>
+            <mat-select [ngModel]="store.statusFilter()" (ngModelChange)="store.statusFilter.set($event); store.onFilterChange()">
+              <mat-option value="">All</mat-option>
+              <mat-option value="pending">Pending</mat-option>
+              <mat-option value="processing">Processing</mat-option>
+              <mat-option value="completed">Completed</mat-option>
+              <mat-option value="failed">Failed</mat-option>
+              <mat-option value="cancelled">Cancelled</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div class="filter-spacer"></div>
+          <button mat-stroked-button class="btn-refresh" (click)="store.load()">
+            <mat-icon>refresh</mat-icon> Refresh
+          </button>
+        </div>
+      </mat-card>
+
+      <mat-card class="table-card">
+        <div class="loading-overlay" *ngIf="store.loading()">
+          <div class="spinner"></div>
+        </div>
+        <table mat-table [dataSource]="store.deposits()" class="admin-table">
+          <ng-container matColumnDef="ref">
+            <th mat-header-cell *matHeaderCellDef>Reference</th>
+            <td mat-cell *matCellDef="let d" class="cell-ref">{{ d.reference?.slice(0, 16) }}...</td>
+          </ng-container>
+          <ng-container matColumnDef="user">
+            <th mat-header-cell *matHeaderCellDef>User</th>
+            <td mat-cell *matCellDef="let d">{{ d.user?.phone || d.user?.name || '—' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef>Amount</th>
+            <td mat-cell *matCellDef="let d" class="cell-amount">₦{{ d.amount | number }}</td>
+          </ng-container>
+          <ng-container matColumnDef="fee">
+            <th mat-header-cell *matHeaderCellDef>Fee</th>
+            <td mat-cell *matCellDef="let d">₦{{ d.fee | number }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let d">
+              <span class="chip" [style.background]="statusColor(d.status) + '33'" [style.color]="statusColor(d.status)">
+                {{ d.status }}
+              </span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let d">{{ d.createdAt | date:'MMM d, y HH:mm' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let d">
+              <button mat-icon-button (click)="store.toggleDetail(d)" matTooltip="View details">
+                <mat-icon>{{ store.detailId() === d.id ? 'expand_less' : 'expand_more' }}</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="store.columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: store.columns;" class="clickable-row" (click)="store.toggleDetail(row)"></tr>
+        </table>
+
+        <div class="paginator" *ngIf="store.totalPages() > 1">
+          <button mat-button [disabled]="store.page() <= 1" (click)="store.goTo(store.page() - 1)">Previous</button>
+          <span class="page-info">Page {{ store.page() }} of {{ store.totalPages() }}</span>
+          <button mat-button [disabled]="store.page() >= store.totalPages()" (click)="store.goTo(store.page() + 1)">Next</button>
+        </div>
+
+        <div class="empty-state" *ngIf="!store.loading() && store.deposits().length === 0">
+          No deposits found
+        </div>
+      </mat-card>
+
+      <div class="detail-panel" *ngIf="store.detail() as detail">
+        <div class="detail-header">
+          <h3>Deposit Details</h3>
+          <button mat-icon-button (click)="store.detail.set(null)"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-item"><span class="d-label">Reference</span><span class="d-value">{{ detail.reference }}</span></div>
+          <div class="detail-item"><span class="d-label">User</span><span class="d-value">{{ detail.user?.phone || '—' }} {{ detail.user?.name ? '(' + (detail.user?.name || '') + ')' : '' }}</span></div>
+          <div class="detail-item"><span class="d-label">Amount</span><span class="d-value">₦{{ detail.amount | number }}</span></div>
+          <div class="detail-item"><span class="d-label">Fee</span><span class="d-value">₦{{ detail.fee | number }}</span></div>
+          <div class="detail-item"><span class="d-label">Net Amount</span><span class="d-value">₦{{ (detail.amount - detail.fee) | number }}</span></div>
+          <div class="detail-item"><span class="d-label">Status</span><span class="d-value"><span class="chip" [style.background]="statusColor(detail.status) + '33'" [style.color]="statusColor(detail.status)">{{ detail.status }}</span></span></div>
+          <div class="detail-item"><span class="d-label">Provider</span><span class="d-value">{{ detail.provider || '—' }}</span></div>
+          <div class="detail-item"><span class="d-label">Created</span><span class="d-value">{{ detail.createdAt | date:'MMM d, y HH:mm:ss' }}</span></div>
+          <div class="detail-item"><span class="d-label">Completed</span><span class="d-value">{{ detail.completedAt ? (detail.completedAt | date:'MMM d, y HH:mm:ss') : '—' }}</span></div>
+          <div class="detail-item"><span class="d-label">Description</span><span class="d-value">{{ detail.metadata?.description || '—' }}</span></div>
+          <div class="detail-item" *ngIf="detail.failureReason"><span class="d-label">Failure Reason</span><span class="d-value" style="color:#f44336">{{ detail.failureReason }}</span></div>
+        </div>
+      </div>
+    </div>
+  

@@ -1,0 +1,68 @@
+
+    <div class="mobile-root">
+      <div class="mobile-header">
+        <button class="back-btn" (click)="goBack()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <span class="header-logo">
+          <img src="img/logo/logo.png" alt="BetPool Logo" class="logo-image">
+          <span class="logo-bet">Bet</span>
+          <span class="logo-pool">Pool</span>
+        </span>
+        <div style="width:44px"></div>
+      </div>
+
+      <div class="mobile-content">
+        <h1 class="page-title">Create Account</h1>
+        <p class="page-subtitle">Join the BetPool community</p>
+
+        <div class="field">
+          <label class="field-label">Full Name</label>
+          <input class="field-input" type="text" [(ngModel)]="fullName" placeholder="Enter your full name" maxlength="50" />
+        </div>
+
+        <div class="field">
+          <label class="field-label">Phone Number</label>
+          <div class="phone-wrap">
+            <span class="phone-prefix">+234</span>
+            <input class="field-input" type="tel" [(ngModel)]="phone" placeholder="Enter your phone number" maxlength="10" inputmode="numeric" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Email (optional)</label>
+          <input class="field-input" type="email" [(ngModel)]="email" placeholder="Enter your email address" />
+          <span class="field-hint">Your verification code will also be sent to this email</span>
+        </div>
+
+        <div class="terms-row" (click)="toggleTerms()">
+          <div class="terms-checkbox" [class.checked]="termsAccepted">
+            @if (termsAccepted) {
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A1428" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            }
+          </div>
+          <span class="terms-text">
+            I accept the <a class="terms-link" href="#" (click)="$event.preventDefault()">Terms</a> and <a class="terms-link" href="#" (click)="$event.preventDefault()">Privacy Policy</a>
+          </span>
+        </div>
+
+        @if (store.error()) {
+          <div class="error-msg">{{ store.error() }}</div>
+        }
+      </div>
+
+      <div class="mobile-bottom">
+        <button class="btn-primary" (click)="createAccount()" [disabled]="!isFormValid || store.loading()">
+          @if (store.loading()) { <span class="spinner"></span> }
+          Create Account
+        </button>
+        <div class="bottom-text">
+          Already have an account? <a class="auth-link" (click)="goLogin()">Sign In</a>
+        </div>
+      </div>
+    </div>
+  

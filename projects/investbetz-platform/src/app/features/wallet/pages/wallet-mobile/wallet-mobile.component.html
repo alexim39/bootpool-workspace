@@ -1,0 +1,110 @@
+
+    <div class="mobile-wallet">
+      <header class="mobile-header">
+        <button mat-icon-button routerLink="/home"><mat-icon>arrow_back</mat-icon></button>
+        <h1>Wallet</h1>
+        <button mat-icon-button (click)="store.auth.logout()"><mat-icon>logout</mat-icon></button>
+      </header>
+
+      <div class="balance-card">
+        <div class="balance-label">Available Balance</div>
+        <div class="balance-amount">{{ store.formatCurrency(store.walletBalance().available) }}</div>
+        <div class="balance-sub">
+          <span>Total Balance: {{ store.formatCurrency(store.walletBalance().balance) }}</span>
+          <span *ngIf="store.walletBalance().locked > 0" class="locked">Locked (Active Stakes): {{ store.formatCurrency(store.walletBalance().locked) }}</span>
+        </div>
+        <div class="balance-actions">
+          <button class="btn-action btn-deposit" (click)="showTopUp.set(true)">
+            <mat-icon>add</mat-icon> Deposit
+          </button>
+          <button class="btn-action btn-withdraw" (click)="store.openWithdraw()">
+            <mat-icon>remove</mat-icon> Withdraw
+          </button>
+        </div>
+      </div>
+
+      <div class="section-header"><span>Quick Stats</span></div>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <mat-icon class="stat-icon s-primary">trending_up</mat-icon>
+          <span class="stat-val">{{ store.formatCurrency(store.totalDeposited()) }}</span>
+          <span class="stat-lbl">Deposited</span>
+        </div>
+        <div class="stat-item">
+          <mat-icon class="stat-icon s-gold">trending_down</mat-icon>
+          <span class="stat-val">{{ store.formatCurrency(store.totalWithdrawn()) }}</span>
+          <span class="stat-lbl">Withdrawn</span>
+        </div>
+        <div class="stat-item">
+          <mat-icon class="stat-icon s-primary">casino</mat-icon>
+          <span class="stat-val">{{ store.formatCurrency(store.totalStaked()) }}</span>
+          <span class="stat-lbl">Staked</span>
+        </div>
+        <div class="stat-item">
+          <mat-icon class="stat-icon s-primary">emoji_events</mat-icon>
+          <span class="stat-val">{{ store.formatCurrency(store.totalWon()) }}</span>
+          <span class="stat-lbl">Won</span>
+        </div>
+      </div>
+
+      <div class="section-header"><span>Transaction History <span class="txn-count">({{ store.totalTransactions() }})</span></span></div>
+      <div class="filter-row">
+        <button class="filter-chip" [class.active]="activeFilter() === 'all'" (click)="activeFilter.set('all')">All</button>
+        <button class="filter-chip" [class.active]="activeFilter() === 'deposit'" (click)="activeFilter.set('deposit')">Deposits</button>
+        <button class="filter-chip" [class.active]="activeFilter() === 'withdrawal'" (click)="activeFilter.set('withdrawal')">Withdrawals</button>
+      </div>
+      <div class="txn-list">
+        @if (store.loading()) {
+          <div class="loading-center"><mat-spinner diameter="24"></mat-spinner></div>
+        } @else {
+          @for (txn of filteredTransactions(); track txn.id) {
+            <div class="txn-item">
+              <div class="txn-left">
+                <div class="txn-icon" [class]="'icon-' + store.getTypeColor(txn.type)">
+                  <mat-icon>{{ store.getTransactionIcon(txn.type) }}</mat-icon>
+                </div>
+                <div class="txn-info">
+                  <span class="txn-type">{{ store.formatType(txn.type) }}</span>
+                  <span class="txn-date">{{ store.formatDay(txn.createdAt) }}</span>
+                </div>
+              </div>
+              <div class="txn-right">
+                <span class="txn-amount" [class.credit]="store.isCredit(txn.type)" [class.debit]="store.isDebit(txn.type)">
+                  {{ store.isCredit(txn.type) ? '+' : '-' }}{{ store.formatCurrency(txn.amount) }}
+                </span>
+                <span class="txn-status" [class]="txn.status">{{ store.formatStatus(txn.status) }}</span>
+              </div>
+            </div>
+          } @empty {
+            <div class="empty-state">
+              @if (activeFilter() === 'all') {
+                <mat-icon>receipt_long</mat-icon>
+                <p>No transactions yet</p>
+                <button class="btn-emerald" routerLink="/home">Browse Odds</button>
+              } @else if (activeFilter() === 'deposit') {
+                <mat-icon>account_balance_wallet</mat-icon>
+                <p>No deposits yet</p>
+              } @else {
+                <mat-icon>money_off</mat-icon>
+                <p>No withdrawals yet</p>
+              }
+            </div>
+          }
+          @if (store.hasMore()) {
+            <div class="load-more-container">
+              @if (store.loadingMore()) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                <button class="load-more-btn" (click)="store.loadMore()">
+                  <mat-icon>expand_more</mat-icon> Load More
+                </button>
+              }
+            </div>
+          }
+        }
+      </div>
+
+      <app-top-up-modal [visible]="showTopUp()" [disableClose]="true" (close)="showTopUp.set(false)" />
+      <app-mobile-nav />
+    </div>
+  

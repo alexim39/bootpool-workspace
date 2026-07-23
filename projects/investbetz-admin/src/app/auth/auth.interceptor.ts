@@ -1,7 +1,7 @@
 import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Observable, catchError, switchMap, throwError, BehaviorSubject, filter, take } from 'rxjs';
-import { AdminAuthService } from './admin-auth.service';
+import { AdminAuthService } from './';
 
 let isRefreshing = false;
 const refreshSubject = new BehaviorSubject<string | null>(null);

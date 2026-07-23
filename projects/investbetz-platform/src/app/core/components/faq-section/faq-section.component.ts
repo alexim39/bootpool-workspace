@@ -8,32 +8,8 @@ interface FaqItem { question: string; answer: string; open: boolean; }
   selector: 'app-faq-section',
   standalone: true,
   imports: [CommonModule, MatIconModule],
-  template: `
-    <div class="faq-section">
-      <h2 class="faq-title">Frequently Asked Questions</h2>
-      @for (item of items; track item.question) {
-        <div class="faq-item" [class.open]="item.open">
-          <button class="faq-question" (click)="toggle(item)">
-            <span>{{ item.question }}</span>
-            <mat-icon>{{ item.open ? 'remove' : 'add' }}</mat-icon>
-          </button>
-          @if (item.open) {
-            <div class="faq-answer">{{ item.answer }}</div>
-          }
-        </div>
-      }
-    </div>
-  `,
-  styles: [`
-    .faq-section { max-width: 720px; margin: 0 auto; padding: 24px 0; }
-    .faq-title { font-size: 20px; font-weight: 700; color: #fff; margin: 0 0 16px; }
-    .faq-item { background: #0D1A30; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; margin-bottom: 8px; overflow: hidden; }
-    .faq-question { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: none; border: none; color: rgba(255,255,255,0.85); font-size: 14px; font-weight: 500; cursor: pointer; text-align: left; font-family: inherit; transition: color 0.15s; }
-    .faq-question:hover { color: #00E676; }
-    .faq-question mat-icon { font-size: 20px; width: 20px; height: 20px; color: rgba(255,255,255,0.3); flex-shrink: 0; margin-left: 12px; }
-    .open .faq-question mat-icon { color: #00E676; }
-    .faq-answer { padding: 0 16px 14px; font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.55); }
-  `]
+  templateUrl: './faq-section.component.html',
+  styleUrls: ['./faq-section.component.scss']
 })
 export class FaqSectionComponent {
   items: FaqItem[] = [

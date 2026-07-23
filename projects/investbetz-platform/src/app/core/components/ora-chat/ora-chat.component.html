@@ -1,0 +1,91 @@
+
+    @if (device.isMobile() || device.isTablet()) {
+      <div class="ora-overlay">
+        <div class="ora-sheet">
+          <div class="ora-header">
+            <div class="ora-header-left">
+              <span class="ora-avatar">O</span>
+              <div class="ora-header-info">
+                <span class="ora-name">Ora</span>
+                <span class="ora-status">Online &bull; AI Assistant</span>
+              </div>
+            </div>
+            <button class="ora-close" (click)="close.emit()"><mat-icon>close</mat-icon></button>
+          </div>
+          <div class="ora-body" #messagesContainer>
+            <div class="ora-date-divider">Today</div>
+            @for (msg of messages(); track msg) {
+              <div class="msg-row" [class.msg-user]="msg.role === 'user'" [class.msg-ora]="msg.role === 'assistant'">
+                @if (msg.role === 'assistant') { <div class="msg-avatar">O</div> }
+                <div class="msg-content">
+                  <div class="msg-bubble">{{ msg.content }}</div>
+                  <span class="msg-time">{{ msg.time }}</span>
+                </div>
+              </div>
+            }
+            @if (loading()) {
+              <div class="msg-row msg-ora">
+                <div class="msg-avatar">O</div>
+                <div class="msg-typing"><span class="t-dot"></span><span class="t-dot"></span><span class="t-dot"></span></div>
+              </div>
+            }
+          </div>
+          <div class="ora-footer">
+            <div class="ora-input-wrap">
+              <input class="ora-input" [(ngModel)]="inputText" placeholder="Type a message..." (keydown.enter)="sendMessage()" [disabled]="loading()" autofocus>
+              <button class="ora-send" (click)="sendMessage()" [disabled]="!inputText.trim() || loading()">
+                @if (loading()) { <mat-spinner diameter="18"></mat-spinner> } @else { <mat-icon>send</mat-icon> }
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="d-overlay">
+        <div class="d-widget">
+          <div class="d-header">
+            <div class="d-header-left">
+              <span class="ora-avatar">O</span>
+              <div>
+                <span class="ora-name">Ora</span>
+                <span class="ora-status">AI Assistant &bull; Online</span>
+              </div>
+            </div>
+            <button class="ora-close" (click)="close.emit()"><mat-icon>close</mat-icon></button>
+          </div>
+          <div class="d-body" #messagesContainer>
+            <div class="ora-date-divider">Today</div>
+            @for (msg of messages(); track msg) {
+              <div class="msg-row" [class.msg-user]="msg.role === 'user'" [class.msg-ora]="msg.role === 'assistant'">
+                @if (msg.role === 'assistant') { <div class="msg-avatar">O</div> }
+                <div class="msg-content">
+                  <div class="msg-bubble">{{ msg.content }}</div>
+                  <span class="msg-time">{{ msg.time }}</span>
+                </div>
+              </div>
+            }
+            @if (loading()) {
+              <div class="msg-row msg-ora">
+                <div class="msg-avatar">O</div>
+                <div class="msg-typing"><span class="t-dot"></span><span class="t-dot"></span><span class="t-dot"></span></div>
+              </div>
+            }
+            <div class="ora-suggestions">
+              @for (s of suggestions; track s) {
+                <button class="s-chip" (click)="quickQuestion(s)">{{ s }}</button>
+              }
+            </div>
+          </div>
+          <div class="d-footer">
+            <div class="ora-input-wrap">
+              <input class="ora-input" [(ngModel)]="inputText" placeholder="Type a message..." (keydown.enter)="sendMessage()" [disabled]="loading()">
+              <button class="ora-send" (click)="sendMessage()" [disabled]="!inputText.trim() || loading()">
+                @if (loading()) { <mat-spinner diameter="18"></mat-spinner> } @else { <mat-icon>send</mat-icon> }
+              </button>
+            </div>
+            <span class="d-footer-note">Powered by BetPool AI</span>
+          </div>
+        </div>
+      </div>
+    }
+  

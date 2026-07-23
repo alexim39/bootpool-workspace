@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, signal, WritableSignal } from '@angular/core';
 import { HomeComponent } from './home.component';
-import { DeviceService } from '../../core/services/device.service';
-import { HomeDesktopComponent } from './home-desktop.component';
-import { HomeMobileComponent } from './mobile/home-mobile.component';
+import { DeviceService } from '../../core/services';
+import { HomeDesktopComponent } from './pages/home-desktop/home-desktop.component';
+import { HomeMobileComponent } from './pages/home-mobile/home-mobile.component';
 
 @Component({ selector: 'app-home-desktop', standalone: true, template: '' })
 class MockHomeDesktopComponent {}

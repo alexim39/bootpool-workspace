@@ -1,0 +1,175 @@
+
+    <div class="page">
+      <div class="page-header">
+        <h1>Loan Management</h1>
+        <span class="header-count">{{ store.total() }} loans</span>
+        <div class="header-spacer"></div>
+        <button mat-stroked-button class="btn-create" (click)="store.showCreate.set(true)">
+          <mat-icon>add</mat-icon> New Loan
+        </button>
+      </div>
+
+      <mat-card class="filter-card">
+        <div class="filter-row">
+          <mat-form-field appearance="outline" class="filter-select">
+            <mat-label>Status</mat-label>
+            <mat-select [ngModel]="store.statusFilter()" (ngModelChange)="store.statusFilter.set($event)" (selectionChange)="store.onFilterChange()">
+              <mat-option value="">All</mat-option>
+              <mat-option value="pending">Pending</mat-option>
+              <mat-option value="approved">Approved</mat-option>
+              <mat-option value="active">Active</mat-option>
+              <mat-option value="repaid">Repaid</mat-option>
+              <mat-option value="defaulted">Defaulted</mat-option>
+              <mat-option value="rejected">Rejected</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div class="filter-spacer"></div>
+          <button mat-stroked-button class="btn-refresh" (click)="store.loadLoans()">
+            <mat-icon>refresh</mat-icon> Refresh
+          </button>
+        </div>
+      </mat-card>
+
+      <mat-card class="table-card">
+        <div class="loading-overlay" *ngIf="store.loading()">
+          <div class="spinner"></div>
+        </div>
+        <table mat-table [dataSource]="store.loans()" class="admin-table">
+          <ng-container matColumnDef="user">
+            <th mat-header-cell *matHeaderCellDef>User</th>
+            <td mat-cell *matCellDef="let l">{{ l.user?.phone || l.user?.fullName || '—' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef>Amount</th>
+            <td mat-cell *matCellDef="let l" class="cell-amount">₦{{ l.amount | number }}</td>
+          </ng-container>
+          <ng-container matColumnDef="purpose">
+            <th mat-header-cell *matHeaderCellDef>Purpose</th>
+            <td mat-cell *matCellDef="let l" class="cell-purpose">{{ l.purpose }}</td>
+          </ng-container>
+          <ng-container matColumnDef="interest">
+            <th mat-header-cell *matHeaderCellDef>Interest</th>
+            <td mat-cell *matCellDef="let l">{{ l.interestRate }}%</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let l">
+              <span class="chip" [style.background]="statusColor(l.status) + '33'" [style.color]="statusColor(l.status)">
+                {{ l.status }}
+              </span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Requested</th>
+            <td mat-cell *matCellDef="let l">{{ l.requestedAt | date:'MMM d, y' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="due">
+            <th mat-header-cell *matHeaderCellDef>Due</th>
+            <td mat-cell *matCellDef="let l">{{ l.dueDate ? (l.dueDate | date:'MMM d, y') : '—' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let l">
+              <button mat-icon-button (click)="toggleDetail(l)" matTooltip="View details">
+                <mat-icon>{{ store.detailId() === l._id ? 'expand_less' : 'expand_more' }}</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns;" class="clickable-row" (click)="toggleDetail(row)"></tr>
+        </table>
+
+        <div class="paginator" *ngIf="store.totalPages() > 1">
+          <button mat-button [disabled]="store.page() <= 1" (click)="store.goTo(store.page() - 1)">Previous</button>
+          <span class="page-info">Page {{ store.page() }} of {{ store.totalPages() }}</span>
+          <button mat-button [disabled]="store.page() >= store.totalPages()" (click)="store.goTo(store.page() + 1)">Next</button>
+        </div>
+
+        <div class="empty-state" *ngIf="!store.loading() && store.loans().length === 0">
+          No loans found
+        </div>
+      </mat-card>
+
+      <div class="detail-panel" *ngIf="store.detail()">
+        <div class="detail-header">
+          <h3>Loan Details</h3>
+          <div class="detail-actions">
+            <button mat-stroked-button class="btn-approve" *ngIf="store.detail()!.status === 'pending'" (click)="store.approve(store.detail()!)" [disabled]="store.actionLoading()">
+              <mat-icon>check_circle</mat-icon> Approve &amp; Credit
+            </button>
+            <button mat-stroked-button class="btn-reject" *ngIf="store.detail()!.status === 'pending'" (click)="store.showReject.set(true)" [disabled]="store.actionLoading()">
+              <mat-icon>cancel</mat-icon> Reject
+            </button>
+            <button mat-stroked-button class="btn-repay" *ngIf="store.detail()!.status === 'approved' || store.detail()!.status === 'active'" (click)="store.repay(store.detail()!)" [disabled]="store.actionLoading()">
+              <mat-icon>payments</mat-icon> Mark Repaid
+            </button>
+            <button mat-icon-button (click)="store.detail.set(null); store.detailId.set(null)"><mat-icon>close</mat-icon></button>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-item"><span class="d-label">User</span><span class="d-value">{{ store.detail()!.user?.fullName || '—' }} ({{ store.detail()!.user?.phone || '—' }})</span></div>
+          <div class="detail-item"><span class="d-label">Amount</span><span class="d-value">₦{{ store.detail()!.amount | number }}</span></div>
+          <div class="detail-item"><span class="d-label">Interest Rate</span><span class="d-value">{{ store.detail()!.interestRate }}%</span></div>
+          <div class="detail-item"><span class="d-label">Repayment Amount</span><span class="d-value">{{ store.detail()!.repaymentAmount ? ('₦' + (store.detail()!.repaymentAmount | number)) : '—' }}</span></div>
+          <div class="detail-item"><span class="d-label">Purpose</span><span class="d-value">{{ store.detail()!.purpose }}</span></div>
+          <div class="detail-item"><span class="d-label">Status</span><span class="d-value"><span class="chip" [style.background]="statusColor(store.detail()!.status) + '33'" [style.color]="statusColor(store.detail()!.status)">{{ store.detail()!.status }}</span></span></div>
+          <div class="detail-item"><span class="d-label">Requested</span><span class="d-value">{{ store.detail()!.requestedAt | date:'MMM d, y HH:mm' }}</span></div>
+          <div class="detail-item"><span class="d-label">Approved</span><span class="d-value">{{ store.detail()!.approvedAt ? (store.detail()!.approvedAt | date:'MMM d, y HH:mm') : '—' }}</span></div>
+          <div class="detail-item"><span class="d-label">Approved By</span><span class="d-value">{{ store.detail()!.approvedBy?.fullName || store.detail()!.approvedBy?.phone || '—' }}</span></div>
+          <div class="detail-item"><span class="d-label">Due Date</span><span class="d-value">{{ store.detail()!.dueDate ? (store.detail()!.dueDate | date:'MMM d, y') : '—' }}</span></div>
+          <div class="detail-item"><span class="d-label">Repaid</span><span class="d-value">{{ store.detail()!.repaidAt ? (store.detail()!.repaidAt | date:'MMM d, y HH:mm') : '—' }}</span></div>
+          <div class="detail-item" *ngIf="store.detail()!.note"><span class="d-label">Note</span><span class="d-value">{{ store.detail()!.note }}</span></div>
+        </div>
+
+        <div class="reject-form" *ngIf="store.showReject()">
+          <mat-form-field appearance="outline" class="reject-input">
+            <mat-label>Rejection reason</mat-label>
+            <input matInput [ngModel]="store.rejectReason()" (ngModelChange)="store.rejectReason.set($event)" placeholder="Enter reason for rejection">
+          </mat-form-field>
+          <div class="reject-actions">
+            <button mat-stroked-button class="btn-cancel" (click)="store.showReject.set(false)">Cancel</button>
+            <button mat-stroked-button class="btn-reject" (click)="store.reject(store.detail()!)" [disabled]="!store.rejectReason().trim()">
+              Confirm Reject
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="create-panel" *ngIf="store.showCreate()">
+        <div class="detail-header">
+          <h3>Create New Loan</h3>
+          <button mat-icon-button (click)="store.showCreate.set(false)"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="create-form">
+          <mat-form-field appearance="outline" class="create-input">
+            <mat-label>User ID</mat-label>
+            <input matInput [(ngModel)]="newLoan.userId" placeholder="MongoDB User ID">
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="create-input">
+            <mat-label>Amount (NGN)</mat-label>
+            <input matInput type="number" [(ngModel)]="newLoan.amount" placeholder="1000" min="100">
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="create-input">
+            <mat-label>Purpose</mat-label>
+            <input matInput [(ngModel)]="newLoan.purpose" placeholder="e.g. Business capital">
+          </mat-form-field>
+          <div class="create-row">
+            <mat-form-field appearance="outline" class="create-input-sm">
+              <mat-label>Interest Rate (%)</mat-label>
+              <input matInput type="number" [(ngModel)]="newLoan.interestRate" placeholder="0">
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="create-input-sm">
+              <mat-label>Due Date</mat-label>
+              <input matInput type="date" [(ngModel)]="newLoan.dueDate">
+            </mat-form-field>
+          </div>
+          <div class="create-actions">
+            <button mat-stroked-button class="btn-cancel" (click)="store.showCreate.set(false)">Cancel</button>
+            <button mat-stroked-button class="btn-approve" (click)="store.createLoan(newLoan)" [disabled]="!newLoan.userId || !newLoan.amount || !newLoan.purpose">
+              <mat-icon>add</mat-icon> Create Loan
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  

@@ -1,0 +1,56 @@
+
+    <div class="settings-page">
+      <div class="page-header">
+        <h1>Settings</h1>
+      </div>
+
+      <div class="settings-card">
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Reserve Amount</div>
+            <div class="setting-desc">
+              The platform reserve used to calculate risk consumption on the Pods page.
+              This represents the maximum liability the platform can absorb.
+            </div>
+          </div>
+          <div class="setting-input-group">
+            <span class="input-currency">₦</span>
+            <input
+              type="number"
+              class="setting-input"
+              [ngModel]="store.reserveAmount()"
+              (ngModelChange)="store.reserveAmount.set($event)"
+              min="0"
+              step="100000"
+              placeholder="1,000,000"
+            />
+          </div>
+        </div>
+
+        <div class="setting-actions">
+          <button class="btn-save" (click)="store.save()" [disabled]="store.saving()">
+            <span *ngIf="!store.saving()">Save Changes</span>
+            <span *ngIf="store.saving()">Saving...</span>
+          </button>
+          <span class="save-message" *ngIf="store.saved()" [class.error]="store.saveError()">{{ store.saveMessage() }}</span>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">How Reserve Risk is Calculated</div>
+            <div class="setting-desc">
+              The bar on the Pods page shows the worst-case scenario as a percentage of the reserve:
+              <br/><br/>
+              <strong>If all pods lose:</strong> total refunds paid = sum of (exposure &times; refund%)
+              <br/>
+              <strong>If all pods win:</strong> total payouts = sum of (exposure &times; odds &times; 0.9)
+              <br/><br/>
+              The bar displays the higher of these two values against the configured reserve.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  

@@ -1,0 +1,191 @@
+
+<app-nav />
+<div class="withdraw-page">
+  <div class="page-header">
+    <button mat-icon-button routerLink="/wallet"><mat-icon>arrow_back</mat-icon></button>
+    <h1>Withdraw Funds</h1>
+  </div>
+
+  <div class="page-body">
+    <div class="main-panel">
+      <mat-card class="form-card">
+        <mat-card-content>
+          <form [formGroup]="store.withdrawForm" class="withdraw-form">
+            @if (store.savedAccounts().length) {
+              <div class="saved-accounts-section">
+                <div class="sa-header">Saved Accounts</div>
+                <div class="sa-list">
+                  @for (acct of store.savedAccounts(); track acct._id) {
+                    <button type="button" class="sa-card"
+                      [class.active]="store.selectedSavedId() === acct._id"
+                      (click)="store.selectSavedAccount(acct)">
+                      <div class="sa-badge" [class.default]="acct.isDefault">
+                        {{ acct.bankName.charAt(0) }}
+                      </div>
+                      <div class="sa-details">
+                        <span class="sa-bank">{{ acct.bankName }}</span>
+                        <span class="sa-number">{{ acct.accountNumber.slice(0,3) }}****{{ acct.accountNumber.slice(-3) }}</span>
+                      </div>
+                      @if (acct.isDefault) {
+                        <span class="sa-default-tag">Default</span>
+                      }
+                      <button type="button" class="sa-del" (click)="$event.stopPropagation(); removeSaved(acct._id)" matTooltip="Remove">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+
+            <div class="balance-banner">
+              <span class="bb-label">Available Balance</span>
+              <span class="bb-value">{{ store.walletService.formatAmount(store.walletBalance().available) }}</span>
+            </div>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Amount (NGN)</mat-label>
+              <input matInput type="number" formControlName="amount" placeholder="Enter amount" min="500" step="100" inputmode="numeric">
+              @if (store.withdrawForm.get('amount')?.hasError('required')) {
+                <mat-error>Amount is required</mat-error>
+              }
+              @if (store.withdrawForm.get('amount')?.hasError('min')) {
+                <mat-error>Minimum withdrawal is ₦500</mat-error>
+              }
+              @if (store.withdrawForm.get('amount')?.errors?.['insufficient']) {
+                <mat-error>Insufficient balance</mat-error>
+              }
+            </mat-form-field>
+
+            <div class="quick-amounts">
+              @for (amt of store.quickAmounts; track amt) {
+                <button type="button" class="quick-chip" [class.active]="store.withdrawForm.get('amount')?.value === amt" (click)="store.setAmount(amt)">₦{{ amt.toLocaleString() }}</button>
+              }
+            </div>
+
+            <mat-form-field appearance="outline" class="full-width bank-search-field">
+              <mat-label>Search Bank</mat-label>
+              <input matInput [matAutocomplete]="bankAuto" [formControl]="store.bankSearchCtrl" placeholder="Type to search banks...">
+              <mat-icon matSuffix>search</mat-icon>
+              <mat-autocomplete #bankAuto="matAutocomplete" [displayWith]="store.displayBankName" (optionSelected)="store.onBankSelected($event.option.value)">
+                @if (store.filteredBanks().length) {
+                  @for (bank of store.filteredBanks(); track bank.code) {
+                    <mat-option [value]="bank">
+                      <span class="bank-option-text">{{ bank.name }}</span>
+                    </mat-option>
+                  }
+                } @else {
+                  <mat-option disabled>
+                    <span class="no-results">No banks match "{{ store.bankSearchCtrl.value }}"</span>
+                  </mat-option>
+                }
+              </mat-autocomplete>
+              @if (store.withdrawForm.get('bankCode')?.hasError('required') && store.withdrawForm.get('bankCode')?.touched) {
+                <mat-error>Select a bank</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Account Number</mat-label>
+              <input matInput formControlName="accountNumber" placeholder="Enter 10-digit account number" maxlength="10" inputmode="numeric" (input)="store.onAccountInput()">
+              @if (store.withdrawForm.get('accountNumber')?.hasError('required')) {
+                <mat-error>Account number is required</mat-error>
+              }
+              @if (store.withdrawForm.get('accountNumber')?.hasError('pattern')) {
+                <mat-error>Enter a valid 10-digit account number</mat-error>
+              }
+              @if (store.withdrawForm.get('accountNumber')?.value?.length === 10 && !store.resolvedAccountName() && !store.resolvingAccount()) {
+                <mat-hint class="hint-auto">Enter a valid 10-digit account number</mat-hint>
+              }
+            </mat-form-field>
+
+            @if (store.resolvingAccount()) {
+              <div class="account-status resolving"><mat-spinner diameter="16"></mat-spinner><span>Verifying account...</span></div>
+            }
+            @if (store.resolvedAccountName()) {
+              <div class="account-status verified">
+                <mat-icon>check_circle</mat-icon>
+                <div class="acct-info">
+                  <span class="acct-name">{{ store.resolvedAccountName() }}</span>
+                  <span class="acct-num">{{ store.withdrawForm.get('accountNumber')?.value }}</span>
+                </div>
+                <mat-slide-toggle class="save-toggle" [(ngModel)]="store.saveAccountToggle" [ngModelOptions]="{standalone: true}" color="primary" matTooltip="Save for future withdrawals">
+                  <span class="toggle-label">Save</span>
+                </mat-slide-toggle>
+              </div>
+            }
+            @if (store.accountError()) {
+              <div class="account-status error">
+                <mat-icon>error</mat-icon><span>{{ store.accountError() }}</span>
+              </div>
+            }
+
+            @if (!store.resolvedAccountName() && !store.resolvingAccount()) {
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Account Name (manual)</mat-label>
+                <input matInput formControlName="accountName" placeholder="Enter account holder name">
+                @if (store.withdrawForm.get('accountName')?.hasError('required')) {
+                  <mat-error>Account name required</mat-error>
+                }
+              </mat-form-field>
+            }
+
+            <div class="fee-summary" *ngIf="store.withdrawForm.get('amount')?.valid">
+              <div class="fee-row"><span>Amount</span><span>{{ store.walletService.formatAmount(store.calculatedAmount()) }}</span></div>
+              <div class="fee-row total"><span>You receive</span><span>{{ store.walletService.formatAmount(store.calculatedAmount()) }}</span></div>
+            </div>
+
+            <div class="pin-section" *ngIf="store.formReady()">
+              <div class="pin-label">Enter your 4-digit PIN to confirm</div>
+              <div class="pin-input-row">
+                <input
+                  *ngFor="let _ of [].constructor(4); let i = index"
+                  class="pin-digit"
+                  type="password"
+                  maxlength="1"
+                  inputmode="numeric"
+                  [value]="store.pinDigits()[i] || ''"
+                  (input)="store.onPinInput($event, i)"
+                  (keydown)="store.onPinKeydown($event, i)"
+                  [id]="'wpin-' + i"
+                  [disabled]="store.submitting()"
+                >
+              </div>
+              @if (store.pinError()) {
+                <div class="pin-error"><mat-icon>error</mat-icon>{{ store.pinError() }}</div>
+              }
+            </div>
+
+            <button mat-raised-button class="btn-submit" [disabled]="!store.canSubmit() || store.submitting()" (click)="submitWithdrawal()">
+              @if (store.submitting()) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                <ng-container><mat-icon>send</mat-icon> Withdraw {{ store.walletService.formatAmount(store.calculatedAmount()) }}</ng-container>
+              }
+            </button>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="sidebar">
+      <mat-card class="info-card">
+        <mat-card-content>
+          <h3>Withdrawal Limits</h3>
+          <div class="info-row"><span class="info-label">Per Transaction</span><span class="info-value">₦500 - ₦5,000,000</span></div>
+          <div class="info-row"><span class="info-label">Daily Limit</span><span class="info-value">₦10,000,000</span></div>
+          <div class="info-row"><span class="info-label">Fee</span><span class="info-value">No fees</span></div>
+          <div class="info-row"><span class="info-label">Processing</span><span class="info-value">Instant - 24hrs</span></div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="info-card security-card">
+        <mat-card-content>
+          <h3><mat-icon>security</mat-icon> Secure Withdrawal</h3>
+          <p>Funds are transferred securely via Paystack. Your PIN is required to authorize each withdrawal.</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>
+  

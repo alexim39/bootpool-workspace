@@ -1,0 +1,100 @@
+
+    <div class="mobile-root">
+      <div class="mobile-header">
+        <button class="back-btn" (click)="goBack()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <span class="header-logo">
+          <img src="img/logo/logo.png" alt="BetPool Logo" class="logo-image">
+          <span class="logo-bet">Bet</span>
+          <span class="logo-pool">Pool</span>
+        </span>
+        <div style="width:44px"></div>
+      </div>
+
+      <div class="mobile-content">
+        <h1 class="page-title">Welcome Back</h1>
+        <p class="page-subtitle">Sign in to your account</p>
+
+        <div class="mobile-tabs">
+          <button class="tab-btn" [class.active]="store.loginMode() === 'pin'" (click)="store.loginMode.set('pin')">PIN</button>
+          <button class="tab-btn" [class.active]="store.loginMode() === 'email'" (click)="store.loginMode.set('email')">Email</button>
+          <button class="tab-btn" [class.active]="store.loginMode() === 'otp'" (click)="store.loginMode.set('otp')">OTP</button>
+        </div>
+
+        @if (store.loginMode() === 'pin') {
+          <div class="field">
+            <label class="field-label">Phone Number</label>
+            <div class="phone-wrap">
+              <span class="phone-prefix">+234</span>
+              <input class="field-input" type="tel" [(ngModel)]="phone" placeholder="Enter your phone number" maxlength="10" inputmode="numeric" />
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">PIN</label>
+            <input class="field-input" type="password" [(ngModel)]="pin" placeholder="Enter your 4-digit PIN" maxlength="4" inputmode="numeric" />
+          </div>
+        } @else if (store.loginMode() === 'email') {
+          @if (!store.emailTokenSent()) {
+            <div class="field">
+              <label class="field-label">Email Address</label>
+              <input class="field-input" type="email" [(ngModel)]="email" placeholder="Enter your email address" />
+            </div>
+          } @else {
+            <div class="field">
+              <label class="field-label">Email Address</label>
+              <input class="field-input" type="email" [(ngModel)]="email" disabled />
+            </div>
+            <div class="field">
+              <label class="field-label">Token</label>
+              <input class="field-input" type="text" [(ngModel)]="emailToken" placeholder="Enter 6-digit token" maxlength="6" inputmode="numeric" />
+            </div>
+          }
+        } @else {
+          <div class="field">
+            <label class="field-label">Phone Number</label>
+            <div class="phone-wrap">
+              <span class="phone-prefix">+234</span>
+              <input class="field-input" type="tel" [(ngModel)]="phone" placeholder="Enter your phone number" maxlength="10" inputmode="numeric" />
+            </div>
+          </div>
+        }
+
+        @if (store.error()) {
+          <div class="error-msg">{{ store.error() }}</div>
+        }
+      </div>
+
+      <div class="mobile-bottom">
+        @if (store.loginMode() === 'pin') {
+          <button class="btn-primary" (click)="loginWithPin()" [disabled]="phone.length < 10 || pin.length < 4 || store.loading()">
+            @if (store.loading()) { <span class="spinner"></span> }
+            Login
+          </button>
+        } @else if (store.loginMode() === 'email') {
+          @if (!store.emailTokenSent()) {
+            <button class="btn-primary" (click)="sendEmailToken()" [disabled]="!email || store.loading()">
+              @if (store.loading()) { <span class="spinner"></span> }
+              Send Token
+            </button>
+          } @else {
+            <button class="btn-primary" (click)="verifyEmailToken()" [disabled]="emailToken.length < 6 || store.loading()">
+              @if (store.loading()) { <span class="spinner"></span> }
+              Verify Token
+            </button>
+            <button class="link-btn" (click)="resetEmailToken()">Use a different email</button>
+          }
+        } @else {
+          <button class="btn-primary" (click)="sendOtp()" [disabled]="phone.length < 10 || store.loading()">
+            @if (store.loading()) { <span class="spinner"></span> }
+            Send OTP
+          </button>
+        }
+        <div class="bottom-text">
+          Don't have an account? <a class="auth-link" (click)="goSignup()">Sign Up</a>
+        </div>
+      </div>
+    </div>
+  

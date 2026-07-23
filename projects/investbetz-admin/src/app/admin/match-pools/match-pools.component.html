@@ -1,0 +1,263 @@
+
+    <div class="mp-page">
+      <div class="page-header">
+        <h1>Match Pools</h1>
+        <div class="header-actions">
+          <button mat-stroked-button (click)="store.switchView('reports')">Reports</button>
+          <button mat-raised-button class="btn-primary" (click)="switchViewCreate()">Create Pool</button>
+        </div>
+      </div>
+
+      <!-- List view -->
+      @if (store.view() === 'list') {
+        <mat-card class="table-card">
+          <div class="filters">
+            <mat-form-field appearance="fill" class="filter-field">
+              <mat-label>Status</mat-label>
+              <mat-select [ngModel]="store.statusFilter()" (ngModelChange)="store.statusFilter.set($event); store.loadList()">
+                <mat-option value="">All</mat-option>
+                <mat-option value="open">Open</mat-option>
+                <mat-option value="staking_closed">Staking Closed</mat-option>
+                <mat-option value="settled">Settled</mat-option>
+                <mat-option value="cancelled">Cancelled</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          @if (store.loading()) {
+            <div class="loading-center"><mat-spinner diameter="32" /></div>
+          } @else {
+          <table mat-table [dataSource]="store.pools()" class="admin-table">
+            <ng-container matColumnDef="eventTitle">
+              <th mat-header-cell *matHeaderCellDef>Event</th>
+              <td mat-cell *matCellDef="let p" class="clickable" (click)="store.openDetail(p._id)">{{ p.eventTitle }}</td>
+            </ng-container>
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let p"><span class="chip" [style.background]="statusColor(p.status)">{{ p.status }}</span></td>
+            </ng-container>
+            <ng-container matColumnDef="stakingClosesAt">
+              <th mat-header-cell *matHeaderCellDef>Staking Closes</th>
+              <td mat-cell *matCellDef="let p">{{ p.stakingClosesAt | date:'short' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="totalPool">
+              <th mat-header-cell *matHeaderCellDef>Pool</th>
+              <td mat-cell *matCellDef="let p">\u20A6{{ p.totalPool | number }}</td>
+            </ng-container>
+            <ng-container matColumnDef="markets">
+              <th mat-header-cell *matHeaderCellDef>Markets</th>
+              <td mat-cell *matCellDef="let p">{{ p.markets.length }}</td>
+            </ng-container>
+            <ng-container matColumnDef="createdAt">
+              <th mat-header-cell *matHeaderCellDef>Created</th>
+              <td mat-cell *matCellDef="let p">{{ p.createdAt | date:'short' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let p">
+                <button mat-icon-button (click)="store.openDetail(p._id)" matTooltip="View"><mat-icon>visibility</mat-icon></button>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="['eventTitle','status','stakingClosesAt','totalPool','markets','createdAt','actions']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['eventTitle','status','stakingClosesAt','totalPool','markets','createdAt','actions'];"></tr>
+          </table>
+          }
+        </mat-card>
+      }
+
+      <!-- Create view -->
+      @if (store.view() === 'create') {
+        <mat-card class="form-card">
+          <div class="form-header">
+            <h2>Create Match Pool</h2>
+            <button mat-icon-button (click)="store.switchView('list')"><mat-icon>close</mat-icon></button>
+          </div>
+          <div class="form-body">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Event Title</mat-label>
+              <input matInput [(ngModel)]="formTitle" placeholder="World Cup Final: Argentina vs France">
+            </mat-form-field>
+            <div class="form-row">
+              <mat-form-field appearance="fill" class="full-width">
+                <mat-label>Staking Closes At</mat-label>
+                <input matInput type="datetime-local" [(ngModel)]="formStakingCloses">
+              </mat-form-field>
+            </div>
+            <div class="form-row">
+              <mat-form-field appearance="fill" class="half-width">
+                <mat-label>Min Stake</mat-label>
+                <input matInput type="number" [(ngModel)]="formMinStake">
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="half-width">
+                <mat-label>Max Stake</mat-label>
+                <input matInput type="number" [(ngModel)]="formMaxStake">
+              </mat-form-field>
+            </div>
+            <div class="section-label">Markets (at least 2)</div>
+            @for (m of formMarkets; track i; let i = $index) {
+              <div class="market-row">
+                <mat-form-field appearance="fill" class="flex-field">
+                  <mat-label>Market {{ i + 1 }}</mat-label>
+                  <input matInput [(ngModel)]="formMarkets[i].label" placeholder="e.g. Argentina to Win">
+                </mat-form-field>
+                <button mat-icon-button class="remove-btn" (click)="removeMarket(i)" [disabled]="formMarkets.length <= 2"><mat-icon>remove_circle</mat-icon></button>
+              </div>
+            }
+            <button mat-stroked-button (click)="addMarket()" class="add-market-btn">+ Add Market</button>
+            <div class="form-actions">
+              <button mat-button (click)="store.switchView('list')">Cancel</button>
+              <button mat-raised-button class="btn-primary" (click)="createPool()" [disabled]="store.saving()">{{ store.saving() ? 'Creating...' : 'Create Pool' }}</button>
+            </div>
+            <div class="error-msg" *ngIf="store.error()">{{ store.error() }}</div>
+          </div>
+        </mat-card>
+      }
+
+      <!-- Detail view -->
+      @if (store.view() === 'detail' && store.loading()) {
+        <div class="loading-center"><mat-spinner diameter="32" /></div>
+      }
+      @if (store.view() === 'detail' && !store.loading() && store.detail(); as d) {
+        <div class="detail-page">
+          <div class="detail-header">
+            <button mat-icon-button (click)="store.switchView('list')"><mat-icon>arrow_back</mat-icon></button>
+            <h2>{{ d.pool.eventTitle }}</h2>
+            <span class="chip" [style.background]="statusColor(d.pool.status)">{{ d.pool.status }}</span>
+          </div>
+
+          <mat-card class="info-card">
+            <div class="info-grid">
+              <div><span class="label">Staking Closes</span><span class="value">{{ d.pool.stakingClosesAt | date:'medium' }}</span></div>
+              <div><span class="label">Total Pool</span><span class="value">\u20A6{{ d.pool.totalPool | number }}</span></div>
+              <div><span class="label">Platform Fee (15%)</span><span class="value">\u20A6{{ d.pool.platformFeeAmount | number }}</span></div>
+              <div><span class="label">Distributable</span><span class="value">\u20A6{{ d.pool.distributableAmount | number }}</span></div>
+              <div><span class="label">Min / Max Stake</span><span class="value">\u20A6{{ d.pool.minStake | number }} / \u20A6{{ d.pool.maxStake | number }}</span></div>
+              <div><span class="label">Total Stakers</span><span class="value">{{ d.totalStakes }}</span></div>
+            </div>
+            @if (d.pool.status === 'open') {
+              <div class="action-bar">
+                <button mat-stroked-button class="action-close" (click)="store.closeStaking(d.pool._id)">Close Staking</button>
+                <button mat-stroked-button class="action-cancel" (click)="store.cancelPool(d.pool._id)">Cancel Pool</button>
+              </div>
+            }
+            @if (d.pool.status === 'open' || d.pool.status === 'staking_closed') {
+              <div class="settle-section">
+                <div class="section-label">Settle Pool</div>
+                <div class="settle-row">
+                  <mat-form-field appearance="fill">
+                    <mat-label>Winning Market</mat-label>
+                    <mat-select [ngModel]="store.selectedMarketId()" (ngModelChange)="store.selectedMarketId.set($event)">
+                      @for (m of d.pool.markets; track m.marketId) {
+                        <mat-option [value]="m.marketId">{{ m.label }} (\u20A6{{ m.totalStaked | number }})</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                  <button mat-raised-button class="action-win" (click)="store.settlePool(d.pool._id)" [disabled]="!store.selectedMarketId() || store.settling()">
+                    {{ store.settling() ? 'Settling...' : 'Settle' }}
+                  </button>
+                </div>
+                @if (store.settlePreview(); as sp) {
+                  <div class="settle-preview">
+                    <div class="preview-row"><span>Total Pool:</span><span>\u20A6{{ sp.totalPool | number }}</span></div>
+                    <div class="preview-row"><span>Platform Fee (15%):</span><span>\u20A6{{ sp.platformFee | number }}</span></div>
+                    <div class="preview-row"><span>Distributable:</span><span>\u20A6{{ sp.distributable | number }}</span></div>
+                    <div class="preview-row"><span>Winning Market Total:</span><span>\u20A6{{ sp.winningTotal | number }}</span></div>
+                    <div class="preview-row"><span>Winners:</span><span>{{ sp.winnerCount }}</span></div>
+                  </div>
+                }
+              </div>
+            }
+          </mat-card>
+
+          <!-- Market breakdown -->
+          <div class="market-cards">
+            @for (m of d.marketBreakdown; track m.marketId) {
+              <mat-card class="market-card">
+                <div class="market-header">
+                  <strong>{{ m.label }}</strong>
+                  <span class="chip" [style.background]="m.marketId === d.pool.winningMarketId ? '#00E676' : 'rgba(255,255,255,0.1)'">
+                    {{ m.marketId === d.pool.winningMarketId ? 'WINNER' : '' }}
+                  </span>
+                </div>
+                <div class="market-stats">
+                  <span>Total: \u20A6{{ m.totalStaked | number }}</span>
+                  <span>Stakers: {{ m.stakerCount }}</span>
+                </div>
+                @if (d.pool.status === 'settled' || d.pool.status === 'cancelled') {
+                  <button mat-stroked-button (click)="store.showReport(d.pool._id)" class="report-btn">View Report</button>
+                }
+              </mat-card>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Reports view -->
+      @if (store.view() === 'reports' && store.loading()) {
+        <div class="loading-center"><mat-spinner diameter="32" /></div>
+      }
+      @if (store.view() === 'reports' && !store.loading() && store.reportsData(); as r) {
+        <div class="reports-page">
+          <div class="reports-header">
+            <h2>Match Pool Reports</h2>
+            <button mat-button (click)="store.switchView('list')">Back</button>
+          </div>
+          <div class="stats-row">
+            <mat-card class="stat-card"><span class="stat-value">{{ r.totalSettled }}</span><span class="stat-label">Settled Pools</span></mat-card>
+            <mat-card class="stat-card"><span class="stat-value">\u20A6{{ r.totalFeeRevenue | number }}</span><span class="stat-label">Fee Revenue</span></mat-card>
+            <mat-card class="stat-card"><span class="stat-value">\u20A6{{ r.avgPoolSize | number }}</span><span class="stat-label">Avg Pool Size</span></mat-card>
+            <mat-card class="stat-card"><span class="stat-value">{{ r.uniqueStakers }}</span><span class="stat-label">Unique Stakers</span></mat-card>
+          </div>
+          <mat-card class="table-card">
+            <table mat-table [dataSource]="r.pools" class="admin-table">
+              <ng-container matColumnDef="eventTitle">
+                <th mat-header-cell *matHeaderCellDef>Event</th>
+                <td mat-cell *matCellDef="let p">{{ p.eventTitle }}</td>
+              </ng-container>
+              <ng-container matColumnDef="totalPool">
+                <th mat-header-cell *matHeaderCellDef>Pool</th>
+                <td mat-cell *matCellDef="let p">\u20A6{{ p.totalPool | number }}</td>
+              </ng-container>
+              <ng-container matColumnDef="platformFeeAmount">
+                <th mat-header-cell *matHeaderCellDef>Fee</th>
+                <td mat-cell *matCellDef="let p">\u20A6{{ p.platformFeeAmount | number }}</td>
+              </ng-container>
+              <ng-container matColumnDef="settledAt">
+                <th mat-header-cell *matHeaderCellDef>Settled</th>
+                <td mat-cell *matCellDef="let p">{{ p.settledAt | date:'short' }}</td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="['eventTitle','totalPool','platformFeeAmount','settledAt']"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['eventTitle','totalPool','platformFeeAmount','settledAt'];"></tr>
+            </table>
+          </mat-card>
+        </div>
+      }
+
+      <!-- Report modal -->
+      @if (store.reportModal(); as rm) {
+        <div class="modal-backdrop" (click)="store.reportModal.set(null)">
+          <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h3>{{ rm.eventTitle }}</h3>
+              <button mat-icon-button (click)="store.reportModal.set(null)"><mat-icon>close</mat-icon></button>
+            </div>
+            <div class="modal-body">
+              <div class="report-grid">
+                <div><span class="label">Total Pool</span><span class="value">\u20A6{{ rm.totalPool | number }}</span></div>
+                <div><span class="label">Platform Fee (15%)</span><span class="value">\u20A6{{ rm.platformFeeAmount | number }}</span></div>
+                <div><span class="label">Distributable</span><span class="value">\u20A6{{ rm.distributableAmount | number }}</span></div>
+                <div><span class="label">Total Stakers</span><span class="value">{{ rm.totalStakers }}</span></div>
+                <div><span class="label">Winners</span><span class="value">{{ rm.totalWinners }}</span></div>
+              </div>
+              <div class="section-label">Per-Market Breakdown</div>
+              @for (mb of rm.marketBreakdown; track mb.marketId) {
+                <div class="market-breakdown-item">
+                  <span class="market-name">{{ mb.label }}</span>
+                  <span>\u20A6{{ mb.totalStaked | number }} ({{ mb.stakerCount }} stakers, {{ mb.winners }} winners)</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  
