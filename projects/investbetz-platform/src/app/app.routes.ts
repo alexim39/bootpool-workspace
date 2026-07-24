@@ -53,6 +53,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'bet-manager',
+    loadChildren: () => import('./features/bet-manager/bet-manager.routes').then(m => m.BET_MANAGER_ROUTES),
+    canActivate: [authGuard]
+  },
+  {
     path: 'terms',
     loadComponent: () => import('./features/legal/terms.component').then(m => m.TermsComponent)
   },

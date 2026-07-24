@@ -45,6 +45,13 @@
               <span class="link-indicator"></span>
             }
           </a>
+          <a routerLink="/bet-manager" routerLinkActive="active" class="nav-link" #rlabm="routerLinkActive">
+            <mat-icon>auto_awesome</mat-icon>
+            <span>Bet Manager</span>
+            @if (rlabm.isActive) {
+              <span class="link-indicator"></span>
+            }
+          </a>
           <a routerLink="/profile" routerLinkActive="active" class="nav-link" #rla4="routerLinkActive">
             <mat-icon>person</mat-icon>
             <span>Profile</span>

@@ -1,0 +1,234 @@
+<div class="detail-root">
+  <button class="back-link" (click)="goBack()">← Back to Bet Manager</button>
+
+  @let cfg = config;
+  @let summary = store.summary();
+  @let nav = store.navData();
+  @let perf = store.performance();
+  @let history = store.depositHistory();
+  @let loading = store.loading();
+
+  @if (loading && !summary) {
+    <div class="loading-state"><div class="spinner"></div><p>Loading portfolio...</p></div>
+  }
+
+  @if (store.error()) {
+    <div class="error-msg">{{ store.error() }}</div>
+  }
+
+  @if (summary) {
+    <div class="tier-hero" [style.--tier-color]="cfg.color">
+      <div class="tier-hero-glow"></div>
+      <div class="tier-hero-top">
+        <div class="tier-id">
+          <span class="tier-icon">{{ cfg.icon }}</span>
+          <div>
+            <h1>{{ cfg.label }}</h1>
+            <p class="tier-strategy">{{ cfg.strategy }}</p>
+          </div>
+        </div>
+        <div class="tier-hero-actions">
+          <button class="btn-primary" (click)="goDeposit()">Deposit</button>
+          @if (summary.unlockedBalance > 0) {
+            <button class="btn-withdraw" (click)="showConfirmWithdraw.set(true)">Withdraw</button>
+          }
+        </div>
+      </div>
+      <div class="tier-hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-label">Portfolio Value</span>
+          <span class="hero-stat-value" [style.color]="cfg.color">₦{{ summary.currentValue | number }}</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-label">Current NAV</span>
+          <span class="hero-stat-value">₦{{ summary.nav | number:'1.2-2' }}</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-label">Total Deposited</span>
+          <span class="hero-stat-value">₦{{ summary.account?.totalDeposited | number }}</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-label">Profit/Loss</span>
+          <span class="hero-stat-value" [class.positive]="summary.totalProfit > 0" [class.negative]="summary.totalProfit < 0">
+            {{ summary.totalProfit > 0 ? '+' : '' }}₦{{ summary.totalProfit | number }}
+          </span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-label">Locked</span>
+          <span class="hero-stat-value" style="color:rgba(255,255,255,0.5)">₦{{ summary.lockedBalance | number }}</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-label">Unlockable</span>
+          <span class="hero-stat-value" style="color:#00E676">₦{{ summary.unlockedBalance | number }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      @if (nav) {
+        <div class="detail-card">
+          <h3>NAV History</h3>
+          @if (nav.history.length > 0) {
+            <div class="nav-chart">
+              <div class="nav-bar-track">
+                @for (cycle of nav.history.slice().reverse(); track cycle.cycleNumber) {
+                  <div class="nav-bar-item">
+                    <div class="nav-bar-label">Cycle {{ cycle.cycleNumber }}</div>
+                    <div class="nav-bar-fill-wrap">
+                      <div class="nav-bar-fill"
+                        [style.width.%]="cycle.endingNav ? ((cycle.endingNav / nav.history[0].startingNav) * 100) : 0"
+                        [class.positive]="cycle.returnPct > 0"
+                        [class.negative]="cycle.returnPct < 0">
+                      </div>
+                    </div>
+                    <div class="nav-bar-value" [class.positive]="cycle.returnPct > 0" [class.negative]="cycle.returnPct < 0">
+                      @if (cycle.endingNav) {
+                        ₦{{ cycle.endingNav | number:'1.2-2' }}
+                        <span class="return-pct">({{ cycle.returnPct > 0 ? '+' : '' }}{{ cycle.returnPct | number:'1.1-1' }}%)</span>
+                      } @else {
+                        ₦{{ cycle.startingNav | number:'1.2-2' }} (Active)
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          } @else {
+            <p class="no-data">No cycle history yet.</p>
+          }
+          @if (nav.current) {
+            <div class="nav-current">
+              Current NAV: <strong>₦{{ nav.current.nav | number:'1.2-2' }}</strong>
+              &middot; Pool: ₦{{ nav.current.totalValue | number }}
+              &middot; Units: {{ nav.current.units | number }}
+            </div>
+          }
+        </div>
+      }
+
+      @if (perf) {
+        <div class="detail-card">
+          <h3>Performance</h3>
+          <div class="perf-summary">
+            <div class="perf-stat">
+              <span>Current Value</span>
+              <strong>₦{{ perf.currentValue | number }}</strong>
+            </div>
+            <div class="perf-stat">
+              <span>Total Deposited</span>
+              <strong>₦{{ perf.totalDeposited | number }}</strong>
+            </div>
+            <div class="perf-stat">
+              <span>Return</span>
+              <strong [class.positive]="perf.returnPct > 0" [class.negative]="perf.returnPct < 0">
+                {{ perf.returnPct > 0 ? '+' : '' }}{{ perf.returnPct | number:'1.1-1' }}%
+              </strong>
+            </div>
+          </div>
+          @if (perf.cycles.length > 0) {
+            <div class="perf-cycles">
+              <h4>Cycle History</h4>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Cycle</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Return</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (c of perf.cycles; track c.cycleNumber) {
+                    <tr>
+                      <td>{{ c.cycleNumber }}</td>
+                      <td>{{ c.startDate | date:'shortDate' }}</td>
+                      <td>{{ c.endDate | date:'shortDate' }}</td>
+                      <td [class.positive]="c.returnPct > 0" [class.negative]="c.returnPct < 0">
+                        {{ c.returnPct > 0 ? '+' : '' }}{{ c.returnPct | number:'1.1-1' }}%
+                      </td>
+                      <td><span class="chip" [class.chip-active]="c.status === 'active'" [class.chip-settled]="c.status === 'settled'">{{ c.status }}</span></td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="detail-card full-width">
+        <h3>Deposit &amp; Withdrawal History</h3>
+        @if (history.length > 0) {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Units</th>
+                <th>NAV at Execution</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (rec of history; track rec._id) {
+                <tr>
+                  <td>
+                    <span class="type-badge" [class.type-deposit]="rec.type === 'deposit'" [class.type-withdrawal]="rec.type === 'withdrawal'">
+                      {{ rec.type }}
+                    </span>
+                  </td>
+                  <td>₦{{ rec.amount | number }}</td>
+                  <td>{{ rec.units | number:'1.2-2' }}</td>
+                  <td>₦{{ rec.navAtExecution | number:'1.2-2' }}</td>
+                  <td>{{ rec.depositedAt | date:'mediumDate' }}</td>
+                  <td>
+                    <span class="chip"
+                      [class.chip-locked]="rec.status === 'locked'"
+                      [class.chip-unlocked]="rec.status === 'unlocked'"
+                      [class.chip-withdrawn]="rec.status === 'withdrawn'">
+                      {{ rec.status }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          @if (store.historyTotal() > 20) {
+            <div class="pagination">
+              <button (click)="loadHistoryPage(historyPage() - 1)" [disabled]="historyPage() <= 1" class="page-btn">← Prev</button>
+              <span class="page-info">Page {{ historyPage() }} of {{ (store.historyTotal() / 20) | number:'1.0-0' }}</span>
+              <button (click)="loadHistoryPage(historyPage() + 1)" [disabled]="historyPage() * 20 >= store.historyTotal()" class="page-btn">Next →</button>
+            </div>
+          }
+        } @else {
+          <p class="no-data">No transaction history yet.</p>
+        }
+      </div>
+    </div>
+  }
+
+  @if (summary && summary.unlockedBalance === 0 && summary.lockedBalance > 0) {
+    <div class="lock-notice">
+      <span>🔒</span> Your deposits are locked for 30 days. Unlock date: {{ summary.account?._id ? 'Check deposit history' : '' }}
+    </div>
+  }
+</div>
+
+@if (showConfirmWithdraw()) {
+  <div class="confirm-overlay" (click)="showConfirmWithdraw.set(false)">
+    <div class="confirm-card" (click)="$event.stopPropagation()">
+      <h3>Confirm Withdrawal</h3>
+      @let s = store.summary()!;
+      <p>You are about to withdraw <strong>₦{{ s.unlockedBalance | number }}</strong> from your {{ config.label }} portfolio.</p>
+      <p class="confirm-note">All unlocked deposits will be withdrawn at current NAV. Your units will reset to 0.</p>
+      <div class="confirm-actions">
+        <button class="btn-cancel" (click)="showConfirmWithdraw.set(false)">Cancel</button>
+        <button class="btn-confirm" (click)="withdraw()" [disabled]="store.loading()">
+          @if (store.loading()) { Processing... } @else { Confirm Withdrawal }
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -20,7 +20,7 @@
     .logo-text { font-weight: 700; font-size: 18px; color: #fff; white-space: nowrap; }
     .toggle-btn { color: rgba(255,255,255,0.6); width: 32px; height: 32px; line-height: 32px; }
     .toggle-btn mat-icon { font-size: 20px; }
-    .nav-list { flex: 1; padding: 12px 8px; display: flex; flex-direction: column; gap: 2px; }
+    .nav-list { flex: 1; padding: 12px 8px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
     .nav-item {
       display: flex; align-items: center; gap: 12px; padding: 10px 12px;
       border-radius: 8px; color: rgba(255,255,255,0.6); text-decoration: none;

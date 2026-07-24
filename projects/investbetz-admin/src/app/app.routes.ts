@@ -91,6 +91,10 @@ export const routes: Routes = [
         loadComponent: () => import('./admin/featured-games/featured-games.component').then(m => m.FeaturedGamesComponent)
       },
       {
+        path: 'bet-manager',
+        loadComponent: () => import('./admin/bet-manager/bet-manager.component').then(m => m.AdminBetManagerComponent)
+      },
+      {
         path: 'ora-chat',
         loadComponent: () => import('./admin/ora-chat/ora-chat.component').then(m => m.OraChatComponent)
       }

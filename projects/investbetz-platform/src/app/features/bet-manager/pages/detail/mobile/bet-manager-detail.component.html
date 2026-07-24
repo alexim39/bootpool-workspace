@@ -1,0 +1,128 @@
+<div class="mobile-root">
+  <header class="mobile-header">
+    <button mat-icon-button (click)="goBack()"><mat-icon>arrow_back</mat-icon></button>
+    <h1>{{ config.label }}</h1>
+    <button mat-icon-button (click)="auth.logout()"><mat-icon>logout</mat-icon></button>
+  </header>
+
+  <div class="mobile-content">
+    @if (store.loading() && !store.summary()) {
+      <div class="loading"><div class="spinner"></div></div>
+    }
+
+    @if (store.error()) {
+      <div class="error-msg">{{ store.error() }}</div>
+    }
+
+    @let summary = store.summary();
+    @let nav = store.navData();
+    @let perf = store.performance();
+    @let history = store.depositHistory();
+
+    @if (summary) {
+      <div class="tier-hero" [style.--tier-color]="config.color">
+        <div class="tier-hero-top">
+          <span class="tier-icon">{{ config.icon }}</span>
+          <div>
+            <div class="tier-name">{{ config.label }}</div>
+            <div class="tier-strat">Min ₦{{ config.minDeposit | number }} &middot; 30-day lock</div>
+          </div>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="label">Value</span>
+            <span class="value" [style.color]="config.color">₦{{ summary.currentValue | number }}</span>
+          </div>
+          <div class="hero-stat">
+            <span class="label">NAV</span>
+            <span class="value">₦{{ summary.nav | number:'1.2-2' }}</span>
+          </div>
+          <div class="hero-stat">
+            <span class="label">P&L</span>
+            <span class="value" [class.positive]="summary.totalProfit > 0" [class.negative]="summary.totalProfit < 0">
+              {{ summary.totalProfit > 0 ? '+' : '' }}₦{{ summary.totalProfit | number }}
+            </span>
+          </div>
+        </div>
+        <div class="hero-sub">
+          <span>Locked: ₦{{ summary.lockedBalance | number }}</span>
+          <span>Unlockable: ₦{{ summary.unlockedBalance | number }}</span>
+        </div>
+        <div class="tier-hero-actions">
+          <button class="btn-primary" (click)="goDeposit()">Deposit</button>
+          @if (summary.unlockedBalance > 0) {
+            <button class="btn-withdraw" (click)="showConfirmWithdraw.set(true)">Withdraw</button>
+          }
+        </div>
+      </div>
+
+      @if (nav && nav.history.length > 0) {
+        <div class="section-card">
+          <h3>NAV History</h3>
+          @for (cycle of nav.history.slice().reverse(); track cycle.cycleNumber) {
+            <div class="nav-row">
+              <span class="nav-label">Cycle {{ cycle.cycleNumber }}</span>
+              <span class="nav-ret" [class.positive]="cycle.returnPct > 0" [class.negative]="cycle.returnPct < 0">
+                {{ cycle.returnPct > 0 ? '+' : '' }}{{ cycle.returnPct | number:'1.1-1' }}%
+              </span>
+              @if (cycle.endingNav) {
+                <span class="nav-val">₦{{ cycle.endingNav | number:'1.2-2' }}</span>
+              } @else {
+                <span class="nav-val active">Active</span>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @if (perf) {
+        <div class="section-card">
+          <h3>Performance</h3>
+          <div class="perf-row">
+            <span>Return</span>
+            <strong [class.positive]="perf.returnPct > 0" [class.negative]="perf.returnPct < 0">
+              {{ perf.returnPct > 0 ? '+' : '' }}{{ perf.returnPct | number:'1.1-1' }}%
+            </strong>
+          </div>
+        </div>
+      }
+
+      <div class="section-card">
+        <h3>History</h3>
+        @if (history.length > 0) {
+          @for (rec of history; track rec._id) {
+            <div class="history-row">
+              <div class="history-left">
+                <span class="type-badge" [class.type-deposit]="rec.type === 'deposit'" [class.type-withdrawal]="rec.type === 'withdrawal'">{{ rec.type }}</span>
+                <span class="history-date">{{ rec.depositedAt | date:'shortDate' }}</span>
+              </div>
+              <div class="history-right">
+                <span class="history-amount">₦{{ rec.amount | number }}</span>
+                <span class="chip" [class.chip-locked]="rec.status === 'locked'" [class.chip-unlocked]="rec.status === 'unlocked'" [class.chip-withdrawn]="rec.status === 'withdrawn'">{{ rec.status }}</span>
+              </div>
+            </div>
+          }
+        } @else {
+          <p class="no-data">No history yet.</p>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+@if (showConfirmWithdraw()) {
+  <div class="confirm-overlay" (click)="showConfirmWithdraw.set(false)">
+    <div class="confirm-card" (click)="$event.stopPropagation()">
+      <h3>Confirm Withdrawal</h3>
+      @let s = store.summary()!;
+      <p>Withdraw <strong>₦{{ s.unlockedBalance | number }}</strong> from {{ config.label }}?</p>
+      <p class="confirm-note">All unlocked deposits withdrawn at current NAV. Units reset to 0.</p>
+      <div class="confirm-actions">
+        <button class="btn-cancel" (click)="showConfirmWithdraw.set(false)">Cancel</button>
+        <button class="btn-confirm" (click)="withdraw()" [disabled]="store.loading()">
+          {{ store.loading() ? 'Processing...' : 'Confirm' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

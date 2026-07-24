@@ -472,6 +472,54 @@ export class AdminService {
     return this.http.post<{ success: boolean; data: { description: string } }>(`${this.baseUrl}/featured-games/generate-description`, { title, subtitle });
   }
 
+  getBetManagerStats(): Observable<{ success: boolean; data: any }> {
+    return this.http.get<{ success: boolean; data: any }>(`${this.baseUrl}/bet-manager/stats`);
+  }
+
+  getBetManagerAccounts(params?: { page?: number; limit?: number; tier?: string; search?: string }): Observable<{ success: boolean; data: any }> {
+    let hp = new HttpParams();
+    if (params?.page) hp = hp.set('page', params.page);
+    if (params?.limit) hp = hp.set('limit', params.limit);
+    if (params?.tier) hp = hp.set('tier', params.tier);
+    if (params?.search) hp = hp.set('search', params.search);
+    return this.http.get<{ success: boolean; data: any }>(`${this.baseUrl}/bet-manager/accounts`, { params: hp });
+  }
+
+  getBetManagerAccountDetail(id: string): Observable<{ success: boolean; data: any }> {
+    return this.http.get<{ success: boolean; data: any }>(`${this.baseUrl}/bet-manager/accounts/${id}`);
+  }
+
+  getBetManagerDeposits(params?: { page?: number; limit?: number; tier?: string; userId?: string; status?: string }): Observable<{ success: boolean; data: any }> {
+    let hp = new HttpParams();
+    if (params?.page) hp = hp.set('page', params.page);
+    if (params?.limit) hp = hp.set('limit', params.limit);
+    if (params?.tier) hp = hp.set('tier', params.tier);
+    if (params?.userId) hp = hp.set('userId', params.userId);
+    if (params?.status) hp = hp.set('status', params.status);
+    return this.http.get<{ success: boolean; data: any }>(`${this.baseUrl}/bet-manager/deposits`, { params: hp });
+  }
+
+  getBetManagerPools(): Observable<{ success: boolean; data: any }> {
+    return this.http.get<{ success: boolean; data: any }>(`${this.baseUrl}/bet-manager/pools`);
+  }
+
+  getBetManagerCycles(tier?: string): Observable<{ success: boolean; data: any }> {
+    const params = tier ? new HttpParams().set('tier', tier) : undefined;
+    return this.http.get<{ success: boolean; data: any }>(`${this.baseUrl}/bet-manager/cycles`, { params });
+  }
+
+  getBetManagerTierDetail(tier: string): Observable<{ success: boolean; data: any }> {
+    return this.http.get<{ success: boolean; data: any }>(`${this.baseUrl}/bet-manager/tier/${tier}`);
+  }
+
+  settleBetManagerCycle(tier: string): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(`${this.baseUrl}/bet-manager/settle-cycle`, { tier });
+  }
+
+  reconcileBetManager(): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(`${this.baseUrl}/bet-manager/reconcile`, {});
+  }
+
   getChatStats(): Observable<{ success: boolean; data: ChatStats }> {
     return this.http.get<{ success: boolean; data: ChatStats }>(`${this.baseUrl}/chat/stats`);
   }

@@ -1,0 +1,356 @@
+<div class="bm-page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1>Bet Manager</h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn-reconcile" mat-stroked-button (click)="reconcile()" [disabled]="reconcileLoading()">
+        <mat-icon>sync</mat-icon> {{ reconcileLoading() ? 'Reconciling...' : 'Reconcile Allocations' }}
+      </button>
+    </div>
+  </div>
+
+  @if (selectedTier && tierDetail) {
+    <div class="tier-detail-panel">
+      <div class="panel-header">
+        <button mat-icon-button (click)="backFromTier()" matTooltip="Back"><mat-icon>arrow_back</mat-icon></button>
+        @let tc = getSelectedTierInfo();
+        <span>{{ tc.icon }} {{ tc.label }}</span>
+        <div class="panel-header-meta">
+          <span class="stat-item">Nav: ₦{{ tierDetail.nav.nav | number:'1.2-2' }}</span>
+          <span class="stat-item">Pool: ₦{{ tierDetail.poolBalance | number }}</span>
+          <span class="stat-item">Accounts: {{ tierDetail.totalAccounts }}</span>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="label">Current NAV</span>
+            <span class="value">₦{{ tierDetail.nav.nav | number:'1.2-2' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Total Value</span>
+            <span class="value">₦{{ tierDetail.nav.totalValue | number }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Pool Balance</span>
+            <span class="value">₦{{ tierDetail.poolBalance | number }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Active Accounts</span>
+            <span class="value">{{ tierDetail.totalAccounts }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Total Deposits</span>
+            <span class="value">{{ tierDetail.totalDeposits }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Active Allocations</span>
+            <span class="value">{{ tierDetail.activeAllocations }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Settled Cycles</span>
+            <span class="value">{{ tierDetail.settledCycleCount }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Total Fees Collected</span>
+            <span class="value" style="color:#E8B923">₦{{ tierDetail.totalFeesCollected | number }}</span>
+          </div>
+        </div>
+
+        @if (tierDetail.activeCycle) {
+          <div class="active-cycle-box">
+            <strong>Active Cycle #{{ tierDetail.activeCycle.cycleNumber }}</strong>
+            <span>Started: {{ tierDetail.activeCycle.startDate | date:'mediumDate' }}</span>
+            <span>Ends: {{ tierDetail.activeCycle.endDate | date:'mediumDate' }}</span>
+            <span>Cash: ₦{{ tierDetail.activeCycle.cashBalance | number }}</span>
+            <span>Staked: ₦{{ tierDetail.activeCycle.totalStaked | number }}</span>
+          </div>
+        }
+
+        @if (tierDetail.navHistory && tierDetail.navHistory.length > 0) {
+          <div class="section">
+            <h4>NAV History</h4>
+            <table class="admin-table">
+              <thead>
+                <tr><th>Cycle</th><th>Start</th><th>End</th><th>Start NAV</th><th>End NAV</th><th>Return</th></tr>
+              </thead>
+              <tbody>
+                @for (c of tierDetail.navHistory; track c.cycleNumber) {
+                  <tr>
+                    <td>{{ c.cycleNumber }}</td>
+                    <td>{{ c.startDate | date:'shortDate' }}</td>
+                    <td>{{ c.endDate | date:'shortDate' }}</td>
+                    <td>₦{{ c.startingNav | number:'1.2-2' }}</td>
+                    <td>{{ c.endingNav ? '₦' + (c.endingNav | number:'1.2-2') : 'Active' }}</td>
+                    <td [style.color]="c.returnPct >= 0 ? '#00E676' : '#f44336'">{{ c.returnPct > 0 ? '+' : '' }}{{ c.returnPct | number:'1.1-1' }}%</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="stats-grid">
+      @if (stats) {
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(0,230,118,0.1);color:#00E676">₦</div>
+          <div class="stat-body">
+            <span class="stat-label">Total AUM</span>
+            <span class="stat-value">₦{{ stats.totalAUM | number }}</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(33,150,243,0.1);color:#90CAF9">👥</div>
+          <div class="stat-body">
+            <span class="stat-label">Active Accounts</span>
+            <span class="stat-value">{{ stats.totalAccounts }}</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(232,185,35,0.1);color:#E8B923">💰</div>
+          <div class="stat-body">
+            <span class="stat-label">Fees Collected</span>
+            <span class="stat-value">₦{{ stats.feesCollected | number }}</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(206,147,216,0.1);color:#CE93D8">🔄</div>
+          <div class="stat-body">
+            <span class="stat-label">Active Cycles</span>
+            <span class="stat-value">{{ stats.activeCycles }}</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="tier-cards">
+      @for (t of tiers; track t.key) {
+        <div class="tier-card" [style.--tier-color]="t.color" (click)="selectTier(t.key)">
+          <div class="tier-card-header">
+            <span class="tier-icon">{{ t.icon }}</span>
+            <span class="tier-name">{{ t.label }}</span>
+          </div>
+          @if (stats) {
+            <div class="tier-stats">
+              <span>Accounts: {{ stats.accountsByTier[t.key] || 0 }}</span>
+              <span>AUM: ₦{{ (stats.aumByTier[t.key] || 0) | number }}</span>
+            </div>
+          }
+          @if (pools.length > 0) {
+            <div class="tier-pool">
+              Pool: ₦{{ getPoolBalance(t.key) | number }}
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        <h3>Pool Wallets</h3>
+      </div>
+      @if (pools.length > 0) {
+        <table class="admin-table">
+          <thead>
+            <tr><th>Tier</th><th>Wallet ID</th><th>Balance</th></tr>
+          </thead>
+          <tbody>
+            @for (p of pools; track p.tier) {
+              <tr>
+                <td>{{ p.tier }}</td>
+                <td style="font-family:monospace;font-size:11px">{{ p.walletId }}</td>
+                <td>₦{{ p.balance | number }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        <h3>Cycles</h3>
+        <div class="filter-group">
+          <select class="filter-select" [(ngModel)]="tierFilter" (change)="onFilterChange()">
+            <option value="">All Tiers</option>
+            @for (t of tiers; track t.key) { <option [value]="t.key">{{ t.label }}</option> }
+          </select>
+        </div>
+      </div>
+      @if (cycles.length > 0) {
+        <table class="admin-table">
+          <thead>
+            <tr><th>Tier</th><th>Cycle</th><th>Start</th><th>End</th><th>Start NAV</th><th>End NAV</th><th>Profit</th><th>Perf Fee</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody>
+            @for (c of cycles; track c._id) {
+              <tr>
+                <td><span class="chip" [style.background]="c.tier === 'defender' ? 'rgba(0,230,118,0.15)' : c.tier === 'midfielder' ? 'rgba(232,185,35,0.15)' : 'rgba(255,82,82,0.15)'" [style.color]="c.tier === 'defender' ? '#00E676' : c.tier === 'midfielder' ? '#E8B923' : '#FF5252'">{{ c.tier }}</span></td>
+                <td>{{ c.cycleNumber }}</td>
+                <td>{{ c.startDate | date:'shortDate' }}</td>
+                <td>{{ c.endDate | date:'shortDate' }}</td>
+                <td>₦{{ c.startingNav | number:'1.2-2' }}</td>
+                <td>{{ c.endingNav ? '₦' + (c.endingNav | number:'1.2-2') : '-' }}</td>
+                <td [style.color]="c.netProfit >= 0 ? '#00E676' : '#f44336'">₦{{ (c.netProfit || 0) | number }}</td>
+                <td>₦{{ ((c.performanceFee || 0) + (c.platformFee || 0)) | number }}</td>
+                <td><span class="chip" [class.chip-active]="c.status === 'active'" [class.chip-settled]="c.status === 'settled'">{{ c.status }}</span></td>
+                <td>
+                  @if (c.status === 'active') {
+                    <button mat-stroked-button class="btn-settle-action" (click)="settleCycle(c.tier)" [disabled]="settleLoading() === c.tier">
+                      {{ settleLoading() === c.tier ? 'Settling...' : 'Force Settle' }}
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <p class="no-data">No cycles found.</p>
+      }
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        <h3>User Accounts</h3>
+        <div class="filter-group">
+          <input class="filter-input" type="text" placeholder="Search phone or name..." [(ngModel)]="searchFilter" (input)="onFilterChange()" />
+        </div>
+      </div>
+      @if (accounts.length > 0) {
+        <table class="admin-table">
+          <thead>
+            <tr><th>User</th><th>Tier</th><th>Units</th><th>Current Value</th><th>Deposited</th><th>Withdrawn</th><th>Current NAV</th><th></th></tr>
+          </thead>
+          <tbody>
+            @for (a of accounts; track a._id) {
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <span class="user-name">{{ a.userId?.fullName || '—' }}</span>
+                    <span class="user-phone">{{ a.userId?.phone || '—' }}</span>
+                  </div>
+                </td>
+                <td><span class="chip" [style.background]="a.tier === 'defender' ? 'rgba(0,230,118,0.15)' : a.tier === 'midfielder' ? 'rgba(232,185,35,0.15)' : 'rgba(255,82,82,0.15)'" [style.color]="a.tier === 'defender' ? '#00E676' : a.tier === 'midfielder' ? '#E8B923' : '#FF5252'">{{ a.tier }}</span></td>
+                <td>{{ a.units | number:'1.2-2' }}</td>
+                <td>₦{{ a.currentValue | number }}</td>
+                <td>₦{{ a.totalDeposited | number }}</td>
+                <td>₦{{ a.totalWithdrawn | number }}</td>
+                <td>₦{{ a.currentNav | number:'1.2-2' }}</td>
+                <td><button mat-icon-button (click)="viewAccount(a._id)" matTooltip="View details"><mat-icon>visibility</mat-icon></button></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        @if (accountsTotal > 20) {
+          <div class="pagination">
+            <button class="page-btn" (click)="accountsPage = accountsPage - 1; loadAccounts()" [disabled]="accountsPage <= 1">← Prev</button>
+            <span class="page-info">Page {{ accountsPage }} of {{ (accountsTotal / 20) | number:'1.0-0' }}</span>
+            <button class="page-btn" (click)="accountsPage = accountsPage + 1; loadAccounts()" [disabled]="accountsPage * 20 >= accountsTotal">Next →</button>
+          </div>
+        }
+      } @else {
+        <p class="no-data">No accounts found.</p>
+      }
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        <h3>Deposits / Withdrawals</h3>
+        <div class="filter-group">
+          <select class="filter-select" [(ngModel)]="depositTierFilter" (change)="onDepositFilterChange()">
+            <option value="">All Tiers</option>
+            @for (t of tiers; track t.key) { <option [value]="t.key">{{ t.label }}</option> }
+          </select>
+          <select class="filter-select" [(ngModel)]="depositStatusFilter" (change)="onDepositFilterChange()">
+            <option value="">All Status</option>
+            <option value="locked">Locked</option>
+            <option value="unlocked">Unlocked</option>
+            <option value="withdrawn">Withdrawn</option>
+            <option value="deposit">Deposit</option>
+            <option value="withdrawal">Withdrawal</option>
+          </select>
+        </div>
+      </div>
+      @if (deposits.length > 0) {
+        <table class="admin-table">
+          <thead>
+            <tr><th>User</th><th>Tier</th><th>Type</th><th>Amount</th><th>Units</th><th>NAV</th><th>Status</th><th>Date</th></tr>
+          </thead>
+          <tbody>
+            @for (d of deposits; track d._id) {
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <span class="user-name">{{ d.userId?.fullName || '—' }}</span>
+                    <span class="user-phone">{{ d.userId?.phone || '—' }}</span>
+                  </div>
+                </td>
+                <td><span class="chip" [style.background]="d.tier === 'defender' ? 'rgba(0,230,118,0.15)' : d.tier === 'midfielder' ? 'rgba(232,185,35,0.15)' : 'rgba(255,82,82,0.15)'" [style.color]="d.tier === 'defender' ? '#00E676' : d.tier === 'midfielder' ? '#E8B923' : '#FF5252'">{{ d.tier }}</span></td>
+                <td><span class="chip" [class.chip-deposit]="d.type === 'deposit'" [class.chip-withdrawal]="d.type === 'withdrawal'">{{ d.type }}</span></td>
+                <td>₦{{ d.amount | number }}</td>
+                <td>{{ d.units | number:'1.2-2' }}</td>
+                <td>₦{{ d.navAtExecution | number:'1.2-2' }}</td>
+                <td><span class="chip" [class.chip-locked]="d.status === 'locked'" [class.chip-unlocked]="d.status === 'unlocked'" [class.chip-withdrawn]="d.status === 'withdrawn'">{{ d.status }}</span></td>
+                <td>{{ d.createdAt | date:'shortDate' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        @if (depositTotal > 20) {
+          <div class="pagination">
+            <button class="page-btn" (click)="depositPage = depositPage - 1; loadDeposits()" [disabled]="depositPage <= 1">← Prev</button>
+            <span class="page-info">Page {{ depositPage }} of {{ (depositTotal / 20) | number:'1.0-0' }}</span>
+            <button class="page-btn" (click)="depositPage = depositPage + 1; loadDeposits()" [disabled]="depositPage * 20 >= depositTotal">Next →</button>
+          </div>
+        }
+      } @else {
+        <p class="no-data">No deposit records found.</p>
+      }
+    </div>
+  }
+
+  @if (accountDetail && selectedAccountId) {
+    <div class="detail-overlay" (click)="closeAccountDetail()">
+      <div class="detail-card" (click)="$event.stopPropagation()">
+        <div class="detail-card-header">
+          <h3>Account Detail</h3>
+          <button mat-icon-button (click)="closeAccountDetail()"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="detail-card-body">
+          @let acct = accountDetail.account;
+          <div class="detail-row"><span>User:</span> <strong>{{ acct.userId?.fullName || '—' }} ({{ acct.userId?.phone || '—' }})</strong></div>
+          <div class="detail-row"><span>Tier:</span> <strong>{{ acct.tier }}</strong></div>
+          <div class="detail-row"><span>Units:</span> <strong>{{ acct.units | number:'1.2-2' }}</strong></div>
+          <div class="detail-row"><span>Total Deposited:</span> <strong>₦{{ acct.totalDeposited | number }}</strong></div>
+          <div class="detail-row"><span>Total Withdrawn:</span> <strong>₦{{ acct.totalWithdrawn | number }}</strong></div>
+          <div class="detail-row"><span>Total Profit:</span> <strong [style.color]="acct.totalProfit >= 0 ? '#00E676' : '#f44336'">₦{{ acct.totalProfit | number }}</strong></div>
+
+          @if (accountDetail.deposits && accountDetail.deposits.length > 0) {
+            <h4 style="margin:16px 0 8px;color:rgba(255,255,255,0.6);font-size:13px">Recent Transactions</h4>
+            <table class="admin-table">
+              <thead>
+                <tr><th>Type</th><th>Amount</th><th>Units</th><th>NAV</th><th>Status</th><th>Date</th></tr>
+              </thead>
+              <tbody>
+                @for (d of accountDetail.deposits; track d._id) {
+                  <tr>
+                    <td><span class="chip" [class.chip-deposit]="d.type === 'deposit'" [class.chip-withdrawal]="d.type === 'withdrawal'">{{ d.type }}</span></td>
+                    <td>₦{{ d.amount | number }}</td>
+                    <td>{{ d.units | number:'1.2-2' }}</td>
+                    <td>₦{{ d.navAtExecution | number:'1.2-2' }}</td>
+                    <td><span class="chip" [class.chip-locked]="d.status === 'locked'" [class.chip-unlocked]="d.status === 'unlocked'" [class.chip-withdrawn]="d.status === 'withdrawn'">{{ d.status }}</span></td>
+                    <td>{{ d.createdAt | date:'shortDate' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

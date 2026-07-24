@@ -1,0 +1,96 @@
+<app-nav />
+<div class="bm-root">
+  <div class="page-header">
+    <h1>Bet Manager
+      <button mat-icon-button class="info-btn" (click)="showGuide.set(!showGuide())" matTooltip="How it works">
+        <mat-icon>info_outline</mat-icon>
+      </button>
+    </h1>
+  </div>
+  <p class="bm-subtitle">Let BetPool's AI invest your balance across live Pods and Match Pools. Choose your risk tier.</p>
+
+  @if (showGuide()) {
+    <div class="guide-bar">
+      <div class="guide-step"><span class="step-num">1</span> Deposit into a tier — funds are locked for a 30-day cycle</div>
+      <div class="guide-step"><span class="step-num">2</span> Our Ora AI automatically allocates your balance across live Pods and Match Pools</div>
+      <div class="guide-step"><span class="step-num">3</span> Returns are reinvested. BetPool earns a 20% performance fee only on net profit</div>
+      <div class="guide-step"><span class="step-num">4</span> Withdraw anytime after the 30-day lock period — instant settlement</div>
+    </div>
+  }
+
+  @if (store.loading() && store.accounts().length === 0) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading your portfolios...</p>
+    </div>
+  }
+
+  @if (store.error()) {
+    <div class="error-msg">{{ store.error() }}</div>
+  }
+
+  @if (store.successMessage()) {
+    <div class="success-msg">{{ store.successMessage() }}</div>
+    <button class="dismiss-btn" (click)="store.clearMessages()">×</button>
+  }
+
+  <div class="tiers-grid">
+    @for (tier of tiers; track tier.key) {
+      @let account = getAccount(tier.key);
+      <div class="tier-card" [style.--tier-color]="tier.color">
+        <div class="tier-card-glow"></div>
+        <div class="tier-card-header">
+          <span class="tier-icon">{{ tier.icon }}</span>
+          <div>
+            <h2 class="tier-name">{{ tier.label }}</h2>
+            <span class="tier-min">From ₦{{ tier.minDeposit | number }}</span>
+          </div>
+        </div>
+
+        <div class="tier-strategy">{{ tier.strategy }}</div>
+
+        @if (account) {
+          <div class="tier-stats">
+            <div class="stat">
+              <span class="stat-label">Portfolio Value</span>
+              <span class="stat-value" [style.color]="tier.color">₦{{ account.currentValue | number }}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Total Deposited</span>
+              <span class="stat-value">₦{{ account.totalDeposited | number }}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Profit/Loss</span>
+              <span class="stat-value" [class.positive]="account.totalProfit > 0" [class.negative]="account.totalProfit < 0">
+                {{ account.totalProfit > 0 ? '+' : '' }}₦{{ account.totalProfit | number }}
+              </span>
+            </div>
+          </div>
+
+          <div class="tier-actions">
+            <button class="btn-secondary" (click)="goDetail(tier.key)">View Details</button>
+            <button class="btn-primary" (click)="goDeposit(tier.key)">Deposit More</button>
+          </div>
+
+          @if (account.currentValue > 0) {
+            <button class="btn-link withdraw-link" (click)="withdraw(tier.key)">
+              Withdraw All (30-day lock applies)
+            </button>
+          }
+        } @else {
+          <div class="tier-empty">
+            <p>No active portfolio. Start with ₦{{ tier.minDeposit | number }}.</p>
+          </div>
+          <button class="btn-primary full" (click)="goDeposit(tier.key)">Get Started</button>
+        }
+
+        <div class="tier-footer">
+          <span class="tier-tag">{{ tier.allocation }}</span>
+          <span class="tier-tag">20% perf. fee on profit</span>
+          <span class="tier-tag">30-day lock</span>
+        </div>
+      </div>
+    }
+  </div>
+
+</div>

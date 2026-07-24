@@ -42,6 +42,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     { path: '/admin/deposit-mgt', icon: 'payments', label: 'Deposits', exact: false, badge: false },
     { path: '/admin/campaigns', icon: 'campaign', label: 'Campaigns', exact: false, badge: false },
     { path: '/admin/featured-games', icon: 'star', label: 'Featured Games', exact: false, badge: false },
+    { path: '/admin/bet-manager', icon: 'account_balance_wallet', label: 'Bet Manager', exact: false, badge: false },
     { path: '/admin/ora-chat', icon: 'smart_toy', label: 'ORA Chat', exact: false, badge: false },
     { path: '/admin/settings', icon: 'settings', label: 'Settings', exact: false, badge: false },
   ];

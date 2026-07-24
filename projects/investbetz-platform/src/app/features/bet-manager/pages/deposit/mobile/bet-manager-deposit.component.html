@@ -1,0 +1,51 @@
+<div class="mobile-root">
+  <header class="mobile-header">
+    <button mat-icon-button (click)="goBack()"><mat-icon>arrow_back</mat-icon></button>
+    <h1>Deposit {{ config.label }}</h1>
+    <button mat-icon-button (click)="auth.logout()"><mat-icon>logout</mat-icon></button>
+  </header>
+
+  <div class="mobile-content">
+    <div class="tier-badge" [style.--tier-color]="config.color">
+      <span class="tier-icon">{{ config.icon }}</span>
+      <div>
+        <div class="tier-name">{{ config.label }}</div>
+        <div class="tier-min">Min ₦{{ config.minDeposit | number }} · 30-day lock</div>
+      </div>
+    </div>
+
+    @if (store.error()) { <div class="error-msg">{{ store.error() }}</div> }
+    @if (store.successMessage()) {
+      <div class="success-msg">{{ store.successMessage() }}</div>
+      <p class="redirect-note">Redirecting...</p>
+    }
+
+    @if (!store.successMessage()) {
+      <label class="field-label">Amount</label>
+      <div class="amount-grid">
+        @for (amt of amountOptions; track amt) {
+          <button class="amount-btn" [class.selected]="!useCustom && amount === amt" (click)="selectAmount(amt)">
+            ₦{{ amt | number }}
+          </button>
+        }
+        <button class="amount-btn custom" [class.selected]="useCustom" (click)="useCustomAmount()">Custom</button>
+      </div>
+
+      @if (useCustom) {
+        <input class="field-input" type="number" [(ngModel)]="customAmount" placeholder="Enter amount" />
+      }
+
+      <div class="summary">
+        <div class="summary-row"><span>Deposit</span><span class="val">₦{{ validAmount | number }}</span></div>
+        <div class="summary-row muted"><span>Lock</span><span>30 days</span></div>
+        <div class="summary-row muted"><span>Fee</span><span>20% of net profit</span></div>
+      </div>
+
+      <button class="btn-primary full" (click)="submit()" [disabled]="!canSubmit">
+        @if (store.loading()) { <span class="spinner"></span> } @else { Deposit ₦{{ validAmount | number }} }
+      </button>
+    }
+  </div>
+
+  <app-mobile-nav />
+</div>

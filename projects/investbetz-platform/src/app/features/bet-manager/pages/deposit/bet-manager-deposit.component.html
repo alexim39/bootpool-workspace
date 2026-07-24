@@ -1,0 +1,72 @@
+<app-nav />
+<div class="deposit-root">
+  <div class="page-header">
+    <h1>Deposit</h1>
+  </div>
+  <div class="deposit-card">
+    <button class="back-link" (click)="goBack()">← Back to Bet Manager</button>
+
+    <div class="deposit-header" [style.--tier-color]="config.color">
+      <span class="tier-icon">{{ config.icon }}</span>
+      <div>
+        <h1 class="deposit-title">Deposit into {{ config.label }}</h1>
+        <p class="deposit-subtitle">Minimum deposit: ₦{{ config.minDeposit | number }} · 30-day lock · 20% perf. fee on profit</p>
+      </div>
+    </div>
+
+    @if (store.error()) {
+      <div class="error-msg">{{ store.error() }}</div>
+    }
+
+    @if (store.successMessage()) {
+      <div class="success-msg">{{ store.successMessage() }}</div>
+      <p class="redirect-note">Redirecting to Bet Manager...</p>
+    }
+
+    @if (!store.successMessage()) {
+      <div class="amount-section">
+        <label class="field-label">Select Amount</label>
+        <div class="amount-grid">
+          @for (amt of amountOptions; track amt) {
+            <button class="amount-btn" [class.selected]="!useCustom && amount === amt" (click)="selectAmount(amt)">
+              ₦{{ amt | number }}
+            </button>
+          }
+          <button class="amount-btn custom" [class.selected]="useCustom" (click)="useCustomAmount()">
+            Custom
+          </button>
+        </div>
+
+        @if (useCustom) {
+          <div class="field" style="margin-top:16px">
+            <label class="field-label">Enter Amount (₦)</label>
+            <input class="field-input" type="number" [(ngModel)]="customAmount" placeholder="Enter amount" min="0" />
+          </div>
+        }
+
+        <div class="summary">
+          <div class="summary-row">
+            <span>Deposit Amount</span>
+            <span class="summary-val">₦{{ validAmount | number }}</span>
+          </div>
+          <div class="summary-row muted">
+            <span>Lock Period</span>
+            <span>30 days</span>
+          </div>
+          <div class="summary-row muted">
+            <span>Performance Fee</span>
+            <span>20% of net profit only</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary full" (click)="submit()" [disabled]="!canSubmit">
+        @if (store.loading()) {
+          <span class="spinner"></span>
+        } @else {
+          Deposit ₦{{ validAmount | number }}
+        }
+      </button>
+    }
+  </div>
+</div>

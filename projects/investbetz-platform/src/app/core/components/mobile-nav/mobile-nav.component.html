@@ -16,6 +16,10 @@
         <mat-icon>pool</mat-icon>
         <span class="nav-label">Pools</span>
       </a>
+      <a routerLink="/bet-manager" routerLinkActive="active" class="nav-item">
+        <mat-icon>auto_awesome</mat-icon>
+        <span class="nav-label">Bet Manager</span>
+      </a>
       <button class="nav-item bell-trigger" (click)="togglePanel()">
         <mat-icon [matBadge]="notifService.unreadCount() > 0 ? notifService.unreadCount() : null" matBadgeSize="small">notifications</mat-icon>
         <span class="nav-label">Alerts</span>
