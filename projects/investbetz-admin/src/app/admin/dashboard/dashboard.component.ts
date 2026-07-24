@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { NgFor, NgIf, DatePipe, DecimalPipe, SlicePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
@@ -125,8 +125,12 @@ import { AdminDashboardStore } from './stores/admin-dashboard.store';
     .t4-warning, .t4-rec { display: flex; align-items: flex-start; gap: 8px; color: rgba(255,255,255,0.7); font-size: 13px; padding: 4px 0; line-height: 1.5; }
   `]
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   readonly store = inject(AdminDashboardStore);
+
+  ngOnInit() {
+    this.store.init();
+  }
 
   Math = Math;
 

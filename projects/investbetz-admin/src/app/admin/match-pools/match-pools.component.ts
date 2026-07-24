@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { NgIf, NgFor, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
@@ -21,8 +21,12 @@ import { AdminMatchPoolsStore } from './stores/admin-match-pools.store';
   templateUrl: './match-pools.component.html',
   styleUrls: ['./match-pools.component.scss']
 })
-export class AdminMatchPoolsComponent {
+export class AdminMatchPoolsComponent implements OnInit {
   readonly store = inject(AdminMatchPoolsStore);
+
+  ngOnInit() {
+    this.store.loadList();
+  }
 
   formTitle = '';
   formStakingCloses = '';

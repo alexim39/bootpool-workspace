@@ -47,9 +47,9 @@
           </div>
           <div class="date-range">
             <input class="date-input" type="date" [ngModel]="store.dateFrom()" (ngModelChange)="store.setDateFrom($event); store.onFilterChange()" title="Match date from" />
-            <span class="date-sep">–</span>
+            <span class="date-sep">&#8211;</span>
             <input class="date-input" type="date" [ngModel]="store.dateTo()" (ngModelChange)="store.setDateTo($event); store.onFilterChange()" title="Match date to" />
-            <button class="date-clear" *ngIf="store.dateFrom() || store.dateTo()" (click)="store.clearDates(); store.onFilterChange()" matTooltip="Clear dates">✕</button>
+            <button class="date-clear" *ngIf="store.dateFrom() || store.dateTo()" (click)="store.clearDates(); store.onFilterChange()" matTooltip="Clear dates">&#x2715;</button>
           </div>
           <div class="sub-filters" *ngIf="store.activeTab() !== 'disputed'">
             <button class="sub-chip" [class.active]="store.statusFilter() === ''" (click)="store.setStatusFilter(''); store.onFilterChange()">All</button>
@@ -87,7 +87,7 @@
             </div>
             <div class="detail-item">
               <span class="label">League</span>
-              <span class="value">{{ store.selectedPod()!.league || '—' }}</span>
+              <span class="value">{{ store.selectedPod()!.league || '\u2014' }}</span>
             </div>
             <div class="detail-item">
               <span class="label">Market Type</span>
@@ -111,15 +111,15 @@
             </div>
             <div class="detail-item">
               <span class="label">Stake Range</span>
-              <span class="value">\u20A6{{ store.selectedPod()!.minStake | number }} – \u20A6{{ store.selectedPod()!.maxStake | number }}</span>
+              <span class="value">&#x20A6;{{ store.selectedPod()!.minStake | number }} &#x2014; &#x20A6;{{ store.selectedPod()!.maxStake | number }}</span>
             </div>
             <div class="detail-item">
               <span class="label">Total Staked</span>
-              <span class="value">\u20A6{{ store.selectedPod()!.currentExposure | number }}</span>
+              <span class="value">&#x20A6;{{ store.selectedPod()!.currentExposure | number }}</span>
             </div>
             <div class="detail-item">
               <span class="label">Max Exposure</span>
-              <span class="value">\u20A6{{ store.selectedPod()!.maxTotalExposure | number }}</span>
+              <span class="value">&#x20A6;{{ store.selectedPod()!.maxTotalExposure | number }}</span>
             </div>
             <div class="detail-item">
               <span class="label">Exposure Used</span>
@@ -284,7 +284,7 @@
       <div class="stuck-panel" *ngIf="store.showStuckPanel()">
         <div class="stuck-header">
           <mat-icon style="color:#90CAF9">help_outline</mat-icon>
-          <span>Needs Review — No Linked Fixture ({{ store.stuckPods().length }})</span>
+          <span>Needs Review &#x2014; No Linked Fixture ({{ store.stuckPods().length }})</span>
           <button mat-icon-button (click)="store.dismissStuckPanel()"><mat-icon>close</mat-icon></button>
         </div>
         <div class="stuck-body">
@@ -294,7 +294,7 @@
               <span class="stuck-teams">{{ p.homeTeam }} vs {{ p.awayTeam }}</span>
               <span class="stuck-selection">{{ p.selection }} ({{ p.gainsMultiplier }}x)</span>
             </div>
-            <div class="stuck-reason">No linked fixture — cannot auto-settle. Settle manually using the pod detail panel.</div>
+            <div class="stuck-reason">No linked fixture &#x2014; cannot auto-settle. Settle manually using the pod detail panel.</div>
             <div class="stuck-actions">
               <button mat-stroked-button class="btn-settle-manual" (click)="store.selectPodAndSettle(p)">Manual Settle</button>
             </div>
@@ -398,20 +398,20 @@
           <div class="reserve-title">
             <mat-icon style="font-size:18px;color:#E8B923">account_balance</mat-icon>
             <span>Reserve Risk</span>
-            <span class="reserve-amount">₦{{ store.reserve()!.reserveAmount | number }}</span>
+            <span class="reserve-amount">&#x20A6;{{ store.reserve()!.reserveAmount | number }}</span>
           </div>
           <div class="reserve-stats">
             <span class="stat" [class.text-green]="store.reserve()!.netIfAllLose >= 0" [class.text-red]="store.reserve()!.netIfAllLose < 0">
-              If all lose: <strong>₦{{ store.reserve()!.refundIfAllLose | number }}</strong> refunds
+              If all lose: <strong>&#x20A6;{{ store.reserve()!.refundIfAllLose | number }}</strong> refunds
               <span class="net-badge" [class.positive]="store.reserve()!.netIfAllLose >= 0" [class.negative]="store.reserve()!.netIfAllLose < 0">
-                net +₦{{ store.reserve()!.netIfAllLose | number }}
+                net +&#x20A6;{{ store.reserve()!.netIfAllLose | number }}
               </span>
             </span>
             <span class="stat-divider">|</span>
             <span class="stat" [class.text-green]="store.reserve()!.netIfAllWin >= 0" [class.text-red]="store.reserve()!.netIfAllWin < 0">
-              If all win: <strong>₦{{ store.reserve()!.payoutIfAllWin | number }}</strong> payouts
+              If all win: <strong>&#x20A6;{{ store.reserve()!.payoutIfAllWin | number }}</strong> payouts
               <span class="net-badge" [class.positive]="store.reserve()!.netIfAllWin >= 0" [class.negative]="store.reserve()!.netIfAllWin < 0">
-                net {{ store.reserve()!.netIfAllWin >= 0 ? '+' : '' }}₦{{ store.reserve()!.netIfAllWin | number }}
+                net {{ store.reserve()!.netIfAllWin >= 0 ? '+' : '' }}&#x20A6;{{ store.reserve()!.netIfAllWin | number }}
               </span>
             </span>
             <span class="stat-divider">|</span>
@@ -424,11 +424,11 @@
           </div>
         </div>
         <div class="reserve-bar-ticks">
-          <span>₦0</span>
-          <span>₦250K</span>
-          <span>₦500K</span>
-          <span>₦750K</span>
-          <span>₦1M</span>
+          <span>&#x20A6;0</span>
+          <span>&#x20A6;250K</span>
+          <span>&#x20A6;500K</span>
+          <span>&#x20A6;750K</span>
+          <span>&#x20A6;1M</span>
         </div>
       </div>
 
@@ -471,7 +471,7 @@
             <th mat-header-cell *matHeaderCellDef>Exposure</th>
             <td mat-cell *matCellDef="let p">
               <div class="exposure-cell">
-                <span class="exposure-amount">\u20A6{{ p.currentExposure | number }} / \u20A6{{ p.maxTotalExposure | number }}</span>
+                <span class="exposure-amount">&#x20A6;{{ p.currentExposure | number }} / &#x20A6;{{ p.maxTotalExposure | number }}</span>
                 <div class="exposure-track">
                   <div class="exposure-fill" [style.width.%]="getExposurePercent(p)" [style.background]="getExposurePercent(p) >= 80 ? '#f44336' : getExposurePercent(p) >= 50 ? '#E8B923' : '#00E676'"></div>
                 </div>
@@ -480,13 +480,13 @@
           </ng-container>
           <ng-container matColumnDef="stakeRange">
             <th mat-header-cell *matHeaderCellDef>Range</th>
-            <td mat-cell *matCellDef="let p" class="range-cell">\u20A6{{ p.minStake | number }} – \u20A6{{ p.maxStake | number }}</td>
+            <td mat-cell *matCellDef="let p" class="range-cell">&#x20A6;{{ p.minStake | number }} &#x2014; &#x20A6;{{ p.maxStake | number }}</td>
           </ng-container>
           <ng-container matColumnDef="refund">
             <th mat-header-cell *matHeaderCellDef>Refund</th>
             <td mat-cell *matCellDef="let p">
               <span *ngIf="p.refundPercent != null" style="color:#E8B923;font-weight:600">{{ p.refundPercent }}%</span>
-              <span *ngIf="p.refundPercent == null" style="color:rgba(255,255,255,0.3)">—</span>
+              <span *ngIf="p.refundPercent == null" style="color:rgba(255,255,255,0.3)">&#x2014;</span>
             </td>
           </ng-container>
           <ng-container matColumnDef="actions">
@@ -543,7 +543,7 @@
             </div>
             <div class="detail-item">
               <span class="label">League</span>
-              <span class="value">{{ store.detailDialogPod()!.league || '—' }}</span>
+              <span class="value">{{ store.detailDialogPod()!.league || '\u2014' }}</span>
             </div>
             <div class="detail-item">
               <span class="label">Market Type</span>
@@ -567,15 +567,15 @@
             </div>
             <div class="detail-item">
               <span class="label">Stake Range</span>
-              <span class="value">\u20A6{{ store.detailDialogPod()!.minStake | number }} – \u20A6{{ store.detailDialogPod()!.maxStake | number }}</span>
+              <span class="value">&#x20A6;{{ store.detailDialogPod()!.minStake | number }} &#x2014; &#x20A6;{{ store.detailDialogPod()!.maxStake | number }}</span>
             </div>
             <div class="detail-item">
               <span class="label">Total Staked</span>
-              <span class="value">\u20A6{{ store.detailDialogPod()!.currentExposure | number }}</span>
+              <span class="value">&#x20A6;{{ store.detailDialogPod()!.currentExposure | number }}</span>
             </div>
             <div class="detail-item">
               <span class="label">Max Exposure</span>
-              <span class="value">\u20A6{{ store.detailDialogPod()!.maxTotalExposure | number }}</span>
+              <span class="value">&#x20A6;{{ store.detailDialogPod()!.maxTotalExposure | number }}</span>
             </div>
             <div class="detail-item">
               <span class="label">Participants</span>

@@ -22,22 +22,22 @@
         <div class="summary-cards">
           <div class="summary-card profit" *ngIf="report.overview.netProfit >= 0">
             <div class="sc-icon"><mat-icon>trending_up</mat-icon></div>
-            <div class="sc-value">\u20A6{{ report.overview.netProfit | number }}</div>
+            <div class="sc-value">&#x20A6;{{ report.overview.netProfit | number }}</div>
             <div class="sc-label">Net Profit</div>
           </div>
           <div class="summary-card loss" *ngIf="report.overview.netProfit < 0">
             <div class="sc-icon"><mat-icon>trending_down</mat-icon></div>
-            <div class="sc-value">-\u20A6{{ Math.abs(report.overview.netProfit) | number }}</div>
+            <div class="sc-value">-&#x20A6;{{ Math.abs(report.overview.netProfit) | number }}</div>
             <div class="sc-label">Net Loss</div>
           </div>
           <div class="summary-card">
             <div class="sc-icon"><mat-icon>payments</mat-icon></div>
-            <div class="sc-value">\u20A6{{ report.overview.totalRevenue | number }}</div>
+            <div class="sc-value">&#x20A6;{{ report.overview.totalRevenue | number }}</div>
             <div class="sc-label">Revenue</div>
           </div>
           <div class="summary-card">
             <div class="sc-icon"><mat-icon>money_off</mat-icon></div>
-            <div class="sc-value">\u20A6{{ report.overview.totalPayouts | number }}</div>
+            <div class="sc-value">&#x20A6;{{ report.overview.totalPayouts | number }}</div>
             <div class="sc-label">Payouts</div>
           </div>
           <div class="summary-card">
@@ -102,16 +102,16 @@
                 </ng-container>
                 <ng-container matColumnDef="revenue">
                   <th mat-header-cell *matHeaderCellDef>Revenue</th>
-                  <td mat-cell *matCellDef="let s">\u20A6{{ s.revenue | number }}</td>
+                  <td mat-cell *matCellDef="let s">&#x20A6;{{ s.revenue | number }}</td>
                 </ng-container>
                 <ng-container matColumnDef="payouts">
                   <th mat-header-cell *matHeaderCellDef>Payouts</th>
-                  <td mat-cell *matCellDef="let s">\u20A6{{ s.payouts | number }}</td>
+                  <td mat-cell *matCellDef="let s">&#x20A6;{{ s.payouts | number }}</td>
                 </ng-container>
                 <ng-container matColumnDef="profit">
                   <th mat-header-cell *matHeaderCellDef>Profit</th>
                   <td mat-cell *matCellDef="let s">
-                    <span [style.color]="s.profit >= 0 ? '#00E676' : '#f44336'">\u20A6{{ s.profit | number }}</span>
+                    <span [style.color]="s.profit >= 0 ? '#00E676' : '#f44336'">&#x20A6;{{ s.profit | number }}</span>
                   </td>
                 </ng-container>
                 <tr mat-header-row *matHeaderRowDef="store.sportColumns"></tr>
@@ -135,12 +135,12 @@
                 </ng-container>
                 <ng-container matColumnDef="revenue">
                   <th mat-header-cell *matHeaderCellDef>Revenue</th>
-                  <td mat-cell *matCellDef="let s">\u20A6{{ s.revenue | number }}</td>
+                  <td mat-cell *matCellDef="let s">&#x20A6;{{ s.revenue | number }}</td>
                 </ng-container>
                 <ng-container matColumnDef="profit">
                   <th mat-header-cell *matHeaderCellDef>Profit</th>
                   <td mat-cell *matCellDef="let s">
-                    <span [style.color]="s.profit >= 0 ? '#00E676' : '#f44336'">\u20A6{{ s.profit | number }}</span>
+                    <span [style.color]="s.profit >= 0 ? '#00E676' : '#f44336'">&#x20A6;{{ s.profit | number }}</span>
                   </td>
                 </ng-container>
                 <tr mat-header-row *matHeaderRowDef="store.leagueColumns"></tr>
@@ -170,12 +170,12 @@
                 </ng-container>
                 <ng-container matColumnDef="volume">
                   <th mat-header-cell *matHeaderCellDef>Volume</th>
-                  <td mat-cell *matCellDef="let p">\u20A6{{ p.volume | number }}</td>
+                  <td mat-cell *matCellDef="let p">&#x20A6;{{ p.volume | number }}</td>
                 </ng-container>
                 <ng-container matColumnDef="profit">
                   <th mat-header-cell *matHeaderCellDef>Profit</th>
                   <td mat-cell *matCellDef="let p">
-                    <span [style.color]="p.profit >= 0 ? '#00E676' : '#f44336'">\u20A6{{ p.profit | number }}</span>
+                    <span [style.color]="p.profit >= 0 ? '#00E676' : '#f44336'">&#x20A6;{{ p.profit | number }}</span>
                   </td>
                 </ng-container>
                 <tr mat-header-row *matHeaderRowDef="store.podColumns"></tr>
@@ -195,11 +195,11 @@
                 </ng-container>
                 <ng-container matColumnDef="staked">
                   <th mat-header-cell *matHeaderCellDef>Total Staked</th>
-                  <td mat-cell *matCellDef="let u">\u20A6{{ u.totalStaked | number }}</td>
+                  <td mat-cell *matCellDef="let u">&#x20A6;{{ u.totalStaked | number }}</td>
                 </ng-container>
                 <ng-container matColumnDef="won">
                   <th mat-header-cell *matHeaderCellDef>Total Won</th>
-                  <td mat-cell *matCellDef="let u">\u20A6{{ u.totalWon | number }}</td>
+                  <td mat-cell *matCellDef="let u">&#x20A6;{{ u.totalWon | number }}</td>
                 </ng-container>
                 <ng-container matColumnDef="count">
                   <th mat-header-cell *matHeaderCellDef>Bets</th>
@@ -232,16 +232,16 @@
                 </div>
                 <div class="metric-item">
                   <span class="m-label">Total Deposits</span>
-                  <span class="m-value">\u20A6{{ report.userMetrics.totalDeposits | number }}</span>
+                  <span class="m-value">&#x20A6;{{ report.userMetrics.totalDeposits | number }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="m-label">Total Withdrawals</span>
-                  <span class="m-value">\u20A6{{ report.userMetrics.totalWithdrawals | number }}</span>
+                  <span class="m-value">&#x20A6;{{ report.userMetrics.totalWithdrawals | number }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="m-label">Net Deposits</span>
                   <span class="m-value" [style.color]="report.userMetrics.netDeposits >= 0 ? '#00E676' : '#f44336'">
-                    \u20A6{{ report.userMetrics.netDeposits | number }}
+                    &#x20A6;{{ report.userMetrics.netDeposits | number }}
                   </span>
                 </div>
               </div>

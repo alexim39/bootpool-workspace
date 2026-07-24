@@ -71,7 +71,7 @@
               </ng-container>
               <ng-container matColumnDef="amount">
                 <th mat-header-cell *matHeaderCellDef>Amount</th>
-                <td mat-cell *matCellDef="let s">\u20A6{{ s.stakeAmount | number }}</td>
+                <td mat-cell *matCellDef="let s">&#x20A6;{{ s.stakeAmount | number }}</td>
               </ng-container>
               <ng-container matColumnDef="status">
                 <th mat-header-cell *matHeaderCellDef>Status</th>
@@ -104,11 +104,11 @@
             <div class="forecast-grid">
               <div class="forecast-item">
                 <span class="f-label">Revenue</span>
-                <span class="f-current">\u20A6{{ store.forecast()!.revenue.current | number }}</span>
+                <span class="f-current">&#x20A6;{{ store.forecast()!.revenue.current | number }}</span>
                 <span class="f-arrow" [style.color]="store.forecast()!.revenue.changePercent >= 0 ? '#00E676' : '#f44336'">
-                  {{ store.forecast()!.revenue.changePercent >= 0 ? '↑' : '↓' }} {{ Math.abs(store.forecast()!.revenue.changePercent) }}%
+                  {{ store.forecast()!.revenue.changePercent >= 0 ? '\u2191' : '\u2193' }} {{ Math.abs(store.forecast()!.revenue.changePercent) }}%
                 </span>
-                <span class="f-next">→ \u20A6{{ store.forecast()!.revenue.projectedNext | number }}</span>
+                <span class="f-next">&#x2192; &#x20A6;{{ store.forecast()!.revenue.projectedNext | number }}</span>
                 <span class="f-confidence" [style.color]="store.forecast()!.revenue.confidence === 'high' ? '#00E676' : store.forecast()!.revenue.confidence === 'medium' ? '#E8B923' : '#f44336'">
                   {{ store.forecast()!.revenue.confidence }}
                 </span>
@@ -117,9 +117,9 @@
                 <span class="f-label">Stakes</span>
                 <span class="f-current">{{ store.forecast()!.stakes.current | number }}</span>
                 <span class="f-arrow" [style.color]="store.forecast()!.stakes.changePercent >= 0 ? '#00E676' : '#f44336'">
-                  {{ store.forecast()!.stakes.changePercent >= 0 ? '↑' : '↓' }} {{ Math.abs(store.forecast()!.stakes.changePercent) }}%
+                  {{ store.forecast()!.stakes.changePercent >= 0 ? '\u2191' : '\u2193' }} {{ Math.abs(store.forecast()!.stakes.changePercent) }}%
                 </span>
-                <span class="f-next">→ {{ store.forecast()!.stakes.projectedNext | number }}</span>
+                <span class="f-next">&#x2192; {{ store.forecast()!.stakes.projectedNext | number }}</span>
                 <span class="f-confidence" [style.color]="store.forecast()!.stakes.confidence === 'high' ? '#00E676' : store.forecast()!.stakes.confidence === 'medium' ? '#E8B923' : '#f44336'">
                   {{ store.forecast()!.stakes.confidence }}
                 </span>
@@ -128,27 +128,27 @@
                 <span class="f-label">New Users</span>
                 <span class="f-current">{{ store.forecast()!.newUsers.current | number }}</span>
                 <span class="f-arrow" [style.color]="store.forecast()!.newUsers.changePercent >= 0 ? '#00E676' : '#f44336'">
-                  {{ store.forecast()!.newUsers.changePercent >= 0 ? '↑' : '↓' }} {{ Math.abs(store.forecast()!.newUsers.changePercent) }}%
+                  {{ store.forecast()!.newUsers.changePercent >= 0 ? '\u2191' : '\u2193' }} {{ Math.abs(store.forecast()!.newUsers.changePercent) }}%
                 </span>
-                <span class="f-next">→ {{ store.forecast()!.newUsers.projectedNext | number }}</span>
+                <span class="f-next">&#x2192; {{ store.forecast()!.newUsers.projectedNext | number }}</span>
                 <span class="f-confidence" [style.color]="store.forecast()!.newUsers.confidence === 'high' ? '#00E676' : store.forecast()!.newUsers.confidence === 'medium' ? '#E8B923' : '#f44336'">
                   {{ store.forecast()!.newUsers.confidence }}
                 </span>
               </div>
               <div class="forecast-item">
                 <span class="f-label">Net Profit</span>
-                <span class="f-current" [style.color]="store.forecast()!.netProfit.current >= 0 ? '#00E676' : '#f44336'">\u20A6{{ store.forecast()!.netProfit.current | number }}</span>
+                <span class="f-current" [style.color]="store.forecast()!.netProfit.current >= 0 ? '#00E676' : '#f44336'">&#x20A6;{{ store.forecast()!.netProfit.current | number }}</span>
                 <span class="f-arrow" [style.color]="store.forecast()!.netProfit.changePercent >= 0 ? '#00E676' : '#f44336'">
-                  {{ store.forecast()!.netProfit.changePercent >= 0 ? '↑' : '↓' }} {{ Math.abs(store.forecast()!.netProfit.changePercent) }}%
+                  {{ store.forecast()!.netProfit.changePercent >= 0 ? '\u2191' : '\u2193' }} {{ Math.abs(store.forecast()!.netProfit.changePercent) }}%
                 </span>
-                <span class="f-next">→ \u20A6{{ store.forecast()!.netProfit.projectedNext | number }}</span>
+                <span class="f-next">&#x2192; &#x20A6;{{ store.forecast()!.netProfit.projectedNext | number }}</span>
                 <span class="f-confidence" [style.color]="store.forecast()!.netProfit.confidence === 'high' ? '#00E676' : store.forecast()!.netProfit.confidence === 'medium' ? '#E8B923' : '#f44336'">
                   {{ store.forecast()!.netProfit.confidence }}
                 </span>
               </div>
             </div>
             <div class="forecast-footer">
-              <a routerLink="/admin/bi-reports" class="forecast-link">View Full BI Reports →</a>
+              <a routerLink="/admin/bi-reports" class="forecast-link">View Full BI Reports &#x2192;</a>
             </div>
           </mat-card-content>
         </mat-card>
@@ -178,7 +178,7 @@
                 {{ store.t4Advisory()!.healthLabel === 'needs_attention' ? 'NEEDS ATTENTION' : store.t4Advisory()!.healthLabel.toUpperCase() }}
               </div>
               <div class="t4-change" [style.color]="store.t4Advisory()!.healthChange === 'improving' ? '#00E676' : store.t4Advisory()!.healthChange === 'deteriorating' ? '#f44336' : '#E8B923'">
-                {{ store.t4Advisory()!.healthChange === 'improving' ? '↑ Improving' : store.t4Advisory()!.healthChange === 'deteriorating' ? '↓ Deteriorating' : '→ Stable' }}
+                {{ store.t4Advisory()!.healthChange === 'improving' ? '\u2191 Improving' : store.t4Advisory()!.healthChange === 'deteriorating' ? '\u2193 Deteriorating' : '&#x2192; Stable' }}
               </div>
             </div>
             <div class="t4-metrics">
@@ -246,9 +246,9 @@
               </div>
             </div>
             <div class="risk-metrics">
-              <div class="metric"><span class="metric-label">Total Reserves</span><span class="metric-value">\u20A6{{ store.riskReport()!.totalReserves | number }}</span></div>
-              <div class="metric"><span class="metric-label">Total Exposure</span><span class="metric-value">\u20A6{{ store.riskReport()!.totalExposure | number }}</span></div>
-              <div class="metric"><span class="metric-label">Potential Payout</span><span class="metric-value">\u20A6{{ store.riskReport()!.totalPotentialPayout | number }}</span></div>
+              <div class="metric"><span class="metric-label">Total Reserves</span><span class="metric-value">&#x20A6;{{ store.riskReport()!.totalReserves | number }}</span></div>
+              <div class="metric"><span class="metric-label">Total Exposure</span><span class="metric-value">&#x20A6;{{ store.riskReport()!.totalExposure | number }}</span></div>
+              <div class="metric"><span class="metric-label">Potential Payout</span><span class="metric-value">&#x20A6;{{ store.riskReport()!.totalPotentialPayout | number }}</span></div>
               <div class="metric"><span class="metric-label">Active Pods</span><span class="metric-value">{{ store.riskReport()!.activePodsCount }}</span></div>
               <div class="metric"><span class="metric-label">Active Users</span><span class="metric-value">{{ store.riskReport()!.activeUsersCount }}</span></div>
               <div class="metric"><span class="metric-label">Auto-Cap</span><span class="metric-value" [style.color]="store.riskReport()!.autoCapActive ? '#E8B923' : '#00E676'">{{ store.riskReport()!.autoCapActive ? 'ACTIVE' : 'Inactive' }}</span></div>
@@ -260,11 +260,11 @@
             <div class="reserve-grid">
               <div class="reserve-item">
                 <span class="reserve-label">Net Available Reserves</span>
-                <span class="reserve-value">\u20A6{{ store.riskReport()!.reserveProjection.netAvailableReserves | number }}</span>
+                <span class="reserve-value">&#x20A6;{{ store.riskReport()!.reserveProjection.netAvailableReserves | number }}</span>
               </div>
               <div class="reserve-item">
                 <span class="reserve-label">Projected Reserve Needed</span>
-                <span class="reserve-value">\u20A6{{ store.riskReport()!.reserveProjection.projectedReserveNeeded | number }}</span>
+                <span class="reserve-value">&#x20A6;{{ store.riskReport()!.reserveProjection.projectedReserveNeeded | number }}</span>
               </div>
               <div class="reserve-item">
                 <span class="reserve-label">Reserve Deficit</span>
@@ -280,7 +280,7 @@
               </div>
               <div class="reserve-item">
                 <span class="reserve-label">Suggested Top-Up</span>
-                <span class="reserve-value" *ngIf="store.riskReport()!.reserveProjection.suggestedTopUp > 0">\u20A6{{ store.riskReport()!.reserveProjection.suggestedTopUp | number }}</span>
+                <span class="reserve-value" *ngIf="store.riskReport()!.reserveProjection.suggestedTopUp > 0">&#x20A6;{{ store.riskReport()!.reserveProjection.suggestedTopUp | number }}</span>
                 <span class="reserve-value" *ngIf="store.riskReport()!.reserveProjection.suggestedTopUp === 0" style="color:#00E676">None needed</span>
               </div>
               <div class="reserve-item">
@@ -356,7 +356,7 @@
               </ng-container>
               <ng-container matColumnDef="exposure">
                 <th mat-header-cell *matHeaderCellDef>Exposure</th>
-                <td mat-cell *matCellDef="let p">\u20A6{{ p.currentExposure | number }} / \u20A6{{ p.maxTotalExposure | number }}</td>
+                <td mat-cell *matCellDef="let p">&#x20A6;{{ p.currentExposure | number }} / &#x20A6;{{ p.maxTotalExposure | number }}</td>
               </ng-container>
               <ng-container matColumnDef="risk">
                 <th mat-header-cell *matHeaderCellDef>Risk</th>
@@ -369,7 +369,7 @@
               </ng-container>
               <ng-container matColumnDef="payout">
                 <th mat-header-cell *matHeaderCellDef>Pot. Payout</th>
-                <td mat-cell *matCellDef="let p">\u20A6{{ p.potentialPayout | number }}</td>
+                <td mat-cell *matCellDef="let p">&#x20A6;{{ p.potentialPayout | number }}</td>
               </ng-container>
               <tr mat-header-row *matHeaderRowDef="store.riskColumns"></tr>
               <tr mat-row *matRowDef="let row; columns: store.riskColumns;"></tr>

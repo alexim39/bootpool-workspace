@@ -45,10 +45,10 @@
           <div class="detail-grid">
             <div class="detail-item"><span class="label">Stake ID</span><span class="value">{{ s._id || s.id }}</span></div>
             <div class="detail-item"><span class="label">Status</span><span class="value"><span class="chip" [style.background]="statusColor(s.status)">{{ s.status }}</span></span></div>
-            <div class="detail-item"><span class="label">Amount</span><span class="value">\u20A6{{ s.stakeAmount | number }}</span></div>
-            <div class="detail-item"><span class="label">Potential Payout</span><span class="value">\u20A6{{ s.potentialPayout | number }}</span></div>
-            <div class="detail-item" *ngIf="s.netPayout"><span class="label">Net Payout</span><span class="value">\u20A6{{ s.netPayout | number }}</span></div>
-            <div class="detail-item" *ngIf="s.platformFee"><span class="label">Platform Fee (35%)</span><span class="value">\u20A6{{ s.platformFee | number }}</span></div>
+            <div class="detail-item"><span class="label">Amount</span><span class="value">&#x20A6;{{ s.stakeAmount | number }}</span></div>
+            <div class="detail-item"><span class="label">Potential Payout</span><span class="value">&#x20A6;{{ s.potentialPayout | number }}</span></div>
+            <div class="detail-item" *ngIf="s.netPayout"><span class="label">Net Payout</span><span class="value">&#x20A6;{{ s.netPayout | number }}</span></div>
+            <div class="detail-item" *ngIf="s.platformFee"><span class="label">Platform Fee (35%)</span><span class="value">&#x20A6;{{ s.platformFee | number }}</span></div>
             <div class="detail-item" *ngIf="s.isSettled"><span class="label">Settled</span><span class="value">{{ s.settledAt | date:'medium' }}</span></div>
             <div class="detail-item"><span class="label">Created</span><span class="value">{{ s.createdAt | date:'medium' }}</span></div>
             <div class="detail-item" *ngIf="s.settlementNotes"><span class="label">Notes</span><span class="value">{{ s.settlementNotes }}</span></div>
@@ -60,8 +60,8 @@
             <div class="detail-item" *ngIf="s.pod?.league"><span class="label">League</span><span class="value">{{ s.pod.league }}</span></div>
             <div class="detail-item" *ngIf="s.pod?.marketType"><span class="label">Market</span><span class="value">{{ s.pod.marketType }}</span></div>
             <div class="detail-item" *ngIf="s.pod?.odds"><span class="label">Odds</span><span class="value">{{ s.pod.odds }}</span></div>
-            <div class="detail-item" *ngIf="s.pod?.minStake"><span class="label">Min Stake</span><span class="value">\u20A6{{ s.pod.minStake | number }}</span></div>
-            <div class="detail-item" *ngIf="s.pod?.maxStake"><span class="label">Max Stake</span><span class="value">\u20A6{{ s.pod.maxStake | number }}</span></div>
+            <div class="detail-item" *ngIf="s.pod?.minStake"><span class="label">Min Stake</span><span class="value">&#x20A6;{{ s.pod.minStake | number }}</span></div>
+            <div class="detail-item" *ngIf="s.pod?.maxStake"><span class="label">Max Stake</span><span class="value">&#x20A6;{{ s.pod.maxStake | number }}</span></div>
             <div class="detail-item" *ngIf="s.pod?.selection"><span class="label">Selection</span><span class="value">{{ s.pod.selection }}</span></div>
             <div class="detail-item" *ngIf="s.pod?.participants?.length"><span class="label">Participants</span><span class="value">{{ s.pod.participants.join(' vs ') }}</span></div>
             <div class="detail-item" *ngIf="s.combinedMultiplier"><span class="label">Combined Odds</span><span class="value" style="color:#CE93D8">{{ s.combinedMultiplier.toFixed(2) }}x</span></div>
@@ -70,7 +70,7 @@
           <div class="detail-grid" *ngIf="s.items && s.items.length > 1">
             @for (item of s.items; track item; let i = $index) {
               <div class="detail-item parlay-leg-item">
-                <span class="label">Leg {{ i + 1 }} — {{ item.homeTeam }} vs {{ item.awayTeam }}</span>
+                <span class="label">Leg {{ i + 1 }} &#x2014; {{ item.homeTeam }} vs {{ item.awayTeam }}</span>
                 <span class="value">{{ item.selection }} &#64; {{ item.gainsMultiplier.toFixed(2) }}x</span>
                 <span class="value" [style.color]="item.status === 'won' ? '#00E676' : item.status === 'lost' ? '#f44336' : '#888'">{{ item.status }}</span>
               </div>
@@ -99,7 +99,7 @@
           </ng-container>
           <ng-container matColumnDef="amount">
             <th mat-header-cell *matHeaderCellDef>Amount</th>
-            <td mat-cell *matCellDef="let s" class="clickable" (click)="store.selectStake(s)">\u20A6{{ s.stakeAmount | number }}</td>
+            <td mat-cell *matCellDef="let s" class="clickable" (click)="store.selectStake(s)">&#x20A6;{{ s.stakeAmount | number }}</td>
           </ng-container>
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef>Status</th>

@@ -28,8 +28,8 @@
           <div class="detail-grid">
             <div class="detail-item"><span class="label">Reference</span><span class="value">{{ w.reference }}</span></div>
             <div class="detail-item"><span class="label">User</span><span class="value">{{ w.user?.phone || w.user?.fullName || w.userId }}</span></div>
-            <div class="detail-item"><span class="label">Amount</span><span class="value">\u20A6{{ w.amount | number }}</span></div>
-            <div class="detail-item"><span class="label">Fee</span><span class="value">\u20A6{{ w.fee | number }}</span></div>
+            <div class="detail-item"><span class="label">Amount</span><span class="value">&#x20A6;{{ w.amount | number }}</span></div>
+            <div class="detail-item"><span class="label">Fee</span><span class="value">&#x20A6;{{ w.fee | number }}</span></div>
             <div class="detail-item"><span class="label">Status</span><span class="value"><span class="chip" [style.background]="statusColor(w.status)">{{ w.status }}</span></span></div>
             <div class="detail-item"><span class="label">Bank</span><span class="value">{{ w.metadata?.accountName || '-' }} / {{ w.metadata?.accountNumber || '-' }}</span></div>
             <div class="detail-item"><span class="label">Created</span><span class="value">{{ w.createdAt | date:'medium' }}</span></div>
@@ -50,7 +50,7 @@
         <div class="reject-content">
           <h3>Reject Withdrawal</h3>
           <p style="color:rgba(255,255,255,0.6);font-size:13px;margin:0 0 12px">
-            Rejecting withdrawal for {{ rt.user?.phone || rt.userId }} &mdash; \u20A6{{ rt.amount | number }}
+            Rejecting withdrawal for {{ rt.user?.phone || rt.userId }} &mdash; &#x20A6;{{ rt.amount | number }}
           </p>
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>Reason for rejection</mat-label>
@@ -78,7 +78,7 @@
           </ng-container>
           <ng-container matColumnDef="amount">
             <th mat-header-cell *matHeaderCellDef>Amount</th>
-            <td mat-cell *matCellDef="let w" class="clickable" (click)="store.selectWdr(w)">\u20A6{{ w.amount | number }}</td>
+            <td mat-cell *matCellDef="let w" class="clickable" (click)="store.selectWdr(w)">&#x20A6;{{ w.amount | number }}</td>
           </ng-container>
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef>Status</th>

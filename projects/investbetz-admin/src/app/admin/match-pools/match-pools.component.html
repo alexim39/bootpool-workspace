@@ -41,7 +41,7 @@
             </ng-container>
             <ng-container matColumnDef="totalPool">
               <th mat-header-cell *matHeaderCellDef>Pool</th>
-              <td mat-cell *matCellDef="let p">\u20A6{{ p.totalPool | number }}</td>
+              <td mat-cell *matCellDef="let p">&#x20A6;{{ p.totalPool | number }}</td>
             </ng-container>
             <ng-container matColumnDef="markets">
               <th mat-header-cell *matHeaderCellDef>Markets</th>
@@ -127,10 +127,10 @@
           <mat-card class="info-card">
             <div class="info-grid">
               <div><span class="label">Staking Closes</span><span class="value">{{ d.pool.stakingClosesAt | date:'medium' }}</span></div>
-              <div><span class="label">Total Pool</span><span class="value">\u20A6{{ d.pool.totalPool | number }}</span></div>
-              <div><span class="label">Platform Fee (15%)</span><span class="value">\u20A6{{ d.pool.platformFeeAmount | number }}</span></div>
-              <div><span class="label">Distributable</span><span class="value">\u20A6{{ d.pool.distributableAmount | number }}</span></div>
-              <div><span class="label">Min / Max Stake</span><span class="value">\u20A6{{ d.pool.minStake | number }} / \u20A6{{ d.pool.maxStake | number }}</span></div>
+              <div><span class="label">Total Pool</span><span class="value">&#x20A6;{{ d.pool.totalPool | number }}</span></div>
+              <div><span class="label">Platform Fee (15%)</span><span class="value">&#x20A6;{{ d.pool.platformFeeAmount | number }}</span></div>
+              <div><span class="label">Distributable</span><span class="value">&#x20A6;{{ d.pool.distributableAmount | number }}</span></div>
+              <div><span class="label">Min / Max Stake</span><span class="value">&#x20A6;{{ d.pool.minStake | number }} / &#x20A6;{{ d.pool.maxStake | number }}</span></div>
               <div><span class="label">Total Stakers</span><span class="value">{{ d.totalStakes }}</span></div>
             </div>
             @if (d.pool.status === 'open') {
@@ -147,7 +147,7 @@
                     <mat-label>Winning Market</mat-label>
                     <mat-select [ngModel]="store.selectedMarketId()" (ngModelChange)="store.selectedMarketId.set($event)">
                       @for (m of d.pool.markets; track m.marketId) {
-                        <mat-option [value]="m.marketId">{{ m.label }} (\u20A6{{ m.totalStaked | number }})</mat-option>
+                        <mat-option [value]="m.marketId">{{ m.label }} (&#x20A6;{{ m.totalStaked | number }})</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
@@ -157,10 +157,10 @@
                 </div>
                 @if (store.settlePreview(); as sp) {
                   <div class="settle-preview">
-                    <div class="preview-row"><span>Total Pool:</span><span>\u20A6{{ sp.totalPool | number }}</span></div>
-                    <div class="preview-row"><span>Platform Fee (15%):</span><span>\u20A6{{ sp.platformFee | number }}</span></div>
-                    <div class="preview-row"><span>Distributable:</span><span>\u20A6{{ sp.distributable | number }}</span></div>
-                    <div class="preview-row"><span>Winning Market Total:</span><span>\u20A6{{ sp.winningTotal | number }}</span></div>
+                    <div class="preview-row"><span>Total Pool:</span><span>&#x20A6;{{ sp.totalPool | number }}</span></div>
+                    <div class="preview-row"><span>Platform Fee (15%):</span><span>&#x20A6;{{ sp.platformFee | number }}</span></div>
+                    <div class="preview-row"><span>Distributable:</span><span>&#x20A6;{{ sp.distributable | number }}</span></div>
+                    <div class="preview-row"><span>Winning Market Total:</span><span>&#x20A6;{{ sp.winningTotal | number }}</span></div>
                     <div class="preview-row"><span>Winners:</span><span>{{ sp.winnerCount }}</span></div>
                   </div>
                 }
@@ -179,7 +179,7 @@
                   </span>
                 </div>
                 <div class="market-stats">
-                  <span>Total: \u20A6{{ m.totalStaked | number }}</span>
+                  <span>Total: &#x20A6;{{ m.totalStaked | number }}</span>
                   <span>Stakers: {{ m.stakerCount }}</span>
                 </div>
                 @if (d.pool.status === 'settled' || d.pool.status === 'cancelled') {
@@ -203,8 +203,8 @@
           </div>
           <div class="stats-row">
             <mat-card class="stat-card"><span class="stat-value">{{ r.totalSettled }}</span><span class="stat-label">Settled Pools</span></mat-card>
-            <mat-card class="stat-card"><span class="stat-value">\u20A6{{ r.totalFeeRevenue | number }}</span><span class="stat-label">Fee Revenue</span></mat-card>
-            <mat-card class="stat-card"><span class="stat-value">\u20A6{{ r.avgPoolSize | number }}</span><span class="stat-label">Avg Pool Size</span></mat-card>
+            <mat-card class="stat-card"><span class="stat-value">&#x20A6;{{ r.totalFeeRevenue | number }}</span><span class="stat-label">Fee Revenue</span></mat-card>
+            <mat-card class="stat-card"><span class="stat-value">&#x20A6;{{ r.avgPoolSize | number }}</span><span class="stat-label">Avg Pool Size</span></mat-card>
             <mat-card class="stat-card"><span class="stat-value">{{ r.uniqueStakers }}</span><span class="stat-label">Unique Stakers</span></mat-card>
           </div>
           <mat-card class="table-card">
@@ -215,11 +215,11 @@
               </ng-container>
               <ng-container matColumnDef="totalPool">
                 <th mat-header-cell *matHeaderCellDef>Pool</th>
-                <td mat-cell *matCellDef="let p">\u20A6{{ p.totalPool | number }}</td>
+                <td mat-cell *matCellDef="let p">&#x20A6;{{ p.totalPool | number }}</td>
               </ng-container>
               <ng-container matColumnDef="platformFeeAmount">
                 <th mat-header-cell *matHeaderCellDef>Fee</th>
-                <td mat-cell *matCellDef="let p">\u20A6{{ p.platformFeeAmount | number }}</td>
+                <td mat-cell *matCellDef="let p">&#x20A6;{{ p.platformFeeAmount | number }}</td>
               </ng-container>
               <ng-container matColumnDef="settledAt">
                 <th mat-header-cell *matHeaderCellDef>Settled</th>
@@ -242,9 +242,9 @@
             </div>
             <div class="modal-body">
               <div class="report-grid">
-                <div><span class="label">Total Pool</span><span class="value">\u20A6{{ rm.totalPool | number }}</span></div>
-                <div><span class="label">Platform Fee (15%)</span><span class="value">\u20A6{{ rm.platformFeeAmount | number }}</span></div>
-                <div><span class="label">Distributable</span><span class="value">\u20A6{{ rm.distributableAmount | number }}</span></div>
+                <div><span class="label">Total Pool</span><span class="value">&#x20A6;{{ rm.totalPool | number }}</span></div>
+                <div><span class="label">Platform Fee (15%)</span><span class="value">&#x20A6;{{ rm.platformFeeAmount | number }}</span></div>
+                <div><span class="label">Distributable</span><span class="value">&#x20A6;{{ rm.distributableAmount | number }}</span></div>
                 <div><span class="label">Total Stakers</span><span class="value">{{ rm.totalStakers }}</span></div>
                 <div><span class="label">Winners</span><span class="value">{{ rm.totalWinners }}</span></div>
               </div>
@@ -252,7 +252,7 @@
               @for (mb of rm.marketBreakdown; track mb.marketId) {
                 <div class="market-breakdown-item">
                   <span class="market-name">{{ mb.label }}</span>
-                  <span>\u20A6{{ mb.totalStaked | number }} ({{ mb.stakerCount }} stakers, {{ mb.winners }} winners)</span>
+                  <span>&#x20A6;{{ mb.totalStaked | number }} ({{ mb.stakerCount }} stakers, {{ mb.winners }} winners)</span>
                 </div>
               }
             </div>

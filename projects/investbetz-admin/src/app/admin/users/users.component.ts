@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { AdminUser } from '../services';
 import { Router } from '@angular/router';
@@ -22,9 +22,13 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss']
 })
-export class UsersComponent {
+export class UsersComponent implements OnInit {
   readonly store = inject(AdminUsersStore);
   private router = inject(Router);
+
+  ngOnInit() {
+    this.store.load();
+  }
 
   viewUser(u: AdminUser) {
     this.router.navigate(['/admin/users', u.id]);

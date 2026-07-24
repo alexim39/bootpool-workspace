@@ -16,35 +16,35 @@
           <mat-icon class="sum-icon">trending_up</mat-icon>
           <div class="sum-info">
             <span class="sum-label">Total Stake Volume</span>
-            <span class="sum-value">\u20A6{{ store.dashData().totalVolume | number }}</span>
+            <span class="sum-value">&#x20A6;{{ store.dashData().totalVolume | number }}</span>
           </div>
         </mat-card>
         <mat-card class="summary-card card-payout">
           <mat-icon class="sum-icon">payments</mat-icon>
           <div class="sum-info">
             <span class="sum-label">Total Payouts</span>
-            <span class="sum-value">\u20A6{{ store.dashData().totalPayouts | number }}</span>
+            <span class="sum-value">&#x20A6;{{ store.dashData().totalPayouts | number }}</span>
           </div>
         </mat-card>
         <mat-card class="summary-card card-deposits">
           <mat-icon class="sum-icon">savings</mat-icon>
           <div class="sum-info">
             <span class="sum-label">Total Deposits</span>
-            <span class="sum-value">\u20A6{{ store.totals().deposits | number }}</span>
+            <span class="sum-value">&#x20A6;{{ store.totals().deposits | number }}</span>
           </div>
         </mat-card>
         <mat-card class="summary-card card-withdrawals">
           <mat-icon class="sum-icon">money_off</mat-icon>
           <div class="sum-info">
             <span class="sum-label">Total Withdrawals</span>
-            <span class="sum-value">\u20A6{{ store.totals().withdrawals | number }}</span>
+            <span class="sum-value">&#x20A6;{{ store.totals().withdrawals | number }}</span>
           </div>
         </mat-card>
         <mat-card class="summary-card card-pending">
           <mat-icon class="sum-icon">hourglass_top</mat-icon>
           <div class="sum-info">
             <span class="sum-label">Pending Withdrawals</span>
-            <span class="sum-value">\u20A6{{ store.totals().pendingAmount | number }}</span>
+            <span class="sum-value">&#x20A6;{{ store.totals().pendingAmount | number }}</span>
             <span class="sum-sub">({{ store.totals().pendingCount }} requests)</span>
           </div>
         </mat-card>
@@ -52,7 +52,7 @@
           <mat-icon class="sum-icon">account_balance</mat-icon>
           <div class="sum-info">
             <span class="sum-label">Platform Revenue</span>
-            <span class="sum-value">\u20A6{{ store.totals().revenue | number }}</span>
+            <span class="sum-value">&#x20A6;{{ store.totals().revenue | number }}</span>
           </div>
         </mat-card>
       </div>
@@ -74,7 +74,7 @@
               <div class="bar-track">
                 <div class="bar-fill" [style.height.%]="barHeight(d.volume)"></div>
               </div>
-              <span class="bar-value">\u20A6{{ d.volume | number: '1.0a' }}</span>
+              <span class="bar-value">&#x20A6;{{ d.volume | number: '1.0a' }}</span>
               <span class="bar-label">{{ d.date | slice:5:10 }}</span>
             </div>
           </div>
@@ -99,7 +99,7 @@
             </ng-container>
             <ng-container matColumnDef="amount">
               <th mat-header-cell *matHeaderCellDef>Amount</th>
-              <td mat-cell *matCellDef="let r" [style.color]="r.type === 'withdrawal' ? '#f44336' : '#00E676'">\u20A6{{ r.amount | number }}</td>
+              <td mat-cell *matCellDef="let r" [style.color]="r.type === 'withdrawal' ? '#f44336' : '#00E676'">&#x20A6;{{ r.amount | number }}</td>
             </ng-container>
             <ng-container matColumnDef="status">
               <th mat-header-cell *matHeaderCellDef>Status</th>
@@ -147,7 +147,7 @@
             </ng-container>
             <ng-container matColumnDef="amount">
               <th mat-header-cell *matHeaderCellDef>Amount</th>
-              <td mat-cell *matCellDef="let w" class="cell-amount">\u20A6{{ w.amount | number }}</td>
+              <td mat-cell *matCellDef="let w" class="cell-amount">&#x20A6;{{ w.amount | number }}</td>
             </ng-container>
             <ng-container matColumnDef="account">
               <th mat-header-cell *matHeaderCellDef>Account</th>
@@ -198,9 +198,9 @@
           <div class="detail-grid">
             <div class="detail-item"><span class="d-label">Reference</span><span class="d-value">{{ store.selectedWd()!.reference }}</span></div>
             <div class="detail-item"><span class="d-label">User</span><span class="d-value">{{ store.selectedWd()!.user?.phone || '\u2014' }} {{ store.selectedWd()!.user?.fullName ? '(' + store.selectedWd()!.user?.fullName + ')' : '' }}</span></div>
-            <div class="detail-item"><span class="d-label">Amount</span><span class="d-value">\u20A6{{ store.selectedWd()!.amount | number }}</span></div>
-            <div class="detail-item"><span class="d-label">Fee</span><span class="d-value">\u20A6{{ store.selectedWd()!.fee | number }}</span></div>
-            <div class="detail-item"><span class="d-label">Net</span><span class="d-value">\u20A6{{ (store.selectedWd()!.amount - store.selectedWd()!.fee) | number }}</span></div>
+            <div class="detail-item"><span class="d-label">Amount</span><span class="d-value">&#x20A6;{{ store.selectedWd()!.amount | number }}</span></div>
+            <div class="detail-item"><span class="d-label">Fee</span><span class="d-value">&#x20A6;{{ store.selectedWd()!.fee | number }}</span></div>
+            <div class="detail-item"><span class="d-label">Net</span><span class="d-value">&#x20A6;{{ (store.selectedWd()!.amount - store.selectedWd()!.fee) | number }}</span></div>
             <div class="detail-item"><span class="d-label">Account Name</span><span class="d-value">{{ store.selectedWd()!.metadata?.accountName || '\u2014' }}</span></div>
             <div class="detail-item"><span class="d-label">Account Number</span><span class="d-value">{{ store.selectedWd()!.metadata?.accountNumber || '\u2014' }}</span></div>
             <div class="detail-item"><span class="d-label">Status</span><span class="d-value"><span class="chip" [style.background]="statusColor(store.selectedWd()!.status) + '33'" [style.color]="statusColor(store.selectedWd()!.status)">{{ store.selectedWd()!.status }}</span></span></div>
@@ -272,7 +272,7 @@
             <ng-container matColumnDef="amount">
               <th mat-header-cell *matHeaderCellDef>Amount</th>
               <td mat-cell *matCellDef="let t" [style.color]="isDebit(t.type) ? '#f44336' : '#00E676'" class="cell-amount">
-                {{ isCredit(t.type) ? '+' : '-' }}\u20A6{{ t.amount | number }}
+                {{ isCredit(t.type) ? '+' : '-' }}&#x20A6;{{ t.amount | number }}
               </td>
             </ng-container>
             <ng-container matColumnDef="status">
@@ -313,9 +313,9 @@
             <div class="detail-item"><span class="d-label">Reference</span><span class="d-value">{{ store.selectedTx()!.reference }}</span></div>
             <div class="detail-item"><span class="d-label">User</span><span class="d-value">{{ store.selectedTx()!.user?.phone || store.selectedTx()!.userId }}</span></div>
             <div class="detail-item"><span class="d-label">Type</span><span class="d-value"><span class="chip" [style.background]="typeColor(store.selectedTx()!.type) + '33'" [style.color]="typeColor(store.selectedTx()!.type)">{{ store.selectedTx()!.type }}</span></span></div>
-            <div class="detail-item"><span class="d-label">Amount</span><span class="d-value">\u20A6{{ store.selectedTx()!.amount | number }}</span></div>
-            <div class="detail-item"><span class="d-label">Fee</span><span class="d-value">\u20A6{{ store.selectedTx()!.fee | number }}</span></div>
-            <div class="detail-item"><span class="d-label">Net Amount</span><span class="d-value">\u20A6{{ (store.selectedTx()!.amount - store.selectedTx()!.fee) | number }}</span></div>
+            <div class="detail-item"><span class="d-label">Amount</span><span class="d-value">&#x20A6;{{ store.selectedTx()!.amount | number }}</span></div>
+            <div class="detail-item"><span class="d-label">Fee</span><span class="d-value">&#x20A6;{{ store.selectedTx()!.fee | number }}</span></div>
+            <div class="detail-item"><span class="d-label">Net Amount</span><span class="d-value">&#x20A6;{{ (store.selectedTx()!.amount - store.selectedTx()!.fee) | number }}</span></div>
             <div class="detail-item"><span class="d-label">Status</span><span class="d-value"><span class="chip" [style.background]="txStatusColor(store.selectedTx()!.status) + '33'" [style.color]="txStatusColor(store.selectedTx()!.status)">{{ store.selectedTx()!.status }}</span></span></div>
             <div class="detail-item"><span class="d-label">Provider</span><span class="d-value">{{ store.selectedTx()!.provider || '\u2014' }}</span></div>
             <div class="detail-item"><span class="d-label">Created</span><span class="d-value">{{ store.selectedTx()!.createdAt | date:'MMM d, y HH:mm:ss' }}</span></div>

@@ -7,7 +7,7 @@
             <span class="stat-divider"></span>
             <span class="stat booked-stat"><strong>{{ store.bookedCount() }}</strong> booked</span>
             <span class="stat-divider"></span>
-            <span class="stat">₦{{ store.totalExposure() | number }} total exposure</span>
+            <span class="stat">&#x20A6;{{ store.totalExposure() | number }} total exposure</span>
           </div>
         </div>
         <div class="header-actions">
@@ -15,7 +15,7 @@
             (click)="store.batchToggleBooked()"
             [disabled]="store.batchProcessing()">
             <mat-icon>sync_alt</mat-icon>
-            {{ store.selectedCount() }} selected — {{ store.allSelectedBooked() ? 'Mark Not Booked' : 'Mark Booked' }}
+            {{ store.selectedCount() }} selected &#x2014; {{ store.allSelectedBooked() ? 'Mark Not Booked' : 'Mark Booked' }}
           </button>
           <button mat-stroked-button class="btn-settle-all" (click)="store.aiSettleAll()" [disabled]="store.settlingAll()">
             <mat-icon>fact_check</mat-icon>
@@ -107,7 +107,7 @@
               <span class="scores-value" *ngIf="p.homeScore != null && p.awayScore != null; else noScores">
                 {{ p.homeScore }} : {{ p.awayScore }}
               </span>
-              <ng-template #noScores><span class="scores-na">—</span></ng-template>
+              <ng-template #noScores><span class="scores-na">&#x2014;</span></ng-template>
             </td>
           </ng-container>
 
@@ -155,7 +155,7 @@
               <span class="sort-icon" *ngIf="store.sortBy() === 'currentExposure'">{{ store.sortOrder() === 'asc' ? '\\25B2' : '\\25BC' }}</span>
             </th>
             <td mat-cell *matCellDef="let p">
-              <span class="stakes-value">\u20A6{{ p.currentExposure | number }}</span>
+              <span class="stakes-value">&#x20A6;{{ p.currentExposure | number }}</span>
             </td>
           </ng-container>
 
@@ -173,7 +173,7 @@
             <th mat-header-cell *matHeaderCellDef>Game</th>
             <td mat-cell *matCellDef="let p">
               <span class="game-status-chip" [class.live]="p.isLive" [class.about-to-start]="isAboutToStart(p)" [class.upcoming]="isUpcoming(p)" [class.finished]="isPastGame(p) && (p.settlementStatus === 'settled' || p.status === 'settled')" [class.awaiting]="isPastGame(p) && p.settlementStatus !== 'settled' && p.status !== 'settled'" [class.unknown-status]="true">
-                {{ p.isLive ? 'LIVE' : isAboutToStart(p) ? 'Starting Soon' : isUpcoming(p) ? 'Upcoming' : isPastGame(p) && (p.settlementStatus === 'settled' || p.status === 'settled') ? 'Finished' : isPastGame(p) ? 'Awaiting Settlement' : '—' }}
+                {{ p.isLive ? 'LIVE' : isAboutToStart(p) ? 'Starting Soon' : isUpcoming(p) ? 'Upcoming' : isPastGame(p) && (p.settlementStatus === 'settled' || p.status === 'settled') ? 'Finished' : isPastGame(p) ? 'Awaiting Settlement' : '\u2014' }}
               </span>
             </td>
           </ng-container>
@@ -205,7 +205,7 @@
           <ng-container matColumnDef="stakeRange">
             <th mat-header-cell *matHeaderCellDef>Stake Range</th>
             <td mat-cell *matCellDef="let p">
-              <span>\u20A6{{ p.minStake | number }} \u2014 \u20A6{{ p.maxStake | number }}</span>
+              <span>&#x20A6;{{ p.minStake | number }} \u2014 &#x20A6;{{ p.maxStake | number }}</span>
             </td>
           </ng-container>
 
@@ -228,7 +228,7 @@
 
         <div class="paginator" *ngIf="store.totalPages() > 0">
           <div class="paginator-left">
-            <span class="page-info">Showing {{ store.pods().length ? (store.page() - 1) * store.limit() + 1 : 0 }}–{{ Math.min(store.page() * store.limit(), store.total()) }} of {{ store.total() }}</span>
+            <span class="page-info">Showing {{ store.pods().length ? (store.page() - 1) * store.limit() + 1 : 0 }}&#x2014;{{ Math.min(store.page() * store.limit(), store.total()) }} of {{ store.total() }}</span>
           </div>
           <div class="paginator-center">
             <button mat-icon-button class="page-btn" [disabled]="store.page() <= 1" (click)="store.goTo(1)" matTooltip="First page">
@@ -278,9 +278,9 @@
           <div class="detail-item"><span class="d-label">League</span><span class="d-value">{{ store.detailPod()!.league || '\u2014' }}</span></div>
           <div class="detail-item"><span class="d-label">Selection</span><span class="d-value" style="color:#00E676">{{ store.detailPod()!.selection }}</span></div>
           <div class="detail-item"><span class="d-label">Odds</span><span class="d-value" style="color:#E8B923">{{ store.detailPod()!.gainsMultiplier.toFixed(2) }}x</span></div>
-          <div class="detail-item"><span class="d-label">Total Stakes</span><span class="d-value" style="color:#00E676">\u20A6{{ store.detailPod()!.currentExposure | number }}</span></div>
+          <div class="detail-item"><span class="d-label">Total Stakes</span><span class="d-value" style="color:#00E676">&#x20A6;{{ store.detailPod()!.currentExposure | number }}</span></div>
           <div class="detail-item"><span class="d-label">Bettors</span><span class="d-value">{{ store.detailPod()!.currentParticipants }}</span></div>
-          <div class="detail-item"><span class="d-label">Stake Range</span><span class="d-value">\u20A6{{ store.detailPod()!.minStake | number }} \u2014 \u20A6{{ store.detailPod()!.maxStake | number }}</span></div>
+          <div class="detail-item"><span class="d-label">Stake Range</span><span class="d-value">&#x20A6;{{ store.detailPod()!.minStake | number }} \u2014 &#x20A6;{{ store.detailPod()!.maxStake | number }}</span></div>
           <div class="detail-item"><span class="d-label">Staking Closed</span><span class="d-value">{{ store.detailPod()!.stakingClosesAt | date:'MMM d, y HH:mm' }}</span></div>
           <div class="detail-item"><span class="d-label">Est. Settlement</span><span class="d-value">{{ store.detailPod()!.settlementEstimateLabel || (store.detailPod()!.settlementEstimateAt | date:'MMM d, y') }}</span></div>
           <div class="detail-item" *ngIf="store.detailPod()!.bookedAt">
@@ -420,7 +420,7 @@
       <div class="stuck-panel" *ngIf="store.showStuckPanel()">
         <div class="stuck-header">
           <mat-icon style="color:#90CAF9">help_outline</mat-icon>
-          <span>Needs Review — Stuck ({{ store.stuckPods().length }})</span>
+          <span>Needs Review &#x2014; Stuck ({{ store.stuckPods().length }})</span>
           <button mat-icon-button (click)="store.dismissStuckPanel()"><mat-icon>close</mat-icon></button>
         </div>
         <div class="stuck-body">
@@ -430,7 +430,7 @@
               <span class="stuck-teams">{{ p.homeTeam }} vs {{ p.awayTeam }}</span>
               <span class="stuck-selection">{{ p.selection }} ({{ p.gainsMultiplier }}x)</span>
             </div>
-            <div class="stuck-reason">{{ p.settlementStuckReason || 'No linked fixture — cannot auto-settle.' }} Settle manually using the pod detail panel.</div>
+            <div class="stuck-reason">{{ p.settlementStuckReason || 'No linked fixture &#x2014; cannot auto-settle.' }} Settle manually using the pod detail panel.</div>
             <div class="stuck-actions">
               <button mat-stroked-button class="btn-settle-manual" (click)="store.selectPodAndSettle(p)">Manual Settle</button>
             </div>

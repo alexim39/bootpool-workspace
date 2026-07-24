@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { NgIf, NgFor, DatePipe, UpperCasePipe, DecimalPipe } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,8 +21,12 @@ import { AdminKycStore, KycUser } from './stores/admin-kyc.store';
   templateUrl: './kyc.component.html',
   styleUrls: ['./kyc.component.scss']
 })
-export class KycComponent {
+export class KycComponent implements OnInit {
   readonly store = inject(AdminKycStore);
+
+  ngOnInit() {
+    this.store.load();
+  }
 
   kycTypeLabel(u: KycUser): string {
     return (u.kycType || '-').toUpperCase();
