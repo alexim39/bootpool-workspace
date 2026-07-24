@@ -111,14 +111,18 @@ export class WalletService {
   }
 
   fetchBalance() {
+    this.loading.set(true);
+    this.error.set(null);
     this.http.get<{ success: boolean; data: WalletBalance }>(`${this.API_URL}/wallet/balance`, {
       headers: this.getHeaders()
     }).subscribe({
       next: (res) => {
         if (res.success) this.balance.set(res.data);
+        this.loading.set(false);
       },
       error: (err) => {
         this.error.set(err.error?.message || 'Failed to fetch balance');
+        this.loading.set(false);
       }
     });
   }
@@ -206,6 +210,7 @@ export class WalletService {
     }).subscribe({
       next: (res) => {
         if (res.success) this.banks.set(res.data);
+        this.error.set(null);
       },
       error: (err) => {
         this.error.set(err.error?.message || 'Failed to fetch banks');

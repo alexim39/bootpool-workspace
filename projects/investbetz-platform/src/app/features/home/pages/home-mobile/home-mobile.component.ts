@@ -80,6 +80,7 @@ export class HomeMobileComponent implements OnInit {
       next: (res) => {
         if (res.success) {
           this.store.clearSelections();
+          this.store.onStakePlaced();
           this._snackBar.open('Accumulator placed successfully!', 'OK', { duration: 3000 });
         } else {
           this._snackBar.open(res.message || 'Failed to place accumulator', 'OK', { duration: 3000 });

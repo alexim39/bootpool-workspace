@@ -65,6 +65,7 @@ export class BetsStore {
 
   onCashoutComplete() {
     this.dismissCashout();
+    this._wallet.fetchBalance();
     this.stakeService.fetchActiveStakes();
     this.fetchSettledStakes(1);
   }

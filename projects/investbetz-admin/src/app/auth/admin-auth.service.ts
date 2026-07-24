@@ -5,7 +5,6 @@ import { Observable, map, catchError, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 const AUTH_KEY = 'ib_token';
-const ADMIN_CHECK_KEY = 'ib_admin';
 
 export interface AdminAuthState {
   authenticated: boolean;
@@ -96,7 +95,6 @@ export class AdminAuthService {
     ).pipe(
       map(res => {
         if (res.success && res.data?.role === 'admin') {
-          localStorage.setItem(ADMIN_CHECK_KEY, 'true');
           this.state.set({ authenticated: true, checked: true, user: res.data });
           return true;
         }
@@ -116,7 +114,6 @@ export class AdminAuthService {
 
   private clearAuth(): void {
     localStorage.removeItem(AUTH_KEY);
-    localStorage.removeItem(ADMIN_CHECK_KEY);
     this.state.set({ authenticated: false, checked: true, user: null });
   }
 }

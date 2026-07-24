@@ -3,7 +3,7 @@
     .auth-root { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; }
     .auth-card { background: #0D1A30; border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); padding: 40px; width: 100%; max-width: 420px; }
     .logo { text-align: center; margin-bottom: 28px; }
-    .logo-bet { font-family: 'Exo-ExtraBold', 'Inter', sans-serif; font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #00E676 0%, #00C853 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .logo-bet { margin-right: -7px; font-family: 'Exo-ExtraBold', 'Inter', sans-serif; font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #00E676 0%, #00C853 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .logo-pool { font-family: 'Exo-ExtraBold', 'Inter', sans-serif; font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #E8B923 0%, #D4AF37 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .auth-title { color: #FFFFFF; font-size: 1.5rem; font-weight: 700; text-align: center; margin: 0 0 4px; }
     .auth-subtitle { color: rgba(255,255,255,0.7); font-size: 0.875rem; text-align: center; margin: 0 0 32px; }

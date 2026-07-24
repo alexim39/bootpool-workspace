@@ -34,7 +34,7 @@
           </div>
           <div class="field">
             <label class="field-label">PIN</label>
-            <input class="field-input" type="password" [(ngModel)]="pin" placeholder="Enter your 4-digit PIN" maxlength="4" inputmode="numeric" />
+            <input class="field-input" type="password" [(ngModel)]="pin" placeholder="Enter your 6-digit PIN" maxlength="6" inputmode="numeric" />
           </div>
         } @else if (store.loginMode() === 'email') {
           @if (!store.emailTokenSent()) {
@@ -69,7 +69,7 @@
 
       <div class="mobile-bottom">
         @if (store.loginMode() === 'pin') {
-          <button class="btn-primary" (click)="loginWithPin()" [disabled]="phone.length < 10 || pin.length < 4 || store.loading()">
+          <button class="btn-primary" (click)="loginWithPin()" [disabled]="phone.length < 10 || pin.length < 6 || store.loading()">
             @if (store.loading()) { <span class="spinner"></span> }
             Login
           </button>

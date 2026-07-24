@@ -18,11 +18,11 @@ export class PinSetupComponent {
   confirmPin = '';
 
   get canSubmit(): boolean {
-    return this.pin.length === 4 && this.confirmPin.length === 4 && this.pin === this.confirmPin;
+    return this.pin.length === 6 && this.confirmPin.length === 6 && this.pin === this.confirmPin;
   }
 
   get pinMismatch(): boolean {
-    return this.confirmPin.length === 4 && this.pin !== this.confirmPin;
+    return this.confirmPin.length === 6 && this.pin !== this.confirmPin;
   }
 
   constructor() {

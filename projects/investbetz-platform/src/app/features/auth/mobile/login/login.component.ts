@@ -32,7 +32,7 @@ export class LoginComponent {
   loginWithPin() {
     const phone = this.phone.trim();
     const pin = this.pin.trim();
-    if (phone.length < 10 || pin.length < 4) return;
+    if (phone.length < 10 || pin.length < 6) return;
     this.store.loginWithPin(phone, pin, () => this.router.navigate(['/home']));
   }
 
