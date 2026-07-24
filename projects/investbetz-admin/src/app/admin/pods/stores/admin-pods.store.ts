@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
-import { AdminService, AdminPod, SettlementCheckResult, ReserveConsumption } from '../../services';
+import { AdminService, AdminPod, SettlementCheckResult, ReserveConsumption, CurationResponse } from '../../services';
 import { PageEvent } from '@angular/material/paginator';
 
 @Injectable({ providedIn: 'root' })
@@ -39,6 +39,8 @@ export class AdminPodsStore {
   readonly showStuckPanel = signal(false);
   readonly batchResolveTarget = signal<{ podIds: string[]; result: string; note: string } | null>(null);
   readonly selectedDisputedIds = signal<Set<string>>(new Set());
+  readonly curating = signal(false);
+  readonly curationResult = signal<CurationResponse | null>(null);
   readonly activeTab = signal<'active' | 'past' | 'disputed'>('active');
 
   readonly draftCount = computed(() => this.pods().filter(p => p.status === 'draft').length);
@@ -386,5 +388,48 @@ export class AdminPodsStore {
     this.page.set(1);
     if (tab === 'disputed') this.loadDisputed();
     this.loadPods();
+  }
+
+  curatePods() {
+    this.curating.set(true);
+    this.curationResult.set(null);
+    this.admin.curatePods().subscribe({
+      next: res => {
+        this.curationResult.set(res);
+        this.curating.set(false);
+      },
+      error: () => this.curating.set(false)
+    });
+  }
+
+  dismissCuration() {
+    this.curationResult.set(null);
+  }
+
+  createPodFromCuration(fixture: import('../../services').CurationFixture) {
+    const podData: Partial<import('../../services').AdminPod> = {
+      sport: 'football',
+      league: fixture.league,
+      homeTeam: fixture.homeTeam,
+      awayTeam: fixture.awayTeam,
+      matchDate: fixture.matchDate,
+      marketType: fixture.isCombined ? 'parlay' : '1X2',
+      selection: fixture.selection || '',
+      gainsMultiplier: fixture.multiplier || 1.5,
+      metadata: {
+        oraCurated: true,
+        oraConfidence: fixture.recommendations?.[0]?.confidence || 0,
+        fixtureId: fixture.fixtureId,
+        combined: fixture.isCombined,
+        legMarkets: fixture.combinedLegs?.map(l => l.marketType),
+        legSelections: fixture.combinedLegs?.map(l => l.selection),
+      }
+    };
+    this.admin.createPod(podData).subscribe({
+      next: () => {
+        this.curationResult.set(null);
+        this.loadPods();
+      }
+    });
   }
 }

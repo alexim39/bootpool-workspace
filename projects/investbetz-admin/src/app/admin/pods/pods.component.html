@@ -20,6 +20,11 @@
             <span *ngIf="!store.settlingAll()">Settle All</span>
             <span *ngIf="store.settlingAll()">Settling...</span>
           </button>
+          <button mat-stroked-button class="btn-curate" (click)="store.curatePods()" [disabled]="store.curating()">
+            <mat-icon>auto_awesome</mat-icon>
+            <span *ngIf="!store.curating()">Curate</span>
+            <span *ngIf="store.curating()">Curating...</span>
+          </button>
           <button mat-raised-button class="btn-create" (click)="store.openCreateForm()">
             <mat-icon>add</mat-icon> Create Pod
           </button>
@@ -390,6 +395,52 @@
             {{ s.homeTeam }} vs {{ s.awayTeam }} &mdash; {{ s.pods }} pods
           </div>
           <div class="sync-more" *ngIf="store.syncResult()!.successes.length > 5">+{{ store.syncResult()!.successes.length - 5 }} more</div>
+        </div>
+      </div>
+
+      <div class="curation-panel" *ngIf="store.curationResult()">
+        <div class="curation-header">
+          <mat-icon style="color:#CE93D8">auto_awesome</mat-icon>
+          <span>Ora Curation: {{ store.curationResult()!.recommended }} recommended, {{ store.curationResult()!.skipped }} skipped of {{ store.curationResult()!.total }}</span>
+          <span class="ora-stats" *ngIf="store.curationResult()!.oraTotalPods > 0">Ora win rate: {{ store.curationResult()!.oraWinRate }}% ({{ store.curationResult()!.oraWon }}/{{ store.curationResult()!.oraTotalPods }}), threshold: {{ store.curationResult()!.confidenceThreshold }}%</span>
+          <button mat-icon-button (click)="store.dismissCuration()"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="curation-body">
+          <div class="curation-log-entry" *ngFor="let log of store.curationResult()!.apiLog">{{ log }}</div>
+          <div class="curation-error" *ngFor="let e of store.curationResult()!.errors">{{ e }}</div>
+          <div class="curation-empty" *ngIf="store.curationResult()!.fixtures.length === 0 && !store.curationResult()!.skippedReason" style="color:rgba(255,255,255,0.3);padding:12px;text-align:center">No fixtures analyzed.</div>
+          <div class="curation-skipped-reason" *ngIf="store.curationResult()!.skippedReason" style="color:rgba(255,255,255,0.5);text-align:center;padding:12px">{{ store.curationResult()!.skippedReason }}</div>
+          <div class="curation-fixtures" *ngIf="store.curationResult()!.fixtures.length > 0">
+            <div class="curation-fixture" *ngFor="let f of store.curationResult()!.fixtures">
+              <div class="fixture-header">
+                <span class="fixture-teams">{{ f.homeTeam }} vs {{ f.awayTeam }}</span>
+                <span class="fixture-league">{{ f.league || 'N/A' }} &middot; {{ f.matchDate | date:'MMM d, HH:mm' }}</span>
+                <span class="fixture-verdict" [class.recommend]="f.verdict === 'RECOMMEND'" [class.skip]="f.verdict === 'SKIP'">{{ f.verdict }}</span>
+              </div>
+              <div class="fixture-body">
+                <div class="combined-info" *ngIf="f.isCombined">
+                  <span class="combined-label">Parlay:</span>
+                  <span *ngFor="let leg of f.combinedLegs; let last = last">{{ leg.marketType }} {{ leg.selection }} ({{ leg.multiplier }}x){{ last ? '' : ' + ' }}</span>
+                  = {{ f.multiplier }}x
+                </div>
+                <div class="recommendation-row" *ngFor="let r of f.recommendations">
+                  <span class="rec-selection">{{ r.selection }}</span>
+                  <span class="rec-confidence">
+                    <span class="confidence-bar" [style.background]="r.confidence >= 70 ? '#00E676' : r.confidence >= 45 ? '#E8B923' : '#f44336'" [style.width.px]="(r.confidence / 100) * 60"></span>
+                    {{ r.confidence }}%
+                  </span>
+                  <span class="rec-multiplier" *ngIf="f.verdict === 'RECOMMEND'">{{ r.recommendedMultiplier }}x</span>
+                  <span class="rec-reasoning">{{ r.reasoning }}</span>
+                </div>
+                <div class="fixture-skip-reason" *ngIf="f.verdict === 'SKIP'">{{ f.overallReasoning }}</div>
+                <div class="fixture-action" *ngIf="f.verdict === 'RECOMMEND'">
+                  <button mat-stroked-button class="btn-create-from-curation" (click)="store.createPodFromCuration(f)">
+                    <mat-icon>add</mat-icon> Create Pod
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
