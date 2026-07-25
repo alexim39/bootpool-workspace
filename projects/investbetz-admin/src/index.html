@@ -1,39 +1,158 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- inline spinner styles to be able to display spinner right away -->
-  <style type="text/css">
-    body, html {  height: 100%;  }
-    .app-loading {  position: relative;     display: flex;     flex-direction: column;     align-items: center;     justify-content: center;     height: 100%;   }
-    .app-loading .spinner {     height: 160px;      width: 160px;      animation: rotate 2s linear infinite;      transform-origin: center center;      position: absolute;      top: 0;      bottom: 0;      left: 0;
-      right: 0;      margin: auto;    }
-    .app-loading .spinner .path {      stroke-dasharray: 1, 200;      stroke-dashoffset: 0;      animation: dash 1.5s ease-in-out infinite;      stroke-linecap: round;      stroke: #00E676;    }
-    @keyframes rotate {      100% {        transform: rotate(360deg);      }    }
-    @keyframes dash {      0% {        stroke-dasharray: 1, 200;        stroke-dashoffset: 0;      }      50% {        stroke-dasharray: 89, 200;        stroke-dashoffset: -35px;      }
-      100% {        stroke-dasharray: 89, 200;        stroke-dashoffset: -124px;      }
-    }
-  </style>
   <meta charset="utf-8">
-  <title>Investbetz - Let's bear the risk for you</title>
+  <title>BetPool Admin — ORA AI-Powered Sports Betting Management</title>
   <base href="/">
 
-  <!--Let browser know website is optimized for mobile-->
+  <meta name="description" content="BetPool Admin — ORA AI-powered management dashboard for sports betting operations.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#0A1428">
+
   <link rel="icon" type="image/x-icon" href="./favicon.ico">
+
+  <!-- Splash screen styles (shown before Angular boots) -->
+  <style type="text/css">
+    html, body { height: 100%; margin: 0; }
+    .app-loading {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #0A1428; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .app-loading::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 32px 32px; pointer-events: none;
+    }
+    .app-loading .orb-1 {
+      position: absolute; top: -8%; right: -4%;
+      width: min(55vw, 520px); aspect-ratio: 1; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,230,118,0.08) 0%, transparent 60%);
+      animation: orbDrift1 7s ease-in-out infinite; pointer-events: none;
+    }
+    .app-loading .orb-2 {
+      position: absolute; bottom: -8%; left: -4%;
+      width: min(50vw, 460px); aspect-ratio: 1; border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,185,35,0.07) 0%, transparent 60%);
+      animation: orbDrift2 7s ease-in-out infinite; pointer-events: none;
+    }
+    .app-loading .orb-center {
+      position: absolute; width: min(35vw, 260px); aspect-ratio: 1; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 50%);
+      animation: orbPulse 5s ease-in-out infinite; pointer-events: none;
+    }
+    @keyframes orbDrift1 {
+      0%, 100% { transform: translate(0,0) scale(1); opacity: 0.7; }
+      33% { transform: translate(-35px, 25px) scale(1.12); opacity: 1; }
+      66% { transform: translate(20px, -30px) scale(0.92); opacity: 0.8; }
+    }
+    @keyframes orbDrift2 {
+      0%, 100% { transform: translate(0,0) scale(1); opacity: 0.6; }
+      33% { transform: translate(30px, -20px) scale(1.15); opacity: 0.9; }
+      66% { transform: translate(-25px, 30px) scale(0.88); opacity: 0.7; }
+    }
+    @keyframes orbPulse {
+      0%, 100% { transform: scale(1); opacity: 0.4; }
+      50% { transform: scale(1.25); opacity: 0.7; }
+    }
+    .app-loading .p { position: absolute; border-radius: 50%; pointer-events: none; background: rgba(255,255,255,0.04); }
+    .app-loading .p1 { width: 8px; height: 8px; top: 22%; left: 12%; animation: floatUp 9s ease-in-out infinite; }
+    .app-loading .p2 { width: 5px; height: 5px; top: 65%; left: 82%; animation: floatUp 11s ease-in-out infinite 2s; }
+    .app-loading .p3 { width: 6px; height: 6px; top: 28%; left: 72%; animation: floatUp 10s ease-in-out infinite 4s; }
+    .app-loading .p4 { width: 4px; height: 4px; top: 72%; left: 22%; animation: floatUp 12s ease-in-out infinite 1s; }
+    @keyframes floatUp {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0; }
+      15% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { transform: translateY(-130px) scale(0.4); opacity: 0; }
+    }
+    .app-loading .logo-wrap {
+      display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1;
+    }
+    .app-loading .logo-img {
+      width: 120px; height: auto; margin-bottom: 1rem;
+      opacity: 0; transform: scale(0.9) translateY(-8px);
+      animation: logoEnter 0.55s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    .app-loading .logo {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.25rem; font-size: 2.2rem; font-weight: 800;
+    }
+    .app-loading .logo-bet {
+      background: linear-gradient(135deg, #00E676 0%, #00C853 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      opacity: 0; transform: scale(0.9) translateY(-8px);
+      animation: logoEnter 0.55s cubic-bezier(0.34,1.56,0.64,1) forwards;
+      filter: drop-shadow(0 0 18px rgba(0,230,118,0.18));
+    }
+    .app-loading .logo-pool {
+      background: linear-gradient(135deg, #E8B923 0%, #D4AF37 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      opacity: 0; transform: scale(0.9) translateY(-8px);
+      animation: logoEnter 0.55s cubic-bezier(0.34,1.56,0.64,1) 0.12s forwards;
+      filter: drop-shadow(0 0 18px rgba(232,185,35,0.18));
+    }
+    @keyframes logoEnter { to { opacity: 1; transform: scale(1) translateY(0); } }
+    .app-loading .underline {
+      width: 0; height: 3px;
+      background: linear-gradient(90deg, #00E676, #E8B923); border-radius: 2px;
+      margin-top: 0.75rem; animation: drawLine 0.7s cubic-bezier(0.22,1,0.36,1) 0.45s forwards;
+    }
+    @keyframes drawLine { to { width: 80px; } }
+    .app-loading .tagline {
+      color: rgba(255,255,255,0.65); font-size: 1rem; font-weight: 400;
+      letter-spacing: -0.3px; margin-top: 0.75rem;
+      opacity: 0; transform: translateY(8px);
+      animation: taglineEnter 0.5s ease 0.95s forwards;
+    }
+    @keyframes taglineEnter { to { opacity: 1; transform: translateY(0); letter-spacing: 0.3px; } }
+    .app-loading .shimmer {
+      width: 140px; height: 3px; border-radius: 2px;
+      background: linear-gradient(90deg, rgba(0,230,118,0.1), rgba(0,230,118,0.4), rgba(0,230,118,0.1));
+      background-size: 200% 100%; margin-top: 1.5rem;
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    @media (prefers-reduced-motion: reduce) {
+      .app-loading .orb-1, .app-loading .orb-2, .app-loading .orb-center,
+      .app-loading .p { animation: none; }
+      .app-loading .logo-img, .app-loading .logo-bet, .app-loading .logo-pool { animation: none; opacity: 1; transform: none; }
+      .app-loading .underline { animation: none; width: 80px; }
+      .app-loading .tagline { animation: none; opacity: 1; transform: none; letter-spacing: 0; }
+      .app-loading .shimmer { animation: none; }
+    }
+    @media (max-width: 480px) {
+      .app-loading .logo-img { width: 90px; }
+      .app-loading .logo { font-size: 1.6rem; }
+      .app-loading .tagline { font-size: 0.85rem; letter-spacing: 0; }
+    }
+  </style>
+
   <!--Import Google Icon Font-->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
 </head>
 <body class="mat-typography">
   <app-root>
-    <!-- loading layout replaced by app after startupp -->
     <div class="app-loading">
-      <div class="logo">Getting ready!</div>
-      <svg class="spinner" viewBox="25 25 50 50">
-        <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="1" stroke-miterlimit="10"/>
-      </svg>
+      <div class="orb-1"></div>
+      <div class="orb-2"></div>
+      <div class="orb-center"></div>
+      <div class="p p1"></div>
+      <div class="p p2"></div>
+      <div class="p p3"></div>
+      <div class="p p4"></div>
+      <div class="logo-wrap">
+        <img src="logo.png" alt="BetPool" class="logo-img">
+        <div class="logo">
+          <span class="logo-bet">Bet</span><span class="logo-pool">Pool</span>
+        </div>
+        <div class="underline"></div>
+        <div class="tagline">ORA AI-Powered Administration</div>
+        <div class="shimmer"></div>
+      </div>
     </div>
   </app-root>
 </body>

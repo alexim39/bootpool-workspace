@@ -3,7 +3,7 @@
       <aside class="sidebar" [class.collapsed]="sidebarCollapsed()">
         <div class="sidebar-header">
           <div class="logo">
-            <span class="logo-icon">B</span>
+            <img src="logo.png" alt="BetPool" class="logo-img">
             <span class="logo-text" *ngIf="!sidebarCollapsed()">BetPool</span>
           </div>
           <button mat-icon-button class="toggle-btn" (click)="sidebarCollapsed.set(!sidebarCollapsed())">
