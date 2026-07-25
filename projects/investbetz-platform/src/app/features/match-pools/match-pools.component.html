@@ -25,7 +25,7 @@
             <span class="ms-lbl">Open</span>
           </div>
           <div class="msummary-item">
-            <span class="ms-val gold">\u20A6{{ store.mSummary().poolTotal | number }}</span>
+            <span class="ms-val gold">₦{{ store.mSummary().poolTotal | number }}</span>
             <span class="ms-lbl">Pool</span>
           </div>
           <div class="msummary-item">
@@ -56,7 +56,7 @@
                       <strong>{{ p.eventTitle }}</strong>
                       <span class="mc-deadline">Closes {{ p.stakingClosesAt | date:'MMM d, h:mm a' }}</span>
                     </div>
-                    <div class="mc-h-right"><!-- \u20A6{{ p.totalPool | number }} --></div>
+                    <div class="mc-h-right"><!-- ₦{{ p.totalPool | number }} --></div>
                   </div>
                   <div class="mc-markets">
                     @for (m of p.markets; track m.marketId) {
@@ -66,7 +66,7 @@
                         <div class="mc-m-bar" [style.width.%]="(m.totalStaked / (p.totalPool || 1)) * 100"></div>
                         <div class="mc-m-left">
                           <span class="mc-m-label">{{ m.label }}</span>
-                          <span class="mc-m-staked"><!-- \u20A6{{ m.totalStaked | number }} --></span>
+                          <span class="mc-m-staked"><!-- ₦{{ m.totalStaked | number }} --></span>
                         </div>
                         <div class="mc-m-right">
                           @if (store.getMarketRank(p.markets, m.marketId) === 0) {
@@ -85,7 +85,7 @@
                   @if (store.selectedPoolId() === p._id && store.selectedMarket()) {
                     <div class="mc-stake">
                       <mat-form-field appearance="outline" class="mc-stake-input">
-                        <mat-label>Stake (\u20A6{{ p.minStake }} \u2013 \u20A6{{ p.maxStake | number }})</mat-label>
+                        <mat-label>Stake (₦{{ p.minStake }} \u2013 ₦{{ p.maxStake | number }})</mat-label>
                         <input matInput type="number" [(ngModel)]="store.stakeAmount">
                       </mat-form-field>
                       <button mat-raised-button class="mc-stake-btn" (click)="store.placeStake(p._id)"
@@ -120,7 +120,7 @@
                       <strong>{{ s.matchPool?.eventTitle || 'Unknown Event' }}</strong>
                       <span class="s-market">{{ store.formatMarketName(s.marketId) }}</span>
                     </div>
-                    <span class="s-amount">\u20A6{{ s.amount | number }}</span>
+                    <span class="s-amount">₦{{ s.amount | number }}</span>
                   </div>
                   <div class="s-bottom">
                     <span class="s-chip" [class.won]="s.status === 'won'" [class.lost]="s.status === 'lost'">
@@ -128,7 +128,7 @@
                       {{ s.status }}
                     </span>
                     @if (s.payoutAmount) {
-                      <span class="s-payout">Payout: \u20A6{{ s.payoutAmount | number }}</span>
+                      <span class="s-payout">Payout: ₦{{ s.payoutAmount | number }}</span>
                     }
                     <span class="s-date">{{ s.createdAt | date:'MMM d' }}</span>
                   </div>
@@ -175,7 +175,7 @@
           <mat-card class="summary-card">
             <mat-card-content>
               <div class="summary-icon pool-val"><mat-icon>account_balance</mat-icon></div>
-              <div class="summary-value">\u20A6{{ store.summary().poolTotal | number }}</div>
+              <div class="summary-value">₦{{ store.summary().poolTotal | number }}</div>
               <div class="summary-label">Combined Pool</div>
             </mat-card-content>
           </mat-card>
@@ -208,7 +208,7 @@
                           <h3>{{ p.eventTitle }}</h3>
                           <span class="pc-deadline">Closes {{ p.stakingClosesAt | date:'MMM d, h:mm a' }}</span>
                         </div>
-                        <div class="pc-pool-total"><!-- \u20A6{{ p.totalPool | number }} --></div>
+                        <div class="pc-pool-total"><!-- ₦{{ p.totalPool | number }} --></div>
                       </div>
                       <div class="pc-markets">
                         @for (m of p.markets; track m.marketId) {
@@ -218,7 +218,7 @@
                             <div class="pc-bar" [style.width.%]="(m.totalStaked / (p.totalPool || 1)) * 100"></div>
                             <div class="pm-left">
                               <span class="pm-label">{{ m.label }}</span>
-                              <span class="pm-staked"><!-- \u20A6{{ m.totalStaked | number }} staked --></span>
+                              <span class="pm-staked"><!-- ₦{{ m.totalStaked | number }} staked --></span>
                             </div>
                             <div class="pm-right">
                               @if (store.getMarketRank(p.markets, m.marketId) === 0) {
@@ -238,7 +238,7 @@
                         <div class="pc-stake-form">
                           <div class="psf-row">
                             <mat-form-field appearance="outline" class="psf-input">
-                              <mat-label>Stake (\u20A6{{ p.minStake | number }} \u2013 \u20A6{{ p.maxStake | number }})</mat-label>
+                              <mat-label>Stake (₦{{ p.minStake | number }} \u2013 ₦{{ p.maxStake | number }})</mat-label>
                               <input matInput type="number" [(ngModel)]="store.stakeAmount">
                             </mat-form-field>
                             <button mat-raised-button class="btn-emerald" (click)="store.placeStake(p._id)"
@@ -281,12 +281,12 @@
                     </ng-container>
                     <ng-container matColumnDef="amount">
                       <th mat-header-cell *matHeaderCellDef>Stake</th>
-                      <td mat-cell *matCellDef="let s">\u20A6{{ s.amount | number }}</td>
+                      <td mat-cell *matCellDef="let s">₦{{ s.amount | number }}</td>
                     </ng-container>
                     <ng-container matColumnDef="payout">
                       <th mat-header-cell *matHeaderCellDef>Payout</th>
                       <td mat-cell *matCellDef="let s">
-                        @if (s.payoutAmount) { \u20A6{{ s.payoutAmount | number }} }
+                        @if (s.payoutAmount) { ₦{{ s.payoutAmount | number }} }
                         @else { \u2014 }
                       </td>
                     </ng-container>
