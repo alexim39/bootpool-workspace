@@ -163,12 +163,11 @@ import { AdminPodsStore } from './stores/admin-pods.store';
     .confidence-bar { height: 6px; border-radius: 3px; width: 60px; display: inline-block; }
     .rec-multiplier { color: #CE93D8; font-weight: 600; min-width: 40px; }
     .rec-reasoning { color: rgba(255,255,255,0.5); font-size: 11px; flex: 1; min-width: 120px; }
-    .fixture-action { margin-top: 8px; }
+    .fixture-action { margin-top: 8px; display: flex; align-items: center; gap: 8px; }
+    .auto-created-badge { font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 10px; background: rgba(0,230,118,0.15); color: #00E676; }
     .btn-create-from-curation { color: #CE93D8 !important; border-color: #CE93D8 !important; font-size: 12px !important; }
     .fixture-skip-reason { color: rgba(255,255,255,0.35); font-size: 11px; font-style: italic; }
     .action-ai-settle { color: #CE93D8 !important; border-color: #CE93D8 !important; }
-    .action-settle-all { color: #CE93D8 !important; border-color: #CE93D8 !important; }
-    .btn-settle-all { color: #81D4FA !important; border-color: #81D4FA !important; }
     .disputed-badge { background: #E8B923; color: #0A1428; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 8px; margin-left: 8px; }
     .settle-item-verdict.disputed { background: rgba(232,185,35,0.15); color: #E8B923; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-weight: 700; }
     .btn-dispute-review { color: #E8B923 !important; border-color: #E8B923 !important; margin-top: 8px; }
@@ -236,12 +235,6 @@ import { AdminPodsStore } from './stores/admin-pods.store';
     .verdict-confidence { color: rgba(255,255,255,0.4); font-size: 11px; }
     .reasoning-row { color: rgba(255,255,255,0.6); font-size: 12px; margin-bottom: 10px; line-height: 1.4; }
     .settle-actions { display: flex; gap: 8px; }
-    .settle-all-panel { background: rgba(129,212,250,0.08); border: 1px solid rgba(129,212,250,0.2); border-radius: 12px; margin-bottom: 16px; overflow: hidden; }
-    .settle-all-header { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #fff; font-size: 14px; }
-    .settle-all-header button { margin-left: auto; color: rgba(255,255,255,0.4); }
-    .settle-all-body { padding: 8px 16px 12px; max-height: 400px; overflow-y: auto; }
-    .settle-all-error { color: #f44336; font-size: 12px; padding: 2px 0; }
-    .settle-all-item { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
     .settle-item-teams { color: rgba(255,255,255,0.7); font-size: 12px; }
     .settle-item-verdict { font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 3px; }
     .settle-item-verdict.win { color: #00E676; }

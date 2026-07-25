@@ -15,11 +15,6 @@
             <span *ngIf="!store.syncing()">Sync</span>
             <span *ngIf="store.syncing()">Syncing...</span>
           </button>
-          <button mat-stroked-button class="btn-settle-all" (click)="store.aiSettleAll()" [disabled]="store.settlingAll()">
-            <mat-icon>fact_check</mat-icon>
-            <span *ngIf="!store.settlingAll()">Settle All</span>
-            <span *ngIf="store.settlingAll()">Settling...</span>
-          </button>
           <button mat-stroked-button class="btn-curate" (click)="store.curatePods()" [disabled]="store.curating()">
             <mat-icon>auto_awesome</mat-icon>
             <span *ngIf="!store.curating()">Curate</span>
@@ -228,37 +223,6 @@
         </div>
       </div>
 
-      <div class="settle-all-panel" *ngIf="store.settleAllResult()">
-        <div class="settle-all-header">
-          <mat-icon [style.color]="store.settleAllResult()!.errors.length === 0 ? '#00E676' : '#E8B923'">fact_check</mat-icon>
-          <span>AI Settle All: {{ store.settleAllResult()!.settled }} settled
-            <span *ngIf="store.settleAllResult()!.disputed > 0" class="disputed-badge">{{ store.settleAllResult()!.disputed }} disputed</span>
-            <span *ngIf="store.settleAllResult()!.stuck > 0" class="stuck-badge">{{ store.settleAllResult()!.stuck }} need review</span>
-          </span>
-          <button mat-icon-button (click)="store.dismissSettleAllResult()"><mat-icon>close</mat-icon></button>
-        </div>
-        <div class="settle-all-body">
-          <div class="settle-all-error" *ngFor="let e of store.settleAllResult()!.errors">{{ e }}</div>
-          <div class="settle-all-item" *ngFor="let r of store.settleAllResult()!.results.slice(0, 10)">
-            <span class="settle-item-teams">{{ r.homeTeam }} vs {{ r.awayTeam }}</span>
-            <span class="settle-item-verdict" [class.win]="r.recommendedResult === 'win'" [class.loss]="r.recommendedResult === 'loss'" [class.disputed]="r.disputed" [class.stuck]="r.recommendedResult === 'cannot_determine' && !r.disputed" [class.unknown]="r.recommendedResult === 'cannot_determine'">
-              <span *ngIf="r.disputed">DISPUTED</span>
-              <span *ngIf="!r.disputed && r.recommendedResult === 'cannot_determine'">STUCK</span>
-              <span *ngIf="!r.disputed && r.recommendedResult !== 'cannot_determine'">{{ r.recommendedResult }}</span>
-            </span>
-          </div>
-          <div class="settle-more" *ngIf="store.settleAllResult()!.results.length > 10">+{{ store.settleAllResult()!.results.length - 10 }} more</div>
-          <div class="settle-all-actions">
-            <button mat-stroked-button class="btn-dispute-review" *ngIf="store.settleAllResult()!.disputed > 0" (click)="store.loadDisputed()">
-              <mat-icon>gavel</mat-icon> Review {{ store.settleAllResult()!.disputed }} Disputed
-            </button>
-            <button mat-stroked-button class="btn-stuck-review" *ngIf="store.settleAllResult()!.stuck > 0" (click)="store.loadStuck()">
-              <mat-icon>help_outline</mat-icon> Review {{ store.settleAllResult()!.stuck }} Stuck
-            </button>
-          </div>
-        </div>
-      </div>
-
       <div class="disputed-panel" *ngIf="store.showDisputedPanel()">
         <div class="disputed-header">
           <mat-icon style="color:#E8B923">gavel</mat-icon>
@@ -434,7 +398,8 @@
                 </div>
                 <div class="fixture-skip-reason" *ngIf="f.verdict === 'SKIP'">{{ f.overallReasoning }}</div>
                 <div class="fixture-action" *ngIf="f.verdict === 'RECOMMEND'">
-                  <button mat-stroked-button class="btn-create-from-curation" (click)="store.createPodFromCuration(f)">
+                  <span class="auto-created-badge" *ngIf="store.curationResult()!.autoCreated">auto-created</span>
+                  <button mat-stroked-button class="btn-create-from-curation" *ngIf="!store.curationResult()!.autoCreated" (click)="store.createPodFromCuration(f)">
                     <mat-icon>add</mat-icon> Create Pod
                   </button>
                 </div>

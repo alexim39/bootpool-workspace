@@ -825,6 +825,8 @@ export interface CurationResponse {
   oraTotalPods: number;
   oraWon: number;
   confidenceThreshold: number;
+  autoCreated?: boolean;
+  createdPods?: Array<{ fixtureId: number; homeTeam: string; awayTeam: string; podId: string; title: string }>;
 }
 
 export interface FeaturedBanner {
