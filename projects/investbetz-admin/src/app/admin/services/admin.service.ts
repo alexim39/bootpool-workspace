@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, timer } from 'rxjs';
+import { switchMap, takeWhile, map, timeout } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface PaginatedResponse<T> {
@@ -355,7 +356,26 @@ export class AdminService {
   }
 
   curatePods(): Observable<CurationResponse> {
-    return this.http.post<CurationResponse>(`${this.baseUrl}/ai/curate`, {});
+    return this.http.post<{ success: boolean; jobId: string }>(`${this.baseUrl}/ai/curate`, {}).pipe(
+      switchMap(res => {
+        if (!res.success || !res.jobId) throw new Error('Failed to start curation job');
+        return this.pollCurationJob(res.jobId);
+      })
+    );
+  }
+
+  private pollCurationJob(jobId: string): Observable<CurationResponse> {
+    return timer(0, 3000).pipe(
+      switchMap(() => this.http.get<{ success: boolean; status: string; result?: CurationResponse; error?: string }>(
+        `${this.baseUrl}/ai/curate/status/${jobId}`
+      )),
+      takeWhile(res => res.status === 'pending' || res.status === 'running', true),
+      map(res => {
+        if (res.status === 'completed' && res.result) return res.result;
+        throw new Error(res.error || 'Curation job failed');
+      }),
+      timeout(180000)
+    );
   }
 
   aiSettleCheck(podId: string): Observable<{ success: boolean; data: SettlementCheckResult }> {
