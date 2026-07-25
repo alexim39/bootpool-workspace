@@ -24,7 +24,7 @@ import { AdminBettingStore } from './stores/admin-betting.store';
 export class BettingComponent implements OnInit {
   readonly store = inject(AdminBettingStore);
   Math = Math;
-  columns = ['select', 'title', 'selection', 'scores', 'outcome', 'games', 'stakes', 'participants', 'gameStatus', 'booked', 'stakeRange', 'stakeAction'];
+  columns = ['select', 'title', 'selection', 'scores', 'outcome', 'status', 'stakes', 'participants', 'booked', 'stakeRange', 'stakeAction'];
 
   ngOnInit() {
     this.store.loadSports();

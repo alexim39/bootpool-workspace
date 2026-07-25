@@ -217,6 +217,12 @@ export class AdminBettingStore {
     this.settleTarget.set(null);
   }
 
+  settleRow(pod: AdminPod) {
+    this.detailPod.set(pod);
+    this.settleCheck.set(null);
+    this.settleTarget.set(pod);
+  }
+
   closeDetailPanel() {
     this.detailPod.set(null);
   }
