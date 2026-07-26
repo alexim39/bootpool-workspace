@@ -18,7 +18,7 @@ export class WithdrawStore {
   accountError = signal<string | null>(null);
   resolvingAccount = signal(false);
   submitting = signal(false);
-  pinDigits = signal<string[]>(['', '', '', '']);
+  pinDigits = signal<string[]>(['', '', '', '', '', '']);
   pinError = signal<string | null>(null);
   savedAccounts = signal<SavedBankAccount[]>([]);
   selectedSavedId = signal<string | null>(null);
@@ -180,12 +180,12 @@ export class WithdrawStore {
         if (res.success && res.data?.accountName) {
           this.resolvedAccountName.set(res.data.accountName);
         } else {
-          this.accountError.set('Could not verify account. Check the account number.');
+          this.accountError.set(res.message || 'Could not verify account. Check the account number.');
         }
       },
-      error: () => {
+      error: (err) => {
         this.resolvingAccount.set(false);
-        this.accountError.set('Verification failed. Try again.');
+        this.accountError.set(err.error?.message || 'Could not verify account. Check the account number.');
       }
     });
   }
@@ -198,7 +198,7 @@ export class WithdrawStore {
     newPins[index] = val;
     this.pinDigits.set(newPins);
     this.pinError.set(null);
-    if (index < 3 && val) {
+    if (index < 5 && val) {
       const next = document.getElementById('wpin-' + (index + 1));
       next?.focus();
     }
@@ -263,7 +263,7 @@ export class WithdrawStore {
   }
 
   private resetPin() {
-    this.pinDigits.set(['', '', '', '']);
+    this.pinDigits.set(['', '', '', '', '', '']);
     const first = document.getElementById('wpin-0');
     first?.focus();
   }

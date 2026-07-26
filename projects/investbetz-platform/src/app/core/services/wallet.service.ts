@@ -219,7 +219,7 @@ export class WalletService {
   }
 
   resolveAccount(accountNumber: string, bankCode: string) {
-    return this.http.get<{ success: boolean; data: AccountResolution }>(
+    return this.http.get<{ success: boolean; data?: AccountResolution; message?: string }>(
       `${this.API_URL}/wallet/resolve-account?accountNumber=${accountNumber}&bankCode=${bankCode}`,
       { headers: this.getHeaders() }
     );
