@@ -14,9 +14,7 @@
         </div>
       </div>
 
-      <div class="loading-shim" *ngIf="store.loading()">
-        <div class="spinner"></div>
-      </div>
+      <div class="loading-shim" *ngIf="store.loading()"><div class="skel-table-wrap"><div class="skel-row" style="padding:12px 16px;gap:16px;margin:0"><div class="skel skel-card" style="flex:1;height:100px;margin:0"></div><div class="skel skel-card" style="flex:1;height:100px;margin:0"></div><div class="skel skel-card" style="flex:1;height:100px;margin:0"></div><div class="skel skel-card" style="flex:1;height:100px;margin:0"></div></div><div class="skel skel-card" style="height:80px"></div><div class="skel-row" style="gap:16px;margin:0"><div class="skel skel-card" style="flex:1;height:160px;margin:0"></div><div class="skel skel-card" style="flex:1;height:160px;margin:0"></div></div><div class="skel-row" style="gap:16px;margin:0"><div class="skel skel-card" style="flex:1;height:200px;margin:0"></div><div class="skel skel-card" style="flex:1;height:200px;margin:0"></div></div></div></div>
 
       <ng-container *ngIf="store.report() as report">
         <div class="summary-cards">

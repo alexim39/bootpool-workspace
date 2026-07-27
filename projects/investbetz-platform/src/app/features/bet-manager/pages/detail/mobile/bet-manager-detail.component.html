@@ -7,7 +7,32 @@
 
   <div class="mobile-content">
     @if (store.loading() && !store.summary()) {
-      <div class="loading"><div class="spinner"></div></div>
+      <div class="skel-page">
+        <div class="skel skel-card" style="height:200px">
+          <div style="padding:14px;display:flex;flex-direction:column;gap:12px">
+            <div class="skel-row"><div class="skel skel-icon-circle" style="width:36px;height:36px"></div><div style="flex:1"><div class="skel skel-title" style="width:50%;margin:0"></div><div class="skel skel-text-sm" style="width:40%;margin:0"></div></div></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">@for (s of [1,2,3]; track s){<div><div class="skel skel-text-sm" style="width:100%;margin:0"></div><div class="skel skel-title" style="width:80%;margin:0;height:18px"></div></div>}</div>
+            <div class="skel-row"><div class="skel skel-text-sm" style="width:45%"></div><div class="skel skel-text-sm" style="width:40%"></div></div>
+            <div class="skel-row"><div class="skel" style="flex:1;height:36px;border-radius:8px"></div><div class="skel" style="flex:1;height:36px;border-radius:8px"></div></div>
+          </div>
+        </div>
+        <div class="skel skel-card-sm" style="height:120px">
+          <div style="padding:14px;display:flex;flex-direction:column;gap:8px">
+            <div class="skel skel-title" style="width:40%"></div>
+            @for (s of [1,2,3]; track s) {
+              <div class="skel-row"><div class="skel skel-text-sm" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="width:50px;margin:0"></div><div class="skel skel-text-sm" style="width:60px;margin:0"></div></div>
+            }
+          </div>
+        </div>
+        <div class="skel skel-card-sm" style="height:120px">
+          <div style="padding:14px;display:flex;flex-direction:column;gap:8px">
+            <div class="skel skel-title" style="width:40%"></div>
+            @for (s of [1,2,3]; track s) {
+              <div class="skel-row"><div class="skel skel-text-sm" style="flex:1;margin:0"></div><div class="skel skel-title" style="width:60px;margin:0;height:16px"></div></div>
+            }
+          </div>
+        </div>
+      </div>
     }
 
     @if (store.error()) {

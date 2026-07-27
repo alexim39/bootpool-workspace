@@ -9,7 +9,23 @@
   @let loading = store.loading();
 
   @if (loading && !summary) {
-    <div class="loading-state"><div class="spinner"></div><p>Loading portfolio...</p></div>
+    <div style="margin-top:20px">
+      <div class="skel skel-card" style="height:200px;margin-bottom:16px">
+        <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+          <div class="skel-row"><div class="skel skel-icon-circle" style="width:44px;height:44px"></div><div style="flex:1"><div class="skel skel-title" style="width:40%;margin:0"></div><div class="skel skel-text-sm" style="width:30%;margin:0"></div></div><div class="skel-row"><div class="skel" style="width:100px;height:36px;border-radius:8px"></div><div class="skel" style="width:100px;height:36px;border-radius:8px"></div></div></div>
+          <div class="skel-stat-row">
+            @for (s of [1,2,3,4,5,6]; track s) {
+              <div class="skel-stat"><div class="skel skel-text-sm" style="width:100%;margin:0"></div><div class="skel skel-title" style="width:80%;margin:0;height:20px"></div></div>
+            }
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        @for (card of [1,2]; track card) {
+          <div class="skel skel-card" style="height:200px"></div>
+        }
+      </div>
+    </div>
   }
 
   @if (store.error()) {

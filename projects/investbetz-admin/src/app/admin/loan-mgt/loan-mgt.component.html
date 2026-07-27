@@ -31,9 +31,7 @@
       </mat-card>
 
       <mat-card class="table-card">
-        <div class="loading-overlay" *ngIf="store.loading()">
-          <div class="spinner"></div>
-        </div>
+        <div class="loading-overlay" *ngIf="store.loading()"><div class="skel-table-wrap"><div class="skel-row" style="padding:12px 16px;gap:16px;border-bottom:1px solid rgba(255,255,255,0.06);margin:0"><div class="skel skel-text-sm" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="flex:0.6;margin:0"></div><div class="skel skel-text-sm" style="flex:0.6;margin:0"></div><div class="skel skel-text-sm" style="flex:0.6;margin:0"></div><div class="skel skel-text-sm" style="flex:0.4;margin:0"></div></div>@for (row of [1,2,3,4,5]; track row) {<div class="skel-row" style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.04);margin:0;gap:16px"><div class="skel skel-text" style="flex:1;margin:0"></div><div class="skel skel-text" style="flex:1;margin:0"></div><div class="skel skel-text" style="flex:1;margin:0"></div><div class="skel skel-text" style="flex:1;margin:0"></div><div class="skel skel-badge" style="flex:0.6;margin:0"></div><div class="skel skel-text-sm" style="flex:0.6;margin:0"></div><div class="skel skel-text-sm" style="flex:0.6;margin:0"></div><div class="skel skel-text" style="flex:0.4;margin:0"></div></div>}</div></div>
         <table mat-table [dataSource]="store.loans()" class="admin-table">
           <ng-container matColumnDef="user">
             <th mat-header-cell *matHeaderCellDef>User</th>

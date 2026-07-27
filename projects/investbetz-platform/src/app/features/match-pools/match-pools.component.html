@@ -41,7 +41,20 @@
 
         @if (store.view() === 'list') {
           @if (store.loading()) {
-            <div class="m-loader"><mat-spinner diameter="24" /></div>
+            <div class="skel-page">
+              @for (item of [1,2,3]; track item) {
+                <div class="skel skel-card-sm" style="height:100px">
+                  <div style="padding:14px;display:flex;flex-direction:column;gap:8px">
+                    <div class="skel skel-title" style="width:80%"></div>
+                    <div class="skel skel-text-sm" style="width:40%"></div>
+                    <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+                      <div class="skel-row"><div class="skel skel-text" style="flex:1;margin:0;"></div><div class="skel skel-text-sm" style="width:40px;margin:0"></div></div>
+                      <div class="skel-row"><div class="skel skel-text" style="flex:1;margin:0;"></div><div class="skel skel-text-sm" style="width:40px;margin:0"></div></div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
           } @else if (store.openPools().length === 0) {
             <div class="m-empty">
               <mat-icon>water_pool</mat-icon>
@@ -105,7 +118,22 @@
 
         @if (store.view() === 'my-stakes') {
           @if (store.myStakesLoading()) {
-            <div class="m-loader"><mat-spinner diameter="24" /></div>
+            <div class="skel-page">
+              @for (item of [1,2,3]; track item) {
+                <div class="skel skel-card-sm" style="height:80px">
+                  <div style="padding:14px;display:flex;flex-direction:column;gap:8px">
+                    <div class="skel-row">
+                      <div class="skel skel-title" style="width:70%;margin:0"></div>
+                      <div class="skel skel-text-sm" style="width:50px;margin:0 0 0 auto"></div>
+                    </div>
+                    <div class="skel-row">
+                      <div class="skel skel-text-sm" style="width:35%"></div>
+                      <div class="skel skel-badge"></div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
           } @else if (store.myStakes().length === 0) {
             <div class="m-empty">
               <mat-icon>casino</mat-icon>
@@ -192,7 +220,21 @@
           <mat-tab label="Open Pools">
             <div class="tab-body">
               @if (store.loading()) {
-                <div class="loading-center"><mat-spinner /></div>
+                <div class="pool-grid">
+                  @for (item of [1,2,3]; track item) {
+                    <div class="skel skel-card" style="height:210px">
+                      <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+                        <div class="skel-row"><div class="skel skel-title" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="width:80px;margin:0"></div></div>
+                        <div class="skel skel-text-sm" style="width:45%"></div>
+                        <div style="display:flex;flex-direction:column;gap:8px">
+                          <div class="skel-row"><div class="skel skel-text" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="width:40px;margin:0"></div></div>
+                          <div class="skel-row"><div class="skel skel-text" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="width:40px;margin:0"></div></div>
+                          <div class="skel-row"><div class="skel skel-text" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="width:40px;margin:0"></div></div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
               } @else if (store.openPools().length === 0) {
                 <div class="empty-state">
                   <mat-icon>water_pool</mat-icon>
@@ -261,7 +303,26 @@
           <mat-tab label="My Stakes">
             <div class="tab-body">
               @if (store.myStakesLoading()) {
-                <div class="loading-center"><mat-spinner /></div>
+                <div class="stakes-table-wrap">
+                  <div class="skel-row" style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);margin:0">
+                    <div class="skel skel-text-sm" style="width:180px;margin:0"></div>
+                    <div class="skel skel-text-sm" style="width:100px;margin:0"></div>
+                    <div class="skel skel-text-sm" style="width:60px;margin:0"></div>
+                    <div class="skel skel-text-sm" style="width:80px;margin:0"></div>
+                    <div class="skel skel-text-sm" style="width:70px;margin:0"></div>
+                    <div class="skel skel-text-sm" style="width:120px;margin:0"></div>
+                  </div>
+                  @for (row of [1,2,3,4]; track row) {
+                    <div class="skel-row" style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.04);margin:0">
+                      <div class="skel skel-text" style="width:180px;margin:0"></div>
+                      <div class="skel skel-text" style="width:100px;margin:0"></div>
+                      <div class="skel skel-text" style="width:60px;margin:0"></div>
+                      <div class="skel skel-text" style="width:80px;margin:0"></div>
+                      <div class="skel skel-badge" style="width:70px;margin:0"></div>
+                      <div class="skel skel-text-sm" style="width:120px;margin:0"></div>
+                    </div>
+                  }
+                </div>
               } @else if (store.myStakes().length === 0) {
                 <div class="empty-state">
                   <mat-icon>casino</mat-icon>

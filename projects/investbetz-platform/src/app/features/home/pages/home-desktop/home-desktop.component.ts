@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -15,7 +15,7 @@ import { PodCardComponent } from '../../components/pod-card/pod-card.component';
 import { StakeModalComponent } from '../../components/stake-modal/stake-modal.component';
 import { BetSlipComponent } from '../../components/bet-slip/bet-slip.component';
 import { FeaturedBannerComponent } from '../../components/featured-banner/featured-banner.component';
-import { AppNavComponent } from '../../../../core/components';
+import { AppNavComponent, OraChatComponent } from '../../../../core/components';
 import { HomeStore } from '../../stores/home.store';
 
 @Component({
@@ -38,7 +38,8 @@ import { HomeStore } from '../../stores/home.store';
     StakeModalComponent,
     BetSlipComponent,
     FeaturedBannerComponent,
-    AppNavComponent
+    AppNavComponent,
+    OraChatComponent
   ],
   templateUrl: './home-desktop.component.html',
   styleUrls: ['./home-desktop.component.scss']
@@ -46,10 +47,15 @@ import { HomeStore } from '../../stores/home.store';
 export class HomeDesktopComponent implements OnInit {
   private _snackBar = inject(MatSnackBar);
   readonly store = inject(HomeStore);
+  readonly showOraChat = signal(false);
 
   ngOnInit() {
     this.store.init();
   }
+
+  openOraChat() { this.showOraChat.set(true); }
+
+  closeOraChat() { this.showOraChat.set(false); }
 
   openStakeModal(pod: any) {
     if (!this.store.auth.isAuthenticated()) {

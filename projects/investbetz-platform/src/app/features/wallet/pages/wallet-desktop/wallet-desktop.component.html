@@ -74,7 +74,17 @@
           </mat-card-header>
           <mat-card-content>
             @if (store.loading()) {
-              <div class="loading-center"><mat-spinner></mat-spinner></div>
+              <div class="skel-page">
+                @for (item of [1,2,3,4]; track item) {
+                  <div class="skel-row">
+                    <div class="skel skel-text-sm" style="width:50px;margin:0"></div>
+                    <div class="skel skel-text-sm" style="width:60px;margin:0"></div>
+                    <div class="skel skel-text-sm" style="flex:1;margin:0"></div>
+                    <div class="skel skel-text-sm" style="width:70px;margin:0"></div>
+                    <div class="skel skel-badge" style="width:60px;height:20px"></div>
+                  </div>
+                }
+              </div>
             } @else {
               <div class="table-container">
                 @if (store.depositTransactions().length === 0) {
@@ -157,7 +167,17 @@
           </mat-card-header>
           <mat-card-content>
             @if (store.loading()) {
-              <div class="loading-center"><mat-spinner></mat-spinner></div>
+              <div class="skel-page">
+                @for (item of [1,2,3,4]; track item) {
+                  <div class="skel-row">
+                    <div class="skel skel-text-sm" style="width:50px;margin:0"></div>
+                    <div class="skel skel-text-sm" style="width:60px;margin:0"></div>
+                    <div class="skel skel-text-sm" style="flex:1;margin:0"></div>
+                    <div class="skel skel-text-sm" style="width:70px;margin:0"></div>
+                    <div class="skel skel-badge" style="width:60px;height:20px"></div>
+                  </div>
+                }
+              </div>
             } @else {
               <div class="table-container">
                 @if (store.withdrawalTransactions().length === 0) {
@@ -240,7 +260,17 @@
           </mat-card-header>
           <mat-card-content>
             @if (store.loading()) {
-              <div class="loading-center"><mat-spinner></mat-spinner></div>
+              <div class="skel-page">
+                @for (item of [1,2,3,4]; track item) {
+                  <div class="skel-row">
+                    <div class="skel skel-text-sm" style="width:50px;margin:0"></div>
+                    <div class="skel skel-text-sm" style="width:60px;margin:0"></div>
+                    <div class="skel skel-text-sm" style="flex:1;margin:0"></div>
+                    <div class="skel skel-text-sm" style="width:70px;margin:0"></div>
+                    <div class="skel skel-badge" style="width:60px;height:20px"></div>
+                  </div>
+                }
+              </div>
             } @else {
               <div class="table-container" [class.loading-more]="store.loadingMore()">
                 @if (store.loadingMore()) {

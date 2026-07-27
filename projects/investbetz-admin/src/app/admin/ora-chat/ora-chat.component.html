@@ -48,10 +48,7 @@
         </div>
       </mat-card>
 
-      <div class="loading-state" *ngIf="store.loading()">
-        <mat-spinner diameter="32"></mat-spinner>
-        <span>Loading conversations...</span>
-      </div>
+      <div class="loading-state" *ngIf="store.loading()"><div class="skel-page" style="display:flex;gap:16px"><div style="flex:1"><div class="skel-row" style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);margin:0;gap:12px"><div class="skel skel-icon-circle" style="width:36px;height:36px"></div><div style="flex:1"><div class="skel skel-title" style="width:50%;margin:0"></div><div class="skel skel-text-sm" style="width:80%;margin:0"></div></div><div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end"><div class="skel skel-text-sm" style="width:80px;margin:0"></div><div class="skel skel-badge" style="width:50px;margin:0"></div></div></div>@for (row of [1,2,3,4,5]; track row) {<div class="skel-row" style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.04);margin:0;gap:12px"><div class="skel skel-icon-circle" style="width:36px;height:36px"></div><div style="flex:1"><div class="skel skel-title" style="width:40%;margin:0"></div><div class="skel skel-text-sm" style="width:70%;margin:0"></div></div><div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end"><div class="skel skel-text-sm" style="width:60px;margin:0"></div><div class="skel skel-badge" style="width:40px;margin:0"></div></div></div>}</div><div class="skel skel-card" style="flex:2;height:400px;margin:0"></div></div></div>
 
       <div class="content-split" *ngIf="!store.loading()">
         <div class="session-list" [class.has-selected]="store.selectedSession()">

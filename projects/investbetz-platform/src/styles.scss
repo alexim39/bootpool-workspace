@@ -228,3 +228,149 @@ img {
   background: rgba($emerald, 0.3);
   color: $white;
 }
+
+// ==========================================
+// Skeleton Loading System
+// ==========================================
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skel {
+  position: relative;
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+  border-radius: 6px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.skel-text {
+  height: 14px;
+  width: 100%;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.skel-text-sm {
+  height: 11px;
+  width: 60%;
+  margin-bottom: 6px;
+  border-radius: 3px;
+}
+
+.skel-title {
+  height: 20px;
+  width: 70%;
+  margin-bottom: 12px;
+  border-radius: 5px;
+}
+
+.skel-card {
+  height: 180px;
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.skel-card-sm {
+  height: 120px;
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.skel-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.skel-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skel-line-group {
+  flex: 1;
+}
+
+.skel-badge {
+  width: 48px;
+  height: 22px;
+  border-radius: 20px;
+}
+
+.skel-icon-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.skel-page {
+  padding: 24px 16px;
+}
+
+.skel-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.skel-page-header .skel-title {
+  width: 160px;
+  margin: 0;
+}
+
+.skel-page-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.skel-stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.skel-stat {
+  height: 80px;
+  border-radius: 10px;
+}
+
+.skel-tabs {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 20px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.skel-tab {
+  height: 28px;
+  width: 60px;
+  border-radius: 3px;
+}
+
+@media (max-width: 768px) {
+  .skel-stat-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .skel-grid {
+    grid-template-columns: 1fr;
+  }
+}

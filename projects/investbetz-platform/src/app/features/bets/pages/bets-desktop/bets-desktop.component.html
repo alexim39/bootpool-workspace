@@ -39,7 +39,28 @@
         <mat-tab label="Active">
           <div class="tab-content">
             @if (store.loading()) {
-              <div class="loading-center"><mat-spinner></mat-spinner></div>
+              <div class="skel-page">
+                @for (item of [1,2,3]; track item) {
+                  <div class="skel skel-card-sm">
+                    <div style="padding:14px;display:flex;flex-direction:column;gap:8px">
+                      <div class="skel-row">
+                        <div class="skel skel-badge"></div>
+                        <div class="skel skel-text-sm" style="width:80px;margin:0 0 0 auto"></div>
+                      </div>
+                      <div class="skel skel-title" style="width:65%"></div>
+                      <div class="skel-row">
+                        <div class="skel skel-text-sm" style="width:30%"></div>
+                        <div class="skel skel-text-sm" style="width:20%"></div>
+                      </div>
+                      <div class="skel-row" style="justify-content:space-between;margin-top:4px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)">
+                        <div class="skel skel-text-sm" style="width:70px;margin:0"></div>
+                        <div class="skel skel-text-sm" style="width:90px;margin:0"></div>
+                        <div class="skel skel-icon-circle"></div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
             } @else if (store.activeStakes().length === 0) {
               <div class="empty-state">
                 <mat-icon>sports_esports</mat-icon>
@@ -66,7 +87,27 @@
         <mat-tab label="History">
           <div class="tab-content">
             @if (store.loadingHistory()) {
-              <div class="loading-center"><mat-spinner></mat-spinner></div>
+              <div class="skel-page">
+                @for (item of [1,2,3]; track item) {
+                  <div class="skel skel-card-sm">
+                    <div style="padding:14px;display:flex;flex-direction:column;gap:8px">
+                      <div class="skel-row">
+                        <div class="skel skel-badge"></div>
+                        <div class="skel skel-text-sm" style="width:80px;margin:0 0 0 auto"></div>
+                      </div>
+                      <div class="skel skel-title" style="width:65%"></div>
+                      <div class="skel-row">
+                        <div class="skel skel-text-sm" style="width:30%"></div>
+                        <div class="skel skel-text-sm" style="width:20%"></div>
+                      </div>
+                      <div class="skel-row" style="justify-content:space-between;margin-top:4px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)">
+                        <div class="skel skel-text-sm" style="width:70px;margin:0"></div>
+                        <div class="skel skel-text-sm" style="width:90px;margin:0"></div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
             } @else if (store.settledStakes().length === 0) {
               <div class="empty-state">
                 <mat-icon>history</mat-icon>

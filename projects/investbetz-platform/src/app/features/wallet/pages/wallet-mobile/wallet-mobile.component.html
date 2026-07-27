@@ -55,7 +55,21 @@
       </div>
       <div class="txn-list">
         @if (store.loading()) {
-          <div class="loading-center"><mat-spinner diameter="24"></mat-spinner></div>
+          <div class="skel-page">
+            @for (item of [1,2,3,4,5]; track item) {
+              <div class="skel-row" style="padding:12px 0">
+                <div class="skel skel-icon-circle" style="width:36px;height:36px"></div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+                  <div class="skel skel-text" style="width:50%;margin:0"></div>
+                  <div class="skel skel-text-sm" style="width:30%;margin:0"></div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+                  <div class="skel skel-text" style="width:60px;margin:0"></div>
+                  <div class="skel skel-badge" style="width:50px;height:16px"></div>
+                </div>
+              </div>
+            }
+          </div>
         } @else {
           @for (txn of filteredTransactions(); track txn.id) {
             <div class="txn-item">
