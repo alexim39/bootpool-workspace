@@ -84,7 +84,7 @@
             (click)="store.loadMore()"
             [disabled]="store.pods.loadingMore()">
             @if (store.pods.loadingMore()) {
-              <mat-spinner diameter="16"></mat-spinner>
+              <mat-spinner diameter="16"/>
               <span>Loading...</span>
             } @else {
               <span>Load More ({{ store.displayedPods().length }}/{{ store.pods.totalPods() }})</span>
@@ -100,8 +100,9 @@
       [pod]="store.selectedPod()!"
       [disableClose]="true"
       (close)="store.closeStakeModal()"
-      (stakePlaced)="onStakePlaced()">
-    </app-stake-modal>
+      (stakePlaced)="onStakePlaced()"
+    />
+    
   }
 
   <app-top-up-modal [visible]="showTopUp()" [disableClose]="true" (close)="showTopUp.set(false)" />
@@ -113,8 +114,8 @@
     (clearAllSelections)="store.clearSelections()"
     (closePanel)="closeSlip()"
     (togglePanel)="store.toggleSlip()"
-    (placeBetRequest)="onPlaceAccumulator($event)">
-  </app-bet-slip>
+    (placeBetRequest)="onPlaceAccumulator($event)"
+  />
 
   <app-mobile-nav />
 </div>
