@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, timer } from 'rxjs';
-import { switchMap, takeWhile, map, timeout } from 'rxjs/operators';
+import { switchMap, takeWhile, map, timeout, filter } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface PaginatedResponse<T> {
@@ -370,6 +370,7 @@ export class AdminService {
         `${this.baseUrl}/ai/curate/status/${jobId}`
       )),
       takeWhile(res => res.status === 'pending' || res.status === 'running', true),
+      filter(res => res.status === 'completed' || res.status === 'failed'),
       map(res => {
         if (res.status === 'completed' && res.result) return res.result;
         throw new Error(res.error || 'Curation job failed');

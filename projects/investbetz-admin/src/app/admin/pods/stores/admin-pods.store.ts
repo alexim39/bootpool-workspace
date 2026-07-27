@@ -41,6 +41,7 @@ export class AdminPodsStore {
   readonly selectedDisputedIds = signal<Set<string>>(new Set());
   readonly curating = signal(false);
   readonly curationResult = signal<CurationResponse | null>(null);
+  readonly curationError = signal<string | null>(null);
   readonly activeTab = signal<'active' | 'past' | 'disputed'>('active');
 
   readonly draftCount = computed(() => this.pods().filter(p => p.status === 'draft').length);
@@ -393,13 +394,22 @@ export class AdminPodsStore {
   curatePods() {
     this.curating.set(true);
     this.curationResult.set(null);
+    this.curationError.set(null);
     this.admin.curatePods().subscribe({
       next: res => {
         this.curationResult.set(res);
         this.curating.set(false);
+        if (res.errors?.length) this.curationError.set(res.errors.join('; '));
       },
-      error: () => this.curating.set(false)
+      error: (err: any) => {
+        this.curating.set(false);
+        this.curationError.set(err?.message || 'Curation failed. Check console or server logs.');
+      }
     });
+  }
+
+  dismissCurationError() {
+    this.curationError.set(null);
   }
 
   dismissCuration() {

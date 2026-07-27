@@ -26,6 +26,14 @@
         </div>
       </div>
 
+      @if (store.curationError()) {
+        <div class="curation-error-banner">
+          <mat-icon>error</mat-icon>
+          <span>{{ store.curationError() }}</span>
+          <button mat-icon-button (click)="store.dismissCurationError()"><mat-icon>close</mat-icon></button>
+        </div>
+      }
+
       <div class="filter-bar">
         <div class="tabs">
           <button class="tab-btn" [class.active]="store.activeTab() === 'active'" (click)="store.switchTab('active')">
