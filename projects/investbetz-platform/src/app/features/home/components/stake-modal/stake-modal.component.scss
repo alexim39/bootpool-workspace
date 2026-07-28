@@ -538,8 +538,18 @@
   border-radius: 2px;
 }
 
+/* ─── Mobile: push dialog up above collapsed betslip ─── */
+@media (max-width: 767px) {
+  .modal-overlay {
+    padding-bottom: 120px;
+  }
+}
+
 /* ─── Responsive ─── */
 @media (min-width: 768px) {
+  .modal-overlay {
+    z-index: 1001;
+  }
   .modal-overlay {
     align-items: center;
   }

@@ -276,6 +276,43 @@
   cursor: not-allowed;
 }
 
+.ora-chat-fab {
+  position: fixed;
+  bottom: 80px;
+  right: 12px;
+  z-index: 1001;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: #0A1428;
+  color: #00E676;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 230, 118, 0.2);
+  outline: 1px solid rgba(0, 230, 118, 0.25);
+  outline-offset: -1px;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+.ora-chat-fab:active {
+  transform: scale(0.92);
+}
+
+.ora-chat-fab .ora-fab-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.ora-chat-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 1999;
+}
+
 .bottom-nav {
   position: fixed;
   bottom: 0;

@@ -4,37 +4,45 @@
         <div class="ora-sheet">
           <div class="ora-header">
             <div class="ora-header-left">
-              <span class="ora-avatar">O</span>
+              <span class="ora-avatar">
+                <mat-icon>smart_toy</mat-icon>
+              </span>
               <div class="ora-header-info">
                 <span class="ora-name">Ora</span>
-                <span class="ora-status">Online &bull; AI Assistant</span>
+                <span class="ora-status"><span class="status-dot"></span> Online &bull; AI Assistant</span>
               </div>
             </div>
             <button class="ora-close" (click)="close.emit()"><mat-icon>close</mat-icon></button>
           </div>
           <div class="ora-body" #messagesContainer>
-            <div class="ora-date-divider">Today</div>
+            <div class="msg-divider"><span>Today</span></div>
             @for (msg of messages(); track msg) {
               <div class="msg-row" [class.msg-user]="msg.role === 'user'" [class.msg-ora]="msg.role === 'assistant'">
-                @if (msg.role === 'assistant') { <div class="msg-avatar">O</div> }
+                @if (msg.role === 'assistant') {
+                  <div class="msg-avatar ora-avatar-icon"><mat-icon>smart_toy</mat-icon></div>
+                } @else {
+                  <div class="msg-avatar user-avatar-icon"><mat-icon>person</mat-icon></div>
+                }
                 <div class="msg-content">
-                  <div class="msg-bubble">{{ msg.content }}</div>
+                  <div class="msg-bubble">
+                    <div class="msg-text">{{ msg.content }}</div>
+                  </div>
                   <span class="msg-time">{{ msg.time }}</span>
                 </div>
               </div>
             }
             @if (loading()) {
               <div class="msg-row msg-ora">
-                <div class="msg-avatar">O</div>
+                <div class="msg-avatar ora-avatar-icon"><mat-icon>smart_toy</mat-icon></div>
                 <div class="msg-typing"><span class="t-dot"></span><span class="t-dot"></span><span class="t-dot"></span></div>
               </div>
             }
           </div>
           <div class="ora-footer">
             <div class="ora-input-wrap">
-              <input class="ora-input" [(ngModel)]="inputText" placeholder="Type a message..." (keydown.enter)="sendMessage()" [disabled]="loading()" autofocus>
+              <input class="ora-input" [(ngModel)]="inputText" placeholder="Ask Ora anything..." (keydown.enter)="sendMessage()" [disabled]="loading()" autofocus>
               <button class="ora-send" (click)="sendMessage()" [disabled]="!inputText.trim() || loading()">
-                @if (loading()) { <mat-spinner diameter="18"></mat-spinner> } @else { <mat-icon>send</mat-icon> }
+                @if (loading()) { <mat-spinner diameter="18"></mat-spinner> } @else { <mat-icon>arrow_upward</mat-icon> }
               </button>
             </div>
           </div>
@@ -45,28 +53,36 @@
         <div class="d-widget">
           <div class="d-header">
             <div class="d-header-left">
-              <span class="ora-avatar">O</span>
+              <span class="ora-avatar">
+                <mat-icon>smart_toy</mat-icon>
+              </span>
               <div>
                 <span class="ora-name">Ora</span>
-                <span class="ora-status">AI Assistant &bull; Online</span>
+                <span class="ora-status"><span class="status-dot"></span> Online &bull; AI Assistant</span>
               </div>
             </div>
             <button class="ora-close" (click)="close.emit()"><mat-icon>close</mat-icon></button>
           </div>
           <div class="d-body" #messagesContainer>
-            <div class="ora-date-divider">Today</div>
+            <div class="msg-divider"><span>Today</span></div>
             @for (msg of messages(); track msg) {
               <div class="msg-row" [class.msg-user]="msg.role === 'user'" [class.msg-ora]="msg.role === 'assistant'">
-                @if (msg.role === 'assistant') { <div class="msg-avatar">O</div> }
+                @if (msg.role === 'assistant') {
+                  <div class="msg-avatar ora-avatar-icon"><mat-icon>smart_toy</mat-icon></div>
+                } @else {
+                  <div class="msg-avatar user-avatar-icon"><mat-icon>person</mat-icon></div>
+                }
                 <div class="msg-content">
-                  <div class="msg-bubble">{{ msg.content }}</div>
+                  <div class="msg-bubble">
+                    <div class="msg-text">{{ msg.content }}</div>
+                  </div>
                   <span class="msg-time">{{ msg.time }}</span>
                 </div>
               </div>
             }
             @if (loading()) {
               <div class="msg-row msg-ora">
-                <div class="msg-avatar">O</div>
+                <div class="msg-avatar ora-avatar-icon"><mat-icon>smart_toy</mat-icon></div>
                 <div class="msg-typing"><span class="t-dot"></span><span class="t-dot"></span><span class="t-dot"></span></div>
               </div>
             }
@@ -78,9 +94,9 @@
           </div>
           <div class="d-footer">
             <div class="ora-input-wrap">
-              <input class="ora-input" [(ngModel)]="inputText" placeholder="Type a message..." (keydown.enter)="sendMessage()" [disabled]="loading()">
+              <input class="ora-input" [(ngModel)]="inputText" placeholder="Ask Ora anything..." (keydown.enter)="sendMessage()" [disabled]="loading()">
               <button class="ora-send" (click)="sendMessage()" [disabled]="!inputText.trim() || loading()">
-                @if (loading()) { <mat-spinner diameter="18"></mat-spinner> } @else { <mat-icon>send</mat-icon> }
+                @if (loading()) { <mat-spinner diameter="18"></mat-spinner> } @else { <mat-icon>arrow_upward</mat-icon> }
               </button>
             </div>
             <span class="d-footer-note">Powered by BetPool AI</span>
@@ -88,4 +104,3 @@
         </div>
       </div>
     }
-  

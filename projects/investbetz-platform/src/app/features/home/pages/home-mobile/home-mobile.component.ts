@@ -13,7 +13,7 @@ import { PodCardComponent } from '../../components/pod-card/pod-card.component';
 import { StakeModalComponent } from '../../components/stake-modal/stake-modal.component';
 import { BetSlipComponent } from '../../components/bet-slip/bet-slip.component';
 import { FeaturedBannerComponent } from '../../components/featured-banner/featured-banner.component';
-import { TopUpModalComponent } from '../../../../core/components';
+import { TopUpModalComponent, OraChatComponent } from '../../../../core/components';
 import { MobileNavComponent } from '../../../../core/components';
 import { HomeStore } from '../../stores/home.store';
 
@@ -35,7 +35,8 @@ import { HomeStore } from '../../stores/home.store';
     BetSlipComponent,
     FeaturedBannerComponent,
     TopUpModalComponent,
-    MobileNavComponent
+    MobileNavComponent,
+    OraChatComponent
   ],
   templateUrl: './home-mobile.component.html',
   styleUrls: ['./home-mobile.component.scss']
@@ -45,6 +46,11 @@ export class HomeMobileComponent implements OnInit {
   readonly store = inject(HomeStore);
 
   showTopUp = signal(false);
+  showOraChat = signal(false);
+
+  openOraChat() { this.showOraChat.set(true); }
+
+  closeOraChat() { this.showOraChat.set(false); }
 
   ngOnInit() {
     this.store.init();

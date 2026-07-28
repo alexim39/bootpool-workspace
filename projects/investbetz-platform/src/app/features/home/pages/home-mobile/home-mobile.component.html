@@ -123,6 +123,20 @@
     }
   </main>
 
+  @if (!store.betSlipOpen()) {
+  <button class="ora-chat-fab" (click)="openOraChat()" aria-label="Chat with Ora">
+    <svg class="ora-fab-icon" viewBox="0 0 24 24" fill="none">
+      <path d="M4 17V7a3 3 0 013-3h10a3 3 0 013 3v8l-3-1.5H7L4 17z" fill="currentColor"/>
+      <path d="M8 8h8M8 11.5h6" stroke="#0A1428" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </button>
+  }
+
+  @if (showOraChat()) {
+    <div class="ora-chat-backdrop" (click)="closeOraChat()"></div>
+    <app-ora-chat (close)="closeOraChat()" />
+  }
+
   @if (store.selectedPod()) {
     <app-stake-modal
       [pod]="store.selectedPod()!"
@@ -130,7 +144,6 @@
       (close)="store.closeStakeModal()"
       (stakePlaced)="onStakePlaced()"
     />
-    
   }
 
   <app-top-up-modal [visible]="showTopUp()" [disableClose]="true" (close)="showTopUp.set(false)" />

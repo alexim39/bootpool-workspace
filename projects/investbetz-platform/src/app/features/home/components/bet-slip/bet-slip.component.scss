@@ -74,6 +74,7 @@
     @media (max-width: 768px) {
       .bet-slip { position: fixed; bottom: 60px; left: 0; right: 0; z-index: 1000; border-radius: 16px 16px 0 0; max-height: calc(70vh - 60px); transform: translateY(calc(100% - 50px)); transition: transform 0.3s ease; padding-bottom: env(safe-area-inset-bottom, 0); }
       .bet-slip.open { transform: translateY(0); }
+      .bet-slip.open .slip-clear-btn { margin-left: auto; }
       .slip-toggle-btn { display: flex !important; }
       .slip-overlay { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: -1; }
       .bet-slip:not(.open) .slip-selections,
@@ -81,5 +82,7 @@
       .bet-slip:not(.open) .slip-stake,
       .bet-slip:not(.open) .slip-payout,
       .bet-slip:not(.open) .place-bet-btn { display: none; }
+      /* Keep header content away from the Ora FAB on the right */
+      .bet-slip:not(.open) .slip-header { padding-right: 70px; }
     }
   
