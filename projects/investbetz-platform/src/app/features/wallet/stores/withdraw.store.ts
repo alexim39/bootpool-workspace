@@ -236,6 +236,7 @@ export class WithdrawStore {
     this._wallet.initiateWithdrawal({
       amount: Number(formVal.amount),
       bankCode: formVal.bankCode,
+      bankName: this.getBankName(formVal.bankCode),
       accountNumber: formVal.accountNumber,
       accountName,
       pin

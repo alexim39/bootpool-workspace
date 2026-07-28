@@ -192,6 +192,7 @@ export class WalletService {
   initiateWithdrawal(data: { 
     amount: number; 
     bankCode: string; 
+    bankName?: string;
     accountNumber: string; 
     accountName: string;
     pin: string;

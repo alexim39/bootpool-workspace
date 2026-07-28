@@ -81,7 +81,7 @@ export class PodService {
 
   pods = signal<Pod[]>([]);
   upcoming = signal<Pod[]>([]);
-  sports = signal<string[]>([]);
+  sports = signal<{ sport: string; count: number }[]>([]);
   loading = signal(false);
   loadingMore = signal(false);
   error = signal<string | null>(null);
@@ -195,7 +195,7 @@ export class PodService {
   }
 
   fetchSports() {
-    this.http.get<{ success: boolean; data: string[] }>(`${environment.apiUrl}/pods/sports`).subscribe({
+    this.http.get<{ success: boolean; data: { sport: string; count: number }[] }>(`${environment.apiUrl}/pods/sports`).subscribe({
       next: (res) => {
         if (res.success) this.sports.set(res.data);
       },

@@ -48,6 +48,10 @@
             <th mat-header-cell *matHeaderCellDef>Account</th>
             <td mat-cell *matCellDef="let w">{{ w.metadata?.accountNumber || '—' }}</td>
           </ng-container>
+          <ng-container matColumnDef="accountName">
+            <th mat-header-cell *matHeaderCellDef>Account Name</th>
+            <td mat-cell *matCellDef="let w">{{ w.metadata?.accountName || '—' }}</td>
+          </ng-container>
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef>Status</th>
             <td mat-cell *matCellDef="let w">
@@ -87,12 +91,6 @@
         <div class="detail-header">
           <h3>Withdrawal Details</h3>
           <div class="detail-actions">
-            <button mat-stroked-button class="btn-approve" *ngIf="detail.status === 'pending'" (click)="store.approve(detail)" [disabled]="store.actionLoading()">
-              <mat-icon>check_circle</mat-icon> Approve & Process
-            </button>
-            <button mat-stroked-button class="btn-reject" *ngIf="detail.status === 'pending'" (click)="store.showReject.set(true)" [disabled]="store.actionLoading()">
-              <mat-icon>cancel</mat-icon> Reject
-            </button>
             <button mat-icon-button (click)="store.detail.set(null); store.detailId.set(null)"><mat-icon>close</mat-icon></button>
           </div>
         </div>
@@ -111,18 +109,6 @@
           <div class="detail-item" *ngIf="detail.failureReason"><span class="d-label">Failure Reason</span><span class="d-value" style="color:#f44336">{{ detail.failureReason }}</span></div>
         </div>
 
-        <div class="reject-form" *ngIf="store.showReject()">
-          <mat-form-field appearance="outline" class="reject-input">
-            <mat-label>Rejection reason</mat-label>
-            <input matInput [ngModel]="store.rejectReason()" (ngModelChange)="store.rejectReason.set($event)" placeholder="Enter reason for rejection">
-          </mat-form-field>
-          <div class="reject-actions">
-            <button mat-stroked-button class="btn-cancel" (click)="store.showReject.set(false)">Cancel</button>
-            <button mat-stroked-button class="btn-reject" (click)="store.reject(detail)" [disabled]="!store.rejectReason().trim()">
-              Confirm Reject
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   

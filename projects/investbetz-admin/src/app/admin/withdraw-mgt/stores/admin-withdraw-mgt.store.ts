@@ -18,7 +18,7 @@ export class AdminWithdrawMgtStore {
   readonly showReject = signal(false);
   readonly rejectReason = signal('');
 
-  readonly columns = ['user', 'amount', 'fee', 'bank', 'account', 'status', 'date', 'actions'];
+  readonly columns = ['user', 'amount', 'fee', 'bank', 'account', 'accountName', 'status', 'date', 'actions'];
 
   load() {
     this.loading.set(true);

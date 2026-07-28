@@ -35,14 +35,14 @@
       class="sport-chip"
       [class.active]="!store.selectedSport()"
       (click)="store.selectSport(null)">
-      All
+      All ({{ store.pods.totalPods() }})
     </button>
-    @for (sport of store.sports(); track sport) {
+    @for (item of store.sports(); track item.sport) {
       <button
         class="sport-chip"
-        [class.active]="store.selectedSport() === sport"
-        (click)="store.selectSport(sport)">
-        {{ sport }}
+        [class.active]="store.selectedSport() === item.sport"
+        (click)="store.selectSport(item.sport)">
+        {{ item.sport }} ({{ item.count }})
       </button>
     }
   </div>

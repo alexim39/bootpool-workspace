@@ -83,8 +83,7 @@ export class HomeStore implements OnDestroy {
   }
 
   onSportChange(index: number) {
-    const tabs = ['All', ...this.sports()];
-    this.selectSport(index === 0 ? null : tabs[index]);
+    this.selectSport(index === 0 ? null : this.sports()[index - 1].sport);
   }
 
   loadMore() {

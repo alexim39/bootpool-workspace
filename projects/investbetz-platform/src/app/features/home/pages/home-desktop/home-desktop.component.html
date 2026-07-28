@@ -12,9 +12,9 @@
   </div>
 
   <mat-tab-group class="sports-tabs" (selectedTabChange)="store.onSportChange($event.index)">
-    <mat-tab label="All"><!-- All --></mat-tab>
-    @for (sport of store.sports(); track sport) {
-      <mat-tab [label]="sport"><!-- {{ sport }} --></mat-tab>
+    <mat-tab [label]="'All (' + store.pods.totalPods() + ')'"><!-- All ({{ store.pods.totalPods() }}) --></mat-tab>
+    @for (item of store.sports(); track item.sport) {
+      <mat-tab [label]="item.sport + ' (' + item.count + ')'"><!-- {{ item.sport }} ({{ item.count }}) --></mat-tab>
     }
   </mat-tab-group>
 
