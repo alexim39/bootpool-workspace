@@ -309,6 +309,10 @@ export class AdminService {
     return this.http.post<{ success: boolean; data: AdminStake }>(`${this.baseUrl}/stakes/${id}/settle`, { result });
   }
 
+  settleStakeLeg(id: string, legIndex: number, result: string): Observable<{ success: boolean; data: AdminStake }> {
+    return this.http.post<{ success: boolean; data: AdminStake }>(`${this.baseUrl}/stakes/${id}/leg/${legIndex}/settle`, { result });
+  }
+
   voidStake(id: string): Observable<{ success: boolean; data: AdminStake }> {
     return this.http.post<{ success: boolean; data: AdminStake }>(`${this.baseUrl}/stakes/${id}/void`, {});
   }

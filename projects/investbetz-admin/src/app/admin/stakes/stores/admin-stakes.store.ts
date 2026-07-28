@@ -80,4 +80,16 @@ export class AdminStakesStore {
       this.loadStakes();
     });
   }
+
+  settleLeg(id: string, legIndex: number, result: string) {
+    this.admin.settleStakeLeg(id, legIndex, result).pipe(takeUntil(this.destroy$)).subscribe(() => {
+      const current = this.selectedStake();
+      if (current && (current._id || current.id) === id) {
+        this.admin.getStake(id).pipe(takeUntil(this.destroy$)).subscribe(res => {
+          if (res.success) this.selectedStake.set(res.data);
+        });
+      }
+      this.loadStakes();
+    });
+  }
 }

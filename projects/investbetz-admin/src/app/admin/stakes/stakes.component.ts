@@ -24,7 +24,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class StakesComponent implements OnInit, OnDestroy {
   readonly store = inject(AdminStakesStore);
-  readonly columns = ['id', 'user', 'amount', 'status', 'createdAt', 'actions'];
+  readonly columns = ['id', 'type', 'user', 'amount', 'status', 'createdAt', 'actions'];
 
   ngOnInit() {
     this.store.loadStakes();
@@ -49,5 +49,16 @@ export class StakesComponent implements OnInit, OnDestroy {
   statusColor(s: string): string {
     const map: Record<string, string> = { pending: '#E8B923', confirmed: '#00E676', active: '#E8B923', won: '#00E676', lost: '#888', void: '#666', cashed_out: '#2196f3', cancelled: '#f44336', refunded: '#888' };
     return map[s] || '#555';
+  }
+
+  legProgress(s: AdminStake): number {
+    if (!s.items || s.items.length === 0) return 0;
+    const settled = s.items.filter(i => i.status !== 'pending').length;
+    return Math.round((settled / s.items.length) * 100);
+  }
+
+  settledLegCount(s: AdminStake): number {
+    if (!s.items) return 0;
+    return s.items.filter(i => i.status !== 'pending').length;
   }
 }
