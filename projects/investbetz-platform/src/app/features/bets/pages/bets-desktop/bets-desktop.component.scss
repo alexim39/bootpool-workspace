@@ -39,9 +39,21 @@
     .odds-value { font-weight: 600; color: #E8B923; }
     .parlay-odds { color: #CE93D8; }
     .parlay-legs-count { display: block; font-size: 10px; color: rgba(255,255,255,0.4); }
-    .parlay-summary { display: flex; flex-direction: column; gap: 2px; }
-    .parlay-badge { font-size: 11px; color: #CE93D8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
-    .parlay-teams { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.3; }
+    .parlay-table-body { display: flex; flex-direction: column; gap: 6px; }
+    .parlay-table-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px 2px 6px; background: linear-gradient(135deg, rgba(206,147,216,0.12), rgba(156,39,176,0.08)); border: 1px solid rgba(206,147,216,0.15); border-radius: 12px; width: fit-content; font-size: 10px; font-weight: 700; color: #CE93D8; text-transform: uppercase; letter-spacing: 0.5px; }
+    .parlay-table-badge mat-icon { font-size: 12px; width: 12px; height: 12px; color: #CE93D8; }
+    .parlay-table-badge-count { font-size: 9px; color: rgba(206,147,216,0.5); font-weight: 600; margin-left: 2px; }
+    .parlay-table-legs { display: flex; flex-direction: column; gap: 2px; }
+    .parlay-table-leg { display: flex; align-items: center; gap: 6px; padding: 3px 6px; background: rgba(255,255,255,0.03); border-radius: 4px; border-left: 2px solid rgba(206,147,216,0.2); }
+    .parlay-table-leg.leg-won { border-left-color: #00E676; background: rgba(0,230,118,0.04); }
+    .parlay-table-leg.leg-lost { border-left-color: #f44336; background: rgba(244,67,54,0.04); }
+    .parlay-table-leg.leg-void { border-left-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.01); opacity: 0.6; }
+    .parlay-table-leg-index { width: 15px; height: 15px; border-radius: 3px; background: rgba(206,147,216,0.12); color: #CE93D8; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; flex-shrink: 0; }
+    .parlay-table-leg.leg-won .parlay-table-leg-index { background: rgba(0,230,118,0.15); color: #00E676; }
+    .parlay-table-leg.leg-lost .parlay-table-leg-index { background: rgba(244,67,54,0.15); color: #f44336; }
+    .parlay-table-leg-info { display: flex; flex-direction: column; gap: 0; }
+    .parlay-table-leg-info span:first-child { font-size: 12px; color: #fff; font-weight: 500; }
+    .parlay-table-leg-pick { font-size: 10px; color: rgba(255,255,255,0.4); }
     .stake-amount { font-weight: 600; color: #FFFFFF; }
     .payout-info { display: flex; flex-direction: column; gap: 2px; }
     .net-payout { font-weight: 600; color: #00E676; }

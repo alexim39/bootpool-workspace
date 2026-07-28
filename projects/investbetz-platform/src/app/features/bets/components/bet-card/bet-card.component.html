@@ -1,5 +1,5 @@
 
-    <mat-card class="bet-card" [class.settled]="stake.isSettled">
+    <mat-card class="bet-card" [class.settled]="stake.isSettled" [class.parlay]="stake.isParlay">
       <mat-card-content>
         <div class="bet-header">
           <div class="bet-status">
@@ -18,19 +18,34 @@
         </div>
 
         @if (stake.isParlay && stake.items) {
-          <div class="parlay-badge">ACCUMULATOR ({{ stake.items.length }} legs)</div>
-          <div class="parlay-legs">
-            @for (item of stake.items; track item.pod) {
-              <div class="parlay-leg">
-                <span class="leg-teams">{{ item.homeTeam }} vs {{ item.awayTeam }}</span>
-                <span class="leg-odds">{{ item.gainsMultiplier.toFixed(2) }}x</span>
-                <span class="leg-selection">{{ item.selection }}</span>
+          <div class="parlay-type-badge">
+            <mat-icon class="parlay-type-icon">stacked_bar_chart</mat-icon>
+            <span class="parlay-type-label">Accumulator</span>
+            <span class="parlay-type-count">{{ stake.items.length }} legs</span>
+          </div>
+          <div class="parlay-card-body">
+            @for (item of stake.items; track item.pod; let i = $index) {
+              <div class="parlay-leg-row" [class.leg-won]="item.status === 'won'" [class.leg-lost]="item.status === 'lost'" [class.leg-void]="item.status === 'void'">
+                <div class="parlay-leg-index">{{ i + 1 }}</div>
+                <div class="parlay-leg-info">
+                  <div class="parlay-leg-match">{{ item.homeTeam }} vs {{ item.awayTeam }}</div>
+                  <div class="parlay-leg-pick">{{ item.selection }}</div>
+                </div>
+                <div class="parlay-leg-multiplier">
+                  <span class="parlay-leg-odds">{{ item.gainsMultiplier.toFixed(2) }}x</span>
+                  @if (item.status !== 'pending') {
+                    <span class="parlay-leg-outcome" [class.outcome-won]="item.status === 'won'" [class.outcome-lost]="item.status === 'lost'" [class.outcome-void]="item.status === 'void'">{{ item.status }}</span>
+                  }
+                </div>
               </div>
             }
-          </div>
-          <div class="bet-selection">
-            <span class="odds parlay-odds">{{ stake.combinedMultiplier?.toFixed(2) }}x</span>
-            <span class="parlay-label">Combined Odds</span>
+            <div class="parlay-combined-row">
+              <div class="parlay-combined-label">
+                <mat-icon>calculate</mat-icon>
+                <span>Combined Odds</span>
+              </div>
+              <span class="parlay-combined-odds">{{ stake.combinedMultiplier?.toFixed(2) }}x</span>
+            </div>
           </div>
         } @else {
           <div class="bet-match">
@@ -43,19 +58,14 @@
               @if (stake.pod.marketType) {
                 <span class="market-type">{{ stake.pod.marketType }}</span>
               }
-              
               @if (stake.pod.refundPercent) {
                 <span class="refund-chip">{{ stake.pod.refundPercent }}% cash back</span>
               }
-              
               @if (stake.pod.matchDate) {
-                <span class="match-time">
-                  {{ formatMatchTime(stake.pod.matchDate) }}
-                </span>
+                <span class="match-time">{{ formatMatchTime(stake.pod.matchDate) }}</span>
               }
             </div>
           </div>
-
           @if (stake.isSettled) {
             <div class="bet-selection">
               <span class="selection">{{ stake.pod.selection }}</span>

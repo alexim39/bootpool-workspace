@@ -124,6 +124,20 @@ export class StakeService {
     return { Authorization: `Bearer ${this.auth.token()}` };
   }
 
+  private mapStake(s: any): Stake {
+    const id = (s as any)._id || s.id;
+    const items = s.items && s.items.length > 0 ? s.items : undefined;
+    return {
+      ...s,
+      id,
+      items,
+      isParlay: Array.isArray(items) && items.length > 1,
+      isSettled: ['won', 'lost', 'void', 'refunded', 'cashed_out'].includes(s.status),
+      isActive: ['pending', 'confirmed'].includes(s.status),
+      profit: s.status === 'won' ? (s.netPayout || 0) - (s.stakeAmount || 0) : s.status === 'lost' ? (s.refundAmount || 0) - (s.stakeAmount || 0) : 0
+    };
+  }
+
   fetchMyStakes(page = 1, limit = 20, status?: string): Observable<StakesResponse> {
     this.loading.set(true);
     this.error.set(null);
@@ -140,7 +154,7 @@ export class StakeService {
       }).subscribe({
         next: (res) => {
           if (res.success) {
-            const mapped = res.data.stakes.map(s => ({ ...s, id: (s as any)._id || s.id }));
+            const mapped = res.data.stakes.map(s => this.mapStake(s));
             if (page === 1) this.stakes.set(mapped);
             else this.stakes.update(s => [...s, ...mapped]);
             this.totalStakes.set(res.data.total);
@@ -172,7 +186,7 @@ export class StakeService {
       headers: this.getHeaders()
     }).subscribe({
       next: (res) => {
-        if (res.success) this.activeStakes.set(res.data.map(s => ({ ...s, id: (s as any)._id || s.id })));
+        if (res.success) this.activeStakes.set(res.data.map(s => this.mapStake(s)));
       },
       error: (err) => {
         this.error.set(err.error?.message || 'Failed to fetch active stakes');

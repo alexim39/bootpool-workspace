@@ -18,6 +18,7 @@
     .list-content { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
     .bet-card-mobile { background: #0D1A30; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 14px; }
     .bet-card-mobile.settled { opacity: 0.7; }
+    .bet-card-mobile.parlay { border-color: rgba(206,147,216,0.15); background: linear-gradient(135deg, #0D1A30 0%, rgba(206,147,216,0.03) 100%); border-left: 3px solid rgba(206,147,216,0.25); }
     .bet-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .bet-status { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 4px; }
     .bet-status.won { background: rgba(0,230,118,0.15); color: #00E676; }
@@ -40,14 +41,33 @@
     .bet-amounts .emerald { color: #00E676; }
     .btn-cashout { width: 44px; height: 44px; border-radius: 50%; background: rgba(0,230,118,0.15); border: none; color: #00E676; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .btn-cashout mat-icon { font-size: 22px; }
-    .parlay-legs { display: flex; flex-direction: column; gap: 4px; padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.04); margin-bottom: 8px; }
-    .parlay-leg { display: flex; align-items: center; gap: 6px; font-size: 12px; padding: 3px 6px; background: rgba(255,255,255,0.03); border-radius: 4px; }
-    .leg-teams { flex: 1; color: rgba(255,255,255,0.7); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .leg-detail { color: rgba(255,255,255,0.4); font-size: 11px; white-space: nowrap; }
-    .leg-status { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 1px 5px; border-radius: 3px; }
-    .leg-status.won { background: rgba(0,230,118,0.15); color: #00E676; }
-    .leg-status.lost { background: rgba(244,67,54,0.15); color: #f44336; }
-    .leg-status.void { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); }
+    /* ── Mobile parlay styles ── */
+    .parlay-mobile-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px 3px 6px; background: linear-gradient(135deg, rgba(206,147,216,0.12), rgba(156,39,176,0.08)); border: 1px solid rgba(206,147,216,0.15); border-radius: 16px; margin-bottom: 10px; }
+    .parlay-mobile-badge-icon { font-size: 14px; width: 14px; height: 14px; color: #CE93D8; }
+    .parlay-mobile-badge-label { font-size: 10px; font-weight: 700; color: #CE93D8; text-transform: uppercase; letter-spacing: 0.6px; }
+    .parlay-mobile-badge-count { font-size: 9px; color: rgba(206,147,216,0.5); font-weight: 600; }
+    .parlay-mobile-legs-container { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px solid rgba(206,147,216,0.06); padding: 6px; }
+    .parlay-mobile-leg { display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid transparent; }
+    .parlay-mobile-leg.leg-won { background: rgba(0,230,118,0.04); border-color: rgba(0,230,118,0.12); }
+    .parlay-mobile-leg.leg-lost { background: rgba(244,67,54,0.04); border-color: rgba(244,67,54,0.12); }
+    .parlay-mobile-leg.leg-void { background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.04); opacity: 0.6; }
+    .parlay-mobile-leg-index { width: 20px; height: 20px; border-radius: 5px; background: rgba(206,147,216,0.12); color: #CE93D8; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; flex-shrink: 0; }
+    .parlay-mobile-leg.leg-won .parlay-mobile-leg-index { background: rgba(0,230,118,0.15); color: #00E676; }
+    .parlay-mobile-leg.leg-lost .parlay-mobile-leg-index { background: rgba(244,67,54,0.15); color: #f44336; }
+    .parlay-mobile-leg-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+    .parlay-mobile-leg-match { font-size: 12px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .parlay-mobile-leg-pick { font-size: 10px; color: rgba(255,255,255,0.4); }
+    .parlay-mobile-leg-pick::before { content: 'Pick:'; color: rgba(255,255,255,0.25); font-weight: 500; margin-right: 2px; }
+    .parlay-mobile-leg-odds-block { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; flex-shrink: 0; }
+    .parlay-mobile-leg-odds { font-size: 13px; font-weight: 800; color: #E8B923; }
+    .parlay-mobile-leg-outcome { font-size: 8px; font-weight: 800; padding: 1px 5px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .parlay-mobile-leg-outcome.outcome-won { background: rgba(0,230,118,0.15); color: #00E676; }
+    .parlay-mobile-leg-outcome.outcome-lost { background: rgba(244,67,54,0.15); color: #f44336; }
+    .parlay-mobile-leg-outcome.outcome-void { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
+    .parlay-mobile-combined { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; margin: 0; background: linear-gradient(135deg, rgba(206,147,216,0.06), rgba(156,39,176,0.03)); border-radius: 8px; border: 1px solid rgba(206,147,216,0.08); }
+    .parlay-mobile-combined-label { display: flex; align-items: center; gap: 4px; font-size: 10px; color: rgba(206,147,216,0.5); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+    .parlay-mobile-combined-label mat-icon { font-size: 14px; width: 14px; height: 14px; color: rgba(206,147,216,0.4); }
+    .parlay-mobile-combined-odds { font-size: 17px; font-weight: 900; color: #CE93D8; }
     .bet-result { display: flex; justify-content: space-between; padding-top: 8px; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.04); font-size: 14px; }
     .positive { color: #00E676; font-weight: 700; }
     .negative { color: rgba(255,255,255,0.5); font-weight: 700; }
