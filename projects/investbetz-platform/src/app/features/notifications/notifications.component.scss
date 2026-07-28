@@ -1,12 +1,12 @@
 
     .notif-page { max-width: 720px; margin: 0 auto; padding: 24px 16px 100px; }
-    .notif-page.mobile { padding: 0 0 80px; }
+    .notif-page.mobile { padding: 0 0 100px; }
     .notif-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-    .notif-page.mobile .notif-header { padding: 12px 16px; margin-bottom: 0; background: rgba(10,20,40,0.95); position: sticky; top: 0; z-index: 10; }
-    .back-btn { color: rgba(255,255,255,0.5); text-decoration: none; display: flex; }
-    .back-btn:hover { color: #fff; }
     .notif-header h1 { font-size: 20px; font-weight: 700; color: #fff; margin: 0; flex: 1; }
     .mark-all-link { background: none; border: none; color: #00E676; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .mobile-header { display: flex; align-items: center; gap: 4px; padding: 8px 12px; background: rgba(10,20,40,0.96); position: sticky; top: 0; z-index: 10; }
+    .mobile-header h1 { font-size: 18px; font-weight: 700; color: #fff; margin: 0; flex: 1; }
+    .bottom-spacer { height: 80px; }
 
     .notif-tabs { display: flex; gap: 4px; margin-bottom: 16px; background: rgba(255,255,255,0.03); border-radius: 10px; padding: 3px; }
     .notif-page.mobile .notif-tabs { margin: 12px 16px; }

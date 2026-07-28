@@ -40,12 +40,19 @@
               <span class="team away">{{ stake.pod.awayTeam }}</span>
             </div>
             <div class="match-info">
-              <span class="league" *ngIf="stake.pod.league">{{ stake.pod.league }}</span>
-              <span class="market-type" *ngIf="stake.pod.marketType">{{ stake.pod.marketType }}</span>
-              <span class="refund-chip" *ngIf="stake.pod.refundPercent">{{ stake.pod.refundPercent }}% cash back</span>
-              <span class="match-time" *ngIf="stake.pod.matchDate">
-                {{ formatMatchTime(stake.pod.matchDate) }}
-              </span>
+              @if (stake.pod.marketType) {
+                <span class="market-type">{{ stake.pod.marketType }}</span>
+              }
+              
+              @if (stake.pod.refundPercent) {
+                <span class="refund-chip">{{ stake.pod.refundPercent }}% cash back</span>
+              }
+              
+              @if (stake.pod.matchDate) {
+                <span class="match-time">
+                  {{ formatMatchTime(stake.pod.matchDate) }}
+                </span>
+              }
             </div>
           </div>
 

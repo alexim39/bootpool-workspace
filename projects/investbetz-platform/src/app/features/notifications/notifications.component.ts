@@ -5,11 +5,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { Subject, takeUntil } from 'rxjs';
 import { NotificationService, AppNotification } from '../../core/services';
 import { DeviceService } from '../../core/services';
+import { AppNavComponent, MobileNavComponent } from '../../core/components';
 
 @Component({
   selector: 'app-notifications',
   standalone: true,
-  imports: [RouterModule, MatIconModule, MatButtonModule],
+  imports: [RouterModule, MatIconModule, MatButtonModule, AppNavComponent, MobileNavComponent],
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.scss']
 })

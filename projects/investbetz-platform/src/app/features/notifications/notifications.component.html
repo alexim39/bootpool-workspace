@@ -1,12 +1,26 @@
 
+    @if (!device.isMobile()) {
+      <app-nav />
+    }
+
     <div class="notif-page" [class.mobile]="device.isMobile()">
-      <div class="notif-header">
-        <a routerLink="/home" class="back-btn"><mat-icon>arrow_back</mat-icon></a>
-        <h1>Notifications</h1>
-        @if (notifService.notifications().length > 0) {
-          <button class="mark-all-link" (click)="markAllRead()">Mark all read</button>
-        }
-      </div>
+      @if (!device.isMobile()) {
+        <div class="notif-header">
+          <h1>Notifications</h1>
+          @if (notifService.notifications().length > 0) {
+            <button class="mark-all-link" (click)="markAllRead()">Mark all read</button>
+          }
+        </div>
+      }
+      @if (device.isMobile()) {
+        <header class="mobile-header">
+          <button mat-icon-button routerLink="/home"><mat-icon>arrow_back</mat-icon></button>
+          <h1>Notifications</h1>
+          @if (notifService.notifications().length > 0) {
+            <button class="mark-all-link" (click)="markAllRead()">Mark all read</button>
+          }
+        </header>
+      }
 
       <div class="notif-tabs">
         <button class="tab" [class.active]="filter() === 'all'" (click)="filter.set('all'); page.set(1); load()">All</button>
@@ -51,4 +65,9 @@
         </div>
       }
     </div>
+
+    @if (device.isMobile()) {
+      <div class="bottom-spacer"></div>
+      <app-mobile-nav />
+    }
   
