@@ -1,11 +1,10 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { AdminService, AdminStake } from '../../services';
-import { PageEvent } from '@angular/material/paginator';
 
 @Injectable({ providedIn: 'root' })
 export class AdminStakesStore {
-  private admin = inject(AdminService);
+  readonly admin = inject(AdminService);
   private destroy$ = new Subject<void>();
   private search$ = new Subject<string>();
 
@@ -60,12 +59,6 @@ export class AdminStakesStore {
     this.loadStakes();
   }
 
-  onPageChange(e: PageEvent) {
-    this.page.set(e.pageIndex + 1);
-    this.limit.set(e.pageSize);
-    this.loadStakes();
-  }
-
   selectStake(s: AdminStake) {
     const id = s._id || s.id;
     if (!id) return;
@@ -76,19 +69,12 @@ export class AdminStakesStore {
 
   settleStake(id: string, result: string) {
     this.admin.settleStake(id, result).pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.selectedStake.set(null);
       this.loadStakes();
     });
   }
 
   settleLeg(id: string, legIndex: number, result: string) {
     this.admin.settleStakeLeg(id, legIndex, result).pipe(takeUntil(this.destroy$)).subscribe(() => {
-      const current = this.selectedStake();
-      if (current && (current._id || current.id) === id) {
-        this.admin.getStake(id).pipe(takeUntil(this.destroy$)).subscribe(res => {
-          if (res.success) this.selectedStake.set(res.data);
-        });
-      }
       this.loadStakes();
     });
   }
