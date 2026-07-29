@@ -26,6 +26,34 @@
         </div>
       </div>
 
+      @if (store.automationStatus(); as status) {
+        <div class="automation-status-bar" [class.disabled]="!status.enabled">
+          <span class="status-dot" [class.active]="status.enabled && !status.running" [class.running]="status.running" [class.off]="!status.enabled"></span>
+          <span class="status-text">
+            @if (!status.enabled) {
+              Automation disabled
+            } @else if (status.running) {
+              Cycle in progress…
+            } @else {
+              Automated — every 2h
+            }
+          </span>
+          @if (status.lastRunAt) {
+            <span class="separator">|</span>
+            <span class="last-run">Last: {{ status.lastRunAt | date:'MMM d, HH:mm' }}</span>
+          }
+          @if (status.lastResult; as last) {
+            <span class="separator">|</span>
+            <span class="last-result" [class.has-errors]="last.settlement.errors.length">
+              {{ last.curation.created }} pods created
+              @if (last.settlement.errors.length) {
+                , {{ last.settlement.errors.length }} error(s)
+              }
+            </span>
+          }
+        </div>
+      }
+
       @if (store.curationError()) {
         <div class="curation-error-banner">
           <mat-icon>error</mat-icon>

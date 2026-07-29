@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
-import { AdminService, AdminPod, SettlementCheckResult, ReserveConsumption, CurationResponse } from '../../services';
+import { AdminService, AdminPod, AutomationStatus, SettlementCheckResult, ReserveConsumption, CurationResponse } from '../../services';
 import { PageEvent } from '@angular/material/paginator';
 
 @Injectable({ providedIn: 'root' })
@@ -43,6 +43,7 @@ export class AdminPodsStore {
   readonly curationResult = signal<CurationResponse | null>(null);
   readonly curationError = signal<string | null>(null);
   readonly activeTab = signal<'active' | 'past' | 'disputed'>('active');
+  readonly automationStatus = signal<AutomationStatus | null>(null);
 
   readonly draftCount = computed(() => this.pods().filter(p => p.status === 'draft').length);
   readonly publishedCount = computed(() => this.pods().filter(p => p.status === 'published').length);
@@ -70,6 +71,7 @@ export class AdminPodsStore {
       this.page.set(1);
       this.loadPods();
     });
+    this.loadAutomationStatus();
   }
 
   setSearchQuery(q: string) {
@@ -114,6 +116,12 @@ export class AdminPodsStore {
   loadReserve() {
     this.admin.getReserveConsumption().subscribe(res => {
       if (res.success) this.reserve.set(res.data);
+    });
+  }
+
+  loadAutomationStatus() {
+    this.admin.getAutomationStatus().subscribe(res => {
+      if (res.success) this.automationStatus.set(res.data);
     });
   }
 

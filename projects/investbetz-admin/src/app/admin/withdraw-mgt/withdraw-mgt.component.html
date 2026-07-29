@@ -1,8 +1,19 @@
 
     <div class="page">
       <div class="page-header">
-        <h1>Withdrawal Management</h1>
-        <span class="header-count">{{ store.total() }} withdrawals</span>
+        <div class="header-left">
+          <h1>Withdrawals</h1>
+          <div class="stats" *ngIf="store.total() > 0">
+            <span class="stat">{{ store.total() | number }} total</span>
+            <span class="stat-divider"></span>
+            <span class="stat">{{ store.page() }}/{{ store.totalPages() }} pages</span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button mat-stroked-button class="btn-refresh" (click)="store.load()" [disabled]="store.loading()" matTooltip="Refresh">
+            <mat-icon>refresh</mat-icon>
+          </button>
+        </div>
       </div>
 
       <mat-card class="filter-card">
@@ -10,7 +21,7 @@
           <mat-form-field appearance="outline" class="filter-select">
             <mat-label>Status</mat-label>
             <mat-select [ngModel]="store.statusFilter()" (ngModelChange)="store.statusFilter.set($event); store.onFilterChange()">
-              <mat-option value="">All</mat-option>
+              <mat-option value="">All Statuses</mat-option>
               <mat-option value="pending">Pending</mat-option>
               <mat-option value="processing">Processing</mat-option>
               <mat-option value="completed">Completed</mat-option>
@@ -18,56 +29,78 @@
               <mat-option value="cancelled">Cancelled</mat-option>
             </mat-select>
           </mat-form-field>
-          <div class="filter-spacer"></div>
-          <button mat-stroked-button class="btn-refresh" (click)="store.load()">
-            <mat-icon>refresh</mat-icon> Refresh
-          </button>
+          <mat-form-field appearance="outline" class="filter-page-size">
+            <mat-label>Per page</mat-label>
+            <mat-select [ngModel]="store.limit()" (ngModelChange)="store.limit.set($event); store.onFilterChange()">
+              <mat-option [value]="20">20</mat-option>
+              <mat-option [value]="50">50</mat-option>
+              <mat-option [value]="100">100</mat-option>
+              <mat-option [value]="200">200</mat-option>
+            </mat-select>
+          </mat-form-field>
         </div>
       </mat-card>
 
       <mat-card class="table-card">
-        <div class="loading-overlay" *ngIf="store.loading()"><div class="skel-table-wrap"><div class="skel-row" style="padding:12px 16px;gap:16px;border-bottom:1px solid rgba(255,255,255,0.06);margin:0"><div class="skel skel-text-sm" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="flex:0.6;margin:0"></div><div class="skel skel-text-sm" style="flex:0.6;margin:0"></div><div class="skel skel-text-sm" style="flex:0.4;margin:0"></div></div>@for (row of [1,2,3,4,5]; track row) {<div class="skel-row" style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.04);margin:0;gap:16px"><div class="skel skel-text" style="flex:1;margin:0"></div><div class="skel skel-text" style="flex:1;margin:0"></div><div class="skel skel-text" style="flex:1;margin:0"></div><div class="skel skel-text" style="flex:1;margin:0"></div><div class="skel skel-badge" style="flex:0.6;margin:0"></div><div class="skel skel-text-sm" style="flex:0.6;margin:0"></div><div class="skel skel-text" style="flex:0.4;margin:0"></div></div>}</div></div>
+        <div class="loading-bar" *ngIf="store.loading()"><div class="loading-bar-fill"></div></div>
+
         <table mat-table [dataSource]="store.withdrawals()" class="admin-table">
           <ng-container matColumnDef="user">
             <th mat-header-cell *matHeaderCellDef>User</th>
-            <td mat-cell *matCellDef="let w">{{ w.user?.phone || w.user?.fullName || '—' }}</td>
+            <td mat-cell *matCellDef="let w" class="clickable" (click)="store.toggleDetail(w)">
+              <span class="user-info">{{ w.user?.phone || w.user?.fullName || '—' }}</span>
+            </td>
           </ng-container>
           <ng-container matColumnDef="amount">
             <th mat-header-cell *matHeaderCellDef>Amount</th>
-            <td mat-cell *matCellDef="let w" class="cell-amount">₦{{ w.amount | number }}</td>
-          </ng-container>
-          <ng-container matColumnDef="fee">
-            <th mat-header-cell *matHeaderCellDef>Fee</th>
-            <td mat-cell *matCellDef="let w">₦{{ w.fee | number }}</td>
-          </ng-container>
-          <ng-container matColumnDef="bank">
-            <th mat-header-cell *matHeaderCellDef>Bank</th>
-            <td mat-cell *matCellDef="let w">{{ w.metadata?.bankName || '—' }}</td>
+            <td mat-cell *matCellDef="let w" class="clickable cell-amount" (click)="store.toggleDetail(w)">&#x20A6;{{ w.amount | number }}</td>
           </ng-container>
           <ng-container matColumnDef="account">
             <th mat-header-cell *matHeaderCellDef>Account</th>
-            <td mat-cell *matCellDef="let w">{{ w.metadata?.accountNumber || '—' }}</td>
+            <td mat-cell *matCellDef="let w" class="clickable" (click)="store.toggleDetail(w)">
+              <span class="acct-info">{{ w.metadata?.accountName || '—' }}</span>
+              <span class="acct-num">{{ w.metadata?.accountNumber || '' }}</span>
+            </td>
           </ng-container>
-          <ng-container matColumnDef="accountName">
-            <th mat-header-cell *matHeaderCellDef>Account Name</th>
-            <td mat-cell *matCellDef="let w">{{ w.metadata?.accountName || '—' }}</td>
+          <ng-container matColumnDef="bank">
+            <th mat-header-cell *matHeaderCellDef>Bank</th>
+            <td mat-cell *matCellDef="let w" class="clickable" (click)="store.toggleDetail(w)">{{ w.metadata?.bankName || '—' }}</td>
           </ng-container>
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef>Status</th>
             <td mat-cell *matCellDef="let w">
-              <span class="chip" [style.background]="statusColor(w.status) + '33'" [style.color]="statusColor(w.status)">
+              <span class="status-chip" [style]="statusStyle(w.status)">
+                <span class="status-dot" [style.background]="statusColor(w.status)"></span>
                 {{ w.status }}
               </span>
             </td>
           </ng-container>
           <ng-container matColumnDef="date">
             <th mat-header-cell *matHeaderCellDef>Date</th>
-            <td mat-cell *matCellDef="let w">{{ w.createdAt | date:'MMM d, y HH:mm' }}</td>
+            <td mat-cell *matCellDef="let w" class="clickable" (click)="store.toggleDetail(w)">{{ w.createdAt | date:'MMM d, y HH:mm' }}</td>
           </ng-container>
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef></th>
             <td mat-cell *matCellDef="let w">
-              <button mat-icon-button (click)="store.toggleDetail(w)" matTooltip="View details">
+              @if (canApprove(w)) {
+                <button mat-stroked-button class="btn-action approve" (click)="store.approve(w); $event.stopPropagation()"
+                  [disabled]="store.actionLoading() === w._id" matTooltip="Approve and send to Paystack">
+                  <mat-icon>check_circle</mat-icon> Approve
+                </button>
+              }
+              @if (canReverse(w)) {
+                <button mat-stroked-button class="btn-action reverse" (click)="store.confirmAction.set({type:'reverse', w}); $event.stopPropagation()"
+                  [disabled]="store.actionLoading() === w._id" matTooltip="Force-fail and refund user">
+                  <mat-icon>undo</mat-icon> Reverse
+                </button>
+              }
+              @if (canRetry(w)) {
+                <button mat-stroked-button class="btn-action retry" (click)="store.retry(w); $event.stopPropagation()"
+                  [disabled]="store.actionLoading() === w._id" matTooltip="Retry transfer on Paystack">
+                  <mat-icon>refresh</mat-icon> Retry
+                </button>
+              }
+              <button mat-icon-button (click)="store.toggleDetail(w); $event.stopPropagation()" matTooltip="Details">
                 <mat-icon>{{ store.detailId() === w._id ? 'expand_less' : 'expand_more' }}</mat-icon>
               </button>
             </td>
@@ -76,39 +109,168 @@
           <tr mat-row *matRowDef="let row; columns: store.columns;" class="clickable-row" (click)="store.toggleDetail(row)"></tr>
         </table>
 
-        <div class="paginator" *ngIf="store.totalPages() > 1">
-          <button mat-button [disabled]="store.page() <= 1" (click)="store.goTo(store.page() - 1)">Previous</button>
-          <span class="page-info">Page {{ store.page() }} of {{ store.totalPages() }}</span>
-          <button mat-button [disabled]="store.page() >= store.totalPages()" (click)="store.goTo(store.page() + 1)">Next</button>
+        <div class="loading-shim" *ngIf="store.loading() && store.withdrawals().length === 0">
+          <div class="spinner"></div>
         </div>
 
         <div class="empty-state" *ngIf="!store.loading() && store.withdrawals().length === 0">
-          No withdrawals found
+          <mat-icon>account_balance_wallet</mat-icon>
+          <p>No withdrawals found</p>
+        </div>
+
+        <div class="paginator-wrap" *ngIf="store.totalPages() > 1">
+          <div class="paginator-left">
+            <span class="page-info">Showing {{ store.withdrawals().length ? (store.page() - 1) * store.limit() + 1 : 0 }}&ndash;{{ Math.min(store.page() * store.limit(), store.total()) }} of {{ store.total() | number }}</span>
+          </div>
+          <div class="paginator-center">
+            <button mat-icon-button class="page-btn" [disabled]="store.page() <= 1" (click)="store.goTo(1)" matTooltip="First"><mat-icon>first_page</mat-icon></button>
+            <button mat-icon-button class="page-btn" [disabled]="store.page() <= 1" (click)="store.goTo(store.page() - 1)" matTooltip="Previous"><mat-icon>chevron_left</mat-icon></button>
+            @for (p of store.visiblePages(); track p) {
+              <button class="page-num" [class.active]="p === store.page()" (click)="store.goTo(p)">{{ p === -1 || p === -2 ? '...' : p }}</button>
+            }
+            <button mat-icon-button class="page-btn" [disabled]="store.page() >= store.totalPages()" (click)="store.goTo(store.page() + 1)" matTooltip="Next"><mat-icon>chevron_right</mat-icon></button>
+            <button mat-icon-button class="page-btn" [disabled]="store.page() >= store.totalPages()" (click)="store.goTo(store.totalPages())" matTooltip="Last"><mat-icon>last_page</mat-icon></button>
+          </div>
+          <div class="paginator-right">
+            <span class="jump-label">Go to</span>
+            <input #jump type="number" class="jump-input" [value]="store.page()"
+              (keydown.enter)="store.goTo(Math.max(1, Math.min(+jump.value, store.totalPages()))); jump.value=''" min="1" />
+          </div>
         </div>
       </mat-card>
 
-      <div class="detail-panel" *ngIf="store.detail() as detail">
-        <div class="detail-header">
-          <h3>Withdrawal Details</h3>
-          <div class="detail-actions">
-            <button mat-icon-button (click)="store.detail.set(null); store.detailId.set(null)"><mat-icon>close</mat-icon></button>
+      @if (store.detail(); as d) {
+        <div class="detail-panel" [class.panel-processing]="d.status === 'processing'" [class.panel-failed]="d.status === 'failed'" [class.panel-completed]="d.status === 'completed'">
+          <div class="detail-top">
+            <div class="detail-badges">
+              <span class="status-chip-lg" [style]="statusStyle(d.status)">
+                <span class="status-dot" [style.background]="statusColor(d.status)"></span>
+                {{ d.status }}
+              </span>
+              <span class="ref-badge">{{ d.reference }}</span>
+            </div>
+            <div class="detail-close">
+              <button mat-icon-button (click)="store.toggleDetail(d)" matTooltip="Close"><mat-icon>close</mat-icon></button>
+            </div>
+          </div>
+
+          <div class="detail-grid">
+            <div class="detail-section">
+              <div class="detail-section-title">Recipient</div>
+              <div class="detail-rows">
+                <div class="detail-row"><span>Account</span><strong>{{ d.metadata?.accountName || '—' }}</strong></div>
+                <div class="detail-row"><span>Number</span><strong>{{ d.metadata?.accountNumber || '—' }}</strong></div>
+                <div class="detail-row"><span>Bank</span><strong>{{ d.metadata?.bankName || '—' }}</strong></div>
+              </div>
+            </div>
+            <div class="detail-section">
+              <div class="detail-section-title">Amount</div>
+              <div class="detail-rows">
+                <div class="detail-row"><span>Gross</span><strong class="amount">&#x20A6;{{ d.amount | number }}</strong></div>
+                <div class="detail-row"><span>Fee</span><strong>&#x20A6;{{ d.fee | number }}</strong></div>
+                <div class="detail-row"><span>Net sent</span><strong class="amount">&#x20A6;{{ (d.amount - d.fee) | number }}</strong></div>
+              </div>
+            </div>
+            <div class="detail-section">
+              <div class="detail-section-title">Timeline</div>
+              <div class="detail-rows">
+                <div class="detail-row"><span>Created</span><strong>{{ d.createdAt | date:'MMM d, y HH:mm:ss' }}</strong></div>
+                <div class="detail-row"><span>Completed</span><strong>{{ d.completedAt ? (d.completedAt | date:'MMM d, y HH:mm:ss') : '—' }}</strong></div>
+              </div>
+            </div>
+            <div class="detail-section">
+              <div class="detail-section-title">User</div>
+              <div class="detail-rows">
+                <div class="detail-row"><span>Phone</span><strong>{{ d.user?.phone || '—' }}</strong></div>
+                <div class="detail-row"><span>Name</span><strong>{{ d.user?.fullName || '—' }}</strong></div>
+              </div>
+            </div>
+          </div>
+
+          @if (d.failureReason) {
+            <div class="failure-banner">
+              <mat-icon>error_outline</mat-icon>
+              <span>{{ d.failureReason }}</span>
+            </div>
+          }
+
+          @if (d.providerData) {
+            <div class="provider-section">
+              <div class="provider-toggle" (click)="showProvider = !showProvider">
+                <mat-icon>{{ showProvider ? 'expand_less' : 'expand_more' }}</mat-icon>
+                <span>Paystack Response Data</span>
+              </div>
+              @if (showProvider) {
+                <pre class="provider-json">{{ d.providerData | json }}</pre>
+              }
+            </div>
+          }
+
+          <div class="detail-actions" *ngIf="isActionable(d)">
+            @if (canApprove(d)) {
+              <button mat-raised-button class="action-approve" (click)="store.approve(d)"
+                [disabled]="store.actionLoading() === d._id">
+                <mat-icon>check_circle</mat-icon> Approve &amp; Send
+              </button>
+            }
+            @if (canReverse(d)) {
+              <button mat-stroked-button class="action-reverse" (click)="store.confirmAction.set({type:'reverse', w:d})"
+                [disabled]="store.actionLoading() === d._id">
+                <mat-icon>undo</mat-icon> Force Reverse &amp; Refund
+              </button>
+            }
+            @if (d.status === 'pending') {
+              <button mat-stroked-button class="action-reject" (click)="store.showReject.set(true)"
+                [disabled]="store.actionLoading() === d._id">
+                <mat-icon>block</mat-icon> Reject
+              </button>
+            }
+            @if (canRetry(d)) {
+              <button mat-raised-button class="action-retry" (click)="store.retry(d)"
+                [disabled]="store.actionLoading() === d._id">
+                <mat-icon>refresh</mat-icon> Retry Transfer
+              </button>
+            }
+          </div>
+
+          @if (store.showReject()) {
+            <div class="reject-form">
+              <mat-form-field appearance="outline" class="reject-input">
+                <mat-label>Rejection reason</mat-label>
+                <input matInput [ngModel]="store.rejectReason()" (ngModelChange)="store.rejectReason.set($event)" placeholder="Why is this being rejected?" />
+              </mat-form-field>
+              <div class="reject-actions">
+                <button mat-button (click)="store.showReject.set(false)">Cancel</button>
+                <button mat-raised-button color="warn" (click)="store.reject(d)" [disabled]="!store.rejectReason().trim() || store.actionLoading() === d._id">
+                  Confirm Reject &amp; Refund
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (store.confirmAction(); as act) {
+        <div class="confirm-modal">
+          <div class="confirm-overlay" (click)="store.confirmAction.set(null)"></div>
+          <div class="confirm-card">
+            <div class="confirm-icon" [class.icon-reverse]="act.type === 'reverse'">
+              <mat-icon>warning_amber</mat-icon>
+            </div>
+            <h3>{{ act.type === 'reverse' ? 'Reverse Withdrawal' : 'Confirm Action' }}</h3>
+            @if (act.type === 'reverse') {
+              <p>This will mark the withdrawal as failed and <strong>refund &#x20A6;{{ act.w.amount | number }}</strong> back to the user's wallet. This action cannot be undone automatically.</p>
+            }
+            <div class="confirm-actions">
+              <button mat-button (click)="store.confirmAction.set(null)">Cancel</button>
+              @if (act.type === 'reverse') {
+                <button mat-raised-button class="action-reverse-btn" (click)="store.reverse(act.w)" [disabled]="store.actionLoading() === act.w._id">
+                  {{ store.actionLoading() === act.w._id ? 'Processing...' : 'Confirm Reverse & Refund' }}
+                </button>
+              }
+            </div>
           </div>
         </div>
-        <div class="detail-grid">
-          <div class="detail-item"><span class="d-label">Reference</span><span class="d-value">{{ detail.reference }}</span></div>
-          <div class="detail-item"><span class="d-label">User</span><span class="d-value">{{ detail.user?.phone || '—' }} {{ detail.user?.fullName ? '(' + (detail.user?.fullName || '') + ')' : '' }}</span></div>
-          <div class="detail-item"><span class="d-label">Amount</span><span class="d-value">₦{{ detail.amount | number }}</span></div>
-          <div class="detail-item"><span class="d-label">Fee</span><span class="d-value">₦{{ detail.fee | number }}</span></div>
-          <div class="detail-item"><span class="d-label">Net</span><span class="d-value">₦{{ (detail.amount - detail.fee) | number }}</span></div>
-          <div class="detail-item"><span class="d-label">Bank</span><span class="d-value">{{ detail.metadata?.bankName || '—' }}</span></div>
-          <div class="detail-item"><span class="d-label">Account Name</span><span class="d-value">{{ detail.metadata?.accountName || '—' }}</span></div>
-          <div class="detail-item"><span class="d-label">Account Number</span><span class="d-value">{{ detail.metadata?.accountNumber || '—' }}</span></div>
-          <div class="detail-item"><span class="d-label">Status</span><span class="d-value"><span class="chip" [style.background]="statusColor(detail.status) + '33'" [style.color]="statusColor(detail.status)">{{ detail.status }}</span></span></div>
-          <div class="detail-item"><span class="d-label">Created</span><span class="d-value">{{ detail.createdAt | date:'MMM d, y HH:mm:ss' }}</span></div>
-          <div class="detail-item"><span class="d-label">Completed</span><span class="d-value">{{ detail.completedAt ? (detail.completedAt | date:'MMM d, y HH:mm:ss') : '—' }}</span></div>
-          <div class="detail-item" *ngIf="detail.failureReason"><span class="d-label">Failure Reason</span><span class="d-value" style="color:#f44336">{{ detail.failureReason }}</span></div>
-        </div>
-
-      </div>
+      }
     </div>
   

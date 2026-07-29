@@ -9,6 +9,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background:
 .admin-table .mat-mdc-row { background: transparent !important; }
 
 .table-card .mat-mdc-text-field-wrapper { background: rgba(255,255,255,0.05) !important; }
+
+.stake-dialog-panel .mat-mdc-dialog-surface { background: transparent !important; border-radius: 16px !important; box-shadow: 0 24px 80px rgba(0,0,0,0.6) !important; }
+.stake-dialog-backdrop { background: rgba(0,0,0,0.65) !important; backdrop-filter: blur(4px); }
 .table-card .mdc-floating-label { color: rgba(255,255,255,0.5) !important; }
 .table-card .mat-mdc-input-element { color: #fff !important; }
 .table-card .mat-mdc-select-value-text { color: #fff !important; }

@@ -269,6 +269,16 @@ import { AdminPodsStore } from './stores/admin-pods.store';
     .detail-dialog-close:hover { color: #f44336; }
     .detail-dialog-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
     .detail-dialog-actions { display: flex; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; }
+    .automation-status-bar { display: flex; align-items: center; gap: 8px; padding: 8px 16px; margin-bottom: 16px; background: rgba(0,230,118,0.08); border: 1px solid rgba(0,230,118,0.2); border-radius: 8px; font-size: 13px; color: #b0bec5; flex-wrap: wrap; }
+    .automation-status-bar.disabled { background: rgba(255,82,82,0.08); border-color: rgba(255,82,82,0.2); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .status-dot.active { background: #00E676; box-shadow: 0 0 6px #00E676; }
+    .status-dot.running { background: #FFD54F; box-shadow: 0 0 6px #FFD54F; animation: pulse 1.2s infinite; }
+    .status-dot.off { background: #FF5252; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .status-text { color: #eceff1; font-weight: 500; }
+    .separator { color: rgba(255,255,255,0.15); }
+    .last-result.has-errors { color: #FF8A80; }
   `]
 })
 export class PodsComponent implements OnInit, OnDestroy {

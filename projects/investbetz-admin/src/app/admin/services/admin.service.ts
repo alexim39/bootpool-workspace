@@ -12,6 +12,18 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
+export interface AutomationStatus {
+  enabled: boolean;
+  running: boolean;
+  startedAt: string | null;
+  lastRunAt: string | null;
+  lastResult: {
+    curation: { recommended: number; created: number };
+    settlement: { settled: number; errors: string[] };
+  } | null;
+  intervalMs: number | null;
+}
+
 export interface DashboardStats {
   totalUsers: number;
   totalPods?: number;
@@ -190,6 +202,10 @@ export class AdminService {
     return this.http.get<{ success: boolean; data: DashboardStats }>(`${this.baseUrl}/dashboard`);
   }
 
+  getAutomationStatus(): Observable<{ success: boolean; data: AutomationStatus }> {
+    return this.http.get<{ success: boolean; data: AutomationStatus }>(`${this.baseUrl}/automation/status`);
+  }
+
   getPods(params?: { page?: number; limit?: number; status?: string; search?: string; dateFrom?: string; dateTo?: string }): Observable<{ success: boolean; data: PaginatedResponse<AdminPod> }> {
     let hp = new HttpParams();
     if (params?.page) hp = hp.set('page', params.page);
@@ -291,6 +307,14 @@ export class AdminService {
 
   rejectWithdrawal(id: string, reason: string): Observable<{ success: boolean; data: any }> {
     return this.http.post<{ success: boolean; data: any }>(`${this.baseUrl}/withdrawals/${id}/reject`, { reason });
+  }
+
+  reverseWithdrawal(id: string): Observable<{ success: boolean; data: any }> {
+    return this.http.post<{ success: boolean; data: any }>(`${this.baseUrl}/withdrawals/${id}/reverse`, {});
+  }
+
+  retryWithdrawal(id: string): Observable<{ success: boolean; data: any }> {
+    return this.http.post<{ success: boolean; data: any }>(`${this.baseUrl}/withdrawals/${id}/retry`, {});
   }
 
   getStakes(params?: { page?: number; limit?: number; status?: string; userId?: string; podId?: string }): Observable<{ success: boolean; data: PaginatedResponse<AdminStake> }> {
