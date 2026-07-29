@@ -41,6 +41,7 @@ export class AdminBetManagerComponent implements OnInit {
   reconcileLoading = signal(false);
 
   readonly tiers = [
+    { key: 'goalkeeper', label: 'Goalkeeper', icon: '🧤', color: '#90CAF9' },
     { key: 'defender', label: 'Defender', icon: '🛡️', color: '#00E676' },
     { key: 'midfielder', label: 'Midfielder', icon: '⚡', color: '#E8B923' },
     { key: 'striker', label: 'Striker', icon: '🎯', color: '#FF5252' },
@@ -140,5 +141,11 @@ export class AdminBetManagerComponent implements OnInit {
 
   getPoolBalance(tierKey: string): number {
     return this.pools.find(p => p.tier === tierKey)?.balance || 0;
+  }
+
+  getTierStyle(tierKey: string): { background: string; color: string } {
+    const t = this.tiers.find(t => t.key === tierKey);
+    if (!t) return { background: 'rgba(255,255,255,0.1)', color: '#888' };
+    return { background: t.color + '26', color: t.color };
   }
 }

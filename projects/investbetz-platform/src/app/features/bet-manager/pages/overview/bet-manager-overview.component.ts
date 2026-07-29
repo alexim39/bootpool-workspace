@@ -21,6 +21,15 @@ export class BetManagerOverviewComponent implements OnInit {
 
   readonly tiers = [
     {
+      key: 'goalkeeper',
+      label: 'Goalkeeper',
+      icon: '🧤',
+      minDeposit: 20_000,
+      strategy: 'Starter — low entry, steady returns, minimal risk',
+      allocation: 'Low-risk Pods (1.1x–1.5x multiplier)',
+      color: '#90CAF9',
+    },
+    {
       key: 'defender',
       label: 'Defender',
       icon: '🛡️',

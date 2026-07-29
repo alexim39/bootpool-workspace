@@ -22,6 +22,7 @@ export class BetManagerOverviewComponent implements OnInit {
   readonly showGuide = signal(false);
 
   readonly tiers = [
+    { key: 'goalkeeper', label: 'Goalkeeper', icon: '🧤', minDeposit: 20_000, color: '#90CAF9' },
     { key: 'defender', label: 'Defender', icon: '🛡️', minDeposit: 50_000, color: '#00E676' },
     { key: 'midfielder', label: 'Midfielder', icon: '⚡', minDeposit: 100_000, color: '#E8B923' },
     { key: 'striker', label: 'Striker', icon: '🎯', minDeposit: 200_000, color: '#FF5252' },

@@ -24,6 +24,7 @@ export class BetManagerDepositComponent implements OnInit {
   amountOptions: number[] = [];
 
   readonly tierConfig: Record<string, { label: string; icon: string; minDeposit: number; color: string }> = {
+    goalkeeper: { label: 'Goalkeeper', icon: '🧤', minDeposit: 20_000, color: '#90CAF9' },
     defender: { label: 'Defender', icon: '🛡️', minDeposit: 50_000, color: '#00E676' },
     midfielder: { label: 'Midfielder', icon: '⚡', minDeposit: 100_000, color: '#E8B923' },
     striker: { label: 'Striker', icon: '🎯', minDeposit: 200_000, color: '#FF5252' },

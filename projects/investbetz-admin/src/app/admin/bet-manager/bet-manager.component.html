@@ -188,7 +188,7 @@
           <tbody>
             @for (c of cycles; track c._id) {
               <tr>
-                <td><span class="chip" [style.background]="c.tier === 'defender' ? 'rgba(0,230,118,0.15)' : c.tier === 'midfielder' ? 'rgba(232,185,35,0.15)' : 'rgba(255,82,82,0.15)'" [style.color]="c.tier === 'defender' ? '#00E676' : c.tier === 'midfielder' ? '#E8B923' : '#FF5252'">{{ c.tier }}</span></td>
+                <td><span class="chip" [style.background]="getTierStyle(c.tier).background" [style.color]="getTierStyle(c.tier).color">{{ c.tier }}</span></td>
                 <td>{{ c.cycleNumber }}</td>
                 <td>{{ c.startDate | date:'shortDate' }}</td>
                 <td>{{ c.endDate | date:'shortDate' }}</td>
@@ -234,7 +234,7 @@
                     <span class="user-phone">{{ a.userId?.phone || '—' }}</span>
                   </div>
                 </td>
-                <td><span class="chip" [style.background]="a.tier === 'defender' ? 'rgba(0,230,118,0.15)' : a.tier === 'midfielder' ? 'rgba(232,185,35,0.15)' : 'rgba(255,82,82,0.15)'" [style.color]="a.tier === 'defender' ? '#00E676' : a.tier === 'midfielder' ? '#E8B923' : '#FF5252'">{{ a.tier }}</span></td>
+                <td><span class="chip" [style.background]="getTierStyle(a.tier).background" [style.color]="getTierStyle(a.tier).color">{{ a.tier }}</span></td>
                 <td>{{ a.units | number:'1.2-2' }}</td>
                 <td>₦{{ a.currentValue | number }}</td>
                 <td>₦{{ a.totalDeposited | number }}</td>
@@ -289,7 +289,7 @@
                     <span class="user-phone">{{ d.userId?.phone || '—' }}</span>
                   </div>
                 </td>
-                <td><span class="chip" [style.background]="d.tier === 'defender' ? 'rgba(0,230,118,0.15)' : d.tier === 'midfielder' ? 'rgba(232,185,35,0.15)' : 'rgba(255,82,82,0.15)'" [style.color]="d.tier === 'defender' ? '#00E676' : d.tier === 'midfielder' ? '#E8B923' : '#FF5252'">{{ d.tier }}</span></td>
+                <td><span class="chip" [style.background]="getTierStyle(d.tier).background" [style.color]="getTierStyle(d.tier).color">{{ d.tier }}</span></td>
                 <td><span class="chip" [class.chip-deposit]="d.type === 'deposit'" [class.chip-withdrawal]="d.type === 'withdrawal'">{{ d.type }}</span></td>
                 <td>₦{{ d.amount | number }}</td>
                 <td>{{ d.units | number:'1.2-2' }}</td>
