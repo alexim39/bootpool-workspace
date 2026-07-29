@@ -1,102 +1,197 @@
 
-    <div class="page">
-      <div class="page-header">
-        <h1>Deposit Management</h1>
-        <span class="header-count">{{ store.total() }} deposits</span>
-      </div>
+<div class="page">
+  <div class="page-header">
+    <h1>Deposit Management</h1>
+    <div class="header-actions">
+      <button mat-stroked-button class="btn-export" (click)="store.exportCsv()" [disabled]="store.deposits().length === 0">
+        <mat-icon>file_download</mat-icon> Export CSV
+      </button>
+      <button mat-stroked-button class="btn-refresh" (click)="store.load()">
+        <mat-icon>refresh</mat-icon> Refresh
+      </button>
+    </div>
+  </div>
 
-      <mat-card class="filter-card">
-        <div class="filter-row">
-          <mat-form-field appearance="outline" class="filter-select">
-            <mat-label>Status</mat-label>
-            <mat-select [ngModel]="store.statusFilter()" (ngModelChange)="store.statusFilter.set($event); store.onFilterChange()">
-              <mat-option value="">All</mat-option>
-              <mat-option value="pending">Pending</mat-option>
-              <mat-option value="processing">Processing</mat-option>
-              <mat-option value="completed">Completed</mat-option>
-              <mat-option value="failed">Failed</mat-option>
-              <mat-option value="cancelled">Cancelled</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <div class="filter-spacer"></div>
-          <button mat-stroked-button class="btn-refresh" (click)="store.load()">
-            <mat-icon>refresh</mat-icon> Refresh
-          </button>
-        </div>
-      </mat-card>
+  <!-- Stats Bar -->
+  <div class="stats-row" *ngIf="store.stats() as s">
+    <div class="stat-card">
+      <span class="stat-label">Total Volume</span>
+      <span class="stat-value accent">₦{{ s.depositVolume | number }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Deposits</span>
+      <span class="stat-value deposit">₦{{ s.depositVolume | number }}</span>
+      <span class="stat-sub">{{ s.depositCount }} txns</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Total Fee</span>
+      <span class="stat-value warn">₦{{ s.totalFee | number }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Completed</span>
+      <span class="stat-value success">{{ s.completedCount }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Pending</span>
+      <span class="stat-value warn">{{ s.pendingCount }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Failed</span>
+      <span class="stat-value danger">{{ s.failedCount }}</span>
+    </div>
+  </div>
 
-      <mat-card class="table-card">
-        <div class="loading-overlay" *ngIf="store.loading()"><div class="skel-table-wrap"><div class="skel-row" style="padding:12px 16px;gap:16px;border-bottom:1px solid rgba(255,255,255,0.06);margin:0"><div class="skel skel-text-sm" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="flex:1;margin:0"></div><div class="skel skel-text-sm" style="flex:0.6;margin:0"></div><div class="skel skel-text-sm" style="flex:0.6;margin:0"></div><div class="skel skel-text-sm" style="flex:0.4;margin:0"></div></div>@for (row of [1,2,3,4,5]; track row) {<div class="skel-row" style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.04);margin:0;gap:16px"><div class="skel skel-text" style="flex:1;margin:0"></div><div class="skel skel-text" style="flex:1;margin:0"></div><div class="skel skel-text" style="flex:1;margin:0"></div><div class="skel skel-text" style="flex:1;margin:0"></div><div class="skel skel-badge" style="flex:0.6;margin:0"></div><div class="skel skel-text-sm" style="flex:0.6;margin:0"></div><div class="skel skel-text" style="flex:0.4;margin:0"></div></div>}</div></div>
-        <table mat-table [dataSource]="store.deposits()" class="admin-table">
-          <ng-container matColumnDef="ref">
-            <th mat-header-cell *matHeaderCellDef>Reference</th>
-            <td mat-cell *matCellDef="let d" class="cell-ref">{{ d.reference?.slice(0, 16) }}...</td>
-          </ng-container>
-          <ng-container matColumnDef="user">
-            <th mat-header-cell *matHeaderCellDef>User</th>
-            <td mat-cell *matCellDef="let d">{{ d.user?.phone || d.user?.name || '—' }}</td>
-          </ng-container>
-          <ng-container matColumnDef="amount">
-            <th mat-header-cell *matHeaderCellDef>Amount</th>
-            <td mat-cell *matCellDef="let d" class="cell-amount">₦{{ d.amount | number }}</td>
-          </ng-container>
-          <ng-container matColumnDef="fee">
-            <th mat-header-cell *matHeaderCellDef>Fee</th>
-            <td mat-cell *matCellDef="let d">₦{{ d.fee | number }}</td>
-          </ng-container>
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef>Status</th>
-            <td mat-cell *matCellDef="let d">
-              <span class="chip" [style.background]="statusColor(d.status) + '33'" [style.color]="statusColor(d.status)">
-                {{ d.status }}
-              </span>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="date">
-            <th mat-header-cell *matHeaderCellDef>Date</th>
-            <td mat-cell *matCellDef="let d">{{ d.createdAt | date:'MMM d, y HH:mm' }}</td>
-          </ng-container>
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let d">
-              <button mat-icon-button (click)="store.toggleDetail(d)" matTooltip="View details">
-                <mat-icon>{{ store.detailId() === d.id ? 'expand_less' : 'expand_more' }}</mat-icon>
-              </button>
-            </td>
-          </ng-container>
-          <tr mat-header-row *matHeaderRowDef="store.columns"></tr>
-          <tr mat-row *matRowDef="let row; columns: store.columns;" class="clickable-row" (click)="store.toggleDetail(row)"></tr>
-        </table>
-
-        <div class="paginator" *ngIf="store.totalPages() > 1">
-          <button mat-button [disabled]="store.page() <= 1" (click)="store.goTo(store.page() - 1)">Previous</button>
-          <span class="page-info">Page {{ store.page() }} of {{ store.totalPages() }}</span>
-          <button mat-button [disabled]="store.page() >= store.totalPages()" (click)="store.goTo(store.page() + 1)">Next</button>
-        </div>
-
-        <div class="empty-state" *ngIf="!store.loading() && store.deposits().length === 0">
-          No deposits found
-        </div>
-      </mat-card>
-
-      <div class="detail-panel" *ngIf="store.detail() as detail">
-        <div class="detail-header">
-          <h3>Deposit Details</h3>
-          <button mat-icon-button (click)="store.detail.set(null)"><mat-icon>close</mat-icon></button>
-        </div>
-        <div class="detail-grid">
-          <div class="detail-item"><span class="d-label">Reference</span><span class="d-value">{{ detail.reference }}</span></div>
-          <div class="detail-item"><span class="d-label">User</span><span class="d-value">{{ detail.user?.phone || '—' }} {{ detail.user?.name ? '(' + (detail.user?.name || '') + ')' : '' }}</span></div>
-          <div class="detail-item"><span class="d-label">Amount</span><span class="d-value">₦{{ detail.amount | number }}</span></div>
-          <div class="detail-item"><span class="d-label">Fee</span><span class="d-value">₦{{ detail.fee | number }}</span></div>
-          <div class="detail-item"><span class="d-label">Net Amount</span><span class="d-value">₦{{ (detail.amount - detail.fee) | number }}</span></div>
-          <div class="detail-item"><span class="d-label">Status</span><span class="d-value"><span class="chip" [style.background]="statusColor(detail.status) + '33'" [style.color]="statusColor(detail.status)">{{ detail.status }}</span></span></div>
-          <div class="detail-item"><span class="d-label">Provider</span><span class="d-value">{{ detail.provider || '—' }}</span></div>
-          <div class="detail-item"><span class="d-label">Created</span><span class="d-value">{{ detail.createdAt | date:'MMM d, y HH:mm:ss' }}</span></div>
-          <div class="detail-item"><span class="d-label">Completed</span><span class="d-value">{{ detail.completedAt ? (detail.completedAt | date:'MMM d, y HH:mm:ss') : '—' }}</span></div>
-          <div class="detail-item"><span class="d-label">Description</span><span class="d-value">{{ detail.metadata?.description || '—' }}</span></div>
-          <div class="detail-item" *ngIf="detail.failureReason"><span class="d-label">Failure Reason</span><span class="d-value" style="color:#f44336">{{ detail.failureReason }}</span></div>
+  <!-- Filters -->
+  <mat-card class="filter-card">
+    <div class="filter-row">
+      <mat-form-field appearance="outline" class="filter-search" subscriptSizing="dynamic">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput [ngModel]="store.search()" (ngModelChange)="store.setSearch($event)" placeholder="Search ref or phone">
+        <button *ngIf="store.search()" matSuffix mat-icon-button class="clear-btn" (click)="store.setSearch('')"><mat-icon>close</mat-icon></button>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="filter-select" subscriptSizing="dynamic">
+        <mat-label>Status</mat-label>
+        <mat-select [ngModel]="store.statusFilter()" (ngModelChange)="store.statusFilter.set($event); store.onFilterChange()">
+          <mat-option value="">All Statuses</mat-option>
+          <mat-option value="pending">Pending</mat-option>
+          <mat-option value="processing">Processing</mat-option>
+          <mat-option value="completed">Completed</mat-option>
+          <mat-option value="failed">Failed</mat-option>
+          <mat-option value="cancelled">Cancelled</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <div class="date-range-group">
+        <mat-form-field appearance="outline" class="date-field" subscriptSizing="dynamic">
+          <mat-label>From</mat-label>
+          <input matInput [matDatepicker]="fromPicker" [ngModel]="store.dateFrom() ? (store.dateFrom() | date:'yyyy-MM-dd') : ''" (dateChange)="store.setDateRange($event.value?.toISOString() || '', store.dateTo())">
+          <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+          <mat-datepicker #fromPicker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="date-field" subscriptSizing="dynamic">
+          <mat-label>To</mat-label>
+          <input matInput [matDatepicker]="toPicker" [ngModel]="store.dateTo() ? (store.dateTo() | date:'yyyy-MM-dd') : ''" (dateChange)="store.setDateRange(store.dateFrom(), $event.value?.toISOString() || '')">
+          <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+          <mat-datepicker #toPicker></mat-datepicker>
+        </mat-form-field>
+        <div class="date-presets">
+          <button mat-stroked-button (click)="quickDate('today')">Today</button>
+          <button mat-stroked-button (click)="quickDate('7d')">7 Days</button>
+          <button mat-stroked-button (click)="quickDate('30d')">30 Days</button>
+          <button mat-stroked-button (click)="quickDate('month')">This Month</button>
+          <button mat-stroked-button *ngIf="store.dateFrom() || store.dateTo()" (click)="store.clearDateRange()">Clear</button>
         </div>
       </div>
     </div>
-  
+  </mat-card>
+
+  <!-- Table -->
+  <mat-card class="table-card">
+    <div class="loading-overlay" *ngIf="store.loading()">
+      <div class="skel-table-wrap">
+        <div class="skel-row" style="padding:12px 16px;gap:16px;border-bottom:1px solid rgba(255,255,255,0.06);margin:0">
+          <div class="skel skel-text-sm" style="flex:1;margin:0"></div>
+          <div class="skel skel-text-sm" style="flex:1;margin:0"></div>
+          <div class="skel skel-text-sm" style="flex:0.8;margin:0"></div>
+          <div class="skel skel-text-sm" style="flex:0.6;margin:0"></div>
+          <div class="skel skel-badge" style="flex:0.6;margin:0"></div>
+          <div class="skel skel-text-sm" style="flex:0.6;margin:0"></div>
+          <div class="skel skel-text-sm" style="flex:0.4;margin:0"></div>
+        </div>
+        @for (row of [1,2,3,4,5]; track row) {
+        <div class="skel-row" style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.04);margin:0;gap:16px">
+          <div class="skel skel-text" style="flex:1;margin:0"></div>
+          <div class="skel skel-text" style="flex:1;margin:0"></div>
+          <div class="skel skel-text" style="flex:0.8;margin:0"></div>
+          <div class="skel skel-text" style="flex:0.6;margin:0"></div>
+          <div class="skel skel-badge" style="flex:0.6;margin:0"></div>
+          <div class="skel skel-text-sm" style="flex:0.6;margin:0"></div>
+          <div class="skel skel-text" style="flex:0.4;margin:0"></div>
+        </div>
+        }
+      </div>
+    </div>
+    <table mat-table [dataSource]="store.deposits()" class="admin-table" matSort (matSortChange)="onSortChange($event)" [matSortActive]="store.sortBy()" [matSortDirection]="sortDir">
+      <ng-container matColumnDef="ref">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Reference</th>
+        <td mat-cell *matCellDef="let d" class="cell-ref">{{ d.reference?.slice(0, 16) }}</td>
+      </ng-container>
+      <ng-container matColumnDef="user">
+        <th mat-header-cell *matHeaderCellDef>User</th>
+        <td mat-cell *matCellDef="let d">{{ d.user?.phone || d.user?.name || '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="amount">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
+        <td mat-cell *matCellDef="let d" class="cell-amount">₦{{ d.amount | number }}</td>
+      </ng-container>
+      <ng-container matColumnDef="fee">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Fee</th>
+        <td mat-cell *matCellDef="let d" class="cell-fee">₦{{ d.fee | number }}</td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+        <td mat-cell *matCellDef="let d">
+          <span class="chip" [style.background]="statusColor(d.status) + '33'" [style.color]="statusColor(d.status)">
+            {{ d.status }}
+          </span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+        <td mat-cell *matCellDef="let d">{{ d.createdAt | date:'MMM d, y HH:mm' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let d">
+          <button mat-icon-button (click)="store.toggleDetail(d)" matTooltip="View details">
+            <mat-icon>{{ store.detailId() === d.id ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="store.columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: store.columns;" class="clickable-row" (click)="store.toggleDetail(row)" [class.row-failed]="row.status === 'failed'"></tr>
+    </table>
+
+    <div class="empty-state" *ngIf="!store.loading() && store.deposits().length === 0">No deposits found</div>
+
+    <!-- Custom Pagination -->
+    <div class="pagination-bar" *ngIf="store.totalPages() > 1">
+      <div class="pagination-info">Page {{ store.page() }} of {{ store.totalPages() }} — {{ store.total() }} total</div>
+      <div class="pagination-controls">
+        <div class="go-to-page">
+          <span>Go to</span>
+          <input matInput type="number" [ngModel]="store.goToPageInput()" (ngModelChange)="store.goToPageInput.set($event)" (keyup.enter)="store.goToPageFromInput()" [min]="1" [max]="store.totalPages()">
+          <button mat-stroked-button (click)="store.goToPageFromInput()">Go</button>
+        </div>
+      </div>
+      <mat-paginator
+        [length]="store.total()"
+        [pageSize]="store.limit()"
+        [pageIndex]="store.page() - 1"
+        [pageSizeOptions]="[20, 50, 100, 200]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+  </mat-card>
+
+  <!-- Detail Panel -->
+  <div class="detail-panel" *ngIf="store.detail() as detail">
+    <div class="detail-header">
+      <h3>Deposit Details</h3>
+      <button mat-icon-button (click)="store.detail.set(null)"><mat-icon>close</mat-icon></button>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-item"><span class="d-label">Reference</span><span class="d-value">{{ detail.reference }}</span></div>
+      <div class="detail-item"><span class="d-label">User</span><span class="d-value">{{ detail.user?.phone || '—' }} {{ detail.user?.name ? '(' + (detail.user?.name || '') + ')' : '' }}</span></div>
+      <div class="detail-item"><span class="d-label">Amount</span><span class="d-value">₦{{ detail.amount | number }}</span></div>
+      <div class="detail-item"><span class="d-label">Fee</span><span class="d-value">₦{{ detail.fee | number }}</span></div>
+      <div class="detail-item"><span class="d-label">Net Amount</span><span class="d-value">₦{{ (detail.amount - detail.fee) | number }}</span></div>
+      <div class="detail-item"><span class="d-label">Status</span><span class="d-value"><span class="chip" [style.background]="statusColor(detail.status) + '33'" [style.color]="statusColor(detail.status)">{{ detail.status }}</span></span></div>
+      <div class="detail-item"><span class="d-label">Provider</span><span class="d-value">{{ detail.provider || '—' }}</span></div>
+      <div class="detail-item"><span class="d-label">Created</span><span class="d-value">{{ detail.createdAt | date:'MMM d, y HH:mm:ss' }}</span></div>
+      <div class="detail-item"><span class="d-label">Completed</span><span class="d-value">{{ detail.completedAt ? (detail.completedAt | date:'MMM d, y HH:mm:ss') : '—' }}</span></div>
+      <div class="detail-item"><span class="d-label">Description</span><span class="d-value">{{ detail.metadata?.description || '—' }}</span></div>
+      <div class="detail-item" *ngIf="detail.failureReason"><span class="d-label">Failure Reason</span><span class="d-value" style="color:#f44336">{{ detail.failureReason }}</span></div>
+    </div>
+  </div>
+</div>

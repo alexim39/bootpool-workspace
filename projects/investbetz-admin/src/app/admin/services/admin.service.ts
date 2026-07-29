@@ -10,6 +10,7 @@ export interface PaginatedResponse<T> {
   page: number;
   limit: number;
   totalPages: number;
+  stats?: { total: number; active: number; suspended: number; kycVerified: number; kycPending: number };
 }
 
 export interface AutomationStatus {
@@ -101,6 +102,8 @@ export interface AdminUser {
   createdAt: string;
   lastLoginAt?: string;
   walletBalance?: number;
+  totalStakes?: number;
+  kycType?: string;
 }
 
 export interface AdminStake {
@@ -131,6 +134,21 @@ export interface AdminStake {
   isSettled?: boolean;
   isParlay?: boolean;
   settlementNotes?: string;
+}
+
+export interface TxStats {
+  totalVolume: number;
+  totalFee: number;
+  depositCount: number;
+  depositVolume: number;
+  withdrawalCount: number;
+  withdrawalVolume: number;
+  stakeCount: number;
+  payoutCount: number;
+  pendingCount: number;
+  completedCount: number;
+  failedCount: number;
+  refundCount: number;
 }
 
 export interface AdminTransaction {
@@ -265,11 +283,16 @@ export class AdminService {
     return this.http.post<{ success: boolean; data: AdminPod }>(`${this.baseUrl}/pods/${id}/cancel`, {});
   }
 
-  getUsers(params?: { page?: number; limit?: number; search?: string }): Observable<{ success: boolean; data: PaginatedResponse<AdminUser> }> {
+  getUsers(params?: { page?: number; limit?: number; search?: string; status?: string; dateFrom?: string; dateTo?: string; sortBy?: string; sortOrder?: string }): Observable<{ success: boolean; data: PaginatedResponse<AdminUser> }> {
     let hp = new HttpParams();
     if (params?.page) hp = hp.set('page', params.page);
     if (params?.limit) hp = hp.set('limit', params.limit);
     if (params?.search) hp = hp.set('search', params.search);
+    if (params?.status) hp = hp.set('status', params.status);
+    if (params?.dateFrom) hp = hp.set('dateFrom', params.dateFrom);
+    if (params?.dateTo) hp = hp.set('dateTo', params.dateTo);
+    if (params?.sortBy) hp = hp.set('sortBy', params.sortBy);
+    if (params?.sortOrder) hp = hp.set('sortOrder', params.sortOrder);
     return this.http.get<{ success: boolean; data: PaginatedResponse<AdminUser> }>(`${this.baseUrl}/users`, { params: hp });
   }
 
@@ -370,13 +393,22 @@ export class AdminService {
     return this.http.post<{ success: boolean; data: any }>(`${this.baseUrl}/loans/${id}/repay`, {});
   }
 
-  getTransactions(params?: { page?: number; limit?: number; type?: string; status?: string }): Observable<{ success: boolean; data: PaginatedResponse<AdminTransaction> }> {
+  getTransactions(params?: {
+    page?: number; limit?: number; type?: string; status?: string;
+    search?: string; dateFrom?: string; dateTo?: string;
+    sortBy?: string; sortOrder?: string
+  }): Observable<{ success: boolean; data: PaginatedResponse<AdminTransaction> & { stats: TxStats } }> {
     let hp = new HttpParams();
     if (params?.page) hp = hp.set('page', params.page);
     if (params?.limit) hp = hp.set('limit', params.limit);
     if (params?.type) hp = hp.set('type', params.type);
     if (params?.status) hp = hp.set('status', params.status);
-    return this.http.get<{ success: boolean; data: PaginatedResponse<AdminTransaction> }>(`${this.baseUrl}/transactions`, { params: hp });
+    if (params?.search) hp = hp.set('search', params.search);
+    if (params?.dateFrom) hp = hp.set('dateFrom', params.dateFrom);
+    if (params?.dateTo) hp = hp.set('dateTo', params.dateTo);
+    if (params?.sortBy) hp = hp.set('sortBy', params.sortBy);
+    if (params?.sortOrder) hp = hp.set('sortOrder', params.sortOrder);
+    return this.http.get<{ success: boolean; data: PaginatedResponse<AdminTransaction> & { stats: TxStats } }>(`${this.baseUrl}/transactions`, { params: hp });
   }
 
   adjustWallet(userId: string, amount: number, type: 'credit' | 'debit', reason: string): Observable<{ success: boolean; message: string }> {
