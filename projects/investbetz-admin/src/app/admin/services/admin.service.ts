@@ -601,6 +601,10 @@ export class AdminService {
     return this.http.post<{ success: boolean; message: string }>(`${this.baseUrl}/bet-manager/reconcile`, {});
   }
 
+  topUpPool(tier: string, amount: number): Observable<{ success: boolean; message: string; data: { balance: number } }> {
+    return this.http.post<{ success: boolean; message: string; data: { balance: number } }>(`${this.baseUrl}/bet-manager/pools/top-up`, { tier, amount });
+  }
+
   getChatStats(): Observable<{ success: boolean; data: ChatStats }> {
     return this.http.get<{ success: boolean; data: ChatStats }>(`${this.baseUrl}/chat/stats`);
   }

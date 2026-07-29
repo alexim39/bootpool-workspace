@@ -39,6 +39,10 @@ export class AdminBetManagerComponent implements OnInit {
   loading = signal(false);
   settleLoading = signal('');
   reconcileLoading = signal(false);
+  topUpTier = signal('');
+  topUpAmount = signal(0);
+  topUpLoading = signal(false);
+  topUpResult = signal<{ success: boolean; message: string } | null>(null);
 
   readonly tiers = [
     { key: 'goalkeeper', label: 'Goalkeeper', icon: '🧤', color: '#90CAF9' },
@@ -120,6 +124,37 @@ export class AdminBetManagerComponent implements OnInit {
     });
   }
 
+  openTopUp(tier: string) {
+    this.topUpTier.set(tier);
+    this.topUpAmount.set(0);
+    this.topUpResult.set(null);
+  }
+
+  closeTopUp() {
+    this.topUpTier.set('');
+    this.topUpAmount.set(0);
+    this.topUpResult.set(null);
+  }
+
+  submitTopUp() {
+    const tier = this.topUpTier();
+    const amount = this.topUpAmount();
+    if (!tier || !amount || amount <= 0) return;
+    this.topUpLoading.set(true);
+    this.topUpResult.set(null);
+    this.admin.topUpPool(tier, amount).pipe(finalize(() => this.topUpLoading.set(false))).subscribe({
+      next: res => {
+        this.topUpResult.set({ success: true, message: res.message });
+        this.loadPools();
+        this.loadStats();
+        setTimeout(() => this.closeTopUp(), 2000);
+      },
+      error: err => {
+        this.topUpResult.set({ success: false, message: err.error?.message || 'Top-up failed' });
+      }
+    });
+  }
+
   viewAccount(id: string) {
     this.selectedAccountId = id;
     this.accountDetail = null;
@@ -141,6 +176,10 @@ export class AdminBetManagerComponent implements OnInit {
 
   getPoolBalance(tierKey: string): number {
     return this.pools.find(p => p.tier === tierKey)?.balance || 0;
+  }
+
+  getTierIcon(tierKey: string): string {
+    return this.tiers.find(t => t.key === tierKey)?.icon || '';
   }
 
   getTierStyle(tierKey: string): { background: string; color: string } {

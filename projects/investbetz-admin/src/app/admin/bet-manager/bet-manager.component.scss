@@ -85,3 +85,20 @@
 .detail-row span { color: rgba(255,255,255,0.5); }
 .detail-row strong { color: #fff; }
 .btn-settle-action { color: #E8B923 !important; border-color: #E8B923 !important; font-size: 12px !important; padding: 0 12px !important; min-height: 30px !important; line-height: 28px !important; }
+.btn-topup { color: #90CAF9 !important; border-color: #90CAF9 !important; font-size: 11px !important; padding: 0 10px !important; min-height: 28px !important; line-height: 26px !important; }
+.btn-topup mat-icon { font-size: 14px; height: 14px; width: 14px; margin-right: 2px; }
+
+.topup-overlay { position: fixed; inset: 0; z-index: 1200; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(0,0,0,0.7); }
+.topup-modal { background: #0D1A30; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; max-width: 420px; width: 100%; }
+.topup-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.topup-header h3 { color: #fff; font-size: 15px; font-weight: 600; margin: 0; text-transform: capitalize; }
+.topup-header button { color: rgba(255,255,255,0.5); }
+.topup-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.topup-field label { font-size: 12px; color: rgba(255,255,255,0.4); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 4px; }
+.topup-field input { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; padding: 10px 12px; font-size: 18px; font-weight: 700; outline: none; box-sizing: border-box; }
+.topup-field input:focus { border-color: #90CAF9; }
+.topup-presets { display: flex; gap: 8px; flex-wrap: wrap; }
+.topup-presets button { color: rgba(255,255,255,0.6) !important; border-color: rgba(255,255,255,0.1) !important; font-size: 12px !important; padding: 0 14px !important; min-height: 34px !important; line-height: 32px !important; }
+.topup-actions { display: flex; justify-content: flex-end; gap: 10px; padding-top: 4px; }
+.btn-topup-submit { background: #90CAF9 !important; color: #0A1428 !important; font-weight: 700 !important; }
+.topup-result { padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 8px; font-size: 13px; text-align: center; font-weight: 500; }

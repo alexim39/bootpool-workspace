@@ -47,6 +47,7 @@
     .parlay-badge { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 1px 6px; border-radius: 6px; background: rgba(206,147,216,0.15); color: #CE93D8; white-space: nowrap; }
     .selection-value { color: #00E676; font-weight: 500; display: block; }
     .odds-value { color: #E8B923; font-weight: 600; font-size: 11px; }
+    .date-value { font-family: monospace; font-size: 11px; color: rgba(255,255,255,0.55); white-space: nowrap; }
     .scores-value { font-size: 14px; font-weight: 700; color: #fff; letter-spacing: 0.5px; }
     .scores-na { color: rgba(255,255,255,0.2); font-size: 13px; }
     .games-list { display: flex; flex-direction: column; gap: 2px; }

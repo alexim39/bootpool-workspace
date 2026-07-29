@@ -155,14 +155,15 @@
       @if (pools.length > 0) {
         <table class="admin-table">
           <thead>
-            <tr><th>Tier</th><th>Wallet ID</th><th>Balance</th></tr>
+            <tr><th>Tier</th><th>Wallet ID</th><th>Balance</th><th></th></tr>
           </thead>
           <tbody>
             @for (p of pools; track p.tier) {
               <tr>
-                <td>{{ p.tier }}</td>
+                <td><span class="chip" [style.background]="getTierStyle(p.tier).background" [style.color]="getTierStyle(p.tier).color">{{ p.tier }}</span></td>
                 <td style="font-family:monospace;font-size:11px">{{ p.walletId }}</td>
                 <td>₦{{ p.balance | number }}</td>
+                <td><button mat-stroked-button class="btn-topup" (click)="openTopUp(p.tier)"><mat-icon>add_circle</mat-icon> Top Up</button></td>
               </tr>
             }
           </tbody>
@@ -310,6 +311,38 @@
       } @else {
         <p class="no-data">No deposit records found.</p>
       }
+    </div>
+  }
+
+  @if (topUpTier()) {
+    <div class="topup-overlay" (click)="closeTopUp()">
+      <div class="topup-modal" (click)="$event.stopPropagation()">
+        <div class="topup-header">
+          <h3>Top Up Pool — {{ getTierIcon(topUpTier()) }} {{ topUpTier() }}</h3>
+          <button mat-icon-button (click)="closeTopUp()"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="topup-body">
+          <div class="topup-field">
+            <label>Amount (NGN)</label>
+            <input type="number" [ngModel]="topUpAmount()" (ngModelChange)="topUpAmount.set($event)" placeholder="e.g. 500000" [min]="1" />
+          </div>
+          <div class="topup-presets">
+            <button mat-stroked-button (click)="topUpAmount.set(100000)">₦100K</button>
+            <button mat-stroked-button (click)="topUpAmount.set(500000)">₦500K</button>
+            <button mat-stroked-button (click)="topUpAmount.set(1000000)">₦1M</button>
+            <button mat-stroked-button (click)="topUpAmount.set(5000000)">₦5M</button>
+          </div>
+          <div class="topup-actions">
+            <button mat-button (click)="closeTopUp()">Cancel</button>
+            <button mat-raised-button class="btn-topup-submit" (click)="submitTopUp()" [disabled]="!topUpAmount() || topUpAmount() <= 0 || topUpLoading()">
+              {{ topUpLoading() ? 'Topping up...' : 'Top Up Pool' }}
+            </button>
+          </div>
+          @if (topUpResult(); as r) {
+            <div class="topup-result" [style.color]="r.success ? '#00E676' : '#f44336'">{{ r.message }}</div>
+          }
+        </div>
+      </div>
     </div>
   }
 
