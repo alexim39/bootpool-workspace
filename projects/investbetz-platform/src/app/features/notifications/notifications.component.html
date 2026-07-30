@@ -1,73 +1,149 @@
+@if (!device.isMobile()) {
+  <app-nav />
+}
 
-    @if (!device.isMobile()) {
-      <app-nav />
-    }
+<div class="notif-page" [class.mobile]="device.isMobile()">
 
-    <div class="notif-page" [class.mobile]="device.isMobile()">
-      @if (!device.isMobile()) {
-        <div class="notif-header">
-          <h1>Notifications</h1>
-          @if (notifService.notifications().length > 0) {
-            <button class="mark-all-link" (click)="markAllRead()">Mark all read</button>
-          }
-        </div>
-      }
-      @if (device.isMobile()) {
-        <header class="mobile-header">
-          <button mat-icon-button routerLink="/home"><mat-icon>arrow_back</mat-icon></button>
-          <h1>Notifications</h1>
-          @if (notifService.notifications().length > 0) {
-            <button class="mark-all-link" (click)="markAllRead()">Mark all read</button>
-          }
-        </header>
-      }
-
-      <div class="notif-tabs">
-        <button class="tab" [class.active]="filter() === 'all'" (click)="filter.set('all'); page.set(1); load()">All</button>
-        <button class="tab" [class.active]="filter() === 'unread'" (click)="filter.set('unread'); page.set(1); load()">Unread</button>
+  @if (!device.isMobile()) {
+    <div class="notif-header">
+      <div class="notif-header-left">
+        <h1>Notifications</h1>
+        <span class="notif-count">{{ total() }} total</span>
       </div>
-
-      <div class="notif-list">
-        @if (loading() && notifications().length === 0) {
-          <div class="state-msg"><mat-icon>hourglass_empty</mat-icon><span>Loading...</span></div>
-        } @else if (notifications().length === 0) {
-          <div class="state-msg"><mat-icon>notifications_none</mat-icon><span>No notifications</span></div>
-        }
-        @for (notif of notifications(); track notif._id) {
-          <div class="notif-item" [class.unread]="!notif.read" [class.mobile]="device.isMobile()">
-            <div class="notif-left">
-              <div class="notif-icon" [style.--notif-color]="notifService.getNotificationColor(notif.type)">
-                <mat-icon>{{ notifService.getNotificationIcon(notif.type) }}</mat-icon>
-              </div>
-            </div>
-            <div class="notif-body">
-              <div class="notif-title">{{ notif.title }}</div>
-              <div class="notif-message">{{ notif.message }}</div>
-              <div class="notif-time">{{ notifService.timeAgo(notif.createdAt) }}</div>
-            </div>
-            <div class="notif-actions">
-              @if (notif.read) {
-                <button class="action-btn" (click)="markUnread(notif._id)" matTooltip="Mark unread"><mat-icon>mark_email_unread</mat-icon></button>
-              } @else {
-                <button class="action-btn" (click)="markRead(notif._id)" matTooltip="Mark read"><mat-icon>done</mat-icon></button>
-              }
-              <button class="action-btn delete" (click)="deleteNotif(notif._id)" matTooltip="Delete"><mat-icon>delete</mat-icon></button>
-            </div>
-          </div>
+      <div class="notif-header-actions">
+        @if (notifications().length > 0) {
+          <button class="mark-all-link" (click)="markAllRead()"><mat-icon>done_all</mat-icon> Mark all read</button>
         }
       </div>
+    </div>
+  }
 
-      @if (totalPages() > 1) {
-        <div class="pagination">
-          <button class="page-btn" [disabled]="page() <= 1" (click)="page.set(page() - 1); load()"><mat-icon>chevron_left</mat-icon></button>
-          <span class="page-info">{{ page() }} / {{ totalPages() }}</span>
-          <button class="page-btn" [disabled]="page() >= totalPages()" (click)="page.set(page() + 1); load()"><mat-icon>chevron_right</mat-icon></button>
-        </div>
+  @if (device.isMobile()) {
+    <header class="mobile-header">
+      <button mat-icon-button routerLink="/home"><mat-icon>arrow_back</mat-icon></button>
+      <h1>Notifications</h1>
+      @if (notifications().length > 0) {
+        <button class="mark-all-link" (click)="markAllRead()">Mark all read</button>
+      }
+    </header>
+  }
+
+  <div class="filter-bar">
+    <div class="filter-row">
+      <div class="filter-select">
+        <select [ngModel]="typeFilter()" (ngModelChange)="typeFilter.set($event); onFilterChange()" class="filter-dropdown">
+          <option value="">All Types</option>
+          @for (t of NOTIF_TYPES; track t) {
+            <option [value]="t">{{ t }}</option>
+          }
+        </select>
+      </div>
+      <div class="filter-select">
+        <select [ngModel]="readFilter()" (ngModelChange)="readFilter.set($event); onFilterChange()" class="filter-dropdown">
+          <option value="">All Status</option>
+          <option value="false">Unread</option>
+          <option value="true">Read</option>
+        </select>
+      </div>
+      <div class="filter-date">
+        <input type="date" [ngModel]="dateFrom()" (ngModelChange)="dateFrom.set($event); onFilterChange()" class="filter-input" placeholder="From" />
+      </div>
+      <div class="filter-date">
+        <input type="date" [ngModel]="dateTo()" (ngModelChange)="dateTo.set($event); onFilterChange()" class="filter-input" placeholder="To" />
+      </div>
+      @if (hasActiveFilters()) {
+        <button class="clear-filters" (click)="clearFilters()"><mat-icon>close</mat-icon> Clear</button>
       }
     </div>
+  </div>
 
-    @if (device.isMobile()) {
-      <div class="bottom-spacer"></div>
-      <app-mobile-nav />
+  @if (hasSelection()) {
+    <div class="bulk-bar">
+      <div class="bulk-info">
+        <mat-icon>checklist</mat-icon>
+        <span>{{ selectedCount() }} selected</span>
+      </div>
+      <div class="bulk-actions">
+        <button class="bulk-delete-btn" (click)="bulkDelete()" [disabled]="bulkDeleting()">
+          <mat-icon>delete</mat-icon>
+          {{ bulkDeleting() ? 'Deleting...' : 'Delete Selected' }}
+        </button>
+        <button class="bulk-cancel-btn" (click)="clearSelection()">Cancel</button>
+      </div>
+    </div>
+  }
+
+  <div class="notif-list">
+    @if (loading() && notifications().length === 0) {
+      @for (_ of skeletonItems; track _) {
+        <div class="notif-skeleton">
+          <div class="sk-avatar"></div>
+          <div class="sk-lines">
+            <div class="sk-line sk-line-title"></div>
+            <div class="sk-line sk-line-body"></div>
+            <div class="sk-line sk-line-time"></div>
+          </div>
+        </div>
+      }
+    } @else if (notifications().length === 0) {
+      <div class="empty-state">
+        <mat-icon class="empty-icon">notifications_off</mat-icon>
+        <span class="empty-title">No notifications</span>
+        <span class="empty-desc">
+          @if (hasActiveFilters()) {
+            No notifications match your filters. Try adjusting them.
+          } @else {
+            You have no notifications yet. They'll appear here when something happens.
+          }
+        </span>
+        @if (hasActiveFilters()) {
+          <button class="clear-filters-link" (click)="clearFilters()">Clear filters</button>
+        }
+      </div>
     }
-  
+
+    @for (notif of notifications(); track notif._id) {
+      <div class="notif-item" [class.unread]="!notif.read" [class.selected]="selectedIds().has(notif._id)" [class.mobile]="device.isMobile()">
+        <label class="notif-check" (click)="$event.stopPropagation()">
+          <input type="checkbox" [checked]="selectedIds().has(notif._id)" (change)="toggleSelect(notif._id)" class="row-checkbox" />
+        </label>
+        <div class="notif-icon" [style.--notif-color]="notifService.getNotificationColor(notif.type)">
+          <mat-icon>{{ notifService.getNotificationIcon(notif.type) }}</mat-icon>
+        </div>
+        <div class="notif-body" (click)="!notif.read ? markRead(notif._id) : markUnread(notif._id)">
+          <div class="notif-title-row">
+            <span class="notif-title">{{ notif.title }}</span>
+            <span class="notif-type-badge" [style.--badge-color]="notifService.getNotificationColor(notif.type)">{{ notif.type }}</span>
+          </div>
+          <div class="notif-message">{{ notif.message }}</div>
+          <div class="notif-time">{{ notifService.timeAgo(notif.createdAt) }} &middot; {{ notif.createdAt | date:'MMM d, y HH:mm' }}</div>
+        </div>
+        <div class="notif-actions">
+          <button class="action-btn" (click)="notif.read ? markUnread(notif._id) : markRead(notif._id)" [matTooltip]="notif.read ? 'Mark unread' : 'Mark read'">
+            <mat-icon>{{ notif.read ? 'mark_email_unread' : 'done' }}</mat-icon>
+          </button>
+          <button class="action-btn delete" (click)="deleteSingle(notif._id)" matTooltip="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (totalPages() > 1) {
+    <div class="pagination">
+      <button class="page-btn" [disabled]="page() <= 1" (click)="goToPage(page() - 1)"><mat-icon>chevron_left</mat-icon></button>
+      @for (p of getPageRange(); track p) {
+        <button class="page-num" [class.active]="p === page()" (click)="goToPage(p)">{{ p }}</button>
+      }
+      <button class="page-btn" [disabled]="page() >= totalPages()" (click)="goToPage(page() + 1)"><mat-icon>chevron_right</mat-icon></button>
+      <span class="page-info">{{ (page() - 1) * limit() + 1 }}&ndash;{{ Math.min(page() * limit(), total()) }} of {{ total() }}</span>
+    </div>
+  }
+
+</div>
+
+@if (device.isMobile()) {
+  <div class="bottom-spacer"></div>
+  <app-mobile-nav />
+}

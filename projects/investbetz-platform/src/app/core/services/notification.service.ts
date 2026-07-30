@@ -44,15 +44,18 @@ export class NotificationService {
     return { Authorization: `Bearer ${token}` };
   }
 
-  fetchNotifications(page = 1, limit = 20): Observable<NotificationsResponse> {
+  fetchNotifications(page = 1, limit = 20, filters?: { type?: string; read?: string; from?: string; to?: string }): Observable<NotificationsResponse> {
     this.loading.set(true);
     this.error.set(null);
 
+    let url = `${this.API_URL}/notifications?page=${page}&limit=${limit}`;
+    if (filters?.type) url += `&type=${filters.type}`;
+    if (filters?.read !== undefined) url += `&read=${filters.read}`;
+    if (filters?.from) url += `&from=${filters.from}`;
+    if (filters?.to) url += `&to=${filters.to}`;
+
     return new Observable(observer => {
-      this.http.get<NotificationsResponse>(
-        `${this.API_URL}/notifications?page=${page}&limit=${limit}`,
-        { headers: this.getHeaders() }
-      ).subscribe({
+      this.http.get<NotificationsResponse>(url, { headers: this.getHeaders() }).subscribe({
         next: (res) => {
           if (res.success) {
             if (page === 1) this.notifications.set(res.data.notifications);
@@ -92,6 +95,14 @@ export class NotificationService {
   deleteNotification(id: string): Observable<any> {
     return this.http.delete<any>(
       `${this.API_URL}/notifications/${id}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  bulkDelete(ids: string[]): Observable<any> {
+    return this.http.post<any>(
+      `${this.API_URL}/notifications/bulk-delete`,
+      { ids },
       { headers: this.getHeaders() }
     );
   }
