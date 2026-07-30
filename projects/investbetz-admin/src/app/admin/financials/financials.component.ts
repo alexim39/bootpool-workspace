@@ -15,7 +15,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   selector: 'app-financials',
   standalone: true,
   imports: [
-    NgIf, NgFor, DatePipe, DecimalPipe, SlicePipe, FormsModule,
+    DatePipe, DecimalPipe, SlicePipe, FormsModule,
     MatCardModule, MatTableModule, MatButtonModule, MatIconModule,
     MatFormFieldModule, MatSelectModule, MatInputModule, MatTooltipModule
   ],
