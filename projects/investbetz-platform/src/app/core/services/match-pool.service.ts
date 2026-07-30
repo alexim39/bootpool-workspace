@@ -63,28 +63,21 @@ export interface MyPoolStake {
 
 export interface MatchPoolFeedResponse {
   success: boolean;
-  data: { items: MatchPool[]; total: number };
+  data: { items: MatchPool[]; total: number; page: number; limit: number; totalPages: number };
 }
 
 export interface MyStakesResponse {
   success: boolean;
-  data: { items: MyPoolStake[]; total: number };
+  data: { items: MyPoolStake[]; total: number; page: number; limit: number; totalPages: number };
 }
 
 @Injectable({ providedIn: 'root' })
 export class MatchPoolService {
   private readonly API_URL = environment.apiUrl;
 
-  pools = signal<MatchPool[]>([]);
-  loading = signal(false);
-  error = signal<string | null>(null);
+  private _lastLimit = 10;
 
-  openPools = computed(() =>
-    this.pools().filter(p =>
-      p.status === 'open' &&
-      new Date(p.stakingClosesAt) >= new Date()
-    )
-  );
+  get lastLimit() { return this._lastLimit; }
 
   constructor(private http: HttpClient) {}
 
@@ -93,28 +86,15 @@ export class MatchPoolService {
     return { Authorization: `Bearer ${token}` };
   }
 
-  fetchPools() {
-    this.loading.set(true);
-    this.error.set(null);
-    this.http.get<MatchPoolFeedResponse>(`${this.API_URL}/match-pools`, {
-      headers: this.getHeaders()
-    }).subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.pools.set(res.data.items.map(p => ({
-            ...p,
-            id: (p as any)._id || p.id,
-            timeRemaining: Math.max(0, new Date(p.stakingClosesAt).getTime() - Date.now()),
-            isOpen: new Date(p.stakingClosesAt) >= new Date() && p.status === 'open'
-          })));
-        }
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.error.set(err.error?.message || 'Failed to fetch match pools');
-        this.loading.set(false);
-      }
-    });
+  fetchPools(page = 1, limit = 10, search = '', status = 'all') {
+    this._lastLimit = limit;
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (search) params.set('search', search);
+    if (status && status !== 'all') params.set('status', status);
+    return this.http.get<MatchPoolFeedResponse>(
+      `${this.API_URL}/match-pools?${params}`,
+      { headers: this.getHeaders() }
+    );
   }
 
   getById(id: string) {

@@ -166,6 +166,40 @@
 
     .stakes-table mat-chip mat-icon { color: rgba(255,255,255,0.6); font-size: 16px; width: 16px; height: 16px; }
 
+    /* Mobile search */
+    .m-search-bar { padding: 8px 12px 0; }
+    .m-search-field { width: 100%; }
+    ::ng-deep .m-search-field .mat-mdc-text-field-wrapper { background: #0D1A30; border-radius: 10px; height: 42px; }
+    ::ng-deep .m-search-field .mat-mdc-form-field-flex { padding-top: 0 !important; }
+    ::ng-deep .m-search-field input { font-size: 13px; color: #fff; }
+    ::ng-deep .m-search-field .mat-icon { color: rgba(255,255,255,0.3); font-size: 18px; }
+
+    /* Mobile pagination */
+    .m-pagination { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 12px; }
+    .m-page-info { font-size: 12px; color: rgba(255,255,255,0.4); }
+    .m-pagination button { color: rgba(255,255,255,0.5); }
+    .m-pagination button:disabled { opacity: 0.2; }
+
+    /* Filter bar (desktop) */
+    .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+    .search-field { flex: 1; min-width: 200px; }
+    .status-field { width: 180px; }
+    .clear-btn { height: 40px; color: rgba(255,255,255,0.6) !important; border-color: rgba(255,255,255,0.12) !important; }
+    .clear-btn mat-icon { font-size: 16px; width: 16px; height: 16px; }
+    ::ng-deep .search-field .mat-mdc-text-field-wrapper { background: #0D1A30; border-radius: 10px; }
+    ::ng-deep .status-field .mat-mdc-text-field-wrapper { background: #0D1A30; border-radius: 10px; }
+    ::ng-deep .search-field input { font-size: 13px; color: #fff; }
+    ::ng-deep .search-field .mat-icon { color: rgba(255,255,255,0.3); }
+    ::ng-deep .status-field .mat-mdc-select-value-text { color: #fff; font-size: 13px; }
+    ::ng-deep .status-field .mat-mdc-select-arrow { color: rgba(255,255,255,0.3); }
+
+    /* Pagination bar (desktop) */
+    .pagination-bar { display: flex; justify-content: center; padding: 16px 0 4px; }
+    ::ng-deep .pagination-bar .mat-mdc-paginator { background: transparent; color: rgba(255,255,255,0.6); }
+    ::ng-deep .pagination-bar .mat-mdc-paginator-navigation-button { color: rgba(255,255,255,0.5); }
+    ::ng-deep .pagination-bar .mat-mdc-paginator-range-label { color: rgba(255,255,255,0.4); font-size: 12px; }
+    ::ng-deep .pagination-bar .mat-mdc-select-value-text { color: rgba(255,255,255,0.6); }
+
     /* Utility */
     .btn-emerald { background: linear-gradient(135deg, #00E676, #00C853) !important; color: #0A1428 !important; border: none !important; display: inline-flex; align-items: center; gap: 6px; font-weight: 600 !important; padding: 0 20px !important; height: 40px; }
     .btn-emerald:disabled { opacity: 0.4; }

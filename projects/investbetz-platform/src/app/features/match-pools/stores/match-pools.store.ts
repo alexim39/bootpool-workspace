@@ -1,5 +1,5 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { MatchPoolService, AuthService, MyPoolStake } from '../../../core/services';
+import { MatchPoolService, AuthService, MatchPool, MyPoolStake } from '../../../core/services';
 
 type View = 'list' | 'my-stakes';
 
@@ -8,17 +8,25 @@ export class MatchPoolsStore {
   private _service = inject(MatchPoolService);
   private _auth = inject(AuthService);
 
-  readonly pools = computed(() => this._service.pools());
-  readonly openPools = computed(() => this._service.openPools());
-  readonly loading = computed(() => this._service.loading());
-  readonly serviceError = computed(() => this._service.error());
+  readonly pools = signal<MatchPool[]>([]);
+  readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
+  readonly totalPools = signal(0);
+  readonly totalPages = signal(0);
+
+  readonly openPools = computed(() =>
+    this.pools().filter(p =>
+      p.status === 'open' &&
+      new Date(p.stakingClosesAt) >= new Date()
+    )
+  );
 
   readonly view = signal<View>('list');
   readonly showGuide = signal(false);
   readonly selectedMarket = signal<string>('');
 
   readonly mSummary = computed(() => {
-    const open = this._service.openPools();
+    const open = this.openPools();
     return {
       open: open.length,
       poolTotal: open.reduce((s, p) => s + p.totalPool, 0),
@@ -39,19 +47,41 @@ export class MatchPoolsStore {
 
   readonly summary = signal({ total: 0, open: 0, poolTotal: 0, myStakes: 0 });
 
-  init() {
-    this._service.fetchPools();
-    this.computeSummary();
-  }
-
   private computeSummary() {
-    const pools = this._service.pools();
-    const open = this._service.openPools();
+    const open = this.openPools();
     this.summary.set({
-      total: pools.length,
+      total: this.totalPools(),
       open: open.length,
       poolTotal: open.reduce((s, p) => s + p.totalPool, 0),
       myStakes: this.myStakes().length
+    });
+  }
+
+  initPaginated(page = 1, limit = 10) {
+    this.fetchPoolsPaginated(page, limit);
+  }
+
+  fetchPoolsPaginated(page = 1, limit = 10, search = '', status = 'all') {
+    this.loading.set(true);
+    this._service.fetchPools(page, limit, search, status).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.pools.set(res.data.items.map(p => ({
+            ...p,
+            id: (p as any)._id || p.id,
+            timeRemaining: Math.max(0, new Date(p.stakingClosesAt).getTime() - Date.now()),
+            isOpen: new Date(p.stakingClosesAt) >= new Date() && p.status === 'open'
+          })));
+          this.totalPools.set(res.data.total);
+          this.totalPages.set(Math.ceil(res.data.total / limit));
+          this.computeSummary();
+        }
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.error.set(err.error?.message || 'Failed to fetch match pools');
+        this.loading.set(false);
+      }
     });
   }
 
@@ -87,8 +117,7 @@ export class MatchPoolsStore {
           this.stakeAmount = 0;
           this.selectedMarket.set('');
           this.selectedPoolId.set(null);
-          this._service.fetchPools();
-          this.computeSummary();
+          this.fetchPoolsPaginated(1, this._service.lastLimit);
           setTimeout(() => this.stakeSuccess.set(false), 3000);
         }
         this.staking.set(false);
