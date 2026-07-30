@@ -298,6 +298,87 @@
       padding: 8px 12px 12px;
       flex-shrink: 0;
     }
+    .stake-card {
+      margin-top: 8px;
+      background: #0D1A30;
+      border: 1px solid rgba(0, 230, 118, 0.15);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .stake-card-header {
+      padding: 8px 12px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #69F0AE;
+      background: rgba(0, 230, 118, 0.06);
+      border-bottom: 1px solid rgba(0, 230, 118, 0.08);
+    }
+    .stake-card-body {
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .stake-info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+    }
+    .stake-info-row span { color: rgba(255,255,255,0.5); }
+    .stake-info-row strong { color: #FFFFFF; font-weight: 600; }
+    .stake-info-row strong.fee { color: #FF5252; }
+    .stake-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+      margin: 2px 0;
+    }
+    .stake-card-actions {
+      display: flex;
+      gap: 6px;
+      padding: 8px 12px 10px;
+    }
+    .stake-cancel-btn {
+      flex: 1;
+      padding: 8px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .stake-cancel-btn:hover { background: rgba(255,255,255,0.1); }
+    .stake-confirm-btn {
+      flex: 1;
+      padding: 8px;
+      background: linear-gradient(135deg, #00E676, #00C853);
+      border: none;
+      border-radius: 8px;
+      color: #0A1428;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .stake-confirm-btn:hover { box-shadow: 0 2px 12px rgba(0,230,118,0.3); }
+    .stake-card.executing, .stake-card.done, .stake-card.cancelled {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.6);
+    }
+    .stake-card.executing mat-spinner { width: 16px; height: 16px; }
+    .stake-card.done { color: #00E676; }
+    .stake-card.done mat-icon { font-size: 18px; width: 18px; height: 18px; }
+    .stake-card.cancelled { color: rgba(255,255,255,0.3); }
+
     .d-footer-note {
       display: block;
       text-align: center;

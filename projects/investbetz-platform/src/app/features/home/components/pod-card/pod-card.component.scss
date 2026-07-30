@@ -99,6 +99,27 @@ mat-card-content {
   line-height: 1.4;
 }
 
+.ora-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.5rem;
+  background: linear-gradient(135deg, rgba($emerald, 0.15), rgba($emerald-light, 0.08));
+  border: 1px solid rgba($emerald, 0.2);
+  color: $emerald-light;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: $radius-full;
+  line-height: 1.3;
+}
+
+.ora-badge::before {
+  content: '◆';
+  font-size: 0.4rem;
+  margin-right: 0.25rem;
+  color: $emerald;
+}
+
 .live-badge {
   display: inline-flex;
   align-items: center;
@@ -165,6 +186,34 @@ mat-card-content {
   font-weight: 700;
   border-radius: $radius-full;
   line-height: 1.4;
+}
+
+.why-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.5rem;
+  background: rgba($emerald, 0.08);
+  border: 1px solid rgba($emerald, 0.15);
+  border-radius: $radius-full;
+  cursor: pointer;
+  color: $emerald-light;
+  font-size: 0.6rem;
+  font-weight: 600;
+  line-height: 1.4;
+  transition: all $transition-base;
+  flex-shrink: 0;
+}
+
+.why-btn:hover {
+  background: rgba($emerald, 0.18);
+  border-color: rgba($emerald, 0.35);
+}
+
+.why-btn mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
 }
 
 .gains-block {

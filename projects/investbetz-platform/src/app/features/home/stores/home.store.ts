@@ -29,6 +29,8 @@ export class HomeStore implements OnDestroy {
   readonly isSearching = computed(() => this.searchQuery().length > 0);
   readonly displayedPods = computed(() => {
     const pods = this.activePods();
+    const personalized = this.pods.personalized();
+    if (personalized) return pods;
     return [...pods].sort((a, b) =>
       new Date(a.stakingClosesAt).getTime() - new Date(b.stakingClosesAt).getTime()
     );
@@ -55,8 +57,10 @@ export class HomeStore implements OnDestroy {
     this.searchSub.unsubscribe();
   }
 
+  readonly isLoggedIn = computed(() => this.auth.isAuthenticated());
+
   init() {
-    this.pods.fetchFeed({ limit: this.PAGE_SIZE });
+    this.pods.fetchFeed({ limit: this.PAGE_SIZE, personalized: this.isLoggedIn() });
     this.pods.fetchUpcoming({ limit: 10 });
     this.pods.fetchSports();
     this._wallet.fetchBalance();
@@ -72,14 +76,15 @@ export class HomeStore implements OnDestroy {
     this.searchQuery.set('');
     this.pods.fetchFeed({
       limit: this.PAGE_SIZE,
-      sport: this.selectedSport() ?? undefined
+      sport: this.selectedSport() ?? undefined,
+      personalized: this.isLoggedIn()
     });
   }
 
   selectSport(sport: string | null) {
     this.selectedSport.set(sport);
     if (this.isSearching()) this.clearSearch();
-    this.pods.fetchFeed({ limit: this.PAGE_SIZE, sport: sport ?? undefined });
+    this.pods.fetchFeed({ limit: this.PAGE_SIZE, sport: sport ?? undefined, personalized: this.isLoggedIn() });
   }
 
   onSportChange(index: number) {

@@ -41,6 +41,13 @@ export class PodCardComponent {
     return `Gains: ${this.pod().gainsMultiplier.toFixed(1)}x`;
   });
 
+  oraReasoning = computed(() => {
+    const meta = this.pod().metadata;
+    if (meta?.['oraReasoning']) return meta['oraReasoning'] as string;
+    if (meta?.['oraCurated']) return 'This pick was selected by Ora AI based on team form, head-to-head data, and market analysis.';
+    return null;
+  });
+
   formatCountdown(ms: number): string {
     if (ms <= 0) return 'Closed';
     const days = Math.floor(ms / 86400000);

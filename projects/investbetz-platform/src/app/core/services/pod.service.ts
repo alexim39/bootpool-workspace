@@ -87,6 +87,7 @@ export class PodService {
   error = signal<string | null>(null);
   totalPods = signal(0);
   hasMorePods = signal(false);
+  personalized = signal(false);
 
   activePods = computed(() => 
     this.pods().filter(p => 
@@ -128,7 +129,7 @@ export class PodService {
     };
   }
 
-  fetchFeed(params?: { sport?: string; isLive?: boolean; limit?: number; offset?: number }) {
+  fetchFeed(params?: { sport?: string; isLive?: boolean; limit?: number; offset?: number; personalized?: boolean }) {
     const isLoadMore = (params?.offset ?? 0) > 0;
     if (isLoadMore) {
       this.loadingMore.set(true);
@@ -142,6 +143,7 @@ export class PodService {
     if (params?.isLive !== undefined) query.set('isLive', String(params.isLive));
     if (params?.limit) query.set('limit', String(params.limit));
     if (params?.offset) query.set('offset', String(params.offset));
+    if (params?.personalized) query.set('personalized', 'true');
 
     this.http.get<PaginatedPodFeedResponse>(`${environment.apiUrl}/pods/feed?${query}`).subscribe({
       next: (res) => {
@@ -155,6 +157,9 @@ export class PodService {
           }
           this.totalPods.set(total);
           this.hasMorePods.set(hasMore);
+          if (!isLoadMore) {
+            this.personalized.set(!!params?.personalized);
+          }
         }
         if (isLoadMore) {
           this.loadingMore.set(false);

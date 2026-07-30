@@ -5,9 +5,7 @@
     <div class="card-top">
       <div class="top-left">
         <span class="sport-chip">{{ pod().sport }}</span>
-        <!-- @if (pod().league) {
-          <span class="league-chip">{{ pod().league }}</span>
-        } -->
+        <span class="ora-badge">Ora AI</span>
         @if (pod().isLive) {
           <span class="live-badge">LIVE</span>
         }
@@ -23,6 +21,15 @@
 
     <div class="selection-refund-row">
       <span class="selection-badge">PICK: {{ pod().selection }}</span>
+      @if (oraReasoning()) {
+        <button class="why-btn"
+          [matTooltip]="oraReasoning()!"
+          matTooltipPosition="after"
+          (click)="$event.preventDefault()">
+          <mat-icon>info_outline</mat-icon>
+          <span>Why?</span>
+        </button>
+      }
       @if (pod().refundPercent) {
         <span class="refund-badge">{{ pod().refundPercent }}% cash back</span>
       }

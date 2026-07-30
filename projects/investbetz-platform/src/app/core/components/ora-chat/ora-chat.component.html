@@ -27,6 +27,42 @@
                   <div class="msg-bubble">
                     <div class="msg-text">{{ msg.content }}</div>
                   </div>
+                  @if (msg.action && msg.actionState === 'pending') {
+                    <div class="stake-card">
+                      <div class="stake-card-header">Confirm Stake</div>
+                      <div class="stake-card-body">
+                        <div class="stake-info-row"><span>Pod</span><strong>{{ msg.action.data.podTitle }}</strong></div>
+                        <div class="stake-info-row"><span>Stake</span><strong>₦{{ msg.action.data.amount.toLocaleString() }}</strong></div>
+                        <div class="stake-info-row"><span>Gains</span><strong>{{ msg.action.data.gainsMultiplier.toFixed(2) }}x</strong></div>
+                        <div class="stake-info-row"><span>Est. Return</span><strong>₦{{ msg.action.data.netPayout.toLocaleString() }}</strong></div>
+                        <div class="stake-divider"></div>
+                        <div class="stake-info-row"><span>Platform Fee</span><strong class="fee">-₦{{ msg.action.data.platformFee.toLocaleString() }}</strong></div>
+                      </div>
+                      <div class="stake-card-actions">
+                        <button class="stake-cancel-btn" (click)="cancelStake($index)">Cancel</button>
+                        <button class="stake-confirm-btn" (click)="confirmStake($index)">
+                          Confirm & Place
+                        </button>
+                      </div>
+                    </div>
+                  }
+                  @if (msg.action && msg.actionState === 'executing') {
+                    <div class="stake-card executing">
+                      <mat-spinner diameter="16"></mat-spinner>
+                      <span>Placing your bet...</span>
+                    </div>
+                  }
+                  @if (msg.action && msg.actionState === 'done') {
+                    <div class="stake-card done">
+                      <mat-icon>check_circle</mat-icon>
+                      <span>Bet placed successfully! ✅</span>
+                    </div>
+                  }
+                  @if (msg.action && msg.actionState === 'cancelled') {
+                    <div class="stake-card cancelled">
+                      <span>Cancelled</span>
+                    </div>
+                  }
                   <span class="msg-time">{{ msg.time }}</span>
                 </div>
               </div>
@@ -76,6 +112,42 @@
                   <div class="msg-bubble">
                     <div class="msg-text">{{ msg.content }}</div>
                   </div>
+                  @if (msg.action && msg.actionState === 'pending') {
+                    <div class="stake-card">
+                      <div class="stake-card-header">Confirm Stake</div>
+                      <div class="stake-card-body">
+                        <div class="stake-info-row"><span>Pod</span><strong>{{ msg.action.data.podTitle }}</strong></div>
+                        <div class="stake-info-row"><span>Stake</span><strong>₦{{ msg.action.data.amount.toLocaleString() }}</strong></div>
+                        <div class="stake-info-row"><span>Gains</span><strong>{{ msg.action.data.gainsMultiplier.toFixed(2) }}x</strong></div>
+                        <div class="stake-info-row"><span>Est. Return</span><strong>₦{{ msg.action.data.netPayout.toLocaleString() }}</strong></div>
+                        <div class="stake-divider"></div>
+                        <div class="stake-info-row"><span>Platform Fee</span><strong class="fee">-₦{{ msg.action.data.platformFee.toLocaleString() }}</strong></div>
+                      </div>
+                      <div class="stake-card-actions">
+                        <button class="stake-cancel-btn" (click)="cancelStake($index)">Cancel</button>
+                        <button class="stake-confirm-btn" (click)="confirmStake($index)">
+                          Confirm & Place
+                        </button>
+                      </div>
+                    </div>
+                  }
+                  @if (msg.action && msg.actionState === 'executing') {
+                    <div class="stake-card executing">
+                      <mat-spinner diameter="16"></mat-spinner>
+                      <span>Placing your bet...</span>
+                    </div>
+                  }
+                  @if (msg.action && msg.actionState === 'done') {
+                    <div class="stake-card done">
+                      <mat-icon>check_circle</mat-icon>
+                      <span>Bet placed successfully! ✅</span>
+                    </div>
+                  }
+                  @if (msg.action && msg.actionState === 'cancelled') {
+                    <div class="stake-card cancelled">
+                      <span>Cancelled</span>
+                    </div>
+                  }
                   <span class="msg-time">{{ msg.time }}</span>
                 </div>
               </div>

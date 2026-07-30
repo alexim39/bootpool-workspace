@@ -4,6 +4,27 @@ import { Router } from '@angular/router';
 import { Observable, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export interface StakeAction {
+  type: 'confirm_stake';
+  data: {
+    podId: string;
+    podTitle: string;
+    amount: number;
+    gainsMultiplier: number;
+    potentialPayout: number;
+    platformFee: number;
+    netPayout: number;
+  };
+}
+
+export interface ChatResponse {
+  success: boolean;
+  data: {
+    content: string;
+    action: StakeAction | null;
+  };
+}
+
 export interface User {
   id: string;
   phone: string;
@@ -221,8 +242,8 @@ export class AuthService {
     return { Authorization: `Bearer ${this.token()}` };
   }
 
-  chatWithOra(messages: { role: 'user' | 'assistant' | 'system'; content: string }[]): Observable<{ success: boolean; data: { content: string } }> {
-    return this.http.post<{ success: boolean; data: { content: string } }>(`${environment.apiUrl}/ai/chat`, { messages }, {
+  chatWithOra(messages: { role: 'user' | 'assistant' | 'system'; content: string }[]): Observable<ChatResponse> {
+    return this.http.post<ChatResponse>(`${environment.apiUrl}/ai/chat`, { messages }, {
       headers: this.getAuthHeaders()
     });
   }
