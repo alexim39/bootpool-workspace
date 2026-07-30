@@ -16,13 +16,15 @@ export class AuthStore {
   readonly fullName = signal<string>('');
   readonly email = signal<string>('');
   readonly code = signal<string>('');
+  readonly referralCode = signal<string>('');
   readonly purpose = signal<'login' | 'signup'>('signup');
 
-  init(data: { phone?: string; fullName?: string; email?: string; purpose?: 'login' | 'signup'; code?: string }) {
+  init(data: { phone?: string; fullName?: string; email?: string; purpose?: 'login' | 'signup'; code?: string; referralCode?: string }) {
     if (data.phone !== undefined) this.phone.set(data.phone);
     if (data.fullName !== undefined) this.fullName.set(data.fullName);
     if (data.email !== undefined) this.email.set(data.email);
     if (data.code !== undefined) this.code.set(data.code);
+    if (data.referralCode !== undefined) this.referralCode.set(data.referralCode);
     if (data.purpose !== undefined) this.purpose.set(data.purpose);
     this.error.set(null);
   }
@@ -152,7 +154,7 @@ export class AuthStore {
       });
   }
 
-  completeSignup(data: { phone: string; fullName: string; pin: string; email?: string; code: string }, onSuccess: () => void) {
+  completeSignup(data: { phone: string; fullName: string; pin: string; referralCode?: string; email?: string; code: string }, onSuccess: () => void) {
     this.loading.set(true);
     this.error.set(null);
     this._auth.completeSignup(data)

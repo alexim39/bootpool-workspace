@@ -27,12 +27,13 @@ export class PinSetupComponent {
 
   constructor() {
     const nav = this.router.getCurrentNavigation();
-    const state = nav?.extras.state as { phone?: string; fullName?: string; email?: string; code?: string } | null;
+    const state = nav?.extras.state as { phone?: string; fullName?: string; email?: string; code?: string; referralCode?: string } | null;
     this.store.init({
       phone: state?.phone,
       fullName: state?.fullName,
       email: state?.email,
-      code: state?.code
+      code: state?.code,
+      referralCode: state?.referralCode
     });
     if (!this.store.phone() && history.state?.phone) {
       this.store.phone.set(history.state.phone);
@@ -48,7 +49,8 @@ export class PinSetupComponent {
       fullName: this.store.fullName(),
       pin: this.pin.trim(),
       email: this.store.email() || undefined,
-      code: this.store.code()
+      code: this.store.code(),
+      referralCode: this.store.referralCode() || undefined
     }, () => this.router.navigate(['/home']));
   }
 }

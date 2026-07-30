@@ -312,11 +312,20 @@ export class AdminService {
     return this.http.post<{ success: boolean; message: string }>(`${this.baseUrl}/users/${id}/reject-kyc`, { notes });
   }
 
-  getWithdrawals(params?: { page?: number; limit?: number; status?: string }): Observable<{ success: boolean; data: PaginatedResponse<AdminWithdrawal> }> {
+  getWithdrawals(params?: {
+    page?: number; limit?: number; status?: string;
+    search?: string; dateFrom?: string; dateTo?: string;
+    sortBy?: string; sortOrder?: string
+  }): Observable<{ success: boolean; data: PaginatedResponse<AdminWithdrawal> }> {
     let hp = new HttpParams();
     if (params?.page) hp = hp.set('page', params.page);
     if (params?.limit) hp = hp.set('limit', params.limit);
     if (params?.status) hp = hp.set('status', params.status);
+    if (params?.search) hp = hp.set('search', params.search);
+    if (params?.dateFrom) hp = hp.set('dateFrom', params.dateFrom);
+    if (params?.dateTo) hp = hp.set('dateTo', params.dateTo);
+    if (params?.sortBy) hp = hp.set('sortBy', params.sortBy);
+    if (params?.sortOrder) hp = hp.set('sortOrder', params.sortOrder);
     return this.http.get<{ success: boolean; data: PaginatedResponse<AdminWithdrawal> }>(`${this.baseUrl}/withdrawals`, { params: hp });
   }
 

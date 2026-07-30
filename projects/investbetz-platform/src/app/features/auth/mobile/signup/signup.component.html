@@ -37,6 +37,12 @@
           <span class="field-hint">Your verification code will also be sent to this email</span>
         </div>
 
+        <div class="field">
+          <label class="field-label">Referral Code (optional)</label>
+          <input class="field-input" type="text" [(ngModel)]="referralCode" placeholder="Enter referral code" maxlength="6" style="text-transform:uppercase" />
+          <span class="field-hint">Enter a friend's code to earn a bonus when you place your first bet</span>
+        </div>
+
         <div class="terms-row" (click)="toggleTerms()">
           <div class="terms-checkbox" [class.checked]="termsAccepted">
             @if (termsAccepted) {

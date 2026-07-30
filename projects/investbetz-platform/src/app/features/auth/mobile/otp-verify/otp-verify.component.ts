@@ -22,11 +22,12 @@ export class OtpVerifyComponent {
 
   constructor() {
     const nav = this.router.getCurrentNavigation();
-    const state = nav?.extras.state as { phone?: string; fullName?: string; email?: string; purpose?: 'login' | 'signup' } | null;
+    const state = nav?.extras.state as { phone?: string; fullName?: string; email?: string; referralCode?: string; purpose?: 'login' | 'signup' } | null;
     this.store.init({
       phone: state?.phone,
       fullName: state?.fullName,
       email: state?.email,
+      referralCode: state?.referralCode,
       purpose: state?.purpose
     });
     if (!this.store.phone() && history.state?.phone) {
@@ -68,7 +69,7 @@ export class OtpVerifyComponent {
     this.store.verifyOtp(
       code,
       () => this.router.navigate(['/home']),
-      (code) => this.router.navigate(['/auth/setup-pin'], { state: { phone: this.store.phone(), fullName: this.store.fullName(), email: this.store.email(), code } })
+      (code) => this.router.navigate(['/auth/setup-pin'], { state: { phone: this.store.phone(), fullName: this.store.fullName(), email: this.store.email(), referralCode: this.store.referralCode() || undefined, code } })
     );
   }
 
