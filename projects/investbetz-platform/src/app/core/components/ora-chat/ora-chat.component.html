@@ -25,43 +25,74 @@
                 }
                 <div class="msg-content">
                   <div class="msg-bubble">
-                    <div class="msg-text">{{ msg.content }}</div>
+                    <div class="msg-text">{{ msg.displayContent || msg.content }}</div>
                   </div>
-                  @if (msg.action && msg.actionState === 'pending') {
-                    <div class="stake-card">
-                      <div class="stake-card-header">Confirm Stake</div>
-                      <div class="stake-card-body">
-                        <div class="stake-info-row"><span>Pod</span><strong>{{ msg.action.data.podTitle }}</strong></div>
-                        <div class="stake-info-row"><span>Stake</span><strong>₦{{ msg.action.data.amount.toLocaleString() }}</strong></div>
-                        <div class="stake-info-row"><span>Gains</span><strong>{{ msg.action.data.gainsMultiplier.toFixed(2) }}x</strong></div>
-                        <div class="stake-info-row"><span>Est. Return</span><strong>₦{{ msg.action.data.netPayout.toLocaleString() }}</strong></div>
-                        <div class="stake-divider"></div>
-                        <div class="stake-info-row"><span>Platform Fee</span><strong class="fee">-₦{{ msg.action.data.platformFee.toLocaleString() }}</strong></div>
+                  @for (action of msg.actions; track $index; let i = $index) {
+                    @if (msg.actionStates?.[i] === 'pending') {
+                      @if (action.type === 'confirm_stake') {
+                        <div class="stake-card">
+                          <div class="stake-card-header">Confirm Stake</div>
+                          <div class="stake-card-body">
+                            <div class="stake-info-row"><span>Pod</span><strong>{{ action.data.podTitle }}</strong></div>
+                            @if (action.data.selection) {
+                              <div class="stake-info-row"><span>Pick</span><strong>{{ action.data.selection }}</strong></div>
+                            }
+                            <div class="stake-info-row"><span>Stake</span><strong>₦{{ action.data.amount.toLocaleString() }}</strong></div>
+                            <div class="stake-info-row"><span>Gains</span><strong>{{ action.data.gainsMultiplier.toFixed(2) }}x</strong></div>
+                            <div class="stake-info-row"><span>Est. Return</span><strong>₦{{ action.data.netPayout.toLocaleString() }}</strong></div>
+                            <div class="stake-divider"></div>
+                            <div class="stake-info-row"><span>Platform Fee</span><strong class="fee">-₦{{ action.data.platformFee.toLocaleString() }}</strong></div>
+                          </div>
+                          <div class="stake-card-actions">
+                            <button class="stake-cancel-btn" (click)="cancelStake($index, i)">Cancel</button>
+                            <button class="stake-confirm-btn" (click)="confirmStake($index, i)">
+                              Confirm & Place
+                            </button>
+                          </div>
+                        </div>
+                      } @else {
+                        <div class="stake-card">
+                          <div class="stake-card-header">Confirm Accumulator ({{ action.data.legs.length }} legs)</div>
+                          <div class="stake-card-body">
+                            @for (leg of action.data.legs; track $index) {
+                              <div class="stake-info-row">
+                                <span>{{ leg.podTitle }}</span>
+                                <strong>{{ leg.selection }} &bull; {{ leg.gainsMultiplier.toFixed(2) }}x</strong>
+                              </div>
+                            }
+                            <div class="stake-divider"></div>
+                            <div class="stake-info-row"><span>Stake</span><strong>₦{{ action.data.stakeAmount.toLocaleString() }}</strong></div>
+                            <div class="stake-info-row"><span>Combined Odds</span><strong>{{ action.data.combinedMultiplier.toFixed(2) }}x</strong></div>
+                            <div class="stake-info-row"><span>Est. Return</span><strong>₦{{ action.data.netPayout.toLocaleString() }}</strong></div>
+                            <div class="stake-divider"></div>
+                            <div class="stake-info-row"><span>Platform Fee</span><strong class="fee">-₦{{ action.data.platformFee.toLocaleString() }}</strong></div>
+                          </div>
+                          <div class="stake-card-actions">
+                            <button class="stake-cancel-btn" (click)="cancelStake($index, i)">Cancel</button>
+                            <button class="stake-confirm-btn" (click)="confirmStake($index, i)">
+                              Confirm & Place
+                            </button>
+                          </div>
+                        </div>
+                      }
+                    }
+                    @if (msg.actionStates?.[i] === 'executing') {
+                      <div class="stake-card executing">
+                        <mat-spinner diameter="16"></mat-spinner>
+                        <span>Placing your bet...</span>
                       </div>
-                      <div class="stake-card-actions">
-                        <button class="stake-cancel-btn" (click)="cancelStake($index)">Cancel</button>
-                        <button class="stake-confirm-btn" (click)="confirmStake($index)">
-                          Confirm & Place
-                        </button>
+                    }
+                    @if (msg.actionStates?.[i] === 'done') {
+                      <div class="stake-card done">
+                        <mat-icon>check_circle</mat-icon>
+                        <span>Bet placed successfully! ✅</span>
                       </div>
-                    </div>
-                  }
-                  @if (msg.action && msg.actionState === 'executing') {
-                    <div class="stake-card executing">
-                      <mat-spinner diameter="16"></mat-spinner>
-                      <span>Placing your bet...</span>
-                    </div>
-                  }
-                  @if (msg.action && msg.actionState === 'done') {
-                    <div class="stake-card done">
-                      <mat-icon>check_circle</mat-icon>
-                      <span>Bet placed successfully! ✅</span>
-                    </div>
-                  }
-                  @if (msg.action && msg.actionState === 'cancelled') {
-                    <div class="stake-card cancelled">
-                      <span>Cancelled</span>
-                    </div>
+                    }
+                    @if (msg.actionStates?.[i] === 'cancelled') {
+                      <div class="stake-card cancelled">
+                        <span>Cancelled</span>
+                      </div>
+                    }
                   }
                   <span class="msg-time">{{ msg.time }}</span>
                 </div>
@@ -108,63 +139,89 @@
                 } @else {
                   <div class="msg-avatar user-avatar-icon"><mat-icon>person</mat-icon></div>
                 }
-                <div class="msg-content">
-                  <div class="msg-bubble">
-                    <div class="msg-text">{{ msg.content }}</div>
-                  </div>
-                  @if (msg.action && msg.actionState === 'pending') {
+            <div class="msg-content">
+              <div class="msg-bubble">
+                <div class="msg-text">{{ msg.displayContent || msg.content }}</div>
+              </div>
+              @for (action of msg.actions; track $index; let i = $index) {
+                @if (msg.actionStates?.[i] === 'pending') {
+                  @if (action.type === 'confirm_stake') {
                     <div class="stake-card">
                       <div class="stake-card-header">Confirm Stake</div>
                       <div class="stake-card-body">
-                        <div class="stake-info-row"><span>Pod</span><strong>{{ msg.action.data.podTitle }}</strong></div>
-                        <div class="stake-info-row"><span>Stake</span><strong>₦{{ msg.action.data.amount.toLocaleString() }}</strong></div>
-                        <div class="stake-info-row"><span>Gains</span><strong>{{ msg.action.data.gainsMultiplier.toFixed(2) }}x</strong></div>
-                        <div class="stake-info-row"><span>Est. Return</span><strong>₦{{ msg.action.data.netPayout.toLocaleString() }}</strong></div>
+                        <div class="stake-info-row"><span>Pod</span><strong>{{ action.data.podTitle }}</strong></div>
+                        @if (action.data.selection) {
+                          <div class="stake-info-row"><span>Pick</span><strong>{{ action.data.selection }}</strong></div>
+                        }
+                        <div class="stake-info-row"><span>Stake</span><strong>₦{{ action.data.amount.toLocaleString() }}</strong></div>
+                        <div class="stake-info-row"><span>Gains</span><strong>{{ action.data.gainsMultiplier.toFixed(2) }}x</strong></div>
+                        <div class="stake-info-row"><span>Est. Return</span><strong>₦{{ action.data.netPayout.toLocaleString() }}</strong></div>
                         <div class="stake-divider"></div>
-                        <div class="stake-info-row"><span>Platform Fee</span><strong class="fee">-₦{{ msg.action.data.platformFee.toLocaleString() }}</strong></div>
+                        <div class="stake-info-row"><span>Platform Fee</span><strong class="fee">-₦{{ action.data.platformFee.toLocaleString() }}</strong></div>
                       </div>
                       <div class="stake-card-actions">
-                        <button class="stake-cancel-btn" (click)="cancelStake($index)">Cancel</button>
-                        <button class="stake-confirm-btn" (click)="confirmStake($index)">
+                        <button class="stake-cancel-btn" (click)="cancelStake($index, i)">Cancel</button>
+                        <button class="stake-confirm-btn" (click)="confirmStake($index, i)">
+                          Confirm & Place
+                        </button>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="stake-card">
+                      <div class="stake-card-header">Confirm Accumulator ({{ action.data.legs.length }} legs)</div>
+                      <div class="stake-card-body">
+                        @for (leg of action.data.legs; track $index) {
+                          <div class="stake-info-row">
+                            <span>{{ leg.podTitle }}</span>
+                            <strong>{{ leg.selection ? leg.selection + ' &bull; ' : '' }}{{ leg.gainsMultiplier.toFixed(2) }}x</strong>
+                          </div>
+                        }
+                        <div class="stake-divider"></div>
+                        <div class="stake-info-row"><span>Stake</span><strong>₦{{ action.data.stakeAmount.toLocaleString() }}</strong></div>
+                        <div class="stake-info-row"><span>Combined Odds</span><strong>{{ action.data.combinedMultiplier.toFixed(2) }}x</strong></div>
+                        <div class="stake-info-row"><span>Est. Return</span><strong>₦{{ action.data.netPayout.toLocaleString() }}</strong></div>
+                        <div class="stake-divider"></div>
+                        <div class="stake-info-row"><span>Platform Fee</span><strong class="fee">-₦{{ action.data.platformFee.toLocaleString() }}</strong></div>
+                      </div>
+                      <div class="stake-card-actions">
+                        <button class="stake-cancel-btn" (click)="cancelStake($index, i)">Cancel</button>
+                        <button class="stake-confirm-btn" (click)="confirmStake($index, i)">
                           Confirm & Place
                         </button>
                       </div>
                     </div>
                   }
-                  @if (msg.action && msg.actionState === 'executing') {
-                    <div class="stake-card executing">
-                      <mat-spinner diameter="16"></mat-spinner>
-                      <span>Placing your bet...</span>
-                    </div>
-                  }
-                  @if (msg.action && msg.actionState === 'done') {
-                    <div class="stake-card done">
-                      <mat-icon>check_circle</mat-icon>
-                      <span>Bet placed successfully! ✅</span>
-                    </div>
-                  }
-                  @if (msg.action && msg.actionState === 'cancelled') {
-                    <div class="stake-card cancelled">
-                      <span>Cancelled</span>
-                    </div>
-                  }
-                  <span class="msg-time">{{ msg.time }}</span>
-                </div>
-              </div>
-            }
-            @if (loading()) {
-              <div class="msg-row msg-ora">
-                <div class="msg-avatar ora-avatar-icon"><mat-icon>smart_toy</mat-icon></div>
-                <div class="msg-typing"><span class="t-dot"></span><span class="t-dot"></span><span class="t-dot"></span></div>
-              </div>
-            }
-            <div class="ora-suggestions">
-              @for (s of suggestions; track s) {
-                <button class="s-chip" (click)="quickQuestion(s)">{{ s }}</button>
+                }
+                @if (msg.actionStates?.[i] === 'executing') {
+                  <div class="stake-card executing">
+                    <mat-spinner diameter="16"></mat-spinner>
+                    <span>Placing your bet...</span>
+                  </div>
+                }
+                @if (msg.actionStates?.[i] === 'done') {
+                  <div class="stake-card done">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>Bet placed successfully! ✅</span>
+                  </div>
+                }
+                @if (msg.actionStates?.[i] === 'cancelled') {
+                  <div class="stake-card cancelled">
+                    <span>Cancelled</span>
+                  </div>
+                }
               }
+              <span class="msg-time">{{ msg.time }}</span>
             </div>
           </div>
-          <div class="d-footer">
+        }
+        @if (loading()) {
+          <div class="msg-row msg-ora">
+            <div class="msg-avatar ora-avatar-icon"><mat-icon>smart_toy</mat-icon></div>
+            <div class="msg-typing"><span class="t-dot"></span><span class="t-dot"></span><span class="t-dot"></span></div>
+          </div>
+        }
+      </div>
+      <div class="ora-footer">
             <div class="ora-input-wrap">
               <input class="ora-input" [(ngModel)]="inputText" placeholder="Ask Ora anything..." (keydown.enter)="sendMessage()" [disabled]="loading()">
               <button class="ora-send" (click)="sendMessage()" [disabled]="!inputText.trim() || loading()">

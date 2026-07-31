@@ -1,5 +1,5 @@
 export { AuthService } from './auth.service';
-export type { User, AuthResponse, OtpResponse, StakeAction, ChatResponse } from './auth.service';
+export type { User, AuthResponse, OtpResponse, StakeAction, AccumulatorAction, ChatAction, ChatResponse } from './auth.service';
 export { DeviceService } from './device.service';
 export type { DeviceType, DeviceState } from './device.service';
 export { ErrorMonitorService, BetPoolErrorHandler } from './error-monitor.service';

@@ -32,8 +32,6 @@ export class GuideDesktopComponent {
     'Stakes are settled within minutes of the final whistle.',
     'Each Pod shows its odds (e.g. 2.10x) and cashback percentage before you stake.',
     'Accumulators combine 2–5 selections into one bet with combined odds.',
-    'Bet Manager charges a 20% performance fee only on net profit.',
-    'You must verify your identity (KYC) before placing bets or withdrawing.',
     'Locked Bet Manager funds unlock after the 30-day cycle ends.',
   ];
 }

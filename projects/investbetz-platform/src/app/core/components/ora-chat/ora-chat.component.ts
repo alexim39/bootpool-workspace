@@ -4,18 +4,23 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
-import { AuthService, StakeAction } from '../../services';
+import { AuthService, ChatAction } from '../../services';
 import { WalletService } from '../../services';
 import { DeviceService } from '../../services';
 import { StakeService } from '../../services';
 
+type ActionState = 'pending' | 'confirming' | 'executing' | 'done' | 'cancelled';
+
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  displayContent?: string;
   time: string;
-  action?: StakeAction;
-  actionState?: 'pending' | 'confirming' | 'executing' | 'done' | 'cancelled';
+  actions?: ChatAction[];
+  actionStates?: ActionState[];
 }
+
+const ACTION_TAG_REGEX = /\s*\[(?:PENDING|STAKE|ACCUM)\]\{[\s\S]*?\}\[\/(?:PENDING|STAKE|ACCUM)\]\s*/g;
 
 @Component({
   selector: 'app-ora-chat',
@@ -58,19 +63,26 @@ export class OraChatComponent implements OnInit {
       next: (res) => {
         this.loading.set(false);
         if (res.success) {
+          const actions = res.data.actions || [];
           const oraMsg: ChatMessage = {
             role: 'assistant',
             content: res.data.content,
+            displayContent: res.data.content.replace(ACTION_TAG_REGEX, ' ').trim(),
             time: this.formatTime(new Date()),
-            action: res.data.action || undefined,
-            actionState: res.data.action ? 'pending' : undefined
+            actions: actions.length ? actions : undefined,
+            actionStates: actions.length ? actions.map(() => 'pending' as ActionState) : undefined
           };
           this.messages.update(m => [...m, oraMsg]);
         }
       },
-      error: () => {
+      error: (err) => {
         this.loading.set(false);
-        this.messages.update(m => [...m, { role: 'assistant', content: 'Sorry, I had trouble connecting. Please try again.', time: this.formatTime(new Date()) }]);
+        const bizMsg = err?.error?.message;
+        this.messages.update(m => [...m, {
+          role: 'assistant',
+          content: bizMsg || "Ora's service is temporarily unreachable, so I couldn't take your bet. No worries — you can still place it manually from the Home feed: pick a pod and tap \"Place Stake\".",
+          time: this.formatTime(new Date())
+        }]);
       }
     });
 
@@ -84,56 +96,61 @@ export class OraChatComponent implements OnInit {
     this.sendMessage(q);
   }
 
-  confirmStake(msgIndex: number) {
+  confirmStake(msgIndex: number, actionIndex: number) {
     const msg = this.messages()[msgIndex];
-    if (!msg.action || msg.actionState !== 'pending') return;
+    const action = msg.actions?.[actionIndex];
+    if (!action || msg.actionStates?.[actionIndex] !== 'pending') return;
 
-    this.messages.update(m => {
-      const updated = [...m];
-      updated[msgIndex] = { ...updated[msgIndex], actionState: 'executing' };
-      return updated;
-    });
+    this.setActionState(msgIndex, actionIndex, 'executing');
 
-    this._stake.placeStake({ podId: msg.action!.data.podId, stakeAmount: msg.action!.data.amount }).subscribe({
+    const request = action.type === 'confirm_accumulator'
+      ? this._stake.placeAccumulator({ podIds: action.data.legs.map(l => l.podId), stakeAmount: action.data.stakeAmount })
+      : this._stake.placeStake({ podId: action.data.podId, stakeAmount: action.data.amount });
+
+    request.subscribe({
       next: (res) => {
-        this.messages.update(m => {
-          const updated = [...m];
-          updated[msgIndex] = { ...updated[msgIndex], actionState: 'done' };
-          return updated;
-        });
+        this.setActionState(msgIndex, actionIndex, 'done');
+        const summary = action.type === 'confirm_accumulator'
+          ? `You staked ₦${action.data.stakeAmount.toLocaleString()} on a ${action.data.legs.length}-leg accumulator (${action.data.legs.map(l => l.podTitle).join(', ')}).`
+          : `You staked ₦${action.data.amount.toLocaleString()} on "${action.data.podTitle}".`;
         this.messages.update(m => [...m, {
           role: 'assistant',
-          content: `✅ Bet placed! You staked ₦${msg.action!.data.amount.toLocaleString()} on "${msg.action!.data.podTitle}". Check the Bets page for details.`,
+          content: `✅ Bet placed! ${summary} Check the Bets page for details.`,
           time: this.formatTime(new Date())
         }]);
         this._wallet.fetchBalance();
       },
-      error: () => {
-        this.messages.update(m => {
-          const updated = [...m];
-          updated[msgIndex] = { ...updated[msgIndex], actionState: 'pending' };
-          return updated;
-        });
+      error: (err) => {
+        this.setActionState(msgIndex, actionIndex, 'pending');
         this.messages.update(m => [...m, {
           role: 'assistant',
-          content: 'Sorry, I couldn\'t place that bet. Make sure you have enough balance and try again.',
+          content: err?.error?.message || 'Sorry, I couldn\'t place that bet. Make sure you have enough balance and try again.',
           time: this.formatTime(new Date())
         }]);
       }
     });
   }
 
-  cancelStake(msgIndex: number) {
-    this.messages.update(m => {
-      const updated = [...m];
-      updated[msgIndex] = { ...updated[msgIndex], actionState: 'cancelled' };
-      return updated;
-    });
+  cancelStake(msgIndex: number, actionIndex: number) {
+    this.setActionState(msgIndex, actionIndex, 'cancelled');
     this.messages.update(m => [...m, {
       role: 'assistant',
       content: 'No problem! Let me know if you want to try a different bet.',
       time: this.formatTime(new Date())
     }]);
+  }
+
+  private setActionState(msgIndex: number, actionIndex: number, state: ActionState) {
+    this.messages.update(m => {
+      const updated = [...m];
+      const msg = updated[msgIndex];
+      if (msg?.actionStates) {
+        const states = [...msg.actionStates];
+        states[actionIndex] = state;
+        updated[msgIndex] = { ...msg, actionStates: states };
+      }
+      return updated;
+    });
   }
 
   private formatTime(date: Date): string {

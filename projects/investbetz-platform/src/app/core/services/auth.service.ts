@@ -9,6 +9,7 @@ export interface StakeAction {
   data: {
     podId: string;
     podTitle: string;
+    selection?: string;
     amount: number;
     gainsMultiplier: number;
     potentialPayout: number;
@@ -17,11 +18,30 @@ export interface StakeAction {
   };
 }
 
+export interface AccumulatorAction {
+  type: 'confirm_accumulator';
+  data: {
+    legs: Array<{
+      podId: string;
+      podTitle: string;
+      selection: string;
+      gainsMultiplier: number;
+    }>;
+    stakeAmount: number;
+    combinedMultiplier: number;
+    potentialPayout: number;
+    platformFee: number;
+    netPayout: number;
+  };
+}
+
+export type ChatAction = StakeAction | AccumulatorAction;
+
 export interface ChatResponse {
   success: boolean;
   data: {
     content: string;
-    action: StakeAction | null;
+    actions: ChatAction[];
   };
 }
 
