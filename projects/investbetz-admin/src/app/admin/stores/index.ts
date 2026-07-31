@@ -15,4 +15,3 @@ export * from '../stakes/stores';
 export * from '../transactions/stores';
 export * from '../users/stores';
 export * from '../withdraw-mgt/stores';
-export * from '../withdrawals/stores';

@@ -12,7 +12,7 @@ import { switchMap } from 'rxjs/operators';
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgFor, NgIf, MatIconModule, MatButtonModule, MatProgressSpinnerModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgIf, MatIconModule, MatButtonModule, MatProgressSpinnerModule],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss']
 })
