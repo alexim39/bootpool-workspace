@@ -24,6 +24,28 @@
     .toggle-btn { color: rgba(255,255,255,0.6); width: 32px; height: 32px; line-height: 32px; }
     .toggle-btn mat-icon { font-size: 20px; }
     .nav-list { flex: 1; padding: 12px 8px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+    .nav-group { display: flex; flex-direction: column; gap: 2px; }
+    .nav-group-btn {
+      display: flex; align-items: center; gap: 12px; width: 100%;
+      padding: 10px 12px; border: none; background: none;
+      color: rgba(255,255,255,0.45); border-radius: 8px;
+      font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s;
+    }
+    .nav-group-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .nav-group-btn.active { color: #00E676; }
+    .nav-group-btn .nav-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+      text-transform: uppercase; opacity: 0.85; white-space: nowrap;
+    }
+    .nav-group-btn .nav-icon { font-size: 22px; width: 22px; height: 22px; flex-shrink: 0; }
+    .nav-chevron {
+      margin-left: auto; font-size: 18px; width: 18px; height: 18px;
+      opacity: 0.7; transition: transform 0.2s ease;
+    }
+    .nav-group.expanded .nav-chevron { transform: rotate(90deg); }
+    .nav-group-items { max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
+    .nav-group.expanded .nav-group-items { max-height: 400px; }
+    .nav-group-items .nav-item { padding-left: 20px; }
     .nav-item {
       display: flex; align-items: center; gap: 12px; padding: 10px 12px;
       border-radius: 8px; color: rgba(255,255,255,0.6); text-decoration: none;

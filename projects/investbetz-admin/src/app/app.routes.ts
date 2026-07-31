@@ -44,7 +44,8 @@ export const routes: Routes = [
       },
       {
         path: 'withdrawals',
-        loadComponent: () => import('./admin/withdrawals/withdrawals.component').then(m => m.WithdrawalsComponent)
+        redirectTo: 'withdraw-mgt',
+        pathMatch: 'full'
       },
       {
         path: 'kyc',
