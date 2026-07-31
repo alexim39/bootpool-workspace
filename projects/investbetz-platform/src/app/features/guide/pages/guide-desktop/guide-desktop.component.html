@@ -1,0 +1,69 @@
+<app-nav />
+<div class="guide-root">
+  <div class="guide-header">
+    <span class="guide-eyebrow">BetPool Academy</span>
+    <h1>How BetPool Works</h1>
+    <p class="guide-sub">From your first deposit to your first payout — watch the film below, then explore everything you can do on the platform.</p>
+  </div>
+
+  <div class="video-card">
+    <div class="video-glow"></div>
+    <div class="video-label">
+      <mat-icon>play_circle</mat-icon>
+      <span>Introduction to BetPool</span>
+    </div>
+    <video controls playsinline preload="metadata" poster="/video/betpool-poster.jpg">
+      <source src="/video/betpool.mp4" type="video/mp4" />
+      Your browser does not support the video tag. Download the video to watch it.
+    </video>
+  </div>
+
+  <section class="guide-section">
+    <h2>Get started in 4 steps</h2>
+    <div class="steps-grid">
+      @for (step of steps; track step.title) {
+        <div class="step-card">
+          <div class="step-num-icon">
+            <mat-icon>{{ step.icon }}</mat-icon>
+          </div>
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.text }}</p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="guide-section">
+    <h2>Everything you can do</h2>
+    <div class="features-grid">
+      @for (f of features; track f.title) {
+        <div class="feature-card" [style.--f-color]="f.color">
+          <div class="feature-icon"><mat-icon>{{ f.icon }}</mat-icon></div>
+          <h3>{{ f.title }}</h3>
+          <p>{{ f.text }}</p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="guide-section">
+    <h2>Good to know</h2>
+    <div class="facts-grid">
+      @for (fact of facts; track fact) {
+        <div class="fact-row">
+          <span class="fact-check"><mat-icon>check_circle</mat-icon></span>
+          <span>{{ fact }}</span>
+        </div>
+      }
+    </div>
+  </section>
+
+  <div class="guide-cta">
+    <h2>Ready to start?</h2>
+    <p>Your first win is one good pick away.</p>
+    <div class="cta-actions">
+      <button class="btn-primary" routerLink="/home">Browse Odds</button>
+      <button class="btn-ghost" routerLink="/bet-manager">Bet Manager</button>
+    </div>
+  </div>
+</div>

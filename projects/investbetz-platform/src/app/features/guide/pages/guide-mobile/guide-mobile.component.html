@@ -1,0 +1,68 @@
+<div class="guide-root">
+  <header class="guide-head">
+    <a class="guide-back" routerLink="/home" aria-label="Back to home"><mat-icon>arrow_back</mat-icon></a>
+    <div class="guide-head-title">
+      <span class="guide-eyebrow">BetPool Academy</span>
+      <h1>How BetPool Works</h1>
+    </div>
+  </header>
+
+  <p class="guide-sub">Watch the film below to see how BetPool works from your first deposit to your first payout.</p>
+
+  <div class="video-card">
+    <video controls playsinline preload="metadata">
+      <source src="/video/betpool.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+    <div class="video-label">
+      <mat-icon>play_circle</mat-icon>
+      <span>Introduction to BetPool</span>
+    </div>
+  </div>
+
+  <section class="guide-section">
+    <h2>Get started in 4 steps</h2>
+    @for (step of steps; track step.title) {
+      <div class="step-card">
+        <div class="step-num-icon"><mat-icon>{{ step.icon }}</mat-icon></div>
+        <div class="step-body">
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.text }}</p>
+        </div>
+      </div>
+    }
+  </section>
+
+  <section class="guide-section">
+    <h2>Everything you can do</h2>
+    @for (f of features; track f.title) {
+      <div class="feature-card" [style.--f-color]="f.color">
+        <div class="feature-icon"><mat-icon>{{ f.icon }}</mat-icon></div>
+        <div class="feature-body">
+          <h3>{{ f.title }}</h3>
+          <p>{{ f.text }}</p>
+        </div>
+      </div>
+    }
+  </section>
+
+  <section class="guide-section">
+    <h2>Good to know</h2>
+    @for (fact of facts; track fact) {
+      <div class="fact-row">
+        <span class="fact-check"><mat-icon>check_circle</mat-icon></span>
+        <span>{{ fact }}</span>
+      </div>
+    }
+  </section>
+
+  <div class="guide-cta">
+    <h2>Ready to start?</h2>
+    <p>Your first win is one good pick away.</p>
+    <div class="cta-actions">
+      <button class="btn-primary" routerLink="/home">Browse Odds</button>
+      <button class="btn-ghost" routerLink="/bet-manager">Bet Manager</button>
+    </div>
+  </div>
+</div>
+<app-mobile-nav />
