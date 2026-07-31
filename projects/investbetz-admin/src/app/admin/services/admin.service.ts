@@ -10,7 +10,7 @@ export interface PaginatedResponse<T> {
   page: number;
   limit: number;
   totalPages: number;
-  stats?: { total: number; active: number; suspended: number; kycVerified: number; kycPending: number };
+  stats?: { total: number; active: number; suspended: number; kycVerified: number; kycPending: number; admins: number };
 }
 
 export interface AutomationStatus {
@@ -283,7 +283,7 @@ export class AdminService {
     return this.http.post<{ success: boolean; data: AdminPod }>(`${this.baseUrl}/pods/${id}/cancel`, {});
   }
 
-  getUsers(params?: { page?: number; limit?: number; search?: string; status?: string; dateFrom?: string; dateTo?: string; sortBy?: string; sortOrder?: string }): Observable<{ success: boolean; data: PaginatedResponse<AdminUser> }> {
+  getUsers(params?: { page?: number; limit?: number; search?: string; status?: string; dateFrom?: string; dateTo?: string; sortBy?: string; sortOrder?: string; role?: 'user' | 'admin' }): Observable<{ success: boolean; data: PaginatedResponse<AdminUser> }> {
     let hp = new HttpParams();
     if (params?.page) hp = hp.set('page', params.page);
     if (params?.limit) hp = hp.set('limit', params.limit);
@@ -293,6 +293,7 @@ export class AdminService {
     if (params?.dateTo) hp = hp.set('dateTo', params.dateTo);
     if (params?.sortBy) hp = hp.set('sortBy', params.sortBy);
     if (params?.sortOrder) hp = hp.set('sortOrder', params.sortOrder);
+    if (params?.role) hp = hp.set('role', params.role);
     return this.http.get<{ success: boolean; data: PaginatedResponse<AdminUser> }>(`${this.baseUrl}/users`, { params: hp });
   }
 

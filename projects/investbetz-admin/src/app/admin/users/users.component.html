@@ -5,6 +5,7 @@
       @if (store.stats(); as s) {
         <div class="stat-group">
           <span class="stat-item total">{{ s.total }} total</span>
+          <span class="stat-item admins">{{ s.admins }} admins</span>
           <span class="stat-item act-dot">{{ s.active }} active</span>
           <span class="stat-item suspended">{{ s.suspended }} suspended</span>
           <span class="stat-item kyc-verified">{{ s.kycVerified }} KYC</span>
@@ -21,14 +22,21 @@
 
   <div class="filter-section">
     <div class="tabs-row">
-      <button class="tab-btn" [class.active]="store.statusFilter() === 'all'" (click)="store.setStatusFilter('all')">All</button>
-      <button class="tab-btn" [class.active]="store.statusFilter() === 'active'" (click)="store.setStatusFilter('active')">Active</button>
-      <button class="tab-btn" [class.active]="store.statusFilter() === 'suspended'" (click)="store.setStatusFilter('suspended')">
-        Suspended
-        @if (store.stats()?.suspended; as n) { <span class="tab-badge warn">{{ n }}</span> }
+      <button class="tab-btn" [class.active]="store.roleFilter() === 'user'" (click)="store.setRoleFilter('user')">Users</button>
+      <button class="tab-btn" [class.active]="store.roleFilter() === 'admin'" (click)="store.setRoleFilter('admin')">
+        Admins
+        @if (store.stats()?.admins; as n) { <span class="tab-badge">{{ n }}</span> }
       </button>
-      <button class="tab-btn" [class.active]="store.statusFilter() === 'kyc_verified'" (click)="store.setStatusFilter('kyc_verified')">KYC Verified</button>
-      <button class="tab-btn" [class.active]="store.statusFilter() === 'kyc_pending'" (click)="store.setStatusFilter('kyc_pending')">KYC Pending</button>
+      @if (store.roleFilter() === 'user') {
+        <button class="tab-btn" [class.active]="store.statusFilter() === 'all'" (click)="store.setStatusFilter('all')">All</button>
+        <button class="tab-btn" [class.active]="store.statusFilter() === 'active'" (click)="store.setStatusFilter('active')">Active</button>
+        <button class="tab-btn" [class.active]="store.statusFilter() === 'suspended'" (click)="store.setStatusFilter('suspended')">
+          Suspended
+          @if (store.stats()?.suspended; as n) { <span class="tab-badge warn">{{ n }}</span> }
+        </button>
+        <button class="tab-btn" [class.active]="store.statusFilter() === 'kyc_verified'" (click)="store.setStatusFilter('kyc_verified')">KYC Verified</button>
+        <button class="tab-btn" [class.active]="store.statusFilter() === 'kyc_pending'" (click)="store.setStatusFilter('kyc_pending')">KYC Pending</button>
+      }
     </div>
     <div class="filter-controls">
       <div class="search-wrapper">

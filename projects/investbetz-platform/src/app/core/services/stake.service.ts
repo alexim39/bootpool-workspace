@@ -24,6 +24,8 @@ export interface PodRef {
   opensAt: string;
   stakingClosesAt: string;
   isLive: boolean;
+  homeScore?: number | null;
+  awayScore?: number | null;
 }
 
 export interface StakeItem {
@@ -35,6 +37,8 @@ export interface StakeItem {
   matchDate: string;
   status: 'pending' | 'won' | 'lost' | 'void';
   settledAt?: string;
+  homeScore?: number | null;
+  awayScore?: number | null;
 }
 
 export interface Stake {
@@ -55,6 +59,7 @@ export interface Stake {
   isActive: boolean;
   isSettled: boolean;
   isParlay: boolean;
+  refundAmount?: number;
   cashoutAmount?: number;
   cashoutFee?: number;
   cashedOutAt?: string;

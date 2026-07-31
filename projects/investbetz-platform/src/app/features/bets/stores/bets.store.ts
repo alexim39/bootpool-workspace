@@ -17,7 +17,7 @@ export class BetsStore {
   readonly walletBalance = computed(() => this._wallet.balance().available || 0);
 
   wonCount = signal(0);
-  refundedCount = signal(0);
+  lostCount = signal(0);
   voidCount = signal(0);
   settledStakes = signal<Stake[]>([]);
 
@@ -34,7 +34,7 @@ export class BetsStore {
   private loadCounts() {
     const stakes = this.settledStakes();
     this.wonCount.set(stakes.filter(s => s.status === 'won').length);
-    this.refundedCount.set(stakes.filter(s => s.status === 'lost' || s.status === 'refunded').length);
+    this.lostCount.set(stakes.filter(s => s.status === 'lost' || s.status === 'refunded').length);
     this.voidCount.set(stakes.filter(s => s.status === 'void' || s.status === 'cancelled').length);
   }
 
@@ -101,8 +101,25 @@ export class BetsStore {
   }
 
   formatStatus(status: Stake['status']): string {
-    if (status === 'lost') return 'Refunded';
     if (status === 'cashed_out') return 'Cashed Out';
     return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+
+  formatResultLabel(stake: Stake): string {
+    if (stake.status === 'won') return 'Won';
+    if (stake.status === 'cashed_out') return 'Cashed Out';
+    if (stake.status === 'lost') return this.hasRefund(stake) ? 'Refunded' : 'Lost';
+    if (stake.status === 'void') return 'Voided';
+    if (stake.status === 'refunded') return 'Refunded';
+    if (stake.status === 'cancelled') return 'Cancelled';
+    return stake.status.charAt(0).toUpperCase() + stake.status.slice(1);
+  }
+
+  hasRefund(stake: Stake): boolean {
+    return !stake.isParlay && (stake.refundAmount || 0) > 0;
+  }
+
+  refundAmount(stake: Stake): number {
+    return stake.refundAmount || 0;
   }
 }

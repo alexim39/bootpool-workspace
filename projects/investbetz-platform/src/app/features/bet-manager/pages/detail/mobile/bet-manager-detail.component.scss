@@ -11,6 +11,22 @@
 
 .error-msg { padding: 10px 14px; border-radius: 10px; font-size: 13px; text-align: center; background: rgba(255,82,82,0.1); color: #FF5252; border: 1px solid rgba(255,82,82,0.2); }
 
+.tier-empty-state {
+  background: #0D1A30; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px;
+  padding: 32px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.tier-empty-state .tier-icon { font-size: 44px; }
+.tier-empty-state .tier-name { font-size: 17px; font-weight: 700; color: #fff; }
+.tier-empty-state .tier-strat { font-size: 12px; color: rgba(255,255,255,0.4); margin: 0; }
+.fact-grid { display: flex; gap: 8px; width: 100%; margin: 10px 0 14px; }
+.fact-grid .fact {
+  flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px; padding: 8px 6px; display: flex; flex-direction: column; gap: 2px;
+}
+.fact-grid .fact span { font-size: 9px; color: rgba(255,255,255,0.4); text-transform: uppercase; font-weight: 600; }
+.fact-grid .fact strong { font-size: 12px; color: var(--tier-color); }
+.tier-empty-state .btn-primary, .tier-empty-state .btn-withdraw { flex: none; width: 100%; }
+
 .tier-hero { background: #0D1A30; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 20px; position: relative; overflow: hidden; }
 .tier-hero::before { content: ''; position: absolute; top: -50%; right: -30%; width: 200px; height: 200px; background: radial-gradient(circle, var(--tier-color) 0%, transparent 70%); opacity: 0.08; pointer-events: none; }
 .tier-hero-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }

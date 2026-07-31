@@ -109,8 +109,10 @@
             <div class="result-label">Cashed Out</div>
             <div class="profit neutral">{{ formatCurrency(stake.profit!) }}</div>
           } @else {
-            <div class="result-label">Refunded</div>
-            <div class="profit neutral">{{ formatCurrency(stake.stakeAmount) }}</div>
+            <div class="result-label">{{ formatResultLabel(stake) }}</div>
+            @if (hasRefund(stake)) {
+              <div class="profit neutral">+{{ formatCurrency(stake.refundAmount!) }} cash back</div>
+            }
           }
           <div class="settled-time" *ngIf="stake.settledAt">
             Settled {{ formatTime(stake.settledAt) }}

@@ -20,7 +20,8 @@ export class AdminUsersStore {
   readonly sortOrder = signal<'asc' | 'desc'>('desc');
   readonly loading = signal(false);
   readonly selectedUser = signal<any>(null);
-  readonly stats = signal<{ total: number; active: number; suspended: number; kycVerified: number; kycPending: number } | null>(null);
+  readonly stats = signal<{ total: number; active: number; suspended: number; kycVerified: number; kycPending: number; admins: number } | null>(null);
+  readonly roleFilter = signal<'user' | 'admin'>('user');
 
   readonly columns = ['phone', 'name', 'email', 'wallet', 'status', 'kyc', 'lastActive', 'registered', 'actions'];
 
@@ -67,6 +68,7 @@ export class AdminUsersStore {
       dateTo: this.dateTo() || undefined,
       sortBy: this.sortBy(),
       sortOrder: this.sortOrder(),
+      role: this.roleFilter(),
     }).subscribe(res => {
       if (res.success) {
         this.items.set(res.data.items);
@@ -98,6 +100,13 @@ export class AdminUsersStore {
 
   setStatusFilter(s: string) {
     this.statusFilter.set(s);
+    this.page.set(1);
+    this.load();
+  }
+
+  setRoleFilter(role: 'user' | 'admin') {
+    this.roleFilter.set(role);
+    this.statusFilter.set('all');
     this.page.set(1);
     this.load();
   }

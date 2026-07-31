@@ -28,9 +28,20 @@ export class BetCardComponent {
 
   formatStatus(status: Stake['status']): string {
     if (status === 'cashed_out') return 'Cashed Out';
-    if (status === 'lost') return 'Refunded';
     if (status === 'confirmed') return 'Active';
     return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+
+  formatResultLabel(stake: Stake): string {
+    if (stake.status === 'lost') return this.hasRefund(stake) ? 'Refunded' : 'Lost';
+    if (stake.status === 'void') return 'Voided';
+    if (stake.status === 'refunded') return 'Refunded';
+    if (stake.status === 'cancelled') return 'Cancelled';
+    return this.formatStatus(stake.status);
+  }
+
+  hasRefund(stake: Stake): boolean {
+    return !stake.isParlay && (stake.refundAmount || 0) > 0;
   }
 
   formatDay(dateStr: string): string {

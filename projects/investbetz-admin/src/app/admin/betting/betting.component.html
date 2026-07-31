@@ -56,6 +56,18 @@
             <option value="booked">Booked</option>
           </select>
         </div>
+        <div class="filter-date">
+          <input type="date" class="date-input" placeholder="From"
+            [ngModel]="store.dateFrom()" (ngModelChange)="store.dateFrom.set($event); store.onFilterChange()" />
+        </div>
+        <div class="filter-date">
+          <input type="date" class="date-input" placeholder="To"
+            [ngModel]="store.dateTo()" (ngModelChange)="store.dateTo.set($event); store.onFilterChange()" />
+        </div>
+        <button mat-icon-button class="date-clear" *ngIf="store.dateFrom() || store.dateTo()"
+          (click)="store.clearDateRange()" matTooltip="Clear date range">
+          <mat-icon>close</mat-icon>
+        </button>
         <div class="filter-select" style="width:90px;">
           <select [ngModel]="store.limit()" (ngModelChange)="store.limit.set($event); store.onFilterChange()" class="filter-dropdown">
             <option [value]="20">20/page</option>

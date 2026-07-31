@@ -5,12 +5,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
+import { AppNavComponent } from '../../../../core/components';
 import { BetManagerStore } from '../../stores/bet-manager.store';
 
 @Component({
   selector: 'app-bet-manager-detail',
   standalone: true,
-  imports: [DecimalPipe, DatePipe, MatButtonModule, MatIconModule, MatTooltipModule, FormsModule],
+  imports: [DecimalPipe, DatePipe, MatButtonModule, MatIconModule, MatTooltipModule, FormsModule, AppNavComponent],
   templateUrl: './bet-manager-detail.component.html',
   styleUrls: ['./bet-manager-detail.component.scss'],
 })

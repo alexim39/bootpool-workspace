@@ -6,12 +6,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Stake } from '../../../../core/services';
 import { BetCardComponent } from '../../components/bet-card/bet-card.component';
 import { CashoutModalComponent } from '../../../home/components/cashout-modal/cashout-modal.component';
@@ -24,23 +22,18 @@ import { BetsStore } from '../../stores/bets.store';
   imports: [
     CommonModule, RouterModule, MatCardModule, MatButtonModule, MatIconModule,
     MatTabsModule, MatTableModule, MatPaginatorModule, MatProgressSpinnerModule,
-    MatBadgeModule, MatChipsModule, MatTooltipModule, MatSnackBarModule, BetCardComponent, CashoutModalComponent, AppNavComponent
+    MatBadgeModule, MatChipsModule, BetCardComponent, CashoutModalComponent, AppNavComponent
   ],
     templateUrl: './bets-desktop.component.html',
   styleUrls: ['./bets-desktop.component.scss']
 })
 export class BetsDesktopComponent implements OnInit {
   readonly store = inject(BetsStore);
-  private snackBar = inject(MatSnackBar);
 
-  displayedColumns = ['date', 'match', 'odds', 'stake', 'payout', 'status', 'result', 'actions'];
+  displayedColumns = ['date', 'match', 'odds', 'stake', 'payout', 'status', 'result'];
 
   ngOnInit() {
     this.store.init();
-  }
-
-  viewStakeDetails(stake: Stake) {
-    this.snackBar.open('Stake details', 'OK', { duration: 2000 });
   }
 
   getStatusClass(status: Stake['status']): string {

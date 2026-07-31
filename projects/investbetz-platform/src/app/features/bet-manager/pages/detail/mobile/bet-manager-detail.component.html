@@ -44,6 +44,21 @@
     @let perf = store.performance();
     @let history = store.depositHistory();
 
+    @if (!store.loading() && !summary && !store.error()) {
+      <div class="tier-empty-state" [style.--tier-color]="config.color">
+        <span class="tier-icon">{{ config.icon }}</span>
+        <div class="tier-name">Your {{ config.label }} isn't funded yet</div>
+        <p class="tier-strat">{{ config.strategy }}</p>
+        <div class="fact-grid">
+          <div class="fact"><span>Min</span><strong>₦{{ config.minDeposit | number }}</strong></div>
+          <div class="fact"><span>Lock</span><strong>30 days</strong></div>
+          <div class="fact"><span>Fee</span><strong>20% on profit</strong></div>
+        </div>
+        <button class="btn-primary" (click)="goDeposit()">Fund {{ config.label }}</button>
+        <button class="btn-withdraw" (click)="goBack()">Back to Bet Manager</button>
+      </div>
+    }
+
     @if (summary) {
       <div class="tier-hero" [style.--tier-color]="config.color">
         <div class="tier-hero-top">
@@ -133,6 +148,8 @@
       </div>
     }
   </div>
+
+  <app-mobile-nav />
 </div>
 
 @if (showConfirmWithdraw()) {

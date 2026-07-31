@@ -22,6 +22,12 @@
     .filter-dropdown { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 10px; color: rgba(255,255,255,0.7); font-size: 12px; outline: none; cursor: pointer; appearance: auto; }
     .filter-dropdown:focus { border-color: rgba(0,230,118,0.4); }
     .filter-dropdown option { background: #0D1A30; color: #fff; }
+    .filter-date { min-width: 140px; }
+    .date-input { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 7px 10px; color: rgba(255,255,255,0.7); font-size: 12px; outline: none; cursor: pointer; color-scheme: dark; }
+    .date-input:focus { border-color: rgba(0,230,118,0.4); }
+    .date-input::-webkit-calendar-picker-indicator { filter: invert(0.6); cursor: pointer; }
+    .date-clear { width: 34px; height: 34px; color: rgba(255,255,255,0.5); }
+    .date-clear mat-icon { font-size: 16px; width: 16px; height: 16px; }
 
     .table-card { background: #0D1A30; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden; }
     .loading-bar { position: absolute; top: 0; left: 0; right: 0; z-index: 10; }

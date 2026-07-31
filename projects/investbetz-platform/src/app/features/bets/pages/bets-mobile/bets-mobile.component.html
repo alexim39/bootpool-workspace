@@ -15,9 +15,9 @@
           <span class="stat-num">{{ store.wonCount() }}</span>
           <span class="stat-lbl">Won</span>
         </div>
-        <div class="stat-pill s-refunded">
-          <span class="stat-num">{{ store.refundedCount() }}</span>
-          <span class="stat-lbl">Refunded</span>
+        <div class="stat-pill s-lost">
+          <span class="stat-num">{{ store.lostCount() }}</span>
+          <span class="stat-lbl">Lost</span>
         </div>
         <div class="stat-pill s-void">
           <span class="stat-num">{{ store.voidCount() }}</span>
@@ -204,6 +204,9 @@
                           <span class="parlay-mobile-leg-match">{{ item.homeTeam }} vs {{ item.awayTeam }}</span>
                           <span class="parlay-mobile-leg-pick">{{ item.selection }}</span>
                         </div>
+                        @if (item.homeScore != null && item.awayScore != null) {
+                          <span class="score-pill">Ended {{ item.homeScore }} - {{ item.awayScore }}</span>
+                        }
                         <div class="parlay-mobile-leg-odds-block">
                           <span class="parlay-mobile-leg-odds">{{ item.gainsMultiplier.toFixed(2) }}x</span>
                           @if (item.status !== 'pending') {
@@ -226,6 +229,9 @@
                     <mat-icon>sports_soccer</mat-icon>
                     <span>{{ stake.pod.awayTeam }}</span>
                   </div>
+                  @if (stake.pod.homeScore != null && stake.pod.awayScore != null) {
+                    <div class="score-pill">Ended {{ stake.pod.homeScore }} - {{ stake.pod.awayScore }}</div>
+                  }
                 }
                 @if (!stake.isParlay) {
                   <div class="bet-meta">
@@ -254,8 +260,10 @@
                     <span>Cashed Out</span>
                     <span class="neutral">{{ store.formatCurrency(stake.profit!) }}</span>
                   } @else {
-                    <span>Refunded</span>
-                    <span class="neutral">{{ store.formatCurrency(stake.stakeAmount) }}</span>
+                    <span>{{ store.formatResultLabel(stake) }}</span>
+                    @if (store.hasRefund(stake)) {
+                      <span class="neutral">+{{ store.formatCurrency(stake.refundAmount!) }} cash back</span>
+                    }
                   }
                 </div>
               </div>

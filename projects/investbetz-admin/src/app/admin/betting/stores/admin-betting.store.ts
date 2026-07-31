@@ -23,6 +23,8 @@ export class AdminBettingStore {
   readonly searchTerm = signal('');
   readonly sportFilter = signal('');
   readonly bookedFilter = signal('');
+  readonly dateFrom = signal('');
+  readonly dateTo = signal('');
   readonly listStatus = signal('all');
   readonly sortBy = signal('stakingClosesAt');
   readonly sortOrder = signal<'desc' | 'asc'>('desc');
@@ -92,6 +94,12 @@ export class AdminBettingStore {
     this.loadPods();
   }
 
+  clearDateRange() {
+    this.dateFrom.set('');
+    this.dateTo.set('');
+    this.onFilterChange();
+  }
+
   toggleSort(field: string) {
     if (this.sortBy() === field) {
       this.sortOrder.update(o => o === 'asc' ? 'desc' : 'asc');
@@ -112,6 +120,8 @@ export class AdminBettingStore {
     if (this.searchTerm()) params.set('search', this.searchTerm());
     if (this.sportFilter()) params.set('sport', this.sportFilter());
     if (this.bookedFilter()) params.set('booked', this.bookedFilter());
+    if (this.dateFrom()) params.set('dateFrom', this.dateFrom());
+    if (this.dateTo()) params.set('dateTo', this.dateTo());
     if (this.sortBy()) params.set('sortBy', this.sortBy());
     if (this.sortOrder()) params.set('sortOrder', this.sortOrder());
     if (this.listStatus()) params.set('listStatus', this.listStatus());

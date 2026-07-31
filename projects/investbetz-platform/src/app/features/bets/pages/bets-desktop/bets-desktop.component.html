@@ -19,11 +19,11 @@
             <div class="summary-label">Won</div>
           </mat-card-content>
         </mat-card>
-        <mat-card class="summary-card s-refunded">
+        <mat-card class="summary-card s-lost">
           <mat-card-content>
-            <div class="summary-icon refunded"><mat-icon>autorenew</mat-icon></div>
-            <div class="summary-value">{{ store.refundedCount() }}</div>
-            <div class="summary-label">Refunded</div>
+            <div class="summary-icon lost"><mat-icon>close</mat-icon></div>
+            <div class="summary-value">{{ store.lostCount() }}</div>
+            <div class="summary-label">Lost</div>
           </mat-card-content>
         </mat-card>
         <mat-card class="summary-card s-void">
@@ -146,6 +146,9 @@
                                     <span>{{ item.homeTeam }} vs {{ item.awayTeam }}</span>
                                     <span class="parlay-table-leg-pick">{{ item.selection }}</span>
                                   </div>
+                                  @if (item.homeScore != null && item.awayScore != null) {
+                                    <span class="score-pill">Ended {{ item.homeScore }} - {{ item.awayScore }}</span>
+                                  }
                                 </div>
                               }
                             </div>
@@ -156,6 +159,9 @@
                             <mat-icon>sports_soccer</mat-icon>
                             <span>{{ stake.pod?.awayTeam }}</span>
                           </div>
+                          @if (stake.pod?.homeScore != null && stake.pod?.awayScore != null) {
+                            <div class="score-pill">Ended {{ stake.pod?.homeScore }} - {{ stake.pod?.awayScore }}</div>
+                          }
                           <div class="match-selection">
                             @if (stake.isSettled) {
                               <span class="selection-value">{{ stake.pod?.selection }}</span>
@@ -216,21 +222,15 @@
                         } @else if (stake.status === 'cashed_out') {
                           <span class="profit neutral">{{ store.formatCurrency(stake.profit!) }}</span>
                         } @else {
-                          <span class="profit neutral">{{ store.formatCurrency(stake.stakeAmount) }}</span>
+                          <span class="result-label-cell">{{ store.formatResultLabel(stake) }}</span>
+                          @if (store.hasRefund(stake)) {
+                            <span class="profit neutral">+{{ store.formatCurrency(stake.refundAmount!) }} cash back</span>
+                          }
                         }
                         <span class="settled-time" *ngIf="stake.settledAt">
                           {{ store.formatTime(stake.settledAt) }}
                         </span>
                       </div>
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="actions">
-                    <th mat-header-cell *matHeaderCellDef></th>
-                    <td mat-cell *matCellDef="let stake">
-                      <button mat-icon-button [matTooltip]="'View details'" (click)="viewStakeDetails(stake)">
-                        <mat-icon>visibility</mat-icon>
-                      </button>
                     </td>
                   </ng-container>
 

@@ -4,12 +4,13 @@ import { DecimalPipe, DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../../../core/services';
+import { MobileNavComponent } from '../../../../../core/components';
 import { BetManagerStore } from '../../../stores/bet-manager.store';
 
 @Component({
   selector: 'app-mobile-bet-manager-detail',
   standalone: true,
-  imports: [DecimalPipe, DatePipe, MatButtonModule, MatIconModule],
+  imports: [DecimalPipe, DatePipe, MatButtonModule, MatIconModule, MobileNavComponent],
   templateUrl: './bet-manager-detail.component.html',
   styleUrls: ['./bet-manager-detail.component.scss'],
 })
@@ -23,11 +24,11 @@ export class BetManagerDetailComponent implements OnInit {
   showConfirmWithdraw = signal(false);
   historyPage = signal(1);
 
-  readonly tierConfig: Record<string, { label: string; icon: string; minDeposit: number; color: string }> = {
-    goalkeeper: { label: 'Goalkeeper', icon: '🧤', minDeposit: 20_000, color: '#90CAF9' },
-    defender: { label: 'Defender', icon: '🛡️', minDeposit: 50_000, color: '#00E676' },
-    midfielder: { label: 'Midfielder', icon: '⚡', minDeposit: 100_000, color: '#E8B923' },
-    striker: { label: 'Striker', icon: '🎯', minDeposit: 200_000, color: '#FF5252' },
+  readonly tierConfig: Record<string, { label: string; icon: string; minDeposit: number; color: string; strategy: string }> = {
+    goalkeeper: { label: 'Goalkeeper', icon: '🧤', minDeposit: 20_000, color: '#90CAF9', strategy: 'Starter — low entry, steady returns, minimal risk' },
+    defender: { label: 'Defender', icon: '🛡️', minDeposit: 50_000, color: '#00E676', strategy: 'Conservative — low-risk Pods, high refund confidence' },
+    midfielder: { label: 'Midfielder', icon: '⚡', minDeposit: 100_000, color: '#E8B923', strategy: 'Balanced — mix of Pods and Match Pools' },
+    striker: { label: 'Striker', icon: '🎯', minDeposit: 200_000, color: '#FF5252', strategy: 'Aggressive — higher multipliers, more Match Pools' },
   };
 
   ngOnInit() {

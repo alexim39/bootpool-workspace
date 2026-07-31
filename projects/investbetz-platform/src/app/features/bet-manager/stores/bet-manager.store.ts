@@ -32,7 +32,17 @@ export class BetManagerStore {
     this.error.set(null);
     this.selectedTier.set(tier);
     this._api.getAccount(tier).pipe(finalize(() => this.loading.set(false))).subscribe({
-      next: (res) => { if (res.success) this.summary.set(res.data); },
+      next: (res) => {
+        if (res.success) {
+          this.summary.set(res.data);
+          if (!res.data) {
+            this.navData.set(null);
+            this.performance.set(null);
+            this.depositHistory.set([]);
+            this.historyTotal.set(0);
+          }
+        }
+      },
       error: (err) => this.error.set(err.error?.message || 'Failed to load account'),
     });
   }

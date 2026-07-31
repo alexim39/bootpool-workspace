@@ -1,3 +1,4 @@
+<app-nav />
 <div class="detail-root">
   <button class="back-link" (click)="goBack()">← Back to Bet Manager</button>
 
@@ -30,6 +31,25 @@
 
   @if (store.error()) {
     <div class="error-msg">{{ store.error() }}</div>
+  }
+
+  @if (!loading && !summary && !store.error()) {
+    <div class="tier-empty-state" [style.--tier-color]="cfg.color">
+      <div class="tier-empty-glow"></div>
+      <span class="tier-icon">{{ cfg.icon }}</span>
+      <h2>Your {{ cfg.label }} portfolio isn't funded yet</h2>
+      <p class="tier-empty-desc">{{ cfg.strategy }}</p>
+      <div class="tier-facts">
+        <div class="fact"><span>Min deposit</span><strong>₦{{ cfg.minDeposit | number }}</strong></div>
+        <div class="fact"><span>Lock period</span><strong>30-day cycle</strong></div>
+        <div class="fact"><span>Performance fee</span><strong>20% on profit only</strong></div>
+        <div class="fact"><span>Managed by</span><strong>Ora AI</strong></div>
+      </div>
+      <div class="tier-empty-actions">
+        <button class="btn-primary" (click)="goDeposit()">Fund {{ cfg.label }}</button>
+        <button class="btn-withdraw" (click)="goBack()">Back to Bet Manager</button>
+      </div>
+    </div>
   }
 
   @if (summary) {
