@@ -117,7 +117,7 @@ export class StakeModalComponent implements OnInit, OnDestroy {
     }).format(amount || 0);
   }
 
-  get minStake() { return this.pod().minStake || 5000; }
+  get minStake() { return this.pod().minStake || 100; }
   get maxStake() { return this.pod().maxStake || 1000000; }
 
   amountError(): string {
