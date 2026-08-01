@@ -22,6 +22,7 @@ describe('CashoutModalComponent', () => {
       platformFee: 3750,
       feePercent: 30,
       status: 'confirmed',
+      isParlay: false,
       createdAt: new Date().toISOString(),
       profit: 0,
       isActive: true,

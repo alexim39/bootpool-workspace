@@ -135,9 +135,10 @@ describe('PodService', () => {
     const pastDate = new Date(Date.now() - 86400000).toISOString();
 
     const pods = [
-      { id: '1', status: 'active', stakingClosesAt: futureDate } as Pod,
-      { id: '2', status: 'active', stakingClosesAt: pastDate } as Pod,
-      { id: '3', status: 'settled', stakingClosesAt: futureDate } as Pod,
+      { id: '1', status: 'active', stakingClosesAt: futureDate, currentExposure: 0, maxTotalExposure: 1000 } as Pod,
+      { id: '2', status: 'active', stakingClosesAt: pastDate, currentExposure: 0, maxTotalExposure: 1000 } as Pod,
+      { id: '3', status: 'settled', stakingClosesAt: futureDate, currentExposure: 0, maxTotalExposure: 1000 } as Pod,
+      { id: '4', status: 'active', stakingClosesAt: futureDate, currentExposure: 1000, maxTotalExposure: 1000 } as Pod,
     ];
 
     service.pods.set(pods);

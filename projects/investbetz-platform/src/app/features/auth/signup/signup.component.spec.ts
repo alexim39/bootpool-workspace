@@ -90,7 +90,7 @@ describe('SignupComponent', () => {
     component.createAccount();
     tick();
 
-    expect(mockAuthService.requestSignupOtp).toHaveBeenCalledWith('1234567890');
+    expect(mockAuthService.requestSignupOtp).toHaveBeenCalledWith('1234567890', undefined);
   }));
 
   it('does not call API when form is invalid', () => {

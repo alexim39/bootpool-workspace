@@ -16,7 +16,7 @@
           </div>
           <div class="ora-body" #messagesContainer>
             <div class="msg-divider"><span>Today</span></div>
-            @for (msg of messages(); track msg) {
+            @for (msg of messages(); track msg; let mi = $index) {
               <div class="msg-row" [class.msg-user]="msg.role === 'user'" [class.msg-ora]="msg.role === 'assistant'">
                 @if (msg.role === 'assistant') {
                   <div class="msg-avatar ora-avatar-icon"><mat-icon>smart_toy</mat-icon></div>
@@ -44,8 +44,8 @@
                             <div class="stake-info-row"><span>Platform Fee</span><strong class="fee">-₦{{ action.data.platformFee.toLocaleString() }}</strong></div>
                           </div>
                           <div class="stake-card-actions">
-                            <button class="stake-cancel-btn" (click)="cancelStake($index, i)">Cancel</button>
-                            <button class="stake-confirm-btn" (click)="confirmStake($index, i)">
+                            <button class="stake-cancel-btn" (click)="cancelStake(mi, i)">Cancel</button>
+                            <button class="stake-confirm-btn" (click)="confirmStake(mi, i)">
                               Confirm & Place
                             </button>
                           </div>
@@ -68,8 +68,8 @@
                             <div class="stake-info-row"><span>Platform Fee</span><strong class="fee">-₦{{ action.data.platformFee.toLocaleString() }}</strong></div>
                           </div>
                           <div class="stake-card-actions">
-                            <button class="stake-cancel-btn" (click)="cancelStake($index, i)">Cancel</button>
-                            <button class="stake-confirm-btn" (click)="confirmStake($index, i)">
+                            <button class="stake-cancel-btn" (click)="cancelStake(mi, i)">Cancel</button>
+                            <button class="stake-confirm-btn" (click)="confirmStake(mi, i)">
                               Confirm & Place
                             </button>
                           </div>
@@ -132,7 +132,7 @@
           </div>
           <div class="d-body" #messagesContainer>
             <div class="msg-divider"><span>Today</span></div>
-            @for (msg of messages(); track msg) {
+            @for (msg of messages(); track msg; let mi = $index) {
               <div class="msg-row" [class.msg-user]="msg.role === 'user'" [class.msg-ora]="msg.role === 'assistant'">
                 @if (msg.role === 'assistant') {
                   <div class="msg-avatar ora-avatar-icon"><mat-icon>smart_toy</mat-icon></div>
@@ -160,8 +160,8 @@
                         <div class="stake-info-row"><span>Platform Fee</span><strong class="fee">-₦{{ action.data.platformFee.toLocaleString() }}</strong></div>
                       </div>
                       <div class="stake-card-actions">
-                        <button class="stake-cancel-btn" (click)="cancelStake($index, i)">Cancel</button>
-                        <button class="stake-confirm-btn" (click)="confirmStake($index, i)">
+                        <button class="stake-cancel-btn" (click)="cancelStake(mi, i)">Cancel</button>
+                        <button class="stake-confirm-btn" (click)="confirmStake(mi, i)">
                           Confirm & Place
                         </button>
                       </div>
@@ -184,8 +184,8 @@
                         <div class="stake-info-row"><span>Platform Fee</span><strong class="fee">-₦{{ action.data.platformFee.toLocaleString() }}</strong></div>
                       </div>
                       <div class="stake-card-actions">
-                        <button class="stake-cancel-btn" (click)="cancelStake($index, i)">Cancel</button>
-                        <button class="stake-confirm-btn" (click)="confirmStake($index, i)">
+                        <button class="stake-cancel-btn" (click)="cancelStake(mi, i)">Cancel</button>
+                        <button class="stake-confirm-btn" (click)="confirmStake(mi, i)">
                           Confirm & Place
                         </button>
                       </div>

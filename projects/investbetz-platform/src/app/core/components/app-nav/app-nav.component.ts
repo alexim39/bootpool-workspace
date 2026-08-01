@@ -7,7 +7,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '../../services';
 import { WalletService } from '../../services';
 import { StakeService } from '../../services';
-import { TopUpModalComponent, NotificationBellComponent } from '..';
+import { TopUpModalComponent } from '../top-up-modal/top-up-modal.component';
+import { NotificationBellComponent } from '../notification-bell/notification-bell.component';
 
 @Component({
   selector: 'app-nav',

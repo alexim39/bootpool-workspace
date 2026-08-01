@@ -17,6 +17,7 @@ describe('BetCardComponent', () => {
       platformFee: 750,
       feePercent: 30,
       status: 'confirmed',
+      isParlay: false,
       createdAt: new Date().toISOString(),
       profit: 0,
       isActive: true,
@@ -52,8 +53,8 @@ describe('BetCardComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('maps lost status to Refunded', () => {
-    expect(component.formatStatus('lost')).toBe('Refunded');
+  it('maps lost status to Refunded when refunded', () => {
+    expect(component.formatResultLabel(createStake({ status: 'lost', isSettled: true, refundAmount: 500 }))).toBe('Refunded');
   });
 
   it('maps cashed_out status to Cashed Out', () => {
@@ -116,7 +117,7 @@ describe('BetCardComponent', () => {
     component.stake = createStake({ isSettled: true, status: 'lost', profit: 0 });
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Refunded');
+    expect(el.textContent).toContain('Lost');
   });
 
   it('shows Cashed Out for cashed_out settled stakes', () => {

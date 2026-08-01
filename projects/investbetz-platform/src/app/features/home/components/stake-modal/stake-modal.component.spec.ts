@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { StakeModalComponent } from './stake-modal.component';
-import { Pod } from '../../../../core/services';
-import { StakeService } from '../../../../core/services';
+import { Pod, StakeService, WalletService, WalletBalance } from '../../../../core/services';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -12,6 +12,7 @@ describe('StakeModalComponent', () => {
   let fixture: ComponentFixture<StakeModalComponent>;
   let component: StakeModalComponent;
   let mockStakeService: jasmine.SpyObj<StakeService>;
+  let mockWalletService: jasmine.SpyObj<WalletService>;
   let mockPod: Pod;
 
   function createPod(overrides: Partial<Pod> = {}): Pod {
@@ -50,12 +51,16 @@ describe('StakeModalComponent', () => {
 
   beforeEach(async () => {
     mockStakeService = jasmine.createSpyObj('StakeService', ['placeStake']);
+    mockWalletService = jasmine.createSpyObj('WalletService', ['fetchBalance'], {
+      balance: signal<WalletBalance>({ balance: 0, locked: 0, available: 0, currency: 'NGN' }),
+    });
     mockPod = createPod();
 
     await TestBed.configureTestingModule({
       imports: [StakeModalComponent, ReactiveFormsModule, NoopAnimationsModule],
       providers: [
         { provide: StakeService, useValue: mockStakeService },
+        { provide: WalletService, useValue: mockWalletService },
       ],
     })
       .overrideComponent(StakeModalComponent, {
@@ -85,7 +90,7 @@ describe('StakeModalComponent', () => {
 
     fixture = TestBed.createComponent(StakeModalComponent);
     component = fixture.componentInstance;
-    component.pod = mockPod;
+    fixture.componentRef.setInput('pod', mockPod);
     fixture.detectChanges();
   });
 
@@ -124,8 +129,8 @@ describe('StakeModalComponent', () => {
     fixture.detectChanges();
 
     expect(component.estimatedPayout()).toBe(2500);
-    expect(component.estimatedFee()).toBe(750);
-    expect(component.estimatedNetPayout()).toBe(1750);
+    expect(component.estimatedFee()).toBe(250);
+    expect(component.estimatedNetPayout()).toBe(2250);
   });
 
   it('shows payout with zero stake as zero', () => {
@@ -191,14 +196,14 @@ describe('StakeModalComponent', () => {
   });
 
   it('filters quick amounts based on available balance', () => {
-    component.store.availableBalance.set(3000);
+    mockWalletService.balance.set({ balance: 30000, locked: 0, available: 30000, currency: 'NGN' });
     fixture.detectChanges();
     const amts = component.quickAmounts();
-    expect(amts).toContain(500);
-    expect(amts).toContain(1000);
-    expect(amts).toContain(2000);
-    expect(amts).not.toContain(5000);
-    expect(amts).not.toContain(10000);
+    expect(amts).toContain(5000);
+    expect(amts).toContain(10000);
+    expect(amts).toContain(20000);
+    expect(amts).not.toContain(50000);
+    expect(amts).not.toContain(100000);
   });
 
   it('formats amount as NGN currency', () => {

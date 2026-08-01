@@ -50,7 +50,7 @@ describe('PodCardComponent', () => {
     }).compileComponents();
     fixture = TestBed.createComponent(PodCardComponent);
     component = fixture.componentInstance;
-    component.pod = mockPod;
+    fixture.componentRef.setInput('pod', mockPod);
     fixture.detectChanges();
   });
 
@@ -66,12 +66,12 @@ describe('PodCardComponent', () => {
 
   it('displays min and max stake amounts', () => {
     const el = fixture.nativeElement.textContent;
-    expect(el).toContain('Min:');
-    expect(el).toContain('Max:');
+    expect(el).toContain('Min₦100');
+    expect(el).toContain('Max₦50,000');
   });
 
-  it('shows settlement estimate label', () => {
-    expect(fixture.nativeElement.textContent).toContain('Today 6:00 PM');
+  it('shows staking close label', () => {
+    expect(fixture.nativeElement.textContent).toContain('Staking Closes');
   });
 
   it('shows info tooltip with gains only', () => {
@@ -109,10 +109,10 @@ describe('PodCardComponent', () => {
   it('formats countdown correctly', () => {
     expect(component.formatCountdown(0)).toBe('Closed');
     expect(component.formatCountdown(-1)).toBe('Closed');
-    expect(component.formatCountdown(125000)).toBe('2:05');
-    expect(component.formatCountdown(45000)).toBe('0:45');
-    expect(component.formatCountdown(60000)).toBe('1:00');
-    expect(component.formatCountdown(3600000)).toBe('60:00');
+    expect(component.formatCountdown(125000)).toBe('02m : 05s');
+    expect(component.formatCountdown(45000)).toBe('45s');
+    expect(component.formatCountdown(60000)).toBe('01m : 00s');
+    expect(component.formatCountdown(3600000)).toBe('01h : 00m : 00s');
   });
 
   it('calculates exposure percentage', () => {

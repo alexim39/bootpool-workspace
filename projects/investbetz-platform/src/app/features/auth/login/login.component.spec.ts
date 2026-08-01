@@ -34,18 +34,22 @@ describe('LoginComponent', () => {
     fixture.detectChanges();
   });
 
-  it('has OTP and PIN tab switcher', () => {
-    expect(component.store.loginMode()).toBe('otp');
+  it('has PIN, Email Token and OTP tab switcher', () => {
+    expect(component.store.loginMode()).toBe('pin');
     const buttons = fixture.nativeElement.querySelectorAll('.tab-btn');
-    expect(buttons.length).toBe(2);
-    expect(buttons[0].textContent).toContain('OTP Login');
-    expect(buttons[1].textContent).toContain('PIN Login');
+    expect(buttons.length).toBe(3);
+    expect(buttons[0].textContent).toContain('PIN');
+    expect(buttons[1].textContent).toContain('Email Token');
+    expect(buttons[2].textContent).toContain('OTP');
   });
 
   it('switches to PIN mode on tab click', () => {
-    component.store.loginMode.set('pin');
+    component.store.loginMode.set('otp');
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.tab-btn.active').textContent).toContain('PIN Login');
+    const buttons = fixture.nativeElement.querySelectorAll('.tab-btn');
+    buttons[0].click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.tab-btn.active').textContent).toContain('PIN');
   });
 
   it('disables submit button when phone has fewer than 10 digits', () => {
@@ -57,6 +61,7 @@ describe('LoginComponent', () => {
 
   it('enables submit button when phone has 10 digits', () => {
     component.phone = '1234567890';
+    component.pin = '123456';
     fixture.detectChanges();
     const button = fixture.nativeElement.querySelector('.btn-primary') as HTMLButtonElement;
     expect(button.disabled).toBeFalse();
@@ -120,7 +125,7 @@ describe('LoginComponent', () => {
   it('enables PIN login button with valid phone and PIN', () => {
     component.store.loginMode.set('pin');
     component.phone = '1234567890';
-    component.pin = '1234';
+    component.pin = '123456';
     fixture.detectChanges();
     const button = fixture.nativeElement.querySelector('.btn-primary') as HTMLButtonElement;
     expect(button.disabled).toBeFalse();
@@ -132,12 +137,12 @@ describe('LoginComponent', () => {
     );
     component.store.loginMode.set('pin');
     component.phone = '1234567890';
-    component.pin = '1234';
+    component.pin = '123456';
 
     component.loginWithPin();
     tick();
 
-    expect(mockAuthService.loginWithPin).toHaveBeenCalledWith('1234567890', '1234');
+    expect(mockAuthService.loginWithPin).toHaveBeenCalledWith('1234567890', '123456');
   }));
 
   it('sets auth and navigates to home on PIN login success', fakeAsync(() => {
@@ -146,7 +151,7 @@ describe('LoginComponent', () => {
     );
     component.store.loginMode.set('pin');
     component.phone = '1234567890';
-    component.pin = '1234';
+    component.pin = '123456';
 
     component.loginWithPin();
     tick();
