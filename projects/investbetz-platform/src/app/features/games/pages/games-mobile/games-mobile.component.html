@@ -55,6 +55,17 @@
     }
 
     <div class="quick-filters">
+      <div class="status-row">
+        @for (opt of statusOptions; track opt.value) {
+          <button
+            class="status-chip"
+            [class.active]="store.matchStatus() === opt.value"
+            (click)="store.setMatchStatus(opt.value)">
+            {{ opt.label }}
+          </button>
+        }
+      </div>
+
       <div class="sort-row">
         <span class="filter-label">Sort</span>
         @for (opt of sortOptions; track opt.value) {

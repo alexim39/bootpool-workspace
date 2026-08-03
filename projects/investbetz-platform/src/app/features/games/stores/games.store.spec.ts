@@ -59,6 +59,7 @@ describe('GamesStore', () => {
       sortOrder: 'asc',
       dateFrom: null,
       dateTo: null,
+      status: 'upcoming',
     });
   });
 
@@ -96,6 +97,16 @@ describe('GamesStore', () => {
     store.init();
     store.setStakableOnly(true);
     expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ stakableOnly: true }));
+  });
+
+  it('match status filter is passed through and finished view sorts newest first', () => {
+    serviceMock.fetchGames.and.callFake(() => gamesSignal.set([game()]));
+    store.init();
+    store.setMatchStatus('finished');
+    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ status: 'finished', sortOrder: 'desc' }));
+    expect(store.hasActiveFilters()).toBe(true);
+    store.setMatchStatus('upcoming');
+    expect(store.hasActiveFilters()).toBe(false);
   });
 
   it('clearFilters resets all filters', () => {

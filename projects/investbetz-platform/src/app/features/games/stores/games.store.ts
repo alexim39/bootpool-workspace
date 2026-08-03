@@ -37,6 +37,7 @@ export class GamesStore implements OnDestroy {
   readonly minConfidence = signal<number | null>(null);
   readonly dateFrom = signal<string | null>(null);
   readonly dateTo = signal<string | null>(null);
+  readonly matchStatus = signal<'upcoming' | 'live' | 'finished' | 'all'>('upcoming');
 
   private readonly search$ = new Subject<string>();
 
@@ -55,7 +56,8 @@ export class GamesStore implements OnDestroy {
     this.stakableOnly() ||
     this.minConfidence() !== null ||
     this.dateFrom() !== null ||
-    this.dateTo() !== null
+    this.dateTo() !== null ||
+    this.matchStatus() !== 'upcoming'
   );
 
   readonly showSkeletons = computed(() => this.loading() && this.games().length === 0);
@@ -118,6 +120,15 @@ export class GamesStore implements OnDestroy {
     this.load();
   }
 
+  setMatchStatus(status: 'upcoming' | 'live' | 'finished' | 'all') {
+    this.matchStatus.set(status);
+    if (status === 'finished' && this.sortField() === 'matchDate' && this.sortOrder() === 'asc') {
+      this.sortOrder.set('desc');
+    }
+    this.page.set(1);
+    this.load();
+  }
+
   setSort(field: string) {
     if (this.sortField() === field) {
       this.sortOrder.set(this.sortOrder() === 'asc' ? 'desc' : 'asc');
@@ -158,6 +169,7 @@ export class GamesStore implements OnDestroy {
     this.minConfidence.set(null);
     this.dateFrom.set(null);
     this.dateTo.set(null);
+    this.matchStatus.set('upcoming');
     this.page.set(1);
     this.load();
   }
@@ -175,6 +187,7 @@ export class GamesStore implements OnDestroy {
       minConfidence?: number;
       dateFrom?: string | null;
       dateTo?: string | null;
+      status?: 'upcoming' | 'live' | 'finished' | 'all';
     } = {
       page: this.page(),
       limit: this.pageSize(),
@@ -182,6 +195,7 @@ export class GamesStore implements OnDestroy {
       sortOrder: this.sortOrder(),
       dateFrom: this.dateFrom(),
       dateTo: this.dateTo(),
+      status: this.matchStatus(),
     };
     const search = this.searchText().trim();
     if (search) q.search = search;

@@ -4,22 +4,33 @@
       <span class="league-chip">{{ game().league || 'Football' }}</span>
       <div class="game-top-right">
         @if (game().stakable) {
-          <span class="status-pill live"><span class="dot"></span>Live pool</span>
+          <span class="status-pill pool"><span class="dot"></span>Live pool</span>
         }
-        <span class="kickoff">{{ kickoff() }}</span>
+        <span class="status-pill" [class]="statusClass()">{{ statusLabel() }}</span>
+        @if (showKickoff()) {
+          <span class="kickoff">{{ kickoff() }}</span>
+        }
       </div>
     </div>
 
     <div class="market-badge">{{ game().marketType || '1X2' }}</div>
 
     <div class="teams">
-      <div class="team">
-        <span class="team-name">{{ game().homeTeam }}</span>
-      </div>
-      <span class="vs">vs</span>
-      <div class="team">
-        <span class="team-name">{{ game().awayTeam }}</span>
-      </div>
+      @if (hasScore()) {
+        <div class="scoreline">
+          <span class="team team-name" [class.winner]="teamWon('home')">{{ game().homeTeam }}</span>
+          <span class="final-score">{{ scoreText() }}</span>
+          <span class="team team-name" [class.winner]="teamWon('away')">{{ game().awayTeam }}</span>
+        </div>
+      } @else {
+        <div class="team">
+          <span class="team-name">{{ game().homeTeam }}</span>
+        </div>
+        <span class="vs">vs</span>
+        <div class="team">
+          <span class="team-name">{{ game().awayTeam }}</span>
+        </div>
+      }
     </div>
 
     <div class="ora-pick">
@@ -42,6 +53,18 @@
       <div class="reasoning">
         <mat-icon [matTooltip]="game().reasoning" matTooltipPosition="above">info_outline</mat-icon>
         <span class="reasoning-text">{{ game().reasoning }}</span>
+      </div>
+    }
+
+    @if (resultLabel()) {
+      <div class="result-line">
+        <span class="result-text">{{ resultLabel() }}</span>
+        @if (pickOutcome() !== 'skip') {
+          <span class="pick-result" [class.won]="pickOutcome() === 'won'" [class.lost]="pickOutcome() === 'lost'">
+            <mat-icon>{{ pickOutcome() === 'won' ? 'check_circle' : 'cancel' }}</mat-icon>
+            {{ pickOutcome() === 'won' ? "Ora's pick won" : "Ora's pick lost" }}
+          </span>
+        }
       </div>
     }
 

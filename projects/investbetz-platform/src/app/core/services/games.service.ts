@@ -17,6 +17,10 @@ export interface TodayGame {
   podId: string | null;
   stakable: boolean;
   stakeReason?: string;
+  matchStatus?: string;
+  homeScore?: number | null;
+  awayScore?: number | null;
+  result?: 'home_win' | 'draw' | 'away_win' | null;
 }
 
 export interface TodayGamesResponse {
@@ -39,6 +43,7 @@ export interface GamesQuery {
   minConfidence?: number;
   dateFrom?: string | null;
   dateTo?: string | null;
+  status?: 'upcoming' | 'live' | 'finished' | 'all';
 }
 
 export interface GamesListResponse {
@@ -114,6 +119,7 @@ export class GamesService {
     if (query.minConfidence) params = params.set('minConfidence', String(query.minConfidence));
     if (query.dateFrom) params = params.set('dateFrom', query.dateFrom);
     if (query.dateTo) params = params.set('dateTo', query.dateTo);
+    if (query.status) params = params.set('status', query.status);
 
     this.http.get<GamesListResponse>(`${environment.apiUrl}/games`, { params }).subscribe({
       next: (res) => {

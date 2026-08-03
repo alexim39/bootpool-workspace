@@ -58,6 +58,45 @@ mat-card-content {
     border-radius: 50%;
     background: $emerald;
   }
+
+  &.live {
+    color: $emerald;
+    background: rgba($emerald, 0.1);
+    border-color: rgba($emerald, 0.3);
+
+    .dot {
+      animation: card-pulse 1.4s ease-in-out infinite;
+    }
+  }
+
+  &.finished {
+    color: $white;
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+
+  &.void {
+    color: $gold-light;
+    background: rgba($gold, 0.1);
+    border-color: rgba($gold, 0.3);
+  }
+
+  &.upcoming {
+    color: $white-dim;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  &.pool {
+    color: $emerald;
+    background: rgba($emerald, 0.1);
+    border-color: rgba($emerald, 0.3);
+  }
+}
+
+@keyframes card-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 
 .market-badge {
@@ -113,6 +152,10 @@ mat-card-content {
   font-weight: 600;
   font-size: $font-size-base;
   line-height: 1.3;
+
+  &.winner {
+    color: $emerald-light;
+  }
 }
 
 .vs {
@@ -120,6 +163,63 @@ mat-card-content {
   font-size: $font-size-xs;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.scoreline {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  .team-name {
+    flex: 1;
+    text-align: center;
+  }
+
+  .final-score {
+    color: $white;
+    font-family: $font-family-mono;
+    font-size: $font-size-xl;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+}
+
+.result-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 0.45rem 0.7rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: $radius-md;
+
+  .result-text {
+    color: $white;
+    font-size: $font-size-xs;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .pick-result {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: $font-size-xs;
+    font-weight: 600;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+
+    &.won { color: $emerald; }
+    &.lost { color: $error; }
+  }
 }
 
 .ora-pick {

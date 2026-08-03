@@ -8,6 +8,17 @@ import { FormsModule } from '@angular/forms';
 import { AppNavComponent } from '../../../../core/components';
 import { GamesStore } from '../../stores/games.store';
 import { TodayGame } from '../../../../core/services';
+import {
+  isLiveMatch,
+  isFinishedMatch,
+  hasScore,
+  scoreText,
+  matchStatusLabel,
+  matchStatusClass,
+  resultLabel,
+  teamWon,
+  pickOutcome,
+} from '../../game-status.util';
 
 @Component({
   selector: 'app-games-desktop',
@@ -28,6 +39,15 @@ export class GamesDesktopComponent implements OnInit {
   private router = inject(Router);
   readonly Math = Math;
   readonly Number = Number;
+  readonly isLiveMatch = isLiveMatch;
+  readonly isFinishedMatch = isFinishedMatch;
+  readonly hasScore = hasScore;
+  readonly scoreText = scoreText;
+  readonly matchStatusLabel = matchStatusLabel;
+  readonly matchStatusClass = matchStatusClass;
+  readonly resultLabel = resultLabel;
+  readonly teamWon = teamWon;
+  readonly pickOutcome = pickOutcome;
 
   readonly sortOptions = [
     { value: 'matchDate', label: 'Kickoff' },

@@ -334,6 +334,10 @@
     &.home::after {
       content: '';
     }
+
+    &.winner {
+      color: $emerald-light;
+    }
   }
 
   .vs {
@@ -341,6 +345,72 @@
     font-size: $font-size-xs;
     letter-spacing: 1px;
   }
+
+  &.scoreline {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+
+    .team-name {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .score-sep {
+      color: $white;
+      font-family: $font-family-mono;
+      font-size: $font-size-lg;
+      font-weight: 700;
+      padding: 0 2px;
+      white-space: nowrap;
+    }
+  }
+}
+
+.result-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+
+  .result-text {
+    color: $white-muted;
+    font-size: $font-size-xs;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .pick-result {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: $font-size-xs;
+    font-weight: 600;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+
+    &.won { color: $emerald; }
+    &.lost { color: $error; }
+  }
+}
+
+.match-status-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.score-missing {
+  color: $white-muted;
+  font-size: $font-size-xs;
 }
 
 .league-cell {
@@ -458,6 +528,28 @@
     color: $emerald;
     background: rgba($emerald, 0.1);
     border: 1px solid rgba($emerald, 0.3);
+
+    .dot {
+      animation: pulse-dot 1.4s ease-in-out infinite;
+    }
+  }
+
+  &.finished {
+    color: $white;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  &.void {
+    color: $gold-light;
+    background: rgba($gold, 0.1);
+    border: 1px solid rgba($gold, 0.3);
+  }
+
+  &.upcoming {
+    color: $white-dim;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   &.soon {
@@ -465,6 +557,11 @@
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 
 .action-cell {

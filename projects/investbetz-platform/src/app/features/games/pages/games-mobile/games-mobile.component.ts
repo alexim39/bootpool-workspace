@@ -37,6 +37,13 @@ export class GamesMobileComponent implements OnInit {
     { value: 'gainsMultiplier', label: 'Odds' },
   ];
 
+  readonly statusOptions = [
+    { value: 'upcoming' as const, label: 'Upcoming' },
+    { value: 'live' as const, label: 'Live' },
+    { value: 'finished' as const, label: 'Finished' },
+    { value: 'all' as const, label: 'All' },
+  ];
+
   ngOnInit() {
     this.store.init();
   }
