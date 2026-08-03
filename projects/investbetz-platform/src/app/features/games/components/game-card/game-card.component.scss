@@ -306,8 +306,8 @@ mat-card-content {
 
   mat-icon {
     font-size: 15px;
-    width: 15px;
-    height: 15px;
+    width: 22px;
+    height: 22px;
     color: $white-dim;
     margin-top: 1px;
   }
@@ -321,6 +321,7 @@ mat-card-content {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  margin-left: 0.1rem;
 }
 
 .game-actions {
