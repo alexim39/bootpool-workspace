@@ -1,0 +1,251 @@
+<app-nav />
+
+<div class="games-page">
+  <header class="games-header">
+    <div class="header-top">
+      <div>
+        <h1 class="page-title">Games Today</h1>
+        <p class="page-subtitle">Every match analyzed by Ora AI — with her pick, confidence and reasoning.</p>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-value">{{ store.total() }}</span>
+          <span class="stat-label">Games analyzed</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">{{ store.stakableTotal() }}</span>
+          <span class="stat-label">Stakable now</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="search-box">
+        <mat-icon>search</mat-icon>
+        <input
+          type="text"
+          placeholder="Search teams or leagues…"
+          [value]="store.searchText()"
+          (input)="onSearch($event)"
+          aria-label="Search games" />
+        @if (store.searchText()) {
+          <button class="search-clear" (click)="store.setSearch(''); $event.stopPropagation()" aria-label="Clear search">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+
+      <select class="filter-select" [value]="store.league() ?? 'All'" (change)="store.setLeague($any($event.target).value)" aria-label="Filter by league">
+        <option value="All">All Leagues</option>
+        @for (league of store.leagues(); track league) {
+          <option [value]="league">{{ league }}</option>
+        }
+      </select>
+
+      <select class="filter-select" [value]="store.marketType() ?? 'All'" (change)="store.setMarketType($any($event.target).value)" aria-label="Filter by market">
+        <option value="All">All Markets</option>
+        @for (mt of store.marketTypes(); track mt) {
+          <option [value]="mt">{{ mt }}</option>
+        }
+      </select>
+
+      <select class="filter-select" [value]="store.matchStatus()" (change)="store.setMatchStatus($any($event.target).value)" aria-label="Filter by match status">
+        <option value="upcoming">Upcoming</option>
+        <option value="live">Live</option>
+        <option value="finished">Finished</option>
+        <option value="all">All</option>
+      </select>
+
+      <select class="filter-select" [value]="store.minConfidence() ?? '0'" (change)="store.setMinConfidence($any($event.target).value === '0' ? null : Number($any($event.target).value))" aria-label="Filter by confidence">
+        <option [value]="0">Any Confidence</option>
+        <option [value]="60">60%+</option>
+        <option [value]="70">70%+</option>
+        <option [value]="80">80%+</option>
+      </select>
+
+      <input class="filter-date" type="date" [value]="store.dateFrom() ?? ''" (change)="store.setDateRange($any($event.target).value || null, store.dateTo())" aria-label="From date" />
+      <span class="date-sep">→</span>
+      <input class="filter-date" type="date" [value]="store.dateTo() ?? ''" (change)="store.setDateRange(store.dateFrom(), $any($event.target).value || null)" aria-label="To date" />
+
+      <button
+        class="stakable-toggle"
+        [class.active]="store.stakableOnly()"
+        (click)="store.setStakableOnly(!store.stakableOnly())"
+        matTooltip="Only games with a live pool">
+        <mat-icon>verified_user</mat-icon>
+        Stakable
+      </button>
+
+      @if (store.hasActiveFilters()) {
+        <button class="clear-filters" (click)="store.clearFilters()">
+          <mat-icon>filter_alt_off</mat-icon>
+          Clear
+        </button>
+      }
+    </div>
+
+    <div class="table-toolbar">
+      <div class="sort-group">
+        <span class="sort-label">Sort by</span>
+        @for (opt of sortOptions; track opt.value) {
+          <button
+            class="sort-chip"
+            [class.active]="store.sortField() === opt.value"
+            (click)="onSortChange(opt.value)">
+            {{ opt.label }}
+            @if (store.sortField() === opt.value) {
+              <mat-icon>{{ store.sortOrder() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+            }
+          </button>
+        }
+      </div>
+      <span class="range-label">{{ store.rangeLabel() }}</span>
+    </div>
+  </header>
+
+  @if (store.showSkeletons()) {
+    <div class="skeleton-list">
+      @for (_ of [1, 2, 3, 4, 5, 6, 7, 8]; track $index) {
+        <div class="skeleton-row">
+          <div class="sk sk-teams"></div>
+          <div class="sk sk-league"></div>
+          <div class="sk sk-time"></div>
+          <div class="sk sk-pick"></div>
+          <div class="sk sk-odds"></div>
+          <div class="sk sk-conf"></div>
+          <div class="sk sk-status"></div>
+          <div class="sk sk-action"></div>
+        </div>
+      }
+    </div>
+  } @else if (store.error()) {
+    <div class="state-box error">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ store.error() }}</p>
+      <button class="retry-btn" (click)="store.refresh()">Retry</button>
+    </div>
+  } @else if (store.games().length === 0) {
+    <div class="state-box empty">
+      <div class="empty-art">
+        <mat-icon>sports_soccer</mat-icon>
+      </div>
+      <p class="empty-title">No games found</p>
+      <p class="empty-hint">
+        {{ store.hasActiveFilters()
+            ? 'No games match your filters. Try widening the range or clearing filters.'
+            : 'Ora is still analyzing today\'s fixtures — check back in a few minutes.' }}
+      </p>
+      @if (store.hasActiveFilters()) {
+        <button class="retry-btn" (click)="store.clearFilters()">
+          <mat-icon>filter_alt_off</mat-icon>
+          Clear filters
+        </button>
+      }
+    </div>
+  } @else {
+    <div class="table-wrap" [class.loading-fade]="store.loading()">
+      <table class="games-table">
+        <thead>
+          <tr>
+            <th>Teams</th>
+            <th>League</th>
+            <th>Kickoff</th>
+            <th>Ora's Pick</th>
+            <th>Odds</th>
+            <th>Confidence</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (game of store.games(); track game.fixtureId) {
+            <tr>
+              <td>
+                @if (hasScore(game)) {
+                  <div class="teams-cell scoreline">
+                    <span class="team-name" [class.winner]="teamWon(game, 'home')">{{ game.homeTeam }}</span>
+                    <span class="score-sep">{{ scoreText(game) }}</span>
+                    <span class="team-name" [class.winner]="teamWon(game, 'away')">{{ game.awayTeam }}</span>
+                  </div>
+                  <div class="result-line">
+                    @if (resultLabel(game.result)) {
+                      <span class="result-text">{{ resultLabel(game.result) }}</span>
+                    }
+                    @if (pickOutcome(game) !== 'skip') {
+                      <span class="pick-result" [class.won]="pickOutcome(game) === 'won'" [class.lost]="pickOutcome(game) === 'lost'">
+                        <mat-icon>{{ pickOutcome(game) === 'won' ? 'check_circle' : 'cancel' }}</mat-icon>
+                        {{ pickOutcome(game) === 'won' ? "Ora's pick won" : "Ora's pick lost" }}
+                      </span>
+                    }
+                  </div>
+                } @else {
+                  <div class="teams-cell">
+                    <span class="team-name home">{{ game.homeTeam }}</span>
+                    <span class="vs">vs</span>
+                    <span class="team-name">{{ game.awayTeam }}</span>
+                  </div>
+                }
+              </td>
+              <td><span class="league-cell">{{ game.league || 'Football' }}</span></td>
+              <td>
+                <div class="kickoff-cell">
+                  <span class="ko-time">{{ kickoff(game) }}</span>
+                  <span class="ko-day">{{ kickoffDay(game) }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="pick-cell">
+                  <span class="market-badge">{{ game.marketType || '1X2' }}</span>
+                  <span class="pick-text">{{ game.pick }}</span>
+                </div>
+              </td>
+              <td><span class="odds-cell">{{ game.gainsMultiplier.toFixed(2) }}x</span></td>
+              <td>
+                <div class="conf-cell">
+                  <div class="conf-bar">
+                    <div class="conf-fill" [class]="confidenceClass(game.confidence)" [style.width.%]="game.confidence"></div>
+                  </div>
+                  <span class="conf-num" [class]="confidenceClass(game.confidence)">{{ game.confidence }}%</span>
+                </div>
+              </td>
+              <td>
+                <div class="match-status-cell">
+                  <span class="status-badge" [class]="matchStatusClass(game.matchStatus)">{{ matchStatusLabel(game.matchStatus) }}</span>
+                  @if (!hasScore(game) && (isLiveMatch(game.matchStatus) || isFinishedMatch(game.matchStatus))) {
+                    <span class="score-missing">Score unavailable</span>
+                  }
+                </div>
+              </td>
+              <td class="action-cell">
+                @if (game.stakable) {
+                  <button class="stake-btn" (click)="onStake(game)">Stake</button>
+                } @else {
+                  <button class="stake-btn ghost" disabled>{{ game.stakeReason || 'Soon' }}</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination-bar">
+      <select class="page-size" [value]="store.pageSize()" (change)="store.setPageSize(Number($any($event.target).value))" aria-label="Rows per page">
+        <option [value]="25">25 / page</option>
+        <option [value]="50">50 / page</option>
+        <option [value]="100">100 / page</option>
+      </select>
+
+      <span class="page-info">Page {{ store.page() }} of {{ Math.max(1, store.totalPages()) }}</span>
+
+      <div class="page-buttons">
+        <button class="page-btn" (click)="store.prevPage()" [disabled]="store.page() <= 1" aria-label="Previous page">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button class="page-btn" (click)="store.nextPage()" [disabled]="store.page() >= store.totalPages()" aria-label="Next page">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+  }
+</div>

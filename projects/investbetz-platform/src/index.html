@@ -36,112 +36,255 @@
 
   <!-- Splash screen styles (shown before Angular boots) -->
   <style type="text/css">
+    :root {
+      --bp-navy: #0A1428;
+      --bp-navy-2: #050D1A;
+      --bp-emerald: #00E676;
+      --bp-emerald-2: #00C853;
+      --bp-gold: #E8B923;
+      --bp-gold-2: #D4AF37;
+    }
     html, body { height: 100%; margin: 0; }
-    .app-loading {
+
+    /* ---------- Shell ---------- */
+    .app-splash {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #0A1428; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      z-index: 99999; overflow: hidden;
+      background:
+        radial-gradient(120% 90% at 85% -10%, rgba(0,230,118,0.10) 0%, transparent 55%),
+        radial-gradient(110% 85% at 0% 110%, rgba(232,185,35,0.08) 0%, transparent 55%),
+        linear-gradient(180deg, var(--bp-navy) 0%, var(--bp-navy-2) 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      transition: opacity 0.45s ease, transform 0.45s ease, filter 0.45s ease;
     }
-    /* Subtle dot-grid texture */
-    .app-loading::before {
+    .app-splash.splash-exit {
+      opacity: 0; transform: scale(1.045); filter: blur(6px); pointer-events: none;
+    }
+
+    /* Dot-grid texture */
+    .app-splash::before {
       content: ''; position: absolute; inset: 0;
-      background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
-      background-size: 32px 32px; pointer-events: none;
+      background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 34px 34px; pointer-events: none;
     }
-    /* Orb 1 - emerald, drifts top-right */
-    .app-loading .orb-1 {
-      position: absolute; top: -8%; right: -4%;
-      width: min(55vw, 520px); aspect-ratio: 1; border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,230,118,0.08) 0%, transparent 60%);
-      animation: orbDrift1 7s ease-in-out infinite; pointer-events: none;
+    /* Faint football pitch centre-ring motif */
+    .app-splash .s-pitch {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: min(92vw, 780px); aspect-ratio: 1; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.045);
+      box-shadow: inset 0 0 0 90px rgba(255,255,255,0.012), inset 0 0 0 190px rgba(255,255,255,0.008);
+      pointer-events: none; animation: pitchBreathe 9s ease-in-out infinite;
     }
-    /* Orb 2 - gold, drifts bottom-left */
-    .app-loading .orb-2 {
-      position: absolute; bottom: -8%; left: -4%;
-      width: min(50vw, 460px); aspect-ratio: 1; border-radius: 50%;
-      background: radial-gradient(circle, rgba(232,185,35,0.07) 0%, transparent 60%);
-      animation: orbDrift2 7s ease-in-out infinite; pointer-events: none;
+    @keyframes pitchBreathe {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+      50% { transform: translate(-50%, -50%) scale(1.06); opacity: 1; }
     }
-    /* Orb 3 - subtle center depth */
-    .app-loading .orb-center {
-      position: absolute; width: min(35vw, 260px); aspect-ratio: 1; border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 50%);
-      animation: orbPulse 5s ease-in-out infinite; pointer-events: none;
+
+    /* Ambient orbs */
+    .app-splash .s-orb {
+      position: absolute; border-radius: 50%; pointer-events: none; filter: blur(2px);
     }
-    @keyframes orbDrift1 {
-      0%, 100% { transform: translate(0,0) scale(1); opacity: 0.7; }
-      33% { transform: translate(-35px, 25px) scale(1.12); opacity: 1; }
-      66% { transform: translate(20px, -30px) scale(0.92); opacity: 0.8; }
+    .app-splash .s-orb-1 {
+      top: -10%; right: -6%; width: min(58vw, 540px); aspect-ratio: 1;
+      background: radial-gradient(circle, rgba(0,230,118,0.13) 0%, transparent 62%);
+      animation: orbA 8s ease-in-out infinite;
     }
-    @keyframes orbDrift2 {
-      0%, 100% { transform: translate(0,0) scale(1); opacity: 0.6; }
-      33% { transform: translate(30px, -20px) scale(1.15); opacity: 0.9; }
-      66% { transform: translate(-25px, 30px) scale(0.88); opacity: 0.7; }
+    .app-splash .s-orb-2 {
+      bottom: -12%; left: -8%; width: min(54vw, 500px); aspect-ratio: 1;
+      background: radial-gradient(circle, rgba(232,185,35,0.11) 0%, transparent 62%);
+      animation: orbB 9s ease-in-out infinite;
     }
-    @keyframes orbPulse {
-      0%, 100% { transform: scale(1); opacity: 0.4; }
-      50% { transform: scale(1.25); opacity: 0.7; }
+    .app-splash .s-orb-3 {
+      top: 50%; left: 50%; width: min(36vw, 300px); aspect-ratio: 1;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(90,150,255,0.07) 0%, transparent 55%);
+      animation: orbC 6s ease-in-out infinite;
     }
-    /* Floating particles */
-    .app-loading .p { position: absolute; border-radius: 50%; pointer-events: none; background: rgba(255,255,255,0.04); }
-    .app-loading .p1 { width: 8px; height: 8px; top: 22%; left: 12%; animation: floatUp 9s ease-in-out infinite; }
-    .app-loading .p2 { width: 5px; height: 5px; top: 65%; left: 82%; animation: floatUp 11s ease-in-out infinite 2s; }
-    .app-loading .p3 { width: 6px; height: 6px; top: 28%; left: 72%; animation: floatUp 10s ease-in-out infinite 4s; }
-    .app-loading .p4 { width: 4px; height: 4px; top: 72%; left: 22%; animation: floatUp 12s ease-in-out infinite 1s; }
-    @keyframes floatUp {
-      0%, 100% { transform: translateY(0) scale(1); opacity: 0; }
-      15% { opacity: 1; }
-      85% { opacity: 1; }
-      100% { transform: translateY(-130px) scale(0.4); opacity: 0; }
+    @keyframes orbA {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      33% { transform: translate(-40px, 30px) scale(1.12); }
+      66% { transform: translate(25px, -35px) scale(0.92); }
     }
-    /* Logo container */
-    .app-loading .logo-wrap {
-      display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1;
+    @keyframes orbB {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      33% { transform: translate(35px, -25px) scale(1.15); }
+      66% { transform: translate(-30px, 30px) scale(0.88); }
     }
-    .app-loading .logo {
+    @keyframes orbC {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+      50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.9; }
+    }
+
+    /* ---------- Stage ---------- */
+    .app-splash .s-stage {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; align-items: center;
+      animation: stageIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes stageIn {
+      from { opacity: 0; transform: translateY(16px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Shield emblem + radar rings */
+    .app-splash .s-emblem {
+      position: relative; width: clamp(108px, 24vw, 150px); aspect-ratio: 1;
       display: flex; align-items: center; justify-content: center;
-      gap: 0.25rem; font-size: 2.5rem; font-weight: 800;
+      margin-bottom: 1.4rem;
     }
-    .app-loading .logo-bet {
-      background: linear-gradient(135deg, #00E676 0%, #00C853 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      opacity: 0; transform: scale(0.9) translateY(-8px);
-      animation: logoEnter 0.55s cubic-bezier(0.34,1.56,0.64,1) forwards;
-      filter: drop-shadow(0 0 18px rgba(0,230,118,0.18));
+    .app-splash .s-ring {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 1.5px dashed rgba(0,230,118,0.35);
+      animation: spinSlow 14s linear infinite;
     }
-    .app-loading .logo-pool {
-      background: linear-gradient(135deg, #E8B923 0%, #D4AF37 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      opacity: 0; transform: scale(0.9) translateY(-8px);
-      animation: logoEnter 0.55s cubic-bezier(0.34,1.56,0.64,1) 0.12s forwards;
-      filter: drop-shadow(0 0 18px rgba(232,185,35,0.18));
+    .app-splash .s-ring-2 {
+      position: absolute; inset: 12px; border-radius: 50%;
+      border: 1px dashed rgba(232,185,35,0.3);
+      animation: spinSlow 20s linear infinite reverse;
     }
-    @keyframes logoEnter { to { opacity: 1; transform: scale(1) translateY(0); } }
-    .app-loading .underline {
-      width: 0; height: 3px;
-      background: linear-gradient(90deg, #00E676, #E8B923); border-radius: 2px;
-      margin-top: 1rem; animation: drawLine 0.7s cubic-bezier(0.22,1,0.36,1) 0.45s forwards;
+    .app-splash .s-ping {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 2px solid rgba(0,230,118,0.55);
+      animation: ping 2.6s cubic-bezier(0, 0, 0.2, 1) infinite;
     }
-    @keyframes drawLine { to { width: 80px; } }
-    .app-loading .tagline {
-      color: rgba(255,255,255,0.65); font-size: 1.05rem; font-weight: 400;
-      letter-spacing: -0.3px; margin-top: 1rem;
-      opacity: 0; transform: translateY(8px);
-      animation: taglineEnter 0.5s ease 0.95s forwards;
+    .app-splash .s-ping-2 {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 2px solid rgba(232,185,35,0.5);
+      animation: ping 2.6s cubic-bezier(0, 0, 0.2, 1) 1.3s infinite;
     }
-    @keyframes taglineEnter { to { opacity: 1; transform: translateY(0); letter-spacing: 0.3px; } }
-    /* Reduced motion */
+    @keyframes ping {
+      0% { transform: scale(0.9); opacity: 0.85; }
+      80%, 100% { transform: scale(1.5); opacity: 0; }
+    }
+    @keyframes spinSlow { to { transform: rotate(360deg); } }
+
+    .app-splash .s-shield {
+      width: 60%; height: 60%; display: block;
+      filter: drop-shadow(0 10px 26px rgba(0,230,118,0.22));
+      animation: shieldFloat 3.4s ease-in-out infinite;
+    }
+    @keyframes shieldFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+
+    /* Wordmark */
+    .app-splash .s-wordmark {
+      display: flex; align-items: center; gap: 0.3rem;
+      font-size: clamp(2rem, 6.4vw, 2.9rem); font-weight: 800; letter-spacing: -0.5px;
+      line-height: 1;
+    }
+    .app-splash .s-bet {
+      background: linear-gradient(135deg, var(--bp-emerald) 0%, var(--bp-emerald-2) 100%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 20px rgba(0,230,118,0.22));
+      opacity: 0; animation: wordIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s forwards;
+    }
+    .app-splash .s-pool {
+      background: linear-gradient(135deg, var(--bp-gold) 0%, var(--bp-gold-2) 100%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 20px rgba(232,185,35,0.22));
+      opacity: 0; animation: wordIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.16s forwards;
+    }
+    @keyframes wordIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.92); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .app-splash .s-underline {
+      width: 0; height: 3px; margin-top: 0.9rem;
+      background: linear-gradient(90deg, var(--bp-emerald), var(--bp-gold));
+      border-radius: 3px;
+      animation: drawLine 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.5s forwards;
+    }
+    @keyframes drawLine { to { width: clamp(64px, 18vw, 88px); } }
+
+    .app-splash .s-tagline {
+      margin: 0.85rem 0 0; font-size: clamp(0.85rem, 2.6vw, 1.02rem); font-weight: 600;
+      background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.55));
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      opacity: 0; animation: taglineIn 0.55s ease 0.9s forwards;
+    }
+    @keyframes taglineIn { to { opacity: 1; } }
+
+    /* ---------- Loader ---------- */
+    .app-splash .s-loader {
+      display: flex; flex-direction: column; align-items: center;
+      margin-top: 1.6rem; opacity: 0; animation: taglineIn 0.5s ease 1.1s forwards;
+    }
+    .app-splash .s-ringwrap {
+      position: relative; width: 74px; height: 74px;
+    }
+    .app-splash .s-ringwrap svg { transform: rotate(-90deg); }
+    .app-splash .s-ring-bg {
+      fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 5;
+    }
+    .app-splash .s-ring-fg {
+      fill: none; stroke: url(#splashGrad); stroke-width: 5; stroke-linecap: round;
+      stroke-dasharray: 163.36; stroke-dashoffset: 163.36;
+      transition: stroke-dashoffset 0.12s linear;
+    }
+    .app-splash .s-pct {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 700; color: #fff; letter-spacing: 0.02em;
+    }
+    .app-splash .s-loader-hint {
+      margin-top: 0.7rem; color: rgba(255,255,255,0.45);
+      font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+    }
+
+    /* Checklist steps */
+    .app-splash .s-steps {
+      display: flex; flex-direction: column; gap: 0.45rem; margin-top: 1.35rem;
+      min-width: min(74vw, 280px);
+    }
+    .app-splash .s-step {
+      display: flex; align-items: center; gap: 0.6rem;
+      color: rgba(255,255,255,0.35); font-size: 0.8rem; font-weight: 500;
+      transition: color 0.35s ease, opacity 0.35s ease; opacity: 0.85;
+    }
+    .app-splash .s-step .s-check {
+      width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .app-splash .s-step .s-check svg { width: 9px; height: 9px; stroke: #fff; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity 0.25s ease; }
+    .app-splash .s-step.on { color: rgba(255,255,255,0.85); }
+    .app-splash .s-step.on .s-check { border-color: var(--bp-emerald); background: rgba(0,230,118,0.16); box-shadow: 0 0 12px rgba(0,230,118,0.35); }
+    .app-splash .s-step.on .s-check svg { opacity: 1; }
+
+    /* ---------- Feature pills ---------- */
+    .app-splash .s-pills {
+      position: absolute; bottom: clamp(1.2rem, 4vh, 2.2rem); left: 0; right: 0; z-index: 1;
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.6rem; flex-wrap: wrap; padding: 0 1rem;
+      opacity: 0; animation: taglineIn 0.6s ease 1.25s forwards;
+    }
+    .app-splash .s-pill {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.42rem 0.85rem; border-radius: 999px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.09);
+      color: rgba(255,255,255,0.72); font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.02em; backdrop-filter: blur(6px);
+    }
+    .app-splash .s-pill svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .app-splash .s-pill.p-emerald svg { stroke: var(--bp-emerald); }
+    .app-splash .s-pill.p-gold svg { stroke: var(--bp-gold); }
+
+    /* ---------- Reduced motion ---------- */
     @media (prefers-reduced-motion: reduce) {
-      .app-loading .orb-1, .app-loading .orb-2, .app-loading .orb-center,
-      .app-loading .p { animation: none; }
-      .app-loading .logo-bet, .app-loading .logo-pool { animation: none; opacity: 1; transform: none; }
-      .app-loading .underline { animation: none; width: 80px; }
-      .app-loading .tagline { animation: none; opacity: 1; transform: none; letter-spacing: 0; }
-    }
-    @media (max-width: 480px) {
-      .app-loading .logo { font-size: 1.75rem; }
-      .app-loading .tagline { font-size: 0.9rem; letter-spacing: 0; }
+      .app-splash .s-pitch, .app-splash .s-orb-1, .app-splash .s-orb-2, .app-splash .s-orb-3,
+      .app-splash .s-ring, .app-splash .s-ring-2, .app-splash .s-ping, .app-splash .s-ping-2,
+      .app-splash .s-shield { animation: none; }
+      .app-splash .s-stage { animation: none; }
+      .app-splash .s-bet, .app-splash .s-pool { animation: none; opacity: 1; transform: none; }
+      .app-splash .s-underline { animation: none; width: 80px; }
+      .app-splash .s-tagline, .app-splash .s-loader, .app-splash .s-pills { animation: none; opacity: 1; }
+      .app-splash .s-ring-fg { transition: none; }
     }
   </style>
 
@@ -149,6 +292,9 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- FAQ Structured Data -->
   <script type="application/ld+json">
@@ -201,24 +347,140 @@
   </script>
 </head>
 <body class="mat-typography">
-  <app-root>
-    <div class="app-loading">
-      <div class="orb-1"></div>
-      <div class="orb-2"></div>
-      <div class="orb-center"></div>
-      <div class="p p1"></div>
-      <div class="p p2"></div>
-      <div class="p p3"></div>
-      <div class="p p4"></div>
-      <div class="logo-wrap">
-        <div class="logo">
-          <span class="logo-bet">Bet</span><span class="logo-pool">Pool</span>
+  <app-root></app-root>
+
+  <div id="app-splash" class="app-splash" role="status" aria-label="BetPool is loading">
+    <div class="s-pitch" aria-hidden="true"></div>
+    <div class="s-orb s-orb-1" aria-hidden="true"></div>
+    <div class="s-orb s-orb-2" aria-hidden="true"></div>
+    <div class="s-orb s-orb-3" aria-hidden="true"></div>
+
+    <div class="s-stage">
+      <div class="s-emblem" aria-hidden="true">
+        <div class="s-ring"></div>
+        <div class="s-ring-2"></div>
+        <div class="s-ping"></div>
+        <div class="s-ping-2"></div>
+        <svg class="s-shield" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="splashShield" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#00E676"/>
+              <stop offset="1" stop-color="#00C853"/>
+            </linearGradient>
+          </defs>
+          <path d="M24 3 L41 8.5 V24 C41 34.4 33.8 41.6 24 45 C14.2 41.6 7 34.4 7 24 V8.5 Z" fill="url(#splashShield)"/>
+          <path d="M15.5 24 L21.5 30 L32.5 17.5" fill="none" stroke="#0A1428" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div class="s-wordmark">
+        <span class="s-bet">Bet</span><span class="s-pool">Pool</span>
+      </div>
+      <div class="s-underline"></div>
+      <p class="s-tagline">Win bigger &middot; Risk nothing</p>
+
+      <div class="s-loader">
+        <div class="s-ringwrap">
+          <svg viewBox="0 0 56 56" width="74" height="74" aria-hidden="true">
+            <defs>
+              <linearGradient id="splashGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#00E676"/>
+                <stop offset="1" stop-color="#E8B923"/>
+              </linearGradient>
+            </defs>
+            <circle class="s-ring-bg" cx="28" cy="28" r="26"/>
+            <circle class="s-ring-fg" cx="28" cy="28" r="26"/>
+          </svg>
+          <span class="s-pct"><span class="s-pct-num">0</span>%</span>
         </div>
-        <div class="underline"></div>
-        <div class="tagline">Your winning partner</div>
+        <div class="s-steps">
+          <div class="s-step">
+            <span class="s-check"><svg viewBox="0 0 10 10"><path d="M1.5 5.5 L4 8 L8.5 2.5"/></svg></span>
+            Securing your session
+          </div>
+          <div class="s-step">
+            <span class="s-check"><svg viewBox="0 0 10 10"><path d="M1.5 5.5 L4 8 L8.5 2.5"/></svg></span>
+            Loading today's picks from Ora
+          </div>
+          <div class="s-step">
+            <span class="s-check"><svg viewBox="0 0 10 10"><path d="M1.5 5.5 L4 8 L8.5 2.5"/></svg></span>
+            Preparing your pool &amp; wallet
+          </div>
+        </div>
+        <p class="s-loader-hint">Preparing your experience</p>
       </div>
     </div>
-  </app-root>
+
+    <div class="s-pills" aria-hidden="true">
+      <span class="s-pill p-emerald">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/>
+        </svg>
+        Ora AI picks
+      </span>
+      <span class="s-pill p-gold">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l7 2.5v5.2c0 4.5-3 8.1-7 9.8-4-1.7-7-5.3-7-9.8V5.5z"/>
+          <path d="M9 11.5l2 2 4-4.5"/>
+        </svg>
+        Stake protected
+      </span>
+      <span class="s-pill p-emerald">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2L4 14h6l-1 8 9-12h-6z"/>
+        </svg>
+        Fast payouts
+      </span>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var splash = document.getElementById('app-splash');
+      if (!splash) return;
+      var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var pctEl = splash.querySelector('.s-pct-num');
+      var ringEl = splash.querySelector('.s-ring-fg');
+      var steps = Array.prototype.slice.call(splash.querySelectorAll('.s-step'));
+      var C = 2 * Math.PI * 26;
+      if (ringEl) ringEl.style.strokeDasharray = C;
+
+      var dur = 1400, start = null;
+      function frame(ts) {
+        if (!start) start = ts;
+        var p = Math.min(1, (ts - start) / dur);
+        p = 1 - Math.pow(1 - p, 3);
+        var n = Math.round(p * 100);
+        if (pctEl) pctEl.textContent = n;
+        if (ringEl) ringEl.style.strokeDashoffset = C * (1 - p);
+        var active = n < 30 ? 1 : n < 65 ? 2 : 3;
+        steps.forEach(function (s, i) { if (i < active) s.classList.add('on'); });
+        if (p < 1) requestAnimationFrame(frame);
+      }
+      if (!reduced) requestAnimationFrame(frame);
+      if (reduced) { if (pctEl) pctEl.textContent = 100; if (ringEl) ringEl.style.strokeDashoffset = 0; steps.forEach(function (s) { s.classList.add('on'); }); }
+
+      var hidden = false;
+      function hide() {
+        if (hidden) return;
+        hidden = true;
+        splash.classList.add('splash-exit');
+        setTimeout(function () {
+          if (splash.parentNode) splash.parentNode.removeChild(splash);
+        }, 520);
+      }
+
+      var minWait = Date.now() + 900;
+      var t = setInterval(function () {
+        var root = document.querySelector('app-root');
+        if (Date.now() >= minWait && root && root.children.length > 0) {
+          clearInterval(t);
+          hide();
+        }
+      }, 80);
+      setTimeout(function () { clearInterval(t); hide(); }, 7000);
+    })();
+  </script>
 </body>
 <noscript>Sorry, your browser does not support JavaScript!</noscript>
 </html>

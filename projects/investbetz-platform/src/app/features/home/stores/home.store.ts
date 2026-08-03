@@ -100,6 +100,17 @@ export class HomeStore implements OnDestroy {
     this.selectedPod.set(pod);
   }
 
+  openPodById(podId: string) {
+    if (!podId || !this.auth.isAuthenticated()) return;
+    this.pods.getById(podId).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.openStakeModal(res.data);
+        }
+      },
+    });
+  }
+
   closeStakeModal() {
     this.selectedPod.set(null);
   }

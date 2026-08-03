@@ -3,6 +3,8 @@ export type { User, AuthResponse, OtpResponse, StakeAction, AccumulatorAction, C
 export { DeviceService } from './device.service';
 export type { DeviceType, DeviceState } from './device.service';
 export { ErrorMonitorService, BetPoolErrorHandler } from './error-monitor.service';
+export { GamesService } from './games.service';
+export type { TodayGame, TodayGamesResponse } from './games.service';
 export { MatchPoolService } from './match-pool.service';
 export type { MatchPoolMarket, MatchPool, PoolStakeResponse, MyPoolStake, MatchPoolFeedResponse, MyStakesResponse } from './match-pool.service';
 export { NotificationService } from './notification.service';
