@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
 export interface TodayGame {
@@ -16,6 +16,7 @@ export interface TodayGame {
   availableOdds: number;
   podId: string | null;
   stakable: boolean;
+  stakeReason?: string;
 }
 
 export interface TodayGamesResponse {
@@ -26,18 +27,51 @@ export interface TodayGamesResponse {
   };
 }
 
+export interface GamesQuery {
+  page?: number;
+  limit?: number;
+  sortField?: string;
+  sortOrder?: 'asc' | 'desc';
+  search?: string;
+  league?: string;
+  marketType?: string;
+  stakableOnly?: boolean;
+  minConfidence?: number;
+  dateFrom?: string | null;
+  dateTo?: string | null;
+}
+
+export interface GamesListResponse {
+  success: boolean;
+  data: {
+    items: TodayGame[];
+    total: number;
+    stakableTotal: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    leagues: string[];
+  };
+}
+
 @Injectable({ providedIn: 'root' })
 export class GamesService {
   games = signal<TodayGame[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
 
-  leagues = computed(() => {
-    const set = new Set<string>();
-    for (const g of this.games()) {
-      if (g.league) set.add(g.league);
-    }
-    return ['All', ...Array.from(set).sort()];
+  total = signal(0);
+  stakableTotal = signal(0);
+  totalPages = signal(0);
+  currentPage = signal(1);
+  pageSize = signal(25);
+  leagues = signal<string[]>([]);
+
+  analytics = computed(() => {
+    const all = this.games();
+    const stakable = all.filter(g => g.stakable).length;
+    const avgConf = all.length ? Math.round(all.reduce((s, g) => s + g.confidence, 0) / all.length) : 0;
+    return { stakable, avgConf };
   });
 
   constructor(private http: HttpClient) {}
@@ -52,6 +86,49 @@ export class GamesService {
             ...g,
             matchDate: new Date(g.matchDate).toISOString(),
           })));
+        } else {
+          this.error.set('Failed to load games');
+        }
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.error.set(err.error?.message || 'Failed to load games');
+        this.loading.set(false);
+      }
+    });
+  }
+
+  fetchGames(query: GamesQuery = {}) {
+    this.loading.set(true);
+    this.error.set(null);
+
+    let params = new HttpParams();
+    if (query.page) params = params.set('page', String(query.page));
+    if (query.limit) params = params.set('limit', String(query.limit));
+    if (query.sortField) params = params.set('sortField', query.sortField);
+    if (query.sortOrder) params = params.set('sortOrder', query.sortOrder);
+    if (query.search) params = params.set('search', query.search);
+    if (query.league) params = params.set('league', query.league);
+    if (query.marketType) params = params.set('marketType', query.marketType);
+    if (query.stakableOnly) params = params.set('stakableOnly', 'true');
+    if (query.minConfidence) params = params.set('minConfidence', String(query.minConfidence));
+    if (query.dateFrom) params = params.set('dateFrom', query.dateFrom);
+    if (query.dateTo) params = params.set('dateTo', query.dateTo);
+
+    this.http.get<GamesListResponse>(`${environment.apiUrl}/games`, { params }).subscribe({
+      next: (res) => {
+        if (res.success) {
+          const data = res.data;
+          this.games.set(data.items.map(g => ({
+            ...g,
+            matchDate: new Date(g.matchDate).toISOString(),
+          })));
+          this.total.set(data.total);
+          this.stakableTotal.set(data.stakableTotal);
+          this.totalPages.set(data.totalPages);
+          this.currentPage.set(data.page);
+          this.pageSize.set(data.limit);
+          this.leagues.set(data.leagues || []);
         } else {
           this.error.set('Failed to load games');
         }

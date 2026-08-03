@@ -18,6 +18,12 @@ export class GameCardComponent {
   stakeRequested = output<TodayGame>();
 
   confidenceLabel = (): string => `${this.game().confidence}%`;
+  confidenceClass = (): string => {
+    const c = this.game().confidence;
+    if (c >= 70) return 'high';
+    if (c >= 55) return 'mid';
+    return 'low';
+  };
   kickoff = (): string => {
     const d = new Date(this.game().matchDate);
     return d.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' });

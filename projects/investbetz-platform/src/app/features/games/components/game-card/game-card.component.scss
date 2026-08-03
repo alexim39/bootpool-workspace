@@ -33,6 +33,46 @@ mat-card-content {
   gap: 0.5rem;
 }
 
+.game-top-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.15rem 0.5rem;
+  background: rgba($emerald, 0.1);
+  border: 1px solid rgba($emerald, 0.3);
+  border-radius: $radius-full;
+  color: $emerald;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+
+  .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: $emerald;
+  }
+}
+
+.market-badge {
+  align-self: flex-start;
+  padding: 0.15rem 0.6rem;
+  background: rgba($gold, 0.12);
+  border: 1px solid rgba($gold, 0.25);
+  border-radius: $radius-full;
+  color: $gold-light;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .league-chip {
   display: inline-flex;
   align-items: center;
@@ -141,15 +181,22 @@ mat-card-content {
 
 .confidence-fill {
   height: 100%;
-  background: linear-gradient(90deg, $emerald-dark, $emerald);
   border-radius: $radius-full;
   transition: width $transition-base;
+
+  &.high { background: linear-gradient(90deg, $emerald-dark, $emerald); }
+  &.mid { background: linear-gradient(90deg, $gold-dark, $gold-light); }
+  &.low { background: linear-gradient(90deg, #FF5252, #FF8A80); }
 }
 
 .confidence-label {
   color: $white-dim;
   font-size: $font-size-xs;
   white-space: nowrap;
+
+  &.high { color: $emerald-light; }
+  &.mid { color: $gold-light; }
+  &.low { color: #FF8A80; }
 }
 
 .reasoning {

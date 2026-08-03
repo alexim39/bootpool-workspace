@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MobileNavComponent } from '../../../../core/components';
 import { AuthService } from '../../../../core/services';
@@ -18,7 +17,6 @@ import { TodayGame } from '../../../../core/services';
     CommonModule,
     MatIconModule,
     MatButtonModule,
-    MatProgressSpinnerModule,
     MatTooltipModule,
     MobileNavComponent,
     GameCardComponent,
@@ -33,16 +31,26 @@ export class GamesMobileComponent implements OnInit {
   readonly auth = inject(AuthService);
   readonly showGuide = signal(false);
 
+  readonly sortOptions = [
+    { value: 'matchDate', label: 'Kickoff' },
+    { value: 'confidence', label: 'Confidence' },
+    { value: 'gainsMultiplier', label: 'Odds' },
+  ];
+
   ngOnInit() {
     this.store.init();
   }
 
-  selectLeague(league: string) {
-    this.store.selectLeague(league);
+  onSearch(event: Event) {
+    this.store.setSearch((event.target as HTMLInputElement).value);
+  }
+
+  onSortChange(value: string) {
+    this.store.setSort(value);
   }
 
   onStake(game: TodayGame) {
-    if (!game.podId) return;
+    if (!game.stakable || !game.podId) return;
     this.router.navigate(['/home'], { queryParams: { pod: game.podId } });
   }
 }

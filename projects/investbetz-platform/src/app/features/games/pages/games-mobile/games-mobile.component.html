@@ -13,30 +13,92 @@
       <div class="guide-step"><span class="step-num">1</span> Ora analyzes every match using team form, head-to-head and live market odds</div>
       <div class="guide-step"><span class="step-num">2</span> Each card shows Ora's pick, its odds and a confidence score for that game</div>
       <div class="guide-step"><span class="step-num">3</span> Confidence reflects how likely the recommended outcome is to land</div>
-      <div class="guide-step"><span class="step-num">4</span> Tap "Stake This Pick" to back it in the pool — picks without a live pool open at kickoff</div>
+      <div class="guide-step"><span class="step-num">4</span> Tap "Stake This Pick" to back it in the pool — a game can only be staked while its live pool is open</div>
     </div>
   }
 
   <div class="mobile-content">
     <p class="page-subtitle">Ora's picks for today's matches — analyzed with confidence.</p>
 
-    @if (store.leagues().length > 1) {
+    <div class="search-box">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        placeholder="Search teams or leagues…"
+        [value]="store.searchText()"
+        (input)="onSearch($event)"
+        aria-label="Search games" />
+      @if (store.searchText()) {
+        <button class="search-clear" (click)="store.setSearch('')" aria-label="Clear search">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </div>
+
+    @if (store.leagues().length > 0) {
       <div class="league-tabs">
+        <button
+          class="league-tab"
+          [class.active]="(store.league() ?? 'All') === 'All'"
+          (click)="store.setLeague('All')">
+          All
+        </button>
         @for (league of store.leagues(); track league) {
           <button
             class="league-tab"
-            [class.active]="(store.selectedLeague() ?? 'All') === league"
-            (click)="selectLeague(league)">
+            [class.active]="store.league() === league"
+            (click)="store.setLeague(league)">
             {{ league }}
           </button>
         }
       </div>
     }
 
-    @if (store.loading()) {
-      <div class="state-box">
-        <mat-spinner diameter="36" />
-        <p>Ora is analyzing today's games…</p>
+    <div class="quick-filters">
+      <div class="sort-row">
+        <span class="filter-label">Sort</span>
+        @for (opt of sortOptions; track opt.value) {
+          <button
+            class="sort-chip"
+            [class.active]="store.sortField() === opt.value"
+            (click)="onSortChange(opt.value)">
+            {{ opt.label }}
+            @if (store.sortField() === opt.value) {
+              <mat-icon>{{ store.sortOrder() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+            }
+          </button>
+        }
+      </div>
+
+      <div class="filter-row">
+        <button
+          class="stakable-toggle"
+          [class.active]="store.stakableOnly()"
+          (click)="store.setStakableOnly(!store.stakableOnly())">
+          <mat-icon>verified_user</mat-icon>
+          Stakable
+        </button>
+        <input class="filter-date" type="date" [value]="store.dateFrom() ?? ''" (change)="store.setDateRange($any($event.target).value || null, store.dateTo())" aria-label="From date" />
+        <span class="date-sep">→</span>
+        <input class="filter-date" type="date" [value]="store.dateTo() ?? ''" (change)="store.setDateRange(store.dateFrom(), $any($event.target).value || null)" aria-label="To date" />
+        @if (store.hasActiveFilters()) {
+          <button class="clear-filters" (click)="store.clearFilters()" aria-label="Clear filters">
+            <mat-icon>filter_alt_off</mat-icon>
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (store.showSkeletons()) {
+      <div class="skeleton-list">
+        @for (_ of [1, 2, 3, 4, 5, 6]; track $index) {
+          <div class="skeleton-card">
+            <div class="sk sk-league"></div>
+            <div class="sk sk-teams"></div>
+            <div class="sk sk-pick"></div>
+            <div class="sk sk-action"></div>
+          </div>
+        }
       </div>
     } @else if (store.error()) {
       <div class="state-box error">
@@ -44,17 +106,42 @@
         <p>{{ store.error() }}</p>
         <button class="retry-btn" (click)="store.refresh()">Retry</button>
       </div>
-    } @else if (store.filteredGames().length === 0) {
-      <div class="state-box">
-        <mat-icon>sports_soccer</mat-icon>
-        <p>No games analyzed for today yet. Check back soon — Ora updates the board after each sync.</p>
+    } @else if (store.games().length === 0) {
+      <div class="state-box empty">
+        <div class="empty-art"><mat-icon>sports_soccer</mat-icon></div>
+        <p class="empty-title">No games found</p>
+        <p class="empty-hint">
+          {{ store.hasActiveFilters()
+              ? 'No games match your filters. Try widening the range or clearing filters.'
+              : 'Ora is still analyzing today\'s fixtures — check back in a few minutes.' }}
+        </p>
+        @if (store.hasActiveFilters()) {
+          <button class="retry-btn" (click)="store.clearFilters()">
+            <mat-icon>filter_alt_off</mat-icon>
+            Clear filters
+          </button>
+        }
       </div>
     } @else {
-      <div class="games-list">
-        @for (game of store.filteredGames(); track game.fixtureId) {
+      <div class="games-list" [class.loading-fade]="store.loading()">
+        @for (game of store.games(); track game.fixtureId) {
           <app-game-card [game]="game" (stakeRequested)="onStake($event)" />
         }
       </div>
+
+      @if (store.page() < store.totalPages()) {
+        <div class="load-more-wrap">
+          <button class="load-more-btn" (click)="store.nextPage()" [disabled]="store.loading()">
+            <mat-icon>expand_more</mat-icon>
+            Load more
+          </button>
+          <span class="load-hint">{{ store.rangeLabel() }}</span>
+        </div>
+      } @else {
+        <div class="list-end">
+          <span>Showing {{ store.rangeLabel() }} games</span>
+        </div>
+      }
     }
   </div>
 

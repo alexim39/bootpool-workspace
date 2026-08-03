@@ -2,8 +2,15 @@
   <mat-card-content>
     <div class="game-top">
       <span class="league-chip">{{ game().league || 'Football' }}</span>
-      <span class="kickoff">{{ kickoff() }}</span>
+      <div class="game-top-right">
+        @if (game().stakable) {
+          <span class="status-pill live"><span class="dot"></span>Live pool</span>
+        }
+        <span class="kickoff">{{ kickoff() }}</span>
+      </div>
     </div>
+
+    <div class="market-badge">{{ game().marketType || '1X2' }}</div>
 
     <div class="teams">
       <div class="team">
@@ -26,7 +33,7 @@
 
     <div class="confidence-row">
       <div class="confidence-bar">
-        <div class="confidence-fill" [style.width.%]="game().confidence"></div>
+        <div class="confidence-fill" [class]="confidenceClass()" [style.width.%]="game().confidence"></div>
       </div>
       <span class="confidence-label">{{ confidenceLabel() }} confidence</span>
     </div>
@@ -42,7 +49,7 @@
       @if (game().stakable) {
         <button class="stake-btn" (click)="onStake()">Stake This Pick</button>
       } @else {
-        <span class="soon-label">Available soon</span>
+        <span class="soon-label">{{ game().stakeReason || 'Available soon' }}</span>
       }
     </div>
   </mat-card-content>

@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { GamesStore } from './games.store';
 import { GamesService, TodayGame } from '../../../core/services';
@@ -29,10 +29,16 @@ describe('GamesStore', () => {
 
   beforeEach(() => {
     gamesSignal = signal<TodayGame[]>([]);
-    serviceMock = jasmine.createSpyObj('GamesService', ['fetchToday'], {
+    serviceMock = jasmine.createSpyObj('GamesService', ['fetchToday', 'fetchGames'], {
       games: gamesSignal.asReadonly(),
       loading: signal(false).asReadonly(),
       error: signal<string | null>(null).asReadonly(),
+      total: signal(0).asReadonly(),
+      stakableTotal: signal(0).asReadonly(),
+      totalPages: signal(0).asReadonly(),
+      currentPage: signal(1).asReadonly(),
+      pageSize: signal(25).asReadonly(),
+      leagues: signal([] as string[]).asReadonly(),
     });
 
     TestBed.configureTestingModule({
@@ -42,49 +48,73 @@ describe('GamesStore', () => {
     store = TestBed.inject(GamesStore);
   });
 
-  it('fetches games once on init', () => {
-    serviceMock.fetchToday.and.callFake(() => gamesSignal.set([game()]));
+  it('fetches page 1 with default sort on init', () => {
+    serviceMock.fetchGames.and.callFake(() => gamesSignal.set([game()]));
     store.init();
+    expect(serviceMock.fetchGames).toHaveBeenCalledTimes(1);
+    expect(serviceMock.fetchGames).toHaveBeenCalledWith({
+      page: 1,
+      limit: 25,
+      sortField: 'matchDate',
+      sortOrder: 'asc',
+      dateFrom: null,
+      dateTo: null,
+    });
+  });
+
+  it('debounces search input by 350ms', fakeAsync(() => {
+    serviceMock.fetchGames.and.callFake(() => gamesSignal.set([game()]));
     store.init();
-    expect(serviceMock.fetchToday).toHaveBeenCalledTimes(1);
-    expect(serviceMock.fetchToday).toHaveBeenCalledWith(3);
+    store.setSearch('a');
+    store.setSearch('ar');
+    store.setSearch('ars');
+    tick(349);
+    expect(serviceMock.fetchGames).toHaveBeenCalledTimes(1);
+    tick(1);
+    expect(serviceMock.fetchGames).toHaveBeenCalledTimes(2);
+    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ search: 'ars', page: 1 }));
+  }));
+
+  it('league filter resets page and reloads', () => {
+    serviceMock.fetchGames.and.callFake(() => gamesSignal.set([game()]));
+    store.init();
+    store.setLeague('La Liga');
+    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ league: 'La Liga', page: 1 }));
   });
 
-  it('filters games by selected league', () => {
-    gamesSignal.set([
-      game({ fixtureId: 1, league: 'Premier League' }),
-      game({ fixtureId: 2, league: 'La Liga' }),
-    ]);
-    expect(store.filteredGames().length).toBe(2);
-    store.selectLeague('La Liga');
-    expect(store.filteredGames().length).toBe(1);
-    expect(store.filteredGames()[0].fixtureId).toBe(2);
-    store.selectLeague('All');
-    expect(store.filteredGames().length).toBe(2);
+  it('sort toggles order on same field', () => {
+    serviceMock.fetchGames.and.callFake(() => gamesSignal.set([game()]));
+    store.init();
+    store.setSort('confidence');
+    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ sortField: 'confidence', sortOrder: 'desc' }));
+    store.setSort('confidence');
+    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ sortOrder: 'asc' }));
   });
 
-  it('computes leagues with All first', () => {
-    gamesSignal.set([
-      game({ league: 'La Liga' }),
-      game({ league: 'Premier League' }),
-      game({ league: 'La Liga' }),
-    ]);
-    expect(store.leagues()).toEqual(['All', 'La Liga', 'Premier League']);
+  it('stakableOnly filter is passed through', () => {
+    serviceMock.fetchGames.and.callFake(() => gamesSignal.set([game()]));
+    store.init();
+    store.setStakableOnly(true);
+    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ stakableOnly: true }));
   });
 
-  it('counts stakable games', () => {
+  it('clearFilters resets all filters', () => {
+    serviceMock.fetchGames.and.callFake(() => gamesSignal.set([game()]));
+    store.init();
+    store.setSearch('ars');
+    store.setLeague('La Liga');
+    store.setStakableOnly(true);
+    store.clearFilters();
+    expect(store.hasActiveFilters()).toBe(false);
+    expect(store.searchText()).toBe('');
+  });
+
+  it('counts stakable games from current page', () => {
     gamesSignal.set([
-      game({ stakable: true }),
-      game({ stakable: false }),
-      game({ stakable: true }),
+      game({ fixtureId: 1, stakable: true }),
+      game({ fixtureId: 2, stakable: false }),
+      game({ fixtureId: 3, stakable: true }),
     ]);
     expect(store.stakableGames().length).toBe(2);
-  });
-
-  it('refresh refetches regardless of cache', () => {
-    serviceMock.fetchToday.and.callFake(() => gamesSignal.set([game()]));
-    store.init();
-    store.refresh();
-    expect(serviceMock.fetchToday).toHaveBeenCalledTimes(2);
   });
 });

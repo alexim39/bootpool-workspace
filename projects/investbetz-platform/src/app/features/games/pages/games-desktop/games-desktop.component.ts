@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { FormsModule } from '@angular/forms';
 import { AppNavComponent } from '../../../../core/components';
 import { GamesStore } from '../../stores/games.store';
-import { GameCardComponent } from '../../components/game-card/game-card.component';
 import { TodayGame } from '../../../../core/services';
 
 @Component({
@@ -14,11 +14,11 @@ import { TodayGame } from '../../../../core/services';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatIconModule,
     MatButtonModule,
-    MatProgressSpinnerModule,
+    MatTooltipModule,
     AppNavComponent,
-    GameCardComponent,
   ],
   templateUrl: './games-desktop.component.html',
   styleUrls: ['./games-desktop.component.scss']
@@ -26,17 +26,51 @@ import { TodayGame } from '../../../../core/services';
 export class GamesDesktopComponent implements OnInit {
   readonly store = inject(GamesStore);
   private router = inject(Router);
+  readonly Math = Math;
+  readonly Number = Number;
+
+  readonly sortOptions = [
+    { value: 'matchDate', label: 'Kickoff' },
+    { value: 'confidence', label: 'Confidence' },
+    { value: 'gainsMultiplier', label: 'Odds' },
+    { value: 'league', label: 'League' },
+    { value: 'homeTeam', label: 'Team' },
+  ];
 
   ngOnInit() {
     this.store.init();
   }
 
-  selectLeague(league: string) {
-    this.store.selectLeague(league);
+  onSearch(event: Event) {
+    this.store.setSearch((event.target as HTMLInputElement).value);
+  }
+
+  onSortChange(value: string) {
+    this.store.setSort(value);
+  }
+
+  kickoff(game: TodayGame): string {
+    return new Date(game.matchDate).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  kickoffDay(game: TodayGame): string {
+    const d = new Date(game.matchDate);
+    const today = new Date();
+    const tomorrow = new Date(today.getTime() + 86400000);
+    const day = d.toLocaleDateString('en-NG', { month: 'short', day: 'numeric' });
+    if (d.toDateString() === today.toDateString()) return `Today · ${day}`;
+    if (d.toDateString() === tomorrow.toDateString()) return `Tomorrow · ${day}`;
+    return day;
+  }
+
+  confidenceClass(conf: number): string {
+    if (conf >= 70) return 'high';
+    if (conf >= 55) return 'mid';
+    return 'low';
   }
 
   onStake(game: TodayGame) {
-    if (!game.podId) return;
+    if (!game.stakable || !game.podId) return;
     this.router.navigate(['/home'], { queryParams: { pod: game.podId } });
   }
 }
