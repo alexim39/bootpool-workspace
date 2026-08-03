@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -8,7 +8,9 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatBadgeModule } from '@angular/material/badge';
 import { Pod } from '../../../../core/services';
+import { NotificationService } from '../../../../core/services';
 import { PodCardComponent } from '../../components/pod-card/pod-card.component';
 import { StakeModalComponent } from '../../components/stake-modal/stake-modal.component';
 import { BetSlipComponent } from '../../components/bet-slip/bet-slip.component';
@@ -30,6 +32,7 @@ import { HomeStore } from '../../stores/home.store';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatTooltipModule,
+    MatBadgeModule,
     PodCardComponent,
     StakeModalComponent,
     BetSlipComponent,
@@ -43,17 +46,56 @@ import { HomeStore } from '../../stores/home.store';
 })
 export class HomeMobileComponent implements OnInit {
   private _snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
   readonly store = inject(HomeStore);
+  readonly notifService = inject(NotificationService);
 
   showTopUp = signal(false);
   showOraChat = signal(false);
+  showNotifPanel = signal(false);
 
   openOraChat() { this.showOraChat.set(true); }
 
   closeOraChat() { this.showOraChat.set(false); }
 
+  toggleNotifPanel() {
+    this.showNotifPanel.update(v => !v);
+    if (this.showNotifPanel()) {
+      this.notifService.fetchNotifications(1, 20).subscribe({ error: () => {} });
+    }
+  }
+
+  closeNotifPanel() { this.showNotifPanel.set(false); }
+
+  markNotifRead(id: string) {
+    this.notifService.markAsRead(id).subscribe({
+      next: () => {
+        this.notifService.notifications.update(n =>
+          n.map(x => x._id === id ? { ...x, read: true } : x)
+        );
+        this.notifService.unreadCount.update(c => Math.max(0, c - 1));
+      },
+      error: () => {}
+    });
+  }
+
+  markAllNotifRead() {
+    this.notifService.markAllAsRead().subscribe({
+      next: () => {
+        this.notifService.notifications.update(n => n.map(x => ({ ...x, read: true })));
+        this.notifService.unreadCount.set(0);
+      }
+    });
+  }
+
+  stopProp(e: Event) {
+    e.stopPropagation();
+  }
+
   ngOnInit() {
     this.store.init();
+    const podId = this.route.snapshot.queryParamMap.get('pod');
+    if (podId) this.store.openPodById(podId);
   }
 
   openStakeModal(pod: Pod) {

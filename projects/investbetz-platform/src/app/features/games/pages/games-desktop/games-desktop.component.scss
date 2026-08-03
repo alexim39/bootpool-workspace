@@ -1,0 +1,100 @@
+@use '../../../../core/styles/brand' as *;
+
+.games-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 84px $spacing-xl $spacing-3xl;
+}
+
+.games-header {
+  margin-bottom: $spacing-xl;
+}
+
+.header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-lg;
+}
+
+.page-title {
+  font-family: $font-family-display;
+  font-size: $font-size-3xl;
+  color: $white;
+  margin: 0 0 $spacing-xs;
+}
+
+.page-subtitle {
+  color: $white-dim;
+  font-size: $font-size-base;
+  margin: 0;
+  max-width: 560px;
+}
+
+.stats {
+  display: flex;
+  gap: $spacing-lg;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.stat-value {
+  font-family: $font-family-display;
+  font-size: $font-size-2xl;
+  @include text-gradient-emerald;
+}
+
+.stat-label {
+  color: $white-dim;
+  font-size: $font-size-xs;
+}
+
+.league-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  margin-top: $spacing-lg;
+}
+
+.league-tab {
+  @include button-outline;
+  padding: 0.35rem 1rem;
+  font-size: $font-size-sm;
+  border-radius: $radius-full;
+
+  &.active {
+    border-color: $emerald;
+    color: $emerald;
+    background: rgba($emerald, 0.1);
+  }
+}
+
+.state-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-md;
+  padding: $spacing-2xl;
+  color: $white-dim;
+  text-align: center;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    opacity: 0.5;
+  }
+
+  &.error {
+    color: $error;
+  }
+}
+
+.games-grid {
+  @include responsive-grid(3, 2, 1);
+}

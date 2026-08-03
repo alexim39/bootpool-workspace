@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -46,11 +46,14 @@ import { HomeStore } from '../../stores/home.store';
 })
 export class HomeDesktopComponent implements OnInit {
   private _snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
   readonly store = inject(HomeStore);
   readonly showOraChat = signal(false);
 
   ngOnInit() {
     this.store.init();
+    const podId = this.route.snapshot.queryParamMap.get('pod');
+    if (podId) this.store.openPodById(podId);
   }
 
   openOraChat() { this.showOraChat.set(true); }

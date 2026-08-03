@@ -1,0 +1,62 @@
+<div class="mobile-root">
+  <header class="mobile-header">
+    <button mat-icon-button routerLink="/home"><mat-icon>arrow_back</mat-icon></button>
+    <h1>Games Today</h1>
+    <button mat-icon-button class="info-btn" (click)="showGuide.set(!showGuide())" matTooltip="How it works" [attr.aria-label]="'How it works'">
+      <mat-icon>info_outline</mat-icon>
+    </button>
+    <button mat-icon-button (click)="auth.logout()"><mat-icon>logout</mat-icon></button>
+  </header>
+
+  @if (showGuide()) {
+    <div class="guide-bar">
+      <div class="guide-step"><span class="step-num">1</span> Ora analyzes every match using team form, head-to-head and live market odds</div>
+      <div class="guide-step"><span class="step-num">2</span> Each card shows Ora's pick, its odds and a confidence score for that game</div>
+      <div class="guide-step"><span class="step-num">3</span> Confidence reflects how likely the recommended outcome is to land</div>
+      <div class="guide-step"><span class="step-num">4</span> Tap "Stake This Pick" to back it in the pool — picks without a live pool open at kickoff</div>
+    </div>
+  }
+
+  <div class="mobile-content">
+    <p class="page-subtitle">Ora's picks for today's matches — analyzed with confidence.</p>
+
+    @if (store.leagues().length > 1) {
+      <div class="league-tabs">
+        @for (league of store.leagues(); track league) {
+          <button
+            class="league-tab"
+            [class.active]="(store.selectedLeague() ?? 'All') === league"
+            (click)="selectLeague(league)">
+            {{ league }}
+          </button>
+        }
+      </div>
+    }
+
+    @if (store.loading()) {
+      <div class="state-box">
+        <mat-spinner diameter="36" />
+        <p>Ora is analyzing today's games…</p>
+      </div>
+    } @else if (store.error()) {
+      <div class="state-box error">
+        <mat-icon>error_outline</mat-icon>
+        <p>{{ store.error() }}</p>
+        <button class="retry-btn" (click)="store.refresh()">Retry</button>
+      </div>
+    } @else if (store.filteredGames().length === 0) {
+      <div class="state-box">
+        <mat-icon>sports_soccer</mat-icon>
+        <p>No games analyzed for today yet. Check back soon — Ora updates the board after each sync.</p>
+      </div>
+    } @else {
+      <div class="games-list">
+        @for (game of store.filteredGames(); track game.fixtureId) {
+          <app-game-card [game]="game" (stakeRequested)="onStake($event)" />
+        }
+      </div>
+    }
+  </div>
+
+  <app-mobile-nav />
+</div>

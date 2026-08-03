@@ -1,0 +1,59 @@
+<app-nav />
+
+<div class="games-page">
+  <header class="games-header">
+    <div class="header-top">
+      <div>
+        <h1 class="page-title">Games Today</h1>
+        <p class="page-subtitle">Every match analyzed by Ora AI — with her pick, confidence and reasoning.</p>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-value">{{ store.analyzedCount() }}</span>
+          <span class="stat-label">Games analyzed</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">{{ store.stakableGames().length }}</span>
+          <span class="stat-label">Stakable now</span>
+        </div>
+      </div>
+    </div>
+
+    @if (store.leagues().length > 1) {
+      <div class="league-tabs">
+        @for (league of store.leagues(); track league) {
+          <button
+            class="league-tab"
+            [class.active]="(store.selectedLeague() ?? 'All') === league"
+            (click)="selectLeague(league)">
+            {{ league }}
+          </button>
+        }
+      </div>
+    }
+  </header>
+
+  @if (store.loading()) {
+    <div class="state-box">
+      <mat-spinner diameter="40" />
+      <p>Ora is analyzing today's games…</p>
+    </div>
+  } @else if (store.error()) {
+    <div class="state-box error">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ store.error() }}</p>
+      <button mat-raised-button color="primary" (click)="store.refresh()">Retry</button>
+    </div>
+  } @else if (store.filteredGames().length === 0) {
+    <div class="state-box">
+      <mat-icon>sports_soccer</mat-icon>
+      <p>No games analyzed for today yet. Check back soon — Ora updates the board after each sync.</p>
+    </div>
+  } @else {
+    <div class="games-grid">
+      @for (game of store.filteredGames(); track game.fixtureId) {
+        <app-game-card [game]="game" (stakeRequested)="onStake($event)" />
+      }
+    </div>
+  }
+</div>

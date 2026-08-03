@@ -52,6 +52,13 @@
               <span class="link-indicator"></span>
             }
           </a>
+          <a routerLink="/games" routerLinkActive="active" class="nav-link" #rlagames="routerLinkActive">
+            <mat-icon>sports_soccer</mat-icon>
+            <span>Games</span>
+            @if (rlagames.isActive) {
+              <span class="link-indicator"></span>
+            }
+          </a>
           <a routerLink="/profile" routerLinkActive="active" class="nav-link" #rla4="routerLinkActive">
             <mat-icon>person</mat-icon>
             <span>Profile</span>

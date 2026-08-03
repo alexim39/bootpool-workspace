@@ -3,6 +3,17 @@
 
   <app-featured-banner />
 
+  <a class="games-teaser" routerLink="/games">
+    <div class="games-teaser-left">
+      <span class="games-teaser-icon"><mat-icon>sports_soccer</mat-icon></span>
+      <div class="games-teaser-text">
+        <span class="games-teaser-badge"><mat-icon>auto_awesome</mat-icon> Ora's Games Today</span>
+        <span class="games-teaser-title">Every match analyzed — see Ora's pick for each game</span>
+      </div>
+    </div>
+    <span class="games-teaser-cta">View Board <mat-icon>chevron_right</mat-icon></span>
+  </a>
+
   <div class="search-bar">
     <mat-icon class="search-bar-icon">search</mat-icon>
     <input class="search-bar-input" [value]="store.searchQuery()" (input)="store.onSearchInput($any($event.target).value)" placeholder="Search teams, leagues, sports..." />

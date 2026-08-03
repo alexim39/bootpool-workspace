@@ -1,7 +1,7 @@
 <div class="mobile-container">
   <header class="mobile-header">
     <h1 class="app-title">
-      <img src="img/logo/logo.png" alt="BetPool Logo" class="logo-image" width="42" height="42">
+      <img src="img/logo/logo.png" alt="BetPool Logo" class="logo-image">
       <span class="brand-bet">Bet</span>
       <span class="brand-pool">Pool</span>
     </h1>
@@ -14,13 +14,27 @@
         <mat-icon>add</mat-icon>
         <span>Top Up</span>
       </button>
-      <button mat-icon-button (click)="store.auth.logout()" class="logout-btn">
+      <button mat-icon-button class="icon-btn alert-btn" (click)="toggleNotifPanel()" aria-label="Notifications">
+        <mat-icon [matBadge]="notifService.unreadCount() > 0 ? notifService.unreadCount() : null" matBadgeSize="small">notifications</mat-icon>
+      </button>
+      <button mat-icon-button class="icon-btn logout-btn" (click)="store.auth.logout()" aria-label="Logout">
         <mat-icon>logout</mat-icon>
       </button>
     </div>
   </header>
 
   <app-featured-banner />
+
+  <a class="games-teaser" routerLink="/games">
+    <div class="games-teaser-left">
+      <span class="games-teaser-icon"><mat-icon>sports_soccer</mat-icon></span>
+      <div class="games-teaser-text">
+        <span class="games-teaser-badge"><mat-icon>auto_awesome</mat-icon> Ora's Games Today</span>
+        <span class="games-teaser-title">Every match analyzed — see Ora's pick</span>
+      </div>
+    </div>
+    <span class="games-teaser-cta">View <mat-icon>chevron_right</mat-icon></span>
+  </a>
 
   <div class="search-bar">
     <mat-icon class="search-bar-icon">search</mat-icon>
@@ -147,6 +161,52 @@
   }
 
   <app-top-up-modal [visible]="showTopUp()" [disableClose]="true" (close)="showTopUp.set(false)" />
+
+  @if (showNotifPanel()) {
+    <div class="mobile-notif-backdrop" (click)="closeNotifPanel()">
+      <div class="mobile-notif-sheet" (click)="stopProp($event)">
+        <div class="panel-header">
+          <span class="panel-title">Notifications</span>
+          <div class="panel-header-actions">
+            @if (notifService.unreadCount() > 0) {
+              <button class="mark-all-btn" (click)="markAllNotifRead()">Mark all read</button>
+            }
+            <button class="close-btn" (click)="closeNotifPanel()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="panel-body">
+          @if (notifService.notifications().length === 0) {
+            <div class="empty-state">
+              <mat-icon>notifications_none</mat-icon>
+              <span>No notifications yet</span>
+            </div>
+          }
+          @for (notif of notifService.notifications(); track notif._id) {
+            <div class="notif-item" [class.unread]="!notif.read" (click)="markNotifRead(notif._id)">
+              <div class="notif-icon" [style.--notif-color]="notifService.getNotificationColor(notif.type)">
+                <mat-icon>{{ notifService.getNotificationIcon(notif.type) }}</mat-icon>
+              </div>
+              <div class="notif-content">
+                <div class="notif-title">{{ notif.title }}</div>
+                <div class="notif-message">{{ notif.message }}</div>
+                <div class="notif-time">{{ notifService.timeAgo(notif.createdAt) }}</div>
+              </div>
+              @if (!notif.read) {
+                <span class="unread-dot"></span>
+              }
+            </div>
+          }
+        </div>
+        @if (notifService.notifications().length > 0) {
+          <div class="panel-footer">
+            <a routerLink="/notifications" class="view-all-link" (click)="closeNotifPanel()">View all notifications</a>
+          </div>
+        }
+      </div>
+    </div>
+  }
 
   <app-bet-slip
     [selections]="store.betSlipSelections()"

@@ -1,0 +1,49 @@
+<mat-card class="game-card" [class.stakable]="game().stakable">
+  <mat-card-content>
+    <div class="game-top">
+      <span class="league-chip">{{ game().league || 'Football' }}</span>
+      <span class="kickoff">{{ kickoff() }}</span>
+    </div>
+
+    <div class="teams">
+      <div class="team">
+        <span class="team-name">{{ game().homeTeam }}</span>
+      </div>
+      <span class="vs">vs</span>
+      <div class="team">
+        <span class="team-name">{{ game().awayTeam }}</span>
+      </div>
+    </div>
+
+    <div class="ora-pick">
+      <div class="ora-badge">
+        <mat-icon>auto_awesome</mat-icon>
+        <span>Ora's Pick</span>
+      </div>
+      <span class="pick">{{ game().pick }}</span>
+      <span class="pick-odds">{{ game().gainsMultiplier.toFixed(2) }}x</span>
+    </div>
+
+    <div class="confidence-row">
+      <div class="confidence-bar">
+        <div class="confidence-fill" [style.width.%]="game().confidence"></div>
+      </div>
+      <span class="confidence-label">{{ confidenceLabel() }} confidence</span>
+    </div>
+
+    @if (game().reasoning) {
+      <div class="reasoning">
+        <mat-icon [matTooltip]="game().reasoning" matTooltipPosition="above">info_outline</mat-icon>
+        <span class="reasoning-text">{{ game().reasoning }}</span>
+      </div>
+    }
+
+    <div class="game-actions">
+      @if (game().stakable) {
+        <button class="stake-btn" (click)="onStake()">Stake This Pick</button>
+      } @else {
+        <span class="soon-label">Available soon</span>
+      }
+    </div>
+  </mat-card-content>
+</mat-card>
