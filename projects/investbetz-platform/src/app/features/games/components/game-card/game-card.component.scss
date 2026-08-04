@@ -19,6 +19,25 @@
   box-shadow: $shadow-lg, 0 0 30px rgba($emerald, 0.08);
 }
 
+.game-card.is-live {
+  border-color: rgba($emerald, 0.45);
+  animation: live-card-breath 2.4s ease-in-out infinite;
+}
+
+@keyframes live-card-breath {
+  0%, 100% {
+    box-shadow: $shadow-lg, 0 0 18px rgba($emerald, 0.14);
+  }
+  50% {
+    box-shadow: $shadow-lg, 0 0 30px rgba($emerald, 0.3);
+  }
+}
+
+.game-card.is-finished {
+  opacity: 0.94;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
 mat-card-content {
   padding: 1.25rem;
   display: flex;
@@ -37,66 +56,106 @@ mat-card-content {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .status-pill {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 0.15rem 0.5rem;
-  background: rgba($emerald, 0.1);
-  border: 1px solid rgba($emerald, 0.3);
+  gap: 5px;
+  padding: 0.2rem 0.6rem;
   border-radius: $radius-full;
-  color: $emerald;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 800;
   white-space: nowrap;
 
+  .pill-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+  }
+
+  .pill-label {
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .pill-detail {
+    font-weight: 600;
+    line-height: 1;
+  }
+
   .dot {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: $emerald;
+    background: currentColor;
   }
 
   &.live {
-    color: $emerald;
-    background: rgba($emerald, 0.1);
-    border-color: rgba($emerald, 0.3);
+    color: #02240E;
+    background: linear-gradient(135deg, $emerald, $emerald-dark);
+    border: 1px solid rgba($emerald-light, 0.7);
+    box-shadow: 0 0 14px rgba($emerald, 0.35);
 
     .dot {
-      animation: card-pulse 1.4s ease-in-out infinite;
+      background: #02240E;
+      animation: card-dot-blink 1.1s ease-in-out infinite;
+    }
+
+    .pill-detail {
+      color: rgba(#02240E, 0.85);
     }
   }
 
   &.finished {
-    color: $white;
+    color: $white-muted;
     background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+
+    .pill-icon {
+      color: $white-dim;
+    }
   }
 
   &.void {
     color: $gold-light;
     background: rgba($gold, 0.1);
-    border-color: rgba($gold, 0.3);
+    border: 1px solid rgba($gold, 0.3);
+
+    .pill-icon {
+      color: $gold-light;
+    }
   }
 
   &.upcoming {
     color: $white-dim;
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: rgba($info, 0.1);
+    border: 1px solid rgba($info, 0.25);
+
+    .pill-icon {
+      color: $info;
+    }
   }
 
   &.pool {
     color: $emerald;
     background: rgba($emerald, 0.1);
-    border-color: rgba($emerald, 0.3);
+    border: 1px solid rgba($emerald, 0.3);
+
+    .pill-icon {
+      font-size: 12px;
+      width: 12px;
+      height: 12px;
+    }
   }
 }
 
-@keyframes card-pulse {
+@keyframes card-dot-blink {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  50% { opacity: 0.2; }
 }
 
 .market-badge {
@@ -183,6 +242,63 @@ mat-card-content {
     font-size: $font-size-xl;
     font-weight: 700;
     white-space: nowrap;
+  }
+
+  &.live-score .final-score {
+    color: $emerald-light;
+    text-shadow: 0 0 12px rgba($emerald, 0.55);
+    animation: live-score-pulse 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes live-score-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.72; }
+}
+
+.countdown-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  background: rgba($info, 0.08);
+  border: 1px dashed rgba($info, 0.3);
+  border-radius: $radius-md;
+
+  mat-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    color: $info;
+  }
+
+  .countdown-text {
+    color: $info;
+    font-size: $font-size-xs;
+    font-weight: 700;
+  }
+}
+
+.live-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.6rem;
+  background: rgba($emerald, 0.08);
+  border-radius: $radius-md;
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: $emerald;
+    animation: card-dot-blink 1.1s ease-in-out infinite;
+  }
+
+  .live-banner-text {
+    color: $emerald;
+    font-size: $font-size-xs;
+    font-weight: 600;
   }
 }
 

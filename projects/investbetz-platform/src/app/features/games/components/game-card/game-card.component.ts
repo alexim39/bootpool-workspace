@@ -1,10 +1,11 @@
-import { Component, input, output, computed } from '@angular/core';
+import { Component, input, output, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TodayGame } from '../../../../core/services';
+import { GamesStore } from '../../stores/games.store';
 import {
   hasScore,
   scoreText,
@@ -16,6 +17,9 @@ import {
   isLiveMatch,
   isFinishedMatch,
   isVoidMatch,
+  isUpcomingMatch,
+  livePeriodLabel,
+  kickoffCountdown,
 } from '../../game-status.util';
 
 @Component({
@@ -28,6 +32,8 @@ import {
 export class GameCardComponent {
   game = input.required<TodayGame>();
   stakeRequested = output<TodayGame>();
+
+  private readonly store = inject(GamesStore);
 
   confidenceLabel = (): string => `${this.game().confidence}%`;
   confidenceClass = (): string => {
@@ -45,7 +51,13 @@ export class GameCardComponent {
   readonly scoreText = computed(() => scoreText(this.game()));
   readonly statusLabel = computed(() => matchStatusLabel(this.game().matchStatus));
   readonly statusClass = computed(() => matchStatusClass(this.game().matchStatus));
-  readonly showKickoff = computed(() => !isLiveMatch(this.game().matchStatus) && !isFinishedMatch(this.game().matchStatus) && !isVoidMatch(this.game().matchStatus));
+  readonly isLive = computed(() => isLiveMatch(this.game().matchStatus));
+  readonly isFinished = computed(() => isFinishedMatch(this.game().matchStatus));
+  readonly isVoid = computed(() => isVoidMatch(this.game().matchStatus));
+  readonly isUpcoming = computed(() => isUpcomingMatch(this.game().matchStatus));
+  readonly liveDetail = computed(() => livePeriodLabel(this.game().matchStatus));
+  readonly countdown = computed(() => kickoffCountdown(this.game().matchDate, this.store.now()));
+  readonly showKickoff = computed(() => isUpcomingMatch(this.game().matchStatus));
   readonly resultLabel = computed(() => resultLabel(this.game().result));
   readonly pickOutcome = computed(() => pickOutcome(this.game()));
   readonly teamWon = (side: 'home' | 'away') => teamWon(this.game(), side);

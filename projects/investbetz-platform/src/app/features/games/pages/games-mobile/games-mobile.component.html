@@ -20,6 +20,13 @@
   <div class="mobile-content">
     <p class="page-subtitle">Ora's picks for today's matches — analyzed with confidence.</p>
 
+    @if (store.liveCount() > 0) {
+      <div class="live-now">
+        <span class="live-dot"></span>
+        <span>{{ store.liveCount() }} match{{ store.liveCount() === 1 ? '' : 'es' }} in play now</span>
+      </div>
+    }
+
     <div class="search-box">
       <mat-icon>search</mat-icon>
       <input

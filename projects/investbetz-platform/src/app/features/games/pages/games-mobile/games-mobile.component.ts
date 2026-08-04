@@ -38,7 +38,7 @@ export class GamesMobileComponent implements OnInit {
   ];
 
   readonly statusOptions = [
-    { value: 'upcoming' as const, label: 'Upcoming' },
+    { value: 'upcoming' as const, label: 'Today' },
     { value: 'live' as const, label: 'Live' },
     { value: 'finished' as const, label: 'Finished' },
     { value: 'all' as const, label: 'All' },

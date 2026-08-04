@@ -11,10 +11,14 @@ import { TodayGame } from '../../../../core/services';
 import {
   isLiveMatch,
   isFinishedMatch,
+  isVoidMatch,
+  isUpcomingMatch,
   hasScore,
   scoreText,
   matchStatusLabel,
   matchStatusClass,
+  livePeriodLabel,
+  kickoffCountdown,
   resultLabel,
   teamWon,
   pickOutcome,
@@ -41,10 +45,14 @@ export class GamesDesktopComponent implements OnInit {
   readonly Number = Number;
   readonly isLiveMatch = isLiveMatch;
   readonly isFinishedMatch = isFinishedMatch;
+  readonly isVoidMatch = isVoidMatch;
+  readonly isUpcomingMatch = isUpcomingMatch;
   readonly hasScore = hasScore;
   readonly scoreText = scoreText;
   readonly matchStatusLabel = matchStatusLabel;
   readonly matchStatusClass = matchStatusClass;
+  readonly livePeriodLabel = livePeriodLabel;
+  readonly kickoffCountdown = kickoffCountdown;
   readonly resultLabel = resultLabel;
   readonly teamWon = teamWon;
   readonly pickOutcome = pickOutcome;

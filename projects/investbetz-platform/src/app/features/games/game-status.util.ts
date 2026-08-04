@@ -52,6 +52,46 @@ export function resultLabel(result?: string | null): string {
   return '';
 }
 
+export function isUpcomingMatch(status?: string): boolean {
+  if (isLiveMatch(status) || isFinishedMatch(status) || isVoidMatch(status)) return false;
+  return true;
+}
+
+export function livePeriodLabel(status?: string): string {
+  const s = (status || '').toLowerCase().replace(/[\s_-]+/g, '');
+  switch (s) {
+    case '1sthalf':
+    case 'firsthalf':
+      return '1st half';
+    case '2ndhalf':
+    case 'secondhalf':
+      return '2nd half';
+    case 'halftime':
+    case 'break':
+      return 'Halftime';
+    case 'extratime':
+      return 'Extra time';
+    case 'penalties':
+    case 'shootout':
+      return 'Penalties';
+    default:
+      return 'In play';
+  }
+}
+
+export function kickoffCountdown(matchDate: string, now = Date.now()): string {
+  const start = new Date(matchDate).getTime();
+  if (!Number.isFinite(start)) return '';
+  const diff = start - now;
+  if (diff <= 0) return 'Starts now';
+  if (diff < 60_000) return 'Starts in <1m';
+  if (diff < 3_600_000) return `Starts in ${Math.max(1, Math.round(diff / 60_000))}m`;
+  const h = Math.floor(diff / 3_600_000);
+  const m = Math.round((diff % 3_600_000) / 60_000);
+  if (m > 0) return `Starts in ${h}h ${m}m`;
+  return `Starts in ${h}h`;
+}
+
 export function teamWon(g: ScoreGameLike, side: 'home' | 'away'): boolean {
   if (g.result !== 'home_win' && g.result !== 'away_win') return false;
   return (side === 'home' && g.result === 'home_win') || (side === 'away' && g.result === 'away_win');

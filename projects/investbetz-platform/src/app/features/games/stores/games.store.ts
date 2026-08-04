@@ -2,6 +2,7 @@ import { Injectable, signal, computed, inject, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { GamesService, TodayGame } from '../../../core/services';
+import { isLiveMatch } from '../game-status.util';
 
 export interface GamesFilters {
   search: string;
@@ -61,6 +62,14 @@ export class GamesStore implements OnDestroy {
   );
 
   readonly showSkeletons = computed(() => this.loading() && this.games().length === 0);
+
+  readonly now = signal(Date.now());
+  readonly liveCount = computed(() => this.games().filter(g => isLiveMatch(g.matchStatus)).length);
+
+  private readonly nowTimer: ReturnType<typeof setInterval> | undefined = setInterval(
+    () => this.now.set(Date.now()),
+    30_000
+  );
 
   readonly rangeLabel = computed(() => {
     const total = this.total();
@@ -217,6 +226,7 @@ export class GamesStore implements OnDestroy {
   readonly selectedLeague = computed(() => this.league());
 
   ngOnDestroy() {
+    if (this.nowTimer) clearInterval(this.nowTimer);
     this.search$.complete();
   }
 }
