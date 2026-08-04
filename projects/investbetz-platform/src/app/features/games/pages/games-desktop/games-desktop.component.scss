@@ -428,6 +428,32 @@
     &.is-finished:hover td:first-child {
       background: #12203A;
     }
+
+    &.pick-won td {
+      background: rgba($emerald, 0.02);
+    }
+
+    &.pick-won td:first-child {
+      background: #0E1E31;
+      box-shadow: inset 3px 0 0 $emerald;
+    }
+
+    &.pick-won:hover td:first-child {
+      background: #0F2133;
+    }
+
+    &.pick-lost td {
+      background: rgba($error, 0.025);
+    }
+
+    &.pick-lost td:first-child {
+      background: #221521;
+      box-shadow: inset 3px 0 0 $error;
+    }
+
+    &.pick-lost:hover td:first-child {
+      background: #251724;
+    }
   }
 
   tbody td {
@@ -504,9 +530,11 @@
   .pick-result {
     display: inline-flex;
     align-items: center;
-    gap: 3px;
+    gap: 4px;
+    padding: 2px 9px;
+    border-radius: $radius-full;
     font-size: $font-size-xs;
-    font-weight: 600;
+    font-weight: 700;
 
     mat-icon {
       font-size: 14px;
@@ -514,8 +542,17 @@
       height: 14px;
     }
 
-    &.won { color: $emerald; }
-    &.lost { color: $error; }
+    &.won {
+      color: $emerald;
+      background: rgba($emerald, 0.12);
+      border: 1px solid rgba($emerald, 0.4);
+    }
+
+    &.lost {
+      color: #FF8A80;
+      background: rgba($error, 0.12);
+      border: 1px solid rgba($error, 0.4);
+    }
   }
 }
 
@@ -568,7 +605,8 @@
 .pick-cell {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
+  min-width: 0;
 
   .market-badge {
     align-self: flex-start;
@@ -587,6 +625,41 @@
     color: $white;
     font-size: $font-size-sm;
     font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .verdict-chip {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 9px;
+    border-radius: $radius-full;
+    font-size: $font-size-xs;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    mat-icon {
+      font-size: 13px;
+      width: 13px;
+      height: 13px;
+    }
+
+    &.won {
+      color: $emerald;
+      background: rgba($emerald, 0.12);
+      border: 1px solid rgba($emerald, 0.4);
+    }
+
+    &.lost {
+      color: #FF8A80;
+      background: rgba($error, 0.12);
+      border: 1px solid rgba($error, 0.4);
+    }
   }
 }
 

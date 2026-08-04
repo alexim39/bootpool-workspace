@@ -1,4 +1,4 @@
-<mat-card class="game-card" [class.stakable]="game().stakable" [class.is-live]="isLive()" [class.is-finished]="isFinished()">
+<mat-card class="game-card" [class.stakable]="game().stakable" [class.is-live]="isLive()" [class.is-finished]="isFinished()" [class.pick-won]="pickOutcome() === 'won'" [class.pick-lost]="pickOutcome() === 'lost'">
   <mat-card-content>
     <div class="game-top">
       <span class="league-chip">{{ game().league || 'Football' }}</span>
@@ -6,22 +6,29 @@
         @if (game().stakable) {
           <span class="status-pill pool"><mat-icon class="pill-icon">bolt</mat-icon>Pool open</span>
         }
-        <span class="status-pill" [class]="statusClass()">
-          @if (isLive()) {
-            <span class="dot"></span>
-            <span class="pill-label">{{ statusLabel() }}</span>
-            <span class="pill-detail">{{ liveDetail() }}</span>
-          } @else if (isFinished()) {
-            <mat-icon class="pill-icon">check_circle</mat-icon>
-            <span class="pill-label">{{ statusLabel() }}</span>
-          } @else if (isVoid()) {
-            <mat-icon class="pill-icon">event_busy</mat-icon>
-            <span class="pill-label">{{ statusLabel() }}</span>
-          } @else {
-            <mat-icon class="pill-icon">schedule</mat-icon>
-            <span class="pill-label">{{ statusLabel() }}</span>
-          }
-        </span>
+        @if (isFinished() && pickOutcome() !== 'skip') {
+          <span class="status-pill verdict" [class.won]="pickOutcome() === 'won'" [class.lost]="pickOutcome() === 'lost'">
+            <mat-icon class="pill-icon">{{ pickOutcome() === 'won' ? 'check_circle' : 'cancel' }}</mat-icon>
+            <span class="pill-label">{{ pickOutcome() === 'won' ? 'Won' : 'Lost' }}</span>
+          </span>
+        } @else {
+          <span class="status-pill" [class]="statusClass()">
+            @if (isLive()) {
+              <span class="dot"></span>
+              <span class="pill-label">{{ statusLabel() }}</span>
+              <span class="pill-detail">{{ liveDetail() }}</span>
+            } @else if (isFinished()) {
+              <mat-icon class="pill-icon">check_circle</mat-icon>
+              <span class="pill-label">{{ statusLabel() }}</span>
+            } @else if (isVoid()) {
+              <mat-icon class="pill-icon">event_busy</mat-icon>
+              <span class="pill-label">{{ statusLabel() }}</span>
+            } @else {
+              <mat-icon class="pill-icon">schedule</mat-icon>
+              <span class="pill-label">{{ statusLabel() }}</span>
+            }
+          </span>
+        }
         @if (showKickoff()) {
           <span class="kickoff">{{ kickoff() }}</span>
         }
@@ -85,15 +92,17 @@
       </div>
     }
 
-    @if (resultLabel()) {
-      <div class="result-line">
-        <span class="result-text">{{ resultLabel() }}</span>
-        @if (pickOutcome() !== 'skip') {
-          <span class="pick-result" [class.won]="pickOutcome() === 'won'" [class.lost]="pickOutcome() === 'lost'">
-            <mat-icon>{{ pickOutcome() === 'won' ? 'check_circle' : 'cancel' }}</mat-icon>
-            {{ pickOutcome() === 'won' ? "Ora's pick won" : "Ora's pick lost" }}
-          </span>
-        }
+    @if (isFinished()) {
+      <div class="verdict-strip" [class.won]="pickOutcome() === 'won'" [class.lost]="pickOutcome() === 'lost'" [class.neutral]="pickOutcome() === 'skip'">
+        <div class="verdict-main">
+          <mat-icon class="verdict-icon">{{ pickOutcome() === 'won' ? 'check_circle' : pickOutcome() === 'lost' ? 'cancel' : 'sports_score' }}</mat-icon>
+          <div class="verdict-text">
+            <span class="verdict-title">{{ pickOutcome() === 'won' ? "Ora's pick won" : pickOutcome() === 'lost' ? "Ora's pick lost" : 'Match result' }}</span>
+            @if (resultLabel()) {
+              <span class="verdict-sub">{{ resultLabel() }}</span>
+            }
+          </div>
+        </div>
       </div>
     }
 

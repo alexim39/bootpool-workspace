@@ -99,10 +99,50 @@ export function teamWon(g: ScoreGameLike, side: 'home' | 'away'): boolean {
 
 export type PickOutcome = 'won' | 'lost' | 'skip';
 
-export function pickOutcome(g: { pick?: string; result?: string | null; matchStatus?: string }): PickOutcome {
+export function pickOutcome(g: {
+  pick?: string;
+  result?: string | null;
+  matchStatus?: string;
+  homeScore?: number | null;
+  awayScore?: number | null;
+}): PickOutcome {
   if (!isFinishedMatch(g.matchStatus) || !g.result) return 'skip';
   const p = (g.pick || '').toLowerCase();
-  if (/over\s?\d/.test(p) || /under\s?\d/.test(p) || /btts|both team|double chance|draw no bet/.test(p)) return 'skip';
+
+  const over = /over\s*(\d+(?:\.\d+)?)/.exec(p);
+  const under = !over ? /under\s*(\d+(?:\.\d+)?)/.exec(p) : null;
+  if (over || under) {
+    if (g.homeScore == null || g.awayScore == null) return 'skip';
+    const line = parseFloat((over || under)![1]);
+    const total = Number(g.homeScore) + Number(g.awayScore);
+    if (over) return total > line ? 'won' : total < line ? 'lost' : 'skip';
+    return total < line ? 'won' : total > line ? 'lost' : 'skip';
+  }
+
+  if (/btts|both team/.test(p)) {
+    if (g.homeScore == null || g.awayScore == null) return 'skip';
+    return Number(g.homeScore) > 0 && Number(g.awayScore) > 0 ? 'won' : 'lost';
+  }
+
+  if (/double chance|draw no bet|\b1x\b|\bx2\b|\bor draw\b|\bor away\b|\bor home\b/.test(p)) {
+    const homeCovered = /home|\b1\b|\b1x\b/.test(p);
+    const awayCovered = /away|\b2\b|\bx2\b/.test(p);
+    const drawCovered = /draw/.test(p);
+    if (/draw no bet/.test(p)) {
+      const homeSide = homeCovered && !awayCovered;
+      const awaySide = awayCovered && !homeCovered;
+      if (!homeSide && !awaySide) return 'skip';
+      if (g.result === 'draw') return 'skip';
+      if (homeSide) return g.result === 'home_win' ? 'won' : 'lost';
+      return g.result === 'away_win' ? 'won' : 'lost';
+    }
+    const won =
+      (homeCovered && g.result === 'home_win') ||
+      (awayCovered && g.result === 'away_win') ||
+      (drawCovered && g.result === 'draw');
+    return won ? 'won' : 'lost';
+  }
+
   if (p.includes('home')) return g.result === 'home_win' ? 'won' : 'lost';
   if (p.includes('away')) return g.result === 'away_win' ? 'won' : 'lost';
   if (p.includes('draw')) return g.result === 'draw' ? 'won' : 'lost';

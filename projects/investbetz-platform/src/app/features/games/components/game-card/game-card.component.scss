@@ -38,6 +38,16 @@
   border-color: rgba(255, 255, 255, 0.1);
 }
 
+.game-card.pick-won {
+  opacity: 1;
+  border-color: rgba($emerald, 0.45);
+  box-shadow: $shadow-lg, 0 0 24px rgba($emerald, 0.14);
+}
+
+.game-card.pick-lost {
+  border-color: rgba($error, 0.35);
+}
+
 mat-card-content {
   padding: 1.25rem;
   display: flex;
@@ -138,6 +148,20 @@ mat-card-content {
     .pill-icon {
       color: $info;
     }
+  }
+
+  &.verdict.won {
+    color: #02240E;
+    background: linear-gradient(135deg, $emerald, $emerald-dark);
+    border: 1px solid rgba($emerald-light, 0.7);
+    box-shadow: 0 0 14px rgba($emerald, 0.35);
+  }
+
+  &.verdict.lost {
+    color: #FFFFFF;
+    background: linear-gradient(135deg, #FF5252, #D32F2F);
+    border: 1px solid rgba(255, 138, 128, 0.7);
+    box-shadow: 0 0 14px rgba(255, 82, 82, 0.35);
   }
 
   &.pool {
@@ -302,40 +326,74 @@ mat-card-content {
   }
 }
 
-.result-line {
+.verdict-strip {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  padding: 0.45rem 0.7rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.6rem 0.8rem;
   border-radius: $radius-md;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
 
-  .result-text {
-    color: $white;
-    font-size: $font-size-xs;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+  &.won {
+    background: rgba($emerald, 0.1);
+    border-color: rgba($emerald, 0.35);
   }
 
-  .pick-result {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    font-size: $font-size-xs;
-    font-weight: 600;
-
-    mat-icon {
-      font-size: 14px;
-      width: 14px;
-      height: 14px;
-    }
-
-    &.won { color: $emerald; }
-    &.lost { color: $error; }
+  &.lost {
+    background: rgba($error, 0.1);
+    border-color: rgba($error, 0.35);
   }
+
+  &.neutral {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.verdict-main {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.verdict-icon {
+  width: 34px;
+  height: 34px;
+  font-size: 34px;
+  line-height: 34px;
+  flex-shrink: 0;
+}
+
+.verdict-strip.won .verdict-icon { color: $emerald; }
+.verdict-strip.lost .verdict-icon { color: #FF8A80; }
+.verdict-strip.neutral .verdict-icon { color: $white-dim; }
+
+.verdict-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.verdict-title {
+  color: $white;
+  font-size: $font-size-sm;
+  font-weight: 700;
+}
+
+.verdict-strip.won .verdict-title { color: $emerald-light; }
+.verdict-strip.lost .verdict-title { color: #FF8A80; }
+
+.verdict-sub {
+  color: $white-muted;
+  font-size: $font-size-xs;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ora-pick {

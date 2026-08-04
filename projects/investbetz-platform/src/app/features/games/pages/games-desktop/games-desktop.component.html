@@ -174,7 +174,7 @@
         </thead>
         <tbody>
           @for (game of store.games(); track game.fixtureId) {
-            <tr class="game-row" [class.is-live]="isLiveMatch(game.matchStatus)" [class.is-finished]="isFinishedMatch(game.matchStatus)">
+            <tr class="game-row" [class.is-live]="isLiveMatch(game.matchStatus)" [class.is-finished]="isFinishedMatch(game.matchStatus)" [class.pick-won]="pickOutcome(game) === 'won'" [class.pick-lost]="pickOutcome(game) === 'lost'">
               <td>
                 @if (hasScore(game)) {
                   <div class="teams-cell scoreline">
@@ -212,6 +212,12 @@
                 <div class="pick-cell">
                   <span class="market-badge">{{ game.marketType || '1X2' }}</span>
                   <span class="pick-text" [attr.title]="game.pick">{{ game.pick }}</span>
+                  @if (isFinishedMatch(game.matchStatus) && pickOutcome(game) !== 'skip') {
+                    <span class="verdict-chip" [class.won]="pickOutcome(game) === 'won'" [class.lost]="pickOutcome(game) === 'lost'">
+                      <mat-icon>{{ pickOutcome(game) === 'won' ? 'check_circle' : 'cancel' }}</mat-icon>
+                      {{ pickOutcome(game) === 'won' ? 'Won' : 'Lost' }}
+                    </span>
+                  }
                 </div>
               </td>
               <td><span class="odds-cell">{{ game.gainsMultiplier.toFixed(2) }}x</span></td>
