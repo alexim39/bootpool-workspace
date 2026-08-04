@@ -102,8 +102,13 @@ describe('game-status.util', () => {
       expect(kickoffCountdown(new Date(now + 45 * 60000).toISOString(), now)).toBe('Starts in 45m');
     });
 
-    it('returns an empty string far in the future', () => {
+    it('returns an empty string far in the future (48h+)', () => {
       expect(kickoffCountdown(new Date(now + 48 * 3600000).toISOString(), now)).toBe('');
+      expect(kickoffCountdown(new Date(now + 49 * 3600000).toISOString(), now)).toBe('');
+    });
+
+    it('still counts down just under the 48h cutoff', () => {
+      expect(kickoffCountdown(new Date(now + 47 * 3600000 + 59 * 60000).toISOString(), now)).toBe('Starts in 47h 59m');
     });
   });
 });

@@ -1,7 +1,7 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { GamesStore } from './games.store';
-import { GamesService, TodayGame } from '../../../core/services';
+import { GamesService, TodayGame, AuthService } from '../../../core/services';
 
 function game(overrides: Partial<TodayGame> = {}): TodayGame {
   return {
@@ -33,6 +33,7 @@ describe('GamesStore', () => {
       games: gamesSignal.asReadonly(),
       loading: signal(false).asReadonly(),
       error: signal<string | null>(null).asReadonly(),
+      personalized: signal(false).asReadonly(),
       total: signal(0).asReadonly(),
       stakableTotal: signal(0).asReadonly(),
       totalPages: signal(0).asReadonly(),
@@ -42,7 +43,10 @@ describe('GamesStore', () => {
     });
 
     TestBed.configureTestingModule({
-      providers: [{ provide: GamesService, useValue: serviceMock }],
+      providers: [
+        { provide: GamesService, useValue: serviceMock },
+        { provide: AuthService, useValue: { isAuthenticated: () => false } },
+      ],
     });
 
     store = TestBed.inject(GamesStore);
@@ -60,7 +64,21 @@ describe('GamesStore', () => {
       dateFrom: null,
       dateTo: null,
       status: 'upcoming',
+    }, false);
+  });
+
+  it('requests personalization when authenticated', () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: GamesService, useValue: serviceMock },
+        { provide: AuthService, useValue: { isAuthenticated: () => true } },
+      ],
     });
+    const authedStore = TestBed.inject(GamesStore);
+    serviceMock.fetchGames.and.callFake(() => gamesSignal.set([game()]));
+    authedStore.init();
+    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ sortField: 'matchDate' }), true);
   });
 
   it('debounces search input by 350ms', fakeAsync(() => {
@@ -73,37 +91,37 @@ describe('GamesStore', () => {
     expect(serviceMock.fetchGames).toHaveBeenCalledTimes(1);
     tick(1);
     expect(serviceMock.fetchGames).toHaveBeenCalledTimes(2);
-    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ search: 'ars', page: 1 }));
+    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ search: 'ars', page: 1 }), false);
   }));
 
   it('league filter resets page and reloads', () => {
     serviceMock.fetchGames.and.callFake(() => gamesSignal.set([game()]));
     store.init();
     store.setLeague('La Liga');
-    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ league: 'La Liga', page: 1 }));
+    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ league: 'La Liga', page: 1 }), false);
   });
 
   it('sort toggles order on same field', () => {
     serviceMock.fetchGames.and.callFake(() => gamesSignal.set([game()]));
     store.init();
     store.setSort('confidence');
-    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ sortField: 'confidence', sortOrder: 'desc' }));
+    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ sortField: 'confidence', sortOrder: 'desc' }), false);
     store.setSort('confidence');
-    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ sortOrder: 'asc' }));
+    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ sortOrder: 'asc' }), false);
   });
 
   it('stakableOnly filter is passed through', () => {
     serviceMock.fetchGames.and.callFake(() => gamesSignal.set([game()]));
     store.init();
     store.setStakableOnly(true);
-    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ stakableOnly: true }));
+    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ stakableOnly: true }), false);
   });
 
   it('match status filter is passed through and finished view sorts newest first', () => {
     serviceMock.fetchGames.and.callFake(() => gamesSignal.set([game()]));
     store.init();
     store.setMatchStatus('finished');
-    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ status: 'finished', sortOrder: 'desc' }));
+    expect(serviceMock.fetchGames).toHaveBeenCalledWith(jasmine.objectContaining({ status: 'finished', sortOrder: 'desc' }), false);
     expect(store.hasActiveFilters()).toBe(true);
     store.setMatchStatus('upcoming');
     expect(store.hasActiveFilters()).toBe(false);

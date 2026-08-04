@@ -21,6 +21,8 @@ export interface TodayGame {
   homeScore?: number | null;
   awayScore?: number | null;
   result?: 'home_win' | 'draw' | 'away_win' | null;
+  whyRecommended?: string;
+  personalizationScore?: number;
 }
 
 export interface TodayGamesResponse {
@@ -28,6 +30,7 @@ export interface TodayGamesResponse {
   data: {
     items: TodayGame[];
     count: number;
+    personalized?: boolean;
   };
 }
 
@@ -56,6 +59,7 @@ export interface GamesListResponse {
     limit: number;
     totalPages: number;
     leagues: string[];
+    personalized?: boolean;
   };
 }
 
@@ -64,6 +68,7 @@ export class GamesService {
   games = signal<TodayGame[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
+  personalized = signal(false);
 
   total = signal(0);
   stakableTotal = signal(0);
@@ -81,16 +86,20 @@ export class GamesService {
 
   constructor(private http: HttpClient) {}
 
-  fetchToday(days = 1) {
+  fetchToday(days = 1, personalized = false) {
     this.loading.set(true);
     this.error.set(null);
-    this.http.get<TodayGamesResponse>(`${environment.apiUrl}/games/today?days=${days}`).subscribe({
+    this.personalized.set(false);
+    let params = new HttpParams().set('days', String(days));
+    if (personalized) params = params.set('personalized', 'true');
+    this.http.get<TodayGamesResponse>(`${environment.apiUrl}/games/today`, { params }).subscribe({
       next: (res) => {
         if (res.success) {
           this.games.set(res.data.items.map(g => ({
             ...g,
             matchDate: new Date(g.matchDate).toISOString(),
           })));
+          this.personalized.set(!!res.data.personalized);
         } else {
           this.error.set('Failed to load games');
         }
@@ -103,9 +112,10 @@ export class GamesService {
     });
   }
 
-  fetchGames(query: GamesQuery = {}) {
+  fetchGames(query: GamesQuery = {}, personalized = false) {
     this.loading.set(true);
     this.error.set(null);
+    this.personalized.set(false);
 
     let params = new HttpParams();
     if (query.page) params = params.set('page', String(query.page));
@@ -120,6 +130,7 @@ export class GamesService {
     if (query.dateFrom) params = params.set('dateFrom', query.dateFrom);
     if (query.dateTo) params = params.set('dateTo', query.dateTo);
     if (query.status) params = params.set('status', query.status);
+    if (personalized) params = params.set('personalized', 'true');
 
     this.http.get<GamesListResponse>(`${environment.apiUrl}/games`, { params }).subscribe({
       next: (res) => {
@@ -129,6 +140,7 @@ export class GamesService {
             ...g,
             matchDate: new Date(g.matchDate).toISOString(),
           })));
+          this.personalized.set(!!data.personalized);
           this.total.set(data.total);
           this.stakableTotal.set(data.stakableTotal);
           this.totalPages.set(data.totalPages);

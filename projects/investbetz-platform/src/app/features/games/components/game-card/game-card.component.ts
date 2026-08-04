@@ -61,6 +61,8 @@ export class GameCardComponent {
   readonly resultLabel = computed(() => resultLabel(this.game().result));
   readonly pickOutcome = computed(() => pickOutcome(this.game()));
   readonly teamWon = (side: 'home' | 'away') => teamWon(this.game(), side);
+  readonly recommended = computed(() => !!this.game().whyRecommended);
+  readonly whyText = computed(() => this.game().whyRecommended || this.game().reasoning || '');
 
   onStake() {
     this.stakeRequested.emit(this.game());

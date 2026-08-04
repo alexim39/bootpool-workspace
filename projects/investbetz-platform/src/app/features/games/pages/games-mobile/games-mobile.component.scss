@@ -95,6 +95,31 @@
 }
 
 /* ---------- Live indicator ---------- */
+.for-you-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  background: linear-gradient(135deg, rgba(0, 230, 118, 0.12), rgba(0, 106, 62, 0.05));
+  border: 1px solid rgba(0, 230, 118, 0.3);
+  border-radius: 12px;
+  color: #00E676;
+  font-size: 12px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  strong {
+    color: #FFFFFF;
+    font-weight: 700;
+  }
+}
+
 .live-now {
   display: flex;
   align-items: center;

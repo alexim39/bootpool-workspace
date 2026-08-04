@@ -84,6 +84,7 @@ export function kickoffCountdown(matchDate: string, now = Date.now()): string {
   if (!Number.isFinite(start)) return '';
   const diff = start - now;
   if (diff <= 0) return 'Starts now';
+  if (diff >= 48 * 60 * 60 * 1000) return '';
   if (diff < 60_000) return 'Starts in <1m';
   if (diff < 3_600_000) return `Starts in ${Math.max(1, Math.round(diff / 60_000))}m`;
   const h = Math.floor(diff / 3_600_000);

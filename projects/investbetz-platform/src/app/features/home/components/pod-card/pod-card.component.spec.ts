@@ -127,4 +127,40 @@ describe('PodCardComponent', () => {
     expect(testFixture.componentInstance.exposurePercent()).toBe(0);
     testFixture.destroy();
   });
+
+  it('shows the personalized recommendation reason when present', () => {
+    const recPod = createPod({ whyRecommended: 'You often back Manchester United.' });
+    const testFixture = TestBed.createComponent(PodCardComponent);
+    testFixture.componentRef.setInput('pod', recPod);
+    testFixture.detectChanges();
+    expect(testFixture.componentInstance.recommended()).toBeTrue();
+    expect(testFixture.nativeElement.textContent).toContain('You often back Manchester United.');
+    testFixture.destroy();
+  });
+
+  it('hides the recommendation row when no reason is present', () => {
+    expect(component.recommended()).toBeFalse();
+    expect(fixture.nativeElement.textContent).not.toContain('Recommended');
+  });
+
+  it('prefers the personalized reason over Ora reasoning for the Why? tooltip', () => {
+    const recPod = createPod({
+      whyRecommended: 'You regularly bet on Premier League.',
+      metadata: { oraReasoning: 'Ora analysis says high confidence.' },
+    });
+    const testFixture = TestBed.createComponent(PodCardComponent);
+    testFixture.componentRef.setInput('pod', recPod);
+    testFixture.detectChanges();
+    expect(testFixture.componentInstance.whyText()).toBe('You regularly bet on Premier League.');
+    testFixture.destroy();
+  });
+
+  it('falls back to Ora reasoning when no personalized reason exists', () => {
+    const oraPod = createPod({ metadata: { oraReasoning: 'Ora analysis says high confidence.' } });
+    const testFixture = TestBed.createComponent(PodCardComponent);
+    testFixture.componentRef.setInput('pod', oraPod);
+    testFixture.detectChanges();
+    expect(testFixture.componentInstance.whyText()).toBe('Ora analysis says high confidence.');
+    testFixture.destroy();
+  });
 });

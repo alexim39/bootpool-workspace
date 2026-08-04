@@ -1,7 +1,7 @@
 import { Injectable, signal, computed, inject, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { GamesService, TodayGame } from '../../../core/services';
+import { GamesService, TodayGame, AuthService } from '../../../core/services';
 import { isLiveMatch } from '../game-status.util';
 
 export interface GamesFilters {
@@ -17,10 +17,12 @@ export interface GamesFilters {
 @Injectable({ providedIn: 'root' })
 export class GamesStore implements OnDestroy {
   readonly service = inject(GamesService);
+  readonly auth = inject(AuthService);
 
   readonly games = computed(() => this.service.games());
   readonly loading = computed(() => this.service.loading());
   readonly error = computed(() => this.service.error());
+  readonly personalized = computed(() => this.service.personalized());
   readonly total = computed(() => this.service.total());
   readonly stakableTotal = computed(() => this.service.stakableTotal());
   readonly totalPages = computed(() => this.service.totalPages());
@@ -212,7 +214,7 @@ export class GamesStore implements OnDestroy {
     if (this.marketType()) q.marketType = this.marketType()!;
     if (this.stakableOnly()) q.stakableOnly = true;
     if (this.minConfidence()) q.minConfidence = this.minConfidence()!;
-    this.service.fetchGames(q);
+    this.service.fetchGames(q, this.auth.isAuthenticated());
   }
 
   selectLeague(league: string) {

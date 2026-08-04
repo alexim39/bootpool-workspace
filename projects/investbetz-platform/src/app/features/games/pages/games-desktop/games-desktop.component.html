@@ -108,6 +108,13 @@
     </div>
   </header>
 
+  @if (store.personalized() && !store.hasActiveFilters()) {
+    <div class="for-you-strip">
+      <mat-icon>auto_awesome</mat-icon>
+      <span><strong>For You</strong> — these games are re-ranked to match your betting style.</span>
+    </div>
+  }
+
   @if (store.showSkeletons()) {
     <div class="skeleton-list">
       @for (_ of [1, 2, 3, 4, 5, 6, 7, 8]; track $index) {
@@ -198,6 +205,12 @@
                     <span class="team-name home" [attr.title]="game.homeTeam">{{ game.homeTeam }}</span>
                     <span class="vs">vs</span>
                     <span class="team-name" [attr.title]="game.awayTeam">{{ game.awayTeam }}</span>
+                  </div>
+                }
+                @if (game.whyRecommended) {
+                  <div class="for-you-reason" [matTooltip]="game.whyRecommended">
+                    <mat-icon>auto_awesome</mat-icon>
+                    For you
                   </div>
                 }
               </td>

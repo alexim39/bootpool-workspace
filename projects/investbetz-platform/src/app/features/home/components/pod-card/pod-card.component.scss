@@ -157,6 +157,32 @@ mat-card-content {
   line-height: 1.3;
 }
 
+.recommend-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  padding: 0.5rem 0.65rem;
+  background: linear-gradient(135deg, rgba($emerald, 0.1) 0%, rgba($emerald, 0.03) 100%);
+  border: 1px solid rgba($emerald, 0.18);
+  border-radius: $radius-md;
+}
+
+.recommend-icon {
+  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
+  color: $emerald;
+  margin-top: 0.05rem;
+  flex-shrink: 0;
+}
+
+.recommend-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: $emerald-light;
+  line-height: 1.35;
+}
+
 .selection-refund-row {
   display: flex;
   align-items: center;

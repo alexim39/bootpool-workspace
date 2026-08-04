@@ -48,6 +48,10 @@ export class PodCardComponent {
     return null;
   });
 
+  recommended = computed(() => !!this.pod().whyRecommended);
+
+  whyText = computed(() => this.pod().whyRecommended || this.oraReasoning());
+
   formatCountdown(ms: number): string {
     if (ms <= 0) return 'Closed';
     const days = Math.floor(ms / 86400000);

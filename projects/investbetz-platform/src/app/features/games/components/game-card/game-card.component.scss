@@ -396,6 +396,31 @@ mat-card-content {
   text-overflow: ellipsis;
 }
 
+.recommend-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  background: linear-gradient(135deg, rgba($emerald, 0.12), rgba($emerald-dark, 0.06));
+  border: 1px solid rgba($emerald, 0.3);
+  border-radius: $radius-md;
+
+  .recommend-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    color: $emerald;
+    flex-shrink: 0;
+  }
+
+  .recommend-text {
+    color: $emerald-light;
+    font-size: $font-size-xs;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+}
+
 .ora-pick {
   display: flex;
   align-items: center;

@@ -48,6 +48,8 @@ export interface Pod {
   updatedAt: string;
   timeRemaining?: number;
   isOpen?: boolean;
+  whyRecommended?: string;
+  personalizationScore?: number;
 }
 
 export interface PodFeedResponse {

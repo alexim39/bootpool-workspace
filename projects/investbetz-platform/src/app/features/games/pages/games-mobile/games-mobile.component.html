@@ -141,6 +141,12 @@
         }
       </div>
     } @else {
+      @if (store.personalized() && !store.hasActiveFilters()) {
+        <div class="for-you-strip">
+          <mat-icon>auto_awesome</mat-icon>
+          <span><strong>For You</strong> — re-ranked to match your betting style.</span>
+        </div>
+      }
       <div class="games-list" [class.loading-fade]="store.loading()">
         @for (game of store.games(); track game.fixtureId) {
           <app-game-card [game]="game" (stakeRequested)="onStake($event)" />

@@ -22,11 +22,18 @@
       <h3 class="pod-title">{{ pod().title }}</h3>
     }
 
+    @if (recommended()) {
+      <div class="recommend-row">
+        <mat-icon class="recommend-icon">auto_awesome</mat-icon>
+        <span class="recommend-text">{{ pod().whyRecommended }}</span>
+      </div>
+    }
+
     <div class="selection-refund-row">
       <span class="selection-badge">PICK: {{ pod().selection }}</span>
-      @if (oraReasoning()) {
+      @if (whyText()) {
         <button class="why-btn"
-          [matTooltip]="oraReasoning()!"
+          [matTooltip]="whyText()!"
           matTooltipPosition="after"
           (click)="$event.preventDefault()">
           <mat-icon>info_outline</mat-icon>
