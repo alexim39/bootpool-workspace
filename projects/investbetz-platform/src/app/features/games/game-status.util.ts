@@ -110,6 +110,31 @@ export function pickOutcome(g: {
   if (!isFinishedMatch(g.matchStatus) || !g.result) return 'skip';
   const p = (g.pick || '').toLowerCase();
 
+  if (p.includes('+')) {
+    const legs = p.split('+').map(s => s.trim()).filter(Boolean);
+    if (legs.length > 1) {
+      let anyLost = false;
+      for (const leg of legs) {
+        const verdict = judgePick({ ...g, pick: leg });
+        if (verdict === 'lost') anyLost = true;
+        if (verdict === 'skip') return 'skip';
+      }
+      return anyLost ? 'lost' : 'won';
+    }
+  }
+
+  return judgePick(g);
+}
+
+function judgePick(g: {
+  pick?: string;
+  result?: string | null;
+  matchStatus?: string;
+  homeScore?: number | null;
+  awayScore?: number | null;
+}): PickOutcome {
+  const p = (g.pick || '').toLowerCase();
+
   const over = /over\s*(\d+(?:\.\d+)?)/.exec(p);
   const under = !over ? /under\s*(\d+(?:\.\d+)?)/.exec(p) : null;
   if (over || under) {

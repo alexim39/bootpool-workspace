@@ -79,6 +79,20 @@ describe('game-status.util', () => {
     });
   });
 
+  describe('pickOutcome — combined parlay picks', () => {
+    it('wins only when every leg wins', () => {
+      expect(pickOutcome({ ...finished, pick: 'Home Win + Over 2.5', result: 'home_win', homeScore: 2, awayScore: 1 })).toBe('won');
+    });
+
+    it('loses when any leg loses', () => {
+      expect(pickOutcome({ ...finished, pick: 'Home Win + Over 2.5', result: 'home_win', homeScore: 2, awayScore: 0 })).toBe('lost');
+    });
+
+    it('skips when any leg pushes', () => {
+      expect(pickOutcome({ ...finished, pick: 'Home Win + Over 2', result: 'home_win', homeScore: 2, awayScore: 0 })).toBe('skip');
+    });
+  });
+
   describe('labels', () => {
     it('labels live phases', () => {
       expect(livePeriodLabel('2nd_half')).toBe('2nd half');

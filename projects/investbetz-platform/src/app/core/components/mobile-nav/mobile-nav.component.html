@@ -8,10 +8,6 @@
         <mat-icon [matBadge]="activeBetsCount() > 0 ? activeBetsCount() : null" matBadgeSize="medium">sports_esports</mat-icon>
         <span class="nav-label">Bets</span>
       </a>
-      <a routerLink="/wallet" routerLinkActive="active" class="nav-item">
-        <mat-icon>account_balance_wallet</mat-icon>
-        <span class="nav-label">Wallet</span>
-      </a>
       <a routerLink="/match-pools" routerLinkActive="active" class="nav-item">
         <mat-icon>pool</mat-icon>
         <span class="nav-label">Pools</span>
@@ -23,6 +19,10 @@
       <a routerLink="/games" routerLinkActive="active" class="nav-item">
         <mat-icon>sports_soccer</mat-icon>
         <span class="nav-label">Games</span>
+      </a>
+      <a routerLink="/wallet" routerLinkActive="active" class="nav-item">
+        <mat-icon>account_balance_wallet</mat-icon>
+        <span class="nav-label">Wallet</span>
       </a>
       <a routerLink="/profile" routerLinkActive="active" class="nav-item">
         <mat-icon>person</mat-icon>

@@ -31,13 +31,6 @@
               <span class="link-indicator"></span>
             }
           </a>
-          <a routerLink="/wallet" routerLinkActive="active" class="nav-link" #rla3="routerLinkActive">
-            <mat-icon>account_balance_wallet</mat-icon>
-            <span>Wallet</span>
-            @if (rla3.isActive) {
-              <span class="link-indicator"></span>
-            }
-          </a>
           <a routerLink="/match-pools" routerLinkActive="active" class="nav-link" #rlam="routerLinkActive">
             <mat-icon>pool</mat-icon>
             <span>Pools</span>
@@ -56,6 +49,13 @@
             <mat-icon>sports_soccer</mat-icon>
             <span>Games</span>
             @if (rlagames.isActive) {
+              <span class="link-indicator"></span>
+            }
+          </a>
+          <a routerLink="/wallet" routerLinkActive="active" class="nav-link" #rla3="routerLinkActive">
+            <mat-icon>account_balance_wallet</mat-icon>
+            <span>Wallet</span>
+            @if (rla3.isActive) {
               <span class="link-indicator"></span>
             }
           </a>
