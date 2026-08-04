@@ -98,6 +98,10 @@ export const routes: Routes = [
       {
         path: 'ora-chat',
         loadComponent: () => import('./admin/ora-chat/ora-chat.component').then(m => m.OraChatComponent)
+      },
+      {
+        path: 'abtests',
+        loadComponent: () => import('./admin/abtests/abtests.component').then(m => m.AbtestsComponent)
       }
     ]
   }

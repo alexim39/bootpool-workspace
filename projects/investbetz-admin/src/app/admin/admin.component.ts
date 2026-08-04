@@ -72,6 +72,7 @@ export class AdminComponent implements OnInit, OnDestroy {
       items: [
         { path: '/admin/campaigns', icon: 'campaign', label: 'Campaigns', exact: false, badge: false },
         { path: '/admin/ora-chat', icon: 'smart_toy', label: 'ORA Chat', exact: false, badge: false },
+        { path: '/admin/abtests', icon: 'science', label: 'A/B Tests', exact: false, badge: false },
       ]
     },
     {

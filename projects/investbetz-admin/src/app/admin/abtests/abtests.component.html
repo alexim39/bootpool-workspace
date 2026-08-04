@@ -1,0 +1,112 @@
+<div class="abtests-page">
+      <div class="page-header">
+        <div>
+          <h1>A/B Experiments</h1>
+          <p class="page-subtitle">Toggle the feed personalization experiment and monitor per-variant stake events.</p>
+        </div>
+        <button class="btn-add" (click)="startCreate()">+ New Experiment</button>
+      </div>
+
+      <div class="form-card" *ngIf="showForm">
+        <div class="form-title">{{ editingKey ? 'Edit Experiment' : 'Create Experiment' }}</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Key *</label>
+            <input type="text" [(ngModel)]="form.key" [readonly]="!!editingKey" placeholder="e.g. personalization" />
+            <p class="field-hint">Stable identifier referenced in code. Cannot be changed after creation.</p>
+          </div>
+          <div class="form-group">
+            <label>Control Share %</label>
+            <input type="number" [(ngModel)]="form.controlShare" min="0" max="100" />
+            <p class="field-hint">0 = everyone gets treatment, 100 = everyone gets control.</p>
+          </div>
+          <div class="form-group full-width">
+            <label>Description</label>
+            <input type="text" [(ngModel)]="form.description" placeholder="e.g. Personalized feed ranking vs ranked feed" />
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="form.enabled" />
+              Enabled
+            </label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-cancel" (click)="cancelForm()">Cancel</button>
+          <button class="btn-save" (click)="save()" [disabled]="!form.key.trim()">
+            {{ editingKey ? 'Update' : 'Create' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="experiments-list">
+        <div class="experiment-card" *ngFor="let exp of store.experiments(); trackBy: trackByKey" [class.disabled-exp]="!exp.enabled">
+          <div class="exp-info">
+            <div class="exp-key">{{ exp.key }}</div>
+            <div class="exp-desc" *ngIf="exp.description">{{ exp.description }}</div>
+            <div class="exp-meta">
+              <span class="meta-badge" [class.active-badge]="exp.enabled">
+                {{ exp.enabled ? 'Enabled' : 'Disabled' }}
+              </span>
+              <span class="meta-share">Control {{ exp.controlShare }}% / Treatment {{ 100 - exp.controlShare }}%</span>
+              <span class="meta-events" *ngIf="isAnalyzed(exp.key)">Tracked users: {{ eventTotal(exp.key) }} (control {{ controlPct(exp.key) }}%)</span>
+            </div>
+          </div>
+          <div class="exp-actions">
+            <button class="btn-toggle" [class.enabled]="exp.enabled" (click)="toggle(exp)" [disabled]="store.togglingKey() === exp.key">
+              {{ store.togglingKey() === exp.key ? '...' : (exp.enabled ? 'Disable' : 'Enable') }}
+            </button>
+            <button class="btn-icon" title="Analyze" (click)="analyze(exp.key)" [disabled]="store.analyzingKey() === exp.key">
+              {{ store.analyzingKey() === exp.key ? '…' : '📊' }}
+            </button>
+            <button class="btn-icon" title="Edit" (click)="startEdit(exp)">✏️</button>
+          </div>
+        </div>
+        <div class="empty-state" *ngIf="!store.loading() && store.experiments().length === 0">
+          <p>No experiments yet. Create the <code>personalization</code> experiment and enable it when you're ready to start the test.</p>
+        </div>
+      </div>
+
+      <div class="summary-panel" *ngIf="store.summary() as summary">
+        <div class="summary-header">
+          <h2>Summary — {{ summary.experiment?.key }}</h2>
+          <button class="btn-cancel" (click)="store.closeSummary()">Close</button>
+        </div>
+        <div class="stat-cards">
+          <div class="stat-card">
+            <div class="stat-value">{{ summary.users.control }}</div>
+            <div class="stat-label">Control users</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">{{ summary.users.treatment }}</div>
+            <div class="stat-label">Treatment users</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">{{ summary.users.control + summary.users.treatment || 0 }}</div>
+            <div class="stat-label">Total tracked</div>
+          </div>
+        </div>
+
+        <table class="events-table" *ngIf="summary.events.length > 0">
+          <thead>
+            <tr>
+              <th>Variant</th>
+              <th>Event</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of summary.events">
+              <td>
+                <span class="variant-badge" [class.treatment]="row.variant === 'treatment'">{{ row.variant }}</span>
+              </td>
+              <td>{{ row.event }}</td>
+              <td>{{ row.count }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="no-events" *ngIf="summary.events.length === 0">
+          No events recorded yet. Users will appear here once they are assigned variants and place stakes.
+        </p>
+      </div>
+    </div>

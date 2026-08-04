@@ -635,6 +635,22 @@ export class AdminService {
   resolveChatSession(id: string): Observable<{ success: boolean; data: any }> {
     return this.http.put<{ success: boolean; data: any }>(`${this.baseUrl}/chat/sessions/${id}/resolve`, {});
   }
+
+  listExperiments(): Observable<{ success: boolean; experiments: AbTestExperiment[] }> {
+    return this.http.get<{ success: boolean; experiments: AbTestExperiment[] }>(`${this.baseUrl}/abtests`);
+  }
+
+  upsertExperiment(data: { key: string; description?: string; enabled?: boolean; controlShare?: number }): Observable<{ success: boolean; experiment: AbTestExperiment }> {
+    return this.http.post<{ success: boolean; experiment: AbTestExperiment }>(`${this.baseUrl}/abtests`, data);
+  }
+
+  toggleExperiment(key: string, enabled: boolean): Observable<{ success: boolean; experiment: { key: string; enabled: boolean } }> {
+    return this.http.patch<{ success: boolean; experiment: { key: string; enabled: boolean } }>(`${this.baseUrl}/abtests/toggle`, { key, enabled });
+  }
+
+  getExperimentSummary(key: string): Observable<{ success: boolean; experiment: AbTestExperiment | null; events: AbTestEventRow[]; users: { control: number; treatment: number } }> {
+    return this.http.get<{ success: boolean; experiment: AbTestExperiment | null; events: AbTestEventRow[]; users: { control: number; treatment: number } }>(`${this.baseUrl}/abtests/${encodeURIComponent(key)}/summary`);
+  }
 }
 
 export interface CampaignUser {
@@ -964,4 +980,23 @@ export interface ChatSessionDetail {
   escalatedNotified?: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface AbTestExperiment {
+  key: string;
+  description?: string;
+  enabled: boolean;
+  controlShare: number;
+}
+
+export interface AbTestEventRow {
+  variant: string;
+  event: string;
+  count: number;
+}
+
+export interface AbTestSummary {
+  experiment: AbTestExperiment | null;
+  events: AbTestEventRow[];
+  users: { control: number; treatment: number };
 }
