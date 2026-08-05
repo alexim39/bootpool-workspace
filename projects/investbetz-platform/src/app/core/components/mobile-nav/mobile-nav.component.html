@@ -1,5 +1,4 @@
-
-    <nav class="mobile-nav">
+<nav class="mobile-nav">
       <a routerLink="/home" routerLinkActive="active" class="nav-item" [routerLinkActiveOptions]="{ exact: true }">
         <mat-icon>home</mat-icon>
         <span class="nav-label">Home</span>
@@ -8,33 +7,117 @@
         <mat-icon [matBadge]="activeBetsCount() > 0 ? activeBetsCount() : null" matBadgeSize="medium">sports_esports</mat-icon>
         <span class="nav-label">Bets</span>
       </a>
-      <a routerLink="/match-pools" routerLinkActive="active" class="nav-item">
-        <mat-icon>pool</mat-icon>
-        <span class="nav-label">Pools</span>
-      </a>
-      <a routerLink="/bet-manager" routerLinkActive="active" class="nav-item">
-        <mat-icon>auto_awesome</mat-icon>
-        <span class="nav-label">Manager</span>
-      </a>
       <a routerLink="/games" routerLinkActive="active" class="nav-item">
         <mat-icon>sports_soccer</mat-icon>
         <span class="nav-label">Games</span>
       </a>
-      <a routerLink="/leaderboard" routerLinkActive="active" class="nav-item">
-        <mat-icon>emoji_events</mat-icon>
-        <span class="nav-label">Ranks</span>
-      </a>
-      <a routerLink="/virtual-games" routerLinkActive="active" class="nav-item">
-        <mat-icon>casino</mat-icon>
-        <span class="nav-label">Arcade</span>
-      </a>
-      <a routerLink="/wallet" routerLinkActive="active" class="nav-item">
-        <mat-icon>account_balance_wallet</mat-icon>
-        <span class="nav-label">Wallet</span>
-      </a>
-      <a routerLink="/profile" routerLinkActive="active" class="nav-item">
-        <mat-icon>person</mat-icon>
-        <span class="nav-label">Profile</span>
-      </a>
+      <button
+        type="button"
+        class="nav-item"
+        [class.active]="playActive() || playSheetOpen()"
+        [attr.aria-expanded]="playSheetOpen()"
+        (click)="togglePlaySheet(); $event.stopPropagation()">
+        <span class="nav-icon-wrap">
+          <mat-icon>sports</mat-icon>
+          <mat-icon class="nav-chevron">keyboard_arrow_up</mat-icon>
+        </span>
+        <span class="nav-label">Play</span>
+      </button>
+      <button
+        type="button"
+        class="nav-item"
+        [class.active]="accountActive() || accountSheetOpen()"
+        [attr.aria-expanded]="accountSheetOpen()"
+        (click)="toggleAccountSheet(); $event.stopPropagation()">
+        <span class="nav-avatar">{{ userInitial() }}</span>
+        <span class="nav-label">Account</span>
+      </button>
     </nav>
-  
+
+    @if (playSheetOpen()) {
+      <div class="sheet-scrim" (click)="playSheetOpen.set(false)"></div>
+      <div class="sheet" role="dialog" aria-modal="true" (click)="playSheetOpen.set(false)">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">Explore</div>
+
+        <div class="sheet-section-label">Play</div>
+        <a routerLink="/leaderboard" routerLinkActive="active" class="sheet-item">
+          <mat-icon>emoji_events</mat-icon>
+          <span class="sheet-item-text">
+            <span class="sheet-item-title">Leaderboard</span>
+            <span class="sheet-item-desc">Compete for the top rank</span>
+          </span>
+          <mat-icon class="sheet-item-arrow">chevron_right</mat-icon>
+        </a>
+        <a routerLink="/virtual-games" routerLinkActive="active" class="sheet-item">
+          <mat-icon class="gold">casino</mat-icon>
+          <span class="sheet-item-text">
+            <span class="sheet-item-title">Arcade</span>
+            <span class="sheet-item-desc">Instant win games</span>
+          </span>
+          <mat-icon class="sheet-item-arrow">chevron_right</mat-icon>
+        </a>
+
+        <div class="sheet-section-label">Community</div>
+        <a routerLink="/match-pools" routerLinkActive="active" class="sheet-item">
+          <mat-icon>pool</mat-icon>
+          <span class="sheet-item-text">
+            <span class="sheet-item-title">Pools</span>
+            <span class="sheet-item-desc">Join match pools</span>
+          </span>
+          <mat-icon class="sheet-item-arrow">chevron_right</mat-icon>
+        </a>
+        <a routerLink="/bet-manager" routerLinkActive="active" class="sheet-item">
+          <mat-icon class="gold">auto_awesome</mat-icon>
+          <span class="sheet-item-text">
+            <span class="sheet-item-title">Manager</span>
+            <span class="sheet-item-desc">Ora manages your bets</span>
+          </span>
+          <mat-icon class="sheet-item-arrow">chevron_right</mat-icon>
+        </a>
+      </div>
+    }
+
+    @if (accountSheetOpen()) {
+      <div class="sheet-scrim" (click)="accountSheetOpen.set(false)"></div>
+      <div class="sheet" role="dialog" aria-modal="true" (click)="accountSheetOpen.set(false)">
+        <div class="sheet-handle"></div>
+
+        <div class="sheet-user">
+          <span class="sheet-user-avatar">{{ userInitial() }}</span>
+          <div class="sheet-user-meta">
+            <span class="sheet-user-name">{{ auth.user()?.fullName }}</span>
+            <span class="sheet-kyc">
+              <mat-icon>verified_user</mat-icon> KYC {{ auth.isKycVerified() ? 'Verified' : 'Pending' }}
+            </span>
+          </div>
+          <div class="sheet-user-balance">
+            <span class="sheet-balance-label">Balance</span>
+            <span class="sheet-balance-amount">{{ formatMoney(walletBalance()) }}</span>
+          </div>
+        </div>
+
+        <a routerLink="/profile" routerLinkActive="active" class="sheet-item">
+          <mat-icon>person</mat-icon>
+          <span class="sheet-item-text">
+            <span class="sheet-item-title">Profile</span>
+            <span class="sheet-item-desc">Manage your details</span>
+          </span>
+          <mat-icon class="sheet-item-arrow">chevron_right</mat-icon>
+        </a>
+        <a routerLink="/wallet" routerLinkActive="active" class="sheet-item">
+          <mat-icon class="gold">account_balance_wallet</mat-icon>
+          <span class="sheet-item-text">
+            <span class="sheet-item-title">Wallet</span>
+            <span class="sheet-item-desc">Balance &amp; transaction history</span>
+          </span>
+          <mat-icon class="sheet-item-arrow">chevron_right</mat-icon>
+        </a>
+
+        <div class="sheet-divider"></div>
+        <button type="button" class="sheet-item sheet-logout" (click)="auth.logout()">
+          <mat-icon>logout</mat-icon>
+          <span class="sheet-item-text"><span class="sheet-item-title">Logout</span></span>
+        </button>
+      </div>
+    }
