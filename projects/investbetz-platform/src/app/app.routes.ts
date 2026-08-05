@@ -63,6 +63,21 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'ora-record',
+    loadComponent: () => import('./features/ora-record/ora-record.component').then(m => m.OraRecordComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'leaderboard',
+    loadComponent: () => import('./features/leaderboard/leaderboard.component').then(m => m.LeaderboardComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'virtual-games',
+    loadComponent: () => import('./features/virtual-games/virtual-games.component').then(m => m.VirtualGamesComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'bet-manager',
     loadChildren: () => import('./features/bet-manager/bet-manager.routes').then(m => m.BET_MANAGER_ROUTES),
     canActivate: [authGuard]

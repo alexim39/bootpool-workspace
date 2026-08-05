@@ -79,7 +79,93 @@
           </div>
           <mat-icon class="chevron">chevron_right</mat-icon>
         </button>
+
+        <a class="menu-item" routerLink="/leaderboard">
+          <mat-icon class="menu-icon gold">emoji_events</mat-icon>
+          <div class="menu-text">
+            <span class="menu-title">Leaderboard</span>
+            <span class="menu-desc">See how you rank, share wins</span>
+          </div>
+          <mat-icon class="chevron">chevron_right</mat-icon>
+        </a>
+
+        <a class="menu-item" routerLink="/ora-record">
+          <mat-icon class="menu-icon emerald">verified</mat-icon>
+          <div class="menu-text">
+            <span class="menu-title">Ora's Track Record</span>
+            <span class="menu-desc">Proof of our AI pick accuracy</span>
+          </div>
+          <mat-icon class="chevron">chevron_right</mat-icon>
+        </a>
       </div>
+
+      @if (loyalty.snapshot() || loyalty.loading()) {
+        <div class="m-loyalty-card">
+          <div class="m-card-head">
+            <mat-icon class="gold">workspace_premium</mat-icon>
+            <div class="m-card-head-text">
+              <span class="m-card-title">Loyalty &amp; Cashback</span>
+              @if (loyalty.snapshot()) {
+                <span class="tier-badge" [class]="'tier-' + loyalty.snapshot()!.tier">{{ loyalty.snapshot()!.tier }}</span>
+              }
+            </div>
+          </div>
+          @if (loyalty.loading() && !loyalty.snapshot()) {
+            <div class="m-loading"><mat-spinner diameter="16"></mat-spinner><span>Loading…</span></div>
+          } @else if (loyalty.snapshot()) {
+            <div class="m-grid">
+              <div class="m-cell"><span class="m-cell-val">{{ loyalty.snapshot()!.points }}</span><span class="m-cell-lbl">Points</span></div>
+              <div class="m-cell"><span class="m-cell-val">{{ loyalty.snapshot()!.currentStreak }}d</span><span class="m-cell-lbl">Streak</span></div>
+              <div class="m-cell"><span class="m-cell-val">₦{{ loyalty.snapshot()!.totalStaked.toLocaleString() }}</span><span class="m-cell-lbl">Staked</span></div>
+              <div class="m-cell"><span class="m-cell-val">₦{{ loyalty.snapshot()!.cashbackTotal.toLocaleString() }}</span><span class="m-cell-lbl">Cashback</span></div>
+            </div>
+            <div class="m-progress">
+              <mat-progress-bar mode="determinate" [value]="loyalty.snapshot()!.progressPct"></mat-progress-bar>
+              <span class="m-progress-hint">
+                {{ loyalty.snapshot()!.nextTier ? ('Next: ' + loyalty.snapshot()!.nextTier) : 'Max tier' }} · Lose
+                {{ loyalty.snapshot()!.cashbackLossStreak }} in a row → {{ loyalty.snapshot()!.cashbackPercent }}% back
+              </span>
+            </div>
+          }
+        </div>
+      }
+
+      @if (coaching.insights() || coaching.loading()) {
+        <div class="m-coaching-card">
+          <div class="m-card-head">
+            <mat-icon class="emerald">psychology</mat-icon>
+            <div class="m-card-head-text">
+              <span class="m-card-title">Bankroll Coaching</span>
+              @if (coaching.insights()) {
+                <span class="risk-chip" [class]="'risk-' + coaching.insights()!.riskLevel">
+                  {{ coaching.insights()!.riskLevel === 'high' ? 'High risk' : coaching.insights()!.riskLevel === 'caution' ? 'Caution' : 'Healthy' }}
+                </span>
+              }
+            </div>
+          </div>
+          @if (coaching.loading() && !coaching.insights()) {
+            <div class="m-loading"><mat-spinner diameter="16"></mat-spinner><span>Checking…</span></div>
+          } @else if (coaching.insights()) {
+            <div class="m-grid">
+              <div class="m-cell"><span class="m-cell-val">₦{{ coaching.insights()!.bankroll.toLocaleString() }}</span><span class="m-cell-lbl">Bankroll</span></div>
+              <div class="m-cell"><span class="m-cell-val">₦{{ coaching.insights()!.staked24h.toLocaleString() }}</span><span class="m-cell-lbl">Staked 24h</span></div>
+              <div class="m-cell"><span class="m-cell-val">{{ coaching.insights()!.stakes24h }}</span><span class="m-cell-lbl">Stakes 24h</span></div>
+              <div class="m-cell"><span class="m-cell-val">{{ coaching.insights()!.winRate30d !== null ? coaching.insights()!.winRate30d + '%' : '—' }}</span><span class="m-cell-lbl">Win 30d</span></div>
+            </div>
+            @if (coaching.insights()!.nudges.length > 0) {
+              <ul class="m-nudges">
+                @for (nudge of coaching.insights()!.nudges; track nudge) {
+                  <li>{{ nudge }}</li>
+                }
+              </ul>
+            }
+            <div class="m-tip">
+              <mat-icon>lightbulb</mat-icon>
+              <span>{{ coaching.insights()!.tip }}</span>
+            </div>
+          }
+        </div>
+      }
 
       @if (store.activeTab() === 'personal') {
         <div class="sheet-overlay" (click)="store.activeTab.set('')">

@@ -9,8 +9,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MobileNavComponent, OraChatComponent, FaqSectionComponent } from '../../../../core/components';
 import { ProfileStore } from '../../stores/profile.store';
+import { LoyaltyService, CoachingService } from '../../../../core/services';
 
 @Component({
   selector: 'app-profile-mobile',
@@ -18,19 +20,23 @@ import { ProfileStore } from '../../stores/profile.store';
   imports: [
     CommonModule, ReactiveFormsModule, RouterModule, MatButtonModule, MatIconModule,
     MatFormFieldModule, MatInputModule, MatProgressSpinnerModule,
-    MatSnackBarModule, MatChipsModule, MobileNavComponent, OraChatComponent, FaqSectionComponent
+    MatSnackBarModule, MatChipsModule, MatProgressBarModule, MobileNavComponent, OraChatComponent, FaqSectionComponent
   ],
   templateUrl: './profile-mobile.component.html',
   styleUrls: ['./profile-mobile.component.scss']
 })
 export class ProfileMobileComponent implements OnInit, AfterViewInit {
   readonly store = inject(ProfileStore);
+  readonly loyalty = inject(LoyaltyService);
+  readonly coaching = inject(CoachingService);
   private _snackBar = inject(MatSnackBar);
 
   ngOnInit() {}
 
   ngAfterViewInit() {
     this.store.init();
+    this.loyalty.fetchSnapshot();
+    this.coaching.fetchInsights();
   }
 
   updateProfile() {

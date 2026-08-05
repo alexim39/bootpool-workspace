@@ -1,0 +1,322 @@
+@if (isMobileView()) {
+  <div class="mobile-root">
+    <header class="mobile-header">
+      <button mat-icon-button routerLink="/home"><mat-icon>arrow_back</mat-icon></button>
+      <div class="mobile-header-titles">
+        <h1>Ora's Track Record</h1>
+        <span class="page-subtitle">Independent, verifiable proof of how our AI picks perform</span>
+      </div>
+    </header>
+
+    <div class="mobile-content">
+      <a mat-stroked-button class="leaderboard-link mobile" routerLink="/leaderboard">
+        <mat-icon>leaderboard</mat-icon> Leaderboard
+      </a>
+      @if (loading()) {
+        <div class="skel-page">
+          <div class="skel-hero">
+            <div class="sk skel-line" style="width:45%;height:18px"></div>
+            <div class="sk skel-line" style="width:70%;height:11px"></div>
+          </div>
+          <div class="skel-kpis">
+            @for (item of [1,2,3,4]; track item) {
+              <div class="sk skel-kpi"></div>
+            }
+          </div>
+          <div class="sk skel-block"></div>
+        </div>
+      } @else if (error()) {
+        <div class="empty-state">
+          <mat-icon>error_outline</mat-icon>
+          <h3>Could not load the record</h3>
+          <p>{{ error() }}</p>
+          <button mat-raised-button class="retry-btn" (click)="load()">
+            <mat-icon>refresh</mat-icon> Try Again
+          </button>
+        </div>
+      } @else if (record()) {
+        <section class="hero">
+          <div class="hero-glow"></div>
+          <div class="hero-content">
+            <div class="hero-badge">
+              <mat-icon>verified</mat-icon>
+              <span>Signed &amp; Verified</span>
+              <span class="hero-badge-algo">{{ record()!.signatureAlgo }}</span>
+            </div>
+            <h2>Every pick is accountable.</h2>
+            <p class="hero-text">
+              BetPool's AI ("Ora") curates each bet, and this page publishes the outcome ledger in the open:
+              what was settled, how fast, and what actually paid out.
+            </p>
+            <div class="hero-stats">
+              <div class="hero-stat">
+                <span class="hero-stat-value">{{ formatNumber(record()!.settledPots30d) }}</span>
+                <span class="hero-stat-label">Pots settled (30 days)</span>
+              </div>
+              <div class="hero-stat">
+                <span class="hero-stat-value">{{ formatDuration(record()!.avgSettlementMs) }}</span>
+                <span class="hero-stat-label">Avg time to settle</span>
+              </div>
+              <div class="hero-stat">
+                <span class="hero-stat-value">{{ formatNumber(record()!.payouts30d) }}</span>
+                <span class="hero-stat-label">Payouts issued (30 days)</span>
+              </div>
+              <div class="hero-stat">
+                <span class="hero-stat-value">{{ formatDuration(record()!.avgPayoutMs) }}</span>
+                <span class="hero-stat-label">Avg payout speed</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="accuracy-section">
+          <div class="section-head">
+            <h3>Overall Pick Accuracy</h3>
+            <span class="section-hint">Settled picks tracked since launch</span>
+          </div>
+          @if (record()!.overall) {
+            <div class="accuracy-card">
+              <div class="accuracy-ring-wrap">
+                <div
+                  class="accuracy-ring"
+                  [style.--rate]="(record()!.overall!.winRate / 100) * 360 + 'deg'">
+                  <div class="accuracy-ring-inner">
+                    <span class="accuracy-ring-value">{{ formatPercent(record()!.overall!.winRate) }}</span>
+                    <span class="accuracy-ring-label">win rate</span>
+                  </div>
+                </div>
+              </div>
+              <div class="accuracy-facts">
+                <div class="fact"><span class="fact-value">{{ formatNumber(record()!.overall!.played) }}</span><span class="fact-label">picks settled</span></div>
+                <div class="fact"><span class="fact-value">{{ formatNumber(record()!.overall!.won) }}</span><span class="fact-label">wins</span></div>
+                <div class="fact"><span class="fact-value">{{ formatPercent(record()!.overall!.winRate) }}</span><span class="fact-label">converted</span></div>
+              </div>
+            </div>
+          } @else {
+            <div class="accuracy-empty">
+              <mat-icon>query_stats</mat-icon>
+              <span>No settled picks yet — the ledger starts accumulating as pods settle.</span>
+            </div>
+          }
+        </section>
+
+        <section class="leagues-section">
+          <div class="section-head">
+            <h3>Accuracy by League</h3>
+            <span class="section-hint">Low-sample leagues are flagged honestly, not hidden</span>
+          </div>
+          @if (record()!.byLeague.length === 0) {
+            <div class="empty-state">
+              <mat-icon>bar_chart</mat-icon>
+              <p>League breakdowns appear once picks settle.</p>
+            </div>
+          } @else {
+            <div class="league-table">
+              <div class="league-row league-row-head">
+                <span>League</span>
+                <span>Played</span>
+                <span>Won</span>
+                <span class="col-rate">Win rate</span>
+                <span>Sample</span>
+              </div>
+              @for (row of record()!.byLeague; track row.league) {
+                <div class="league-row">
+                  <span class="league-name">{{ row.league }}</span>
+                  <span class="league-num">{{ formatNumber(row.played) }}</span>
+                  <span class="league-num">{{ formatNumber(row.won) }}</span>
+                  <span class="col-rate">
+                    <span class="rate-track">
+                      <span class="rate-fill" [style.width]="row.winRate + '%'" [style.background]="tierColor(row.sample)"></span>
+                    </span>
+                    <span class="rate-value">{{ formatPercent(row.winRate) }}</span>
+                  </span>
+                  <span>
+                    <span class="sample-chip" [style.color]="tierColor(row.sample)" [style.borderColor]="tierColor(row.sample)">
+                      {{ row.sample === 'sufficient' ? 'Sufficient' : 'Low sample' }}
+                    </span>
+                  </span>
+                </div>
+              }
+            </div>
+          }
+        </section>
+
+        <section class="verification-section">
+          <div class="verification-card">
+            <mat-icon>fingerprint</mat-icon>
+            <div class="verification-text">
+              <h4>Integrity check</h4>
+              <p>
+                This page is an open record of settlement activity. Data is aggregated over the last 30 days
+                and signed with <strong>{{ record()!.signatureAlgo }}</strong> so it can be verified independently.
+              </p>
+              <code class="signature">{{ record()!.signature }}</code>
+            </div>
+          </div>
+          <p class="sampled-note">Last updated: {{ formatDate(record()!.sampledAt) }}</p>
+        </section>
+      }
+    </div>
+
+    <app-mobile-nav />
+  </div>
+} @else {
+  <app-nav />
+
+  <div class="ora-record-page">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Ora's Track Record</h1>
+        <span class="page-subtitle">Independent, verifiable proof of how our AI picks perform</span>
+      </div>
+      <a mat-stroked-button class="leaderboard-link" routerLink="/leaderboard">
+        <mat-icon>leaderboard</mat-icon> Leaderboard
+      </a>
+    </div>
+
+    @if (loading()) {
+      <div class="skel-page">
+        <div class="skel-hero">
+          <div class="sk skel-line" style="width:45%;height:18px"></div>
+          <div class="sk skel-line" style="width:70%;height:11px"></div>
+        </div>
+        <div class="skel-kpis">
+          @for (item of [1,2,3,4]; track item) {
+            <div class="sk skel-kpi"></div>
+          }
+        </div>
+        <div class="sk skel-block"></div>
+      </div>
+    } @else if (error()) {
+      <div class="empty-state">
+        <mat-icon>error_outline</mat-icon>
+        <h3>Could not load the record</h3>
+        <p>{{ error() }}</p>
+        <button mat-raised-button class="retry-btn" (click)="load()">
+          <mat-icon>refresh</mat-icon> Try Again
+        </button>
+      </div>
+    } @else if (record()) {
+      <section class="hero">
+        <div class="hero-glow"></div>
+        <div class="hero-content">
+          <div class="hero-badge">
+            <mat-icon>verified</mat-icon>
+            <span>Signed &amp; Verified</span>
+            <span class="hero-badge-algo">{{ record()!.signatureAlgo }}</span>
+          </div>
+          <h2>Every pick is accountable.</h2>
+          <p class="hero-text">
+            BetPool's AI ("Ora") curates each bet, and this page publishes the outcome ledger in the open:
+            what was settled, how fast, and what actually paid out.
+          </p>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <span class="hero-stat-value">{{ formatNumber(record()!.settledPots30d) }}</span>
+              <span class="hero-stat-label">Pots settled (30 days)</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">{{ formatDuration(record()!.avgSettlementMs) }}</span>
+              <span class="hero-stat-label">Avg time to settle</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">{{ formatNumber(record()!.payouts30d) }}</span>
+              <span class="hero-stat-label">Payouts issued (30 days)</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">{{ formatDuration(record()!.avgPayoutMs) }}</span>
+              <span class="hero-stat-label">Avg payout speed</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="accuracy-section">
+        <div class="section-head">
+          <h3>Overall Pick Accuracy</h3>
+          <span class="section-hint">Settled picks tracked since launch</span>
+        </div>
+        @if (record()!.overall) {
+          <div class="accuracy-card">
+            <div class="accuracy-ring-wrap">
+              <div
+                class="accuracy-ring"
+                [style.--rate]="(record()!.overall!.winRate / 100) * 360 + 'deg'">
+                <div class="accuracy-ring-inner">
+                  <span class="accuracy-ring-value">{{ formatPercent(record()!.overall!.winRate) }}</span>
+                  <span class="accuracy-ring-label">win rate</span>
+                </div>
+              </div>
+            </div>
+            <div class="accuracy-facts">
+              <div class="fact"><span class="fact-value">{{ formatNumber(record()!.overall!.played) }}</span><span class="fact-label">picks settled</span></div>
+              <div class="fact"><span class="fact-value">{{ formatNumber(record()!.overall!.won) }}</span><span class="fact-label">wins</span></div>
+              <div class="fact"><span class="fact-value">{{ formatPercent(record()!.overall!.winRate) }}</span><span class="fact-label">converted</span></div>
+            </div>
+          </div>
+        } @else {
+          <div class="accuracy-empty">
+            <mat-icon>query_stats</mat-icon>
+            <span>No settled picks yet — the ledger starts accumulating as pods settle.</span>
+          </div>
+        }
+      </section>
+
+      <section class="leagues-section">
+        <div class="section-head">
+          <h3>Accuracy by League</h3>
+          <span class="section-hint">Low-sample leagues are flagged honestly, not hidden</span>
+        </div>
+        @if (record()!.byLeague.length === 0) {
+          <div class="empty-state">
+            <mat-icon>bar_chart</mat-icon>
+            <p>League breakdowns appear once picks settle.</p>
+          </div>
+        } @else {
+          <div class="league-table">
+            <div class="league-row league-row-head">
+              <span>League</span>
+              <span>Played</span>
+              <span>Won</span>
+              <span class="col-rate">Win rate</span>
+              <span>Sample</span>
+            </div>
+            @for (row of record()!.byLeague; track row.league) {
+              <div class="league-row">
+                <span class="league-name">{{ row.league }}</span>
+                <span class="league-num">{{ formatNumber(row.played) }}</span>
+                <span class="league-num">{{ formatNumber(row.won) }}</span>
+                <span class="col-rate">
+                  <span class="rate-track">
+                    <span class="rate-fill" [style.width]="row.winRate + '%'" [style.background]="tierColor(row.sample)"></span>
+                  </span>
+                  <span class="rate-value">{{ formatPercent(row.winRate) }}</span>
+                </span>
+                <span>
+                  <span class="sample-chip" [style.color]="tierColor(row.sample)" [style.borderColor]="tierColor(row.sample)">
+                    {{ row.sample === 'sufficient' ? 'Sufficient' : 'Low sample' }}
+                  </span>
+                </span>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <section class="verification-section">
+        <div class="verification-card">
+          <mat-icon>fingerprint</mat-icon>
+          <div class="verification-text">
+            <h4>Integrity check</h4>
+            <p>
+              This page is an open record of settlement activity. Data is aggregated over the last 30 days
+              and signed with <strong>{{ record()!.signatureAlgo }}</strong> so it can be verified independently.
+            </p>
+            <code class="signature">{{ record()!.signature }}</code>
+          </div>
+        </div>
+        <p class="sampled-note">Last updated: {{ formatDate(record()!.sampledAt) }}</p>
+      </section>
+    }
+  </div>
+}

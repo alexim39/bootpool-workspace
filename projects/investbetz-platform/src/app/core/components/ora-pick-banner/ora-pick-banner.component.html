@@ -1,0 +1,43 @@
+@if (loading() && !pick()) {
+  <div class="pick-banner skel-banner">
+    <div class="sk sk-line" style="width:180px;height:12px"></div>
+    <div class="sk sk-line" style="width:220px;height:18px"></div>
+  </div>
+} @else if (pick()) {
+  <div class="pick-banner">
+    <div class="pick-glow"></div>
+    <div class="pick-main">
+      <div class="pick-badge">
+        <mat-icon>auto_awesome</mat-icon>
+        <span>Ora's Pick of the Day</span>
+      </div>
+      <div class="pick-teams">
+        <span class="pick-team">{{ pick()!.homeTeam }}</span>
+        <span class="pick-vs">vs</span>
+        <span class="pick-team">{{ pick()!.awayTeam }}</span>
+        <span class="pick-league">{{ pick()!.league }}</span>
+      </div>
+      <div class="pick-meta">
+        <span class="pick-selection"><mat-icon>ads_click</mat-icon> {{ pick()!.pick }}</span>
+        <span class="pick-odds">{{ pick()!.gainsMultiplier }}x</span>
+        <span class="pick-confidence">{{ pick()!.confidence }}% confidence</span>
+        <span class="pick-kickoff">Kickoff {{ kickoffLabel(pick()!) }}</span>
+      </div>
+      @if (pick()!.whyRecommended) {
+        <button class="why-link" (click)="showReason.set(!showReason())">
+          {{ showReason() ? 'Hide' : 'Why this pick?' }}
+        </button>
+        @if (showReason()) {
+          <p class="pick-reason">{{ pick()!.whyRecommended }}</p>
+        }
+      }
+    </div>
+    <div class="pick-action">
+      <button class="stake-now-btn" (click)="stakeNow()">
+        <mat-icon>bolt</mat-icon>
+        Stake now
+      </button>
+      <span class="pick-action-hint">Opens the stake modal with this pod pre-loaded</span>
+    </div>
+  </div>
+}

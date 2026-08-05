@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -11,11 +11,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatBadgeModule } from '@angular/material/badge';
 import { Pod } from '../../../../core/services';
 import { NotificationService } from '../../../../core/services';
+import { OraPick } from '../../../../core/services';
 import { PodCardComponent } from '../../components/pod-card/pod-card.component';
 import { StakeModalComponent } from '../../components/stake-modal/stake-modal.component';
 import { BetSlipComponent } from '../../components/bet-slip/bet-slip.component';
 import { FeaturedBannerComponent } from '../../components/featured-banner/featured-banner.component';
-import { TopUpModalComponent, OraChatComponent } from '../../../../core/components';
+import { TopUpModalComponent, OraChatComponent, OraPickBannerComponent } from '../../../../core/components';
 import { MobileNavComponent } from '../../../../core/components';
 import { HomeStore } from '../../stores/home.store';
 
@@ -39,7 +40,8 @@ import { HomeStore } from '../../stores/home.store';
     FeaturedBannerComponent,
     TopUpModalComponent,
     MobileNavComponent,
-    OraChatComponent
+    OraChatComponent,
+    OraPickBannerComponent
   ],
   templateUrl: './home-mobile.component.html',
   styleUrls: ['./home-mobile.component.scss']
@@ -47,6 +49,7 @@ import { HomeStore } from '../../stores/home.store';
 export class HomeMobileComponent implements OnInit {
   private _snackBar = inject(MatSnackBar);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   readonly store = inject(HomeStore);
   readonly notifService = inject(NotificationService);
 
@@ -79,6 +82,18 @@ export class HomeMobileComponent implements OnInit {
     });
   }
 
+  openNotif(notif: any) {
+    this.markNotifRead(notif._id);
+    const data = notif.data || {};
+    if (data['podId']) {
+      this.closeNotifPanel();
+      this.store.openPodById(data['podId']);
+    } else if (data['coaching'] || data['cashback']) {
+      this.closeNotifPanel();
+      this.router.navigate(['/profile']);
+    }
+  }
+
   markAllNotifRead() {
     this.notifService.markAllAsRead().subscribe({
       next: () => {
@@ -104,6 +119,14 @@ export class HomeMobileComponent implements OnInit {
       return;
     }
     this.store.openStakeModal(pod);
+  }
+
+  onOraPickStake(pick: OraPick) {
+    if (!this.store.auth.isAuthenticated()) {
+      this._snackBar.open('Please log in to place a stake', 'OK', { duration: 3000 });
+      return;
+    }
+    this.store.openPodById(pick.podId);
   }
 
   onStakePlaced() {

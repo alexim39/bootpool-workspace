@@ -52,6 +52,20 @@
               <span class="link-indicator"></span>
             }
           </a>
+          <a routerLink="/leaderboard" routerLinkActive="active" class="nav-link" #rlalboard="routerLinkActive">
+            <mat-icon>emoji_events</mat-icon>
+            <span>Board</span>
+            @if (rlalboard.isActive) {
+              <span class="link-indicator"></span>
+            }
+          </a>
+          <a routerLink="/virtual-games" routerLinkActive="active" class="nav-link" #rlaarcade="routerLinkActive">
+            <mat-icon>casino</mat-icon>
+            <span>Arcade</span>
+            @if (rlaarcade.isActive) {
+              <span class="link-indicator"></span>
+            }
+          </a>
           <a routerLink="/wallet" routerLinkActive="active" class="nav-link" #rla3="routerLinkActive">
             <mat-icon>account_balance_wallet</mat-icon>
             <span>Wallet</span>

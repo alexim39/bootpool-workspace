@@ -1,0 +1,429 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #0A1428;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.board-page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 84px 28px 60px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  background: linear-gradient(90deg, #00E676, #F5B301);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.page-subtitle {
+  display: block;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 4px;
+}
+
+.ora-record-link {
+  color: #F5B301;
+  border-color: rgba(245, 179, 1, 0.35);
+}
+
+.ora-record-link.mobile {
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+/* ---------- Period tabs ---------- */
+.period-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.period-tab {
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.period-tab:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.period-tab.active {
+  background: rgba(0, 230, 118, 0.14);
+  border-color: rgba(0, 230, 118, 0.4);
+  color: #00E676;
+}
+
+/* ---------- My rank card ---------- */
+.my-rank-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: linear-gradient(135deg, rgba(0, 230, 118, 0.08), rgba(245, 179, 1, 0.05));
+  border: 1px solid rgba(0, 230, 118, 0.18);
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+
+.my-rank-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.my-rank-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.my-rank-value {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.rank-no {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.rank-no.rank-gold { color: #F5B301; }
+.rank-no.rank-silver { color: #C0C0C0; }
+.rank-no.rank-bronze { color: #CD7F32; }
+
+.rank-suffix {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.my-rank-stats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.stat-pill {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.stat-pill.won { color: #00E676; }
+
+.my-rank-right {
+  cursor: pointer;
+  text-align: right;
+}
+
+.win-share-label {
+  display: block;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 8px;
+}
+
+.win-share-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 14px;
+  min-width: 260px;
+}
+
+.win-share-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.win-share-amount {
+  font-size: 20px;
+  font-weight: 800;
+  color: #00E676;
+}
+
+.win-share-desc {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.win-share-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.win-share-btn {
+  font-size: 11px;
+  line-height: 30px;
+  color: #00E676;
+  border-color: rgba(0, 230, 118, 0.3);
+}
+
+.win-share-btn mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.win-share-btn.wa {
+  color: #25D366;
+  border-color: rgba(37, 211, 102, 0.3);
+}
+
+.win-share-empty {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ---------- Table ---------- */
+.board-table {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.board-row {
+  display: grid;
+  grid-template-columns: 0.7fr 2fr 0.8fr 1.1fr 1.1fr 0.9fr;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  font-size: 13px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.board-row:first-child {
+  border-top: none;
+}
+
+.board-head {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.self-row {
+  background: rgba(0, 230, 118, 0.05);
+  outline: 1px solid rgba(0, 230, 118, 0.15);
+}
+
+.rank-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.medal {
+  font-size: 15px;
+}
+
+.staker-name {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.num-col {
+  color: rgba(255, 255, 255, 0.6);
+  text-align: right;
+}
+
+.num-col.strong {
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.num-col.won {
+  color: #00E676;
+}
+
+/* ---------- Pagination ---------- */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.page-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.page-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.page-info {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ---------- States ---------- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 48px 20px;
+  color: rgba(255, 255, 255, 0.45);
+  text-align: center;
+}
+
+.empty-state mat-icon {
+  font-size: 34px;
+  width: 34px;
+  height: 34px;
+  opacity: 0.6;
+}
+
+.empty-state h3 {
+  margin: 0;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 12.5px;
+}
+
+.skel-page { display: flex; flex-direction: column; gap: 10px; }
+.sk { border-radius: 8px; background: rgba(255, 255, 255, 0.05); animation: shimmer 1.5s infinite; }
+.skel-row { height: 52px; border-radius: 12px; }
+
+@keyframes shimmer {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+/* ---------- Mobile ---------- */
+.mobile-root {
+  min-height: 100vh;
+  background: #0A1428;
+  padding-bottom: 72px;
+}
+
+.mobile-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: #0D1A30;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  h1 {
+    flex: 1;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  button {
+    color: rgba(255, 255, 255, 0.7);
+
+    &:hover {
+      color: #00E676;
+    }
+  }
+}
+
+.mobile-content {
+  padding: 20px 16px 32px;
+}
+
+.mobile-content .my-rank-card {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.mobile-content .my-rank-right {
+  text-align: left;
+}
+
+.mobile-content .win-share-card {
+  min-width: 0;
+}
+
+.mobile-content .board-row {
+  grid-template-columns: 0.7fr 1.8fr 1fr;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+
+.mobile-content .board-head .num-col:not(:first-of-type),
+.mobile-content .board-row > .num-col:nth-child(4),
+.mobile-content .board-row > .num-col:nth-child(5),
+.mobile-content .board-row > .num-col:nth-child(6),
+.mobile-content .board-head > span:nth-child(4),
+.mobile-content .board-head > span:nth-child(5),
+.mobile-content .board-head > span:nth-child(6) {
+  display: none;
+}
+
+.mobile-content .staker-name {
+  text-align: left;
+}
+
+.mobile-content .num-col {
+  text-align: right;
+}
+
+.mobile-content .rank-no {
+  font-size: 18px;
+}

@@ -1,0 +1,236 @@
+:host {
+  display: block;
+}
+
+.pick-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(245, 179, 1, 0.25);
+  background: linear-gradient(120deg, rgba(245, 179, 1, 0.12), rgba(13, 26, 48, 0.6) 55%, rgba(0, 230, 118, 0.08));
+  padding: 18px 22px;
+  margin-bottom: 18px;
+}
+
+.pick-glow {
+  position: absolute;
+  top: -70px;
+  left: -50px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 179, 1, 0.22), transparent 70%);
+  pointer-events: none;
+}
+
+.pick-main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pick-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #F5B301;
+}
+
+.pick-badge mat-icon {
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
+}
+
+.pick-teams {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pick-team {
+  font-size: 17px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.pick-vs {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.pick-league {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.pick-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+
+.pick-selection {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #00E676;
+  font-weight: 600;
+}
+
+.pick-selection mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.pick-odds {
+  font-weight: 800;
+  font-size: 14px;
+  color: #F5B301;
+}
+
+.pick-confidence {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.pick-kickoff {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.why-link {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.why-link:hover {
+  color: #F5B301;
+}
+
+.pick-reason {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.pick-action {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.stake-now-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #0A1428;
+  background: linear-gradient(90deg, #F5B301, #00E676);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.stake-now-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px rgba(245, 179, 1, 0.35);
+}
+
+.stake-now-btn mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.pick-action-hint {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: center;
+}
+
+.skel-banner {
+  height: 84px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px 22px;
+}
+
+.sk {
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+@media (max-width: 640px) {
+  .pick-banner {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px 16px;
+    gap: 12px;
+  }
+
+  .pick-teams {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .pick-vs {
+    display: none;
+  }
+
+  .pick-meta {
+    gap: 10px;
+    font-size: 11px;
+  }
+
+  .pick-action {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .pick-action-hint {
+    text-align: left;
+  }
+}
