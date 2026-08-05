@@ -50,7 +50,131 @@
             <div class="stat-label">Email</div>
           </mat-card-content>
         </mat-card>
+        <mat-card class="stat-card stat-card-link" routerLink="/leaderboard">
+          <mat-card-content>
+            <div class="stat-icon board"><mat-icon>emoji_events</mat-icon></div>
+            <div class="stat-value">Leaderboard</div>
+            <div class="stat-label">See how you rank <mat-icon class="chev">chevron_right</mat-icon></div>
+          </mat-card-content>
+        </mat-card>
       </div>
+
+      @if (loyalty.snapshot() || loyalty.loading()) {
+        <mat-card class="loyalty-card">
+          <mat-card-content>
+            <div class="loyalty-head">
+              <div class="loyalty-title">
+                <mat-icon>workspace_premium</mat-icon>
+                <div>
+                  <h3>Loyalty &amp; Cashback</h3>
+                  <p>Earn points with every stake. Recovering from a losing streak? We've got you.</p>
+                </div>
+              </div>
+              @if (loyalty.snapshot()) {
+                <span class="tier-badge" [class]="'tier-' + loyalty.snapshot()!.tier">
+                  {{ loyalty.snapshot()!.tier | titlecase }}
+                </span>
+              }
+            </div>
+
+            @if (loyalty.loading() && !loyalty.snapshot()) {
+              <div class="loyalty-loading"><mat-spinner diameter="18"></mat-spinner><span>Loading your tier…</span></div>
+            } @else if (loyalty.snapshot()) {
+              <div class="loyalty-grid">
+                <div class="loyalty-cell">
+                  <span class="cell-value">{{ loyalty.snapshot()!.points.toLocaleString() }}</span>
+                  <span class="cell-label">Loyalty points</span>
+                </div>
+                <div class="loyalty-cell">
+                  <span class="cell-value">{{ loyalty.snapshot()!.currentStreak }}<small> days</small></span>
+                  <span class="cell-label">Staking streak</span>
+                </div>
+                <div class="loyalty-cell">
+                  <span class="cell-value">₦{{ loyalty.snapshot()!.totalStaked.toLocaleString() }}</span>
+                  <span class="cell-label">Lifetime staked</span>
+                </div>
+                <div class="loyalty-cell">
+                  <span class="cell-value">₦{{ loyalty.snapshot()!.cashbackTotal.toLocaleString() }}</span>
+                  <span class="cell-label">Cashback earned</span>
+                </div>
+              </div>
+
+              <div class="tier-progress">
+                <div class="tier-progress-row">
+                  <span>{{ loyalty.snapshot()!.tier | titlecase }}</span>
+                  <span>{{ loyalty.snapshot()!.nextTier ? ('Next: ' + (loyalty.snapshot()!.nextTier | titlecase)) : 'Max tier' }}</span>
+                </div>
+                <mat-progress-bar
+                  mode="determinate"
+                  [value]="loyalty.snapshot()!.progressPct">
+                </mat-progress-bar>
+                <p class="tier-hint">
+                  Lose {{ loyalty.snapshot()!.cashbackLossStreak }} stakes in a row and get
+                  {{ loyalty.snapshot()!.cashbackPercent }}% of your lost stakes back in real money.
+                </p>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
+
+      @if (coaching.insights() || coaching.loading()) {
+        <mat-card class="coaching-card">
+          <mat-card-content>
+            <div class="coaching-head">
+              <mat-icon>psychology</mat-icon>
+              <div>
+                <h3>Bankroll Coaching</h3>
+                <p>Ora's risk checks, tuned to your pace.</p>
+              </div>
+              @if (coaching.insights()) {
+                <span class="risk-chip" [class]="'risk-' + coaching.insights()!.riskLevel">
+                  {{
+                    coaching.insights()!.riskLevel === 'high' ? 'High risk' :
+                    coaching.insights()!.riskLevel === 'caution' ? 'Caution' : 'Healthy pace'
+                  }}
+                </span>
+              }
+            </div>
+
+            @if (coaching.loading() && !coaching.insights()) {
+              <div class="loyalty-loading"><mat-spinner diameter="18"></mat-spinner><span>Checking your bankroll…</span></div>
+            } @else if (coaching.insights()) {
+              <div class="coaching-grid">
+                <div class="loyalty-cell">
+                  <span class="cell-value">₦{{ coaching.insights()!.bankroll.toLocaleString() }}</span>
+                  <span class="cell-label">Bankroll</span>
+                </div>
+                <div class="loyalty-cell">
+                  <span class="cell-value">₦{{ coaching.insights()!.staked24h.toLocaleString() }}</span>
+                  <span class="cell-label">Staked 24h</span>
+                </div>
+                <div class="loyalty-cell">
+                  <span class="cell-value">{{ coaching.insights()!.stakes24h }}</span>
+                  <span class="cell-label">Stakes 24h</span>
+                </div>
+                <div class="loyalty-cell">
+                  <span class="cell-value">
+                    {{ coaching.insights()!.winRate30d !== null ? coaching.insights()!.winRate30d + '%' : '—' }}
+                  </span>
+                  <span class="cell-label">Win rate 30d</span>
+                </div>
+              </div>
+
+              <ul class="nudge-list">
+                @for (nudge of coaching.insights()!.nudges; track nudge) {
+                  <li><mat-icon>tips_and_updates</mat-icon><span>{{ nudge }}</span></li>
+                }
+              </ul>
+
+              <div class="coach-tip">
+                <mat-icon>lightbulb</mat-icon>
+                <span>{{ coaching.insights()!.tip }}</span>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
 
       <mat-tab-group class="settings-tabs">
         <mat-tab label="Personal Info">

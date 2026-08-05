@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed, HostListener, ElementRef } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,6 +17,7 @@ export class NotificationBellComponent {
   notifService = inject(NotificationService);
   device = inject(DeviceService);
   private elementRef = inject(ElementRef);
+  private router = inject(Router);
 
   showPanel = signal(false);
   hasFetched = false;
@@ -50,6 +51,18 @@ export class NotificationBellComponent {
       },
       error: () => {}
     });
+  }
+
+  openNotif(notif: any) {
+    this.markRead(notif._id);
+    const data = notif.data || {};
+    if (data['podId']) {
+      this.showPanel.set(false);
+      this.router.navigate(['/home'], { queryParams: { pod: data['podId'] } });
+    } else if (data['coaching'] || data['cashback']) {
+      this.showPanel.set(false);
+      this.router.navigate(['/profile']);
+    }
   }
 
   markAllRead() {

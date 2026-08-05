@@ -3,4 +3,5 @@ export { FaqSectionComponent } from './faq-section/faq-section.component';
 export { MobileNavComponent } from './mobile-nav/mobile-nav.component';
 export { NotificationBellComponent } from './notification-bell/notification-bell.component';
 export { OraChatComponent } from './ora-chat/ora-chat.component';
+export { OraPickBannerComponent } from './ora-pick-banner/ora-pick-banner.component';
 export { TopUpModalComponent } from './top-up-modal/top-up-modal.component';

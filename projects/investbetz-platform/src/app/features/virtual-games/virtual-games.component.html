@@ -1,0 +1,392 @@
+@if (isMobileView()) {
+  <div class="mobile-root">
+    <header class="mobile-header">
+      <button mat-icon-button routerLink="/home"><mat-icon>arrow_back</mat-icon></button>
+      <h1>Instant Games</h1>
+      <span class="header-balance">{{ formatMoney(balance().available) }}</span>
+    </header>
+
+    <div class="mobile-content">
+      @if (loading()) {
+        <div class="skel-page">
+          @for (item of [1,2,3]; track item) {
+            <div class="sk skel-card"></div>
+          }
+        </div>
+      } @else if (errorSig()) {
+        <div class="empty-state">
+          <mat-icon>error_outline</mat-icon>
+          <h3>Could not load games</h3>
+          <p>{{ errorSig() }}</p>
+        </div>
+      } @else {
+        <p class="page-subtitle">Instant games, instant payouts — every result is verifiable.</p>
+
+        <div class="game-tabs">
+          @for (g of catalog(); track g.id) {
+            <button
+              class="game-tab"
+              [class.active]="activeGameId() === g.id"
+              [class.disabled]="!g.enabled"
+              (click)="applyHomeChoice(g.id)">
+              <mat-icon>{{ g.icon }}</mat-icon>
+              <span>{{ g.name }}</span>
+              <span class="tab-odds">{{ g.multiplier.toFixed(1) }}x</span>
+            </button>
+          }
+        </div>
+
+        @if (activeGame(); as game) {
+          <section class="play-card">
+            <div class="play-head">
+              <div>
+                <h2>{{ game.name }}</h2>
+                <p class="play-desc">{{ game.description }}</p>
+              </div>
+              <span class="rtp-chip">RTP {{ game.rtpPercent }}%</span>
+            </div>
+
+            <p class="choice-label">Pick an outcome</p>
+            @if (game.id === 'coin_flip') {
+              <div class="choice-row">
+                @for (side of game.outcomes; track side) {
+                  <button
+                    class="choice-btn coin"
+                    [class.selected]="choice() === side"
+                    (click)="choice.set(side)">
+                    <mat-icon>{{ side === 'heads' ? 'looks_one' : 'looks_two' }}</mat-icon>
+                    <span>{{ side === 'heads' ? 'Heads' : 'Tails' }}</span>
+                  </button>
+                }
+              </div>
+            } @else if (game.id === 'dice') {
+              <div class="choice-row dice">
+                @for (face of diceFaces; track face) {
+                  <button
+                    class="choice-btn die"
+                    [class.selected]="choice() === face"
+                    (click)="choice.set(face)">
+                    {{ face }}
+                  </button>
+                }
+              </div>
+            } @else {
+              <div class="choice-row">
+                @for (color of colorChoices; track color) {
+                  <button
+                    class="choice-btn color-btn"
+                    [class.selected]="choice() === color"
+                    (click)="choice.set(color)">
+                    <span class="color-dot" [class.dot-emerald]="color === 'emerald'" [class.dot-gold]="color === 'gold'" [class.dot-white]="color === 'white'"></span>
+                    <span>{{ color === 'emerald' ? 'Emerald' : color === 'gold' ? 'Gold' : 'White' }}</span>
+                  </button>
+                }
+              </div>
+            }
+
+            <p class="choice-label">Stake</p>
+            <div class="amount-row">
+              <button class="amount-btn" [class.selected]="stakeAmount() === a" *ngFor="let a of quickAmounts" (click)="stakeAmount.set(a)">{{ formatMoney(a) }}</button>
+            </div>
+            <div class="amount-input">
+              <span class="amount-currency">₦</span>
+              <input type="number" min="100" [value]="stakeAmount()" (input)="onAmountInput($event)" aria-label="Stake amount" />
+            </div>
+
+            <div class="payout-preview">
+              <span>Win pays</span>
+              <strong>{{ formatMoney(winPayout(game)) }}</strong>
+              <span class="odds">{{ game.multiplier.toFixed(1) }}x</span>
+            </div>
+
+            <button
+              mat-raised-button
+              class="play-btn"
+              [disabled]="playing() || !game.enabled"
+              (click)="play()">
+              @if (playing()) {
+                <mat-spinner diameter="18" /> Rolling…
+              } @else {
+                Play {{ formatMoney(stakeAmount()) }}
+              }
+            </button>
+            <p class="fair-note">
+              <mat-icon>verified_user</mat-icon>
+              Outcome is derived from a server seed — tap "Verify" after the round to confirm it locally.
+            </p>
+          </section>
+        }
+
+        <section class="history-section">
+          <div class="section-head">
+            <h3>My Plays</h3>
+            <span class="section-hint">{{ historyTotal() }} total</span>
+          </div>
+          @if (historyLoading() && history().length === 0) {
+            <div class="sk skel-row"></div>
+          } @else if (history().length === 0) {
+            <div class="empty-state compact">
+              <mat-icon>history</mat-icon>
+              <p>No plays yet — try a round above.</p>
+            </div>
+          } @else {
+            <div class="history-list">
+              @for (item of history(); track item._id) {
+                <div class="history-row" [class.win-row]="item.result === 'win'">
+                  <mat-icon class="h-game-icon">{{ gameIcon(item.game) }}</mat-icon>
+                  <div class="h-main">
+                    <span class="h-title">{{ gameName(item.game) }}</span>
+                    <span class="h-sub">{{ item.outcome }} ({{ item.choice }}) · {{ formatDate(item.playedAt) }}</span>
+                  </div>
+                  <div class="h-right">
+                    <span class="h-amount">{{ formatMoney(item.stakeAmount) }}</span>
+                    @if (item.result === 'win') {
+                      <span class="h-payout">+{{ formatMoney(item.payoutAmount) }}</span>
+                    } @else {
+                      <span class="h-loss">-{{ formatMoney(item.stakeAmount) }}</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+            @if (history().length < historyTotal()) {
+              <button class="load-more" (click)="loadMoreHistory()">
+                <mat-icon>expand_more</mat-icon> Load more
+              </button>
+            }
+          }
+        </section>
+      }
+    </div>
+
+    <app-mobile-nav />
+  </div>
+} @else {
+  <app-nav />
+
+  <div class="vg-page">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Instant Games</h1>
+        <span class="page-subtitle">Instant games, instant payouts — every result is provably fair.</span>
+      </div>
+      <div class="page-balance">
+        <mat-icon>account_balance_wallet</mat-icon>
+        <span>{{ formatMoney(balance().available) }}</span>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <div class="skel-page">
+        @for (item of [1,2,3]; track item) {
+          <div class="sk skel-card"></div>
+        }
+      </div>
+    } @else if (errorSig()) {
+      <div class="empty-state">
+        <mat-icon>error_outline</mat-icon>
+        <h3>Could not load games</h3>
+        <p>{{ errorSig() }}</p>
+      </div>
+    } @else {
+      <div class="game-tabs">
+        @for (g of catalog(); track g.id) {
+          <button
+            class="game-tab"
+            [class.active]="activeGameId() === g.id"
+            [class.disabled]="!g.enabled"
+            (click)="applyHomeChoice(g.id)">
+            <mat-icon>{{ g.icon }}</mat-icon>
+            <span>{{ g.name }}</span>
+            <span class="tab-odds">{{ g.multiplier.toFixed(1) }}x</span>
+          </button>
+        }
+      </div>
+
+      @if (activeGame(); as game) {
+        <section class="play-card">
+          <div class="play-head">
+            <div>
+              <h2>{{ game.name }}</h2>
+              <p class="play-desc">{{ game.description }}</p>
+            </div>
+            <span class="rtp-chip">RTP {{ game.rtpPercent }}%</span>
+          </div>
+
+          <div class="play-grid">
+            <div class="pick-col">
+              <p class="choice-label">Pick an outcome</p>
+              @if (game.id === 'coin_flip') {
+                <div class="choice-row">
+                  @for (side of game.outcomes; track side) {
+                    <button
+                      class="choice-btn coin"
+                      [class.selected]="choice() === side"
+                      (click)="choice.set(side)">
+                      <mat-icon>{{ side === 'heads' ? 'looks_one' : 'looks_two' }}</mat-icon>
+                      <span>{{ side === 'heads' ? 'Heads' : 'Tails' }}</span>
+                    </button>
+                  }
+                </div>
+              } @else if (game.id === 'dice') {
+                <div class="choice-row dice">
+                  @for (face of diceFaces; track face) {
+                    <button
+                      class="choice-btn die"
+                      [class.selected]="choice() === face"
+                      (click)="choice.set(face)">
+                      {{ face }}
+                    </button>
+                  }
+                </div>
+              } @else {
+                <div class="choice-row">
+                  @for (color of colorChoices; track color) {
+                    <button
+                      class="choice-btn color-btn"
+                      [class.selected]="choice() === color"
+                      (click)="choice.set(color)">
+                      <span class="color-dot" [class.dot-emerald]="color === 'emerald'" [class.dot-gold]="color === 'gold'" [class.dot-white]="color === 'white'"></span>
+                      <span>{{ color === 'emerald' ? 'Emerald' : color === 'gold' ? 'Gold' : 'White' }}</span>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="stake-col">
+              <p class="choice-label">Stake</p>
+              <div class="amount-row">
+                <button class="amount-btn" [class.selected]="stakeAmount() === a" *ngFor="let a of quickAmounts" (click)="stakeAmount.set(a)">{{ formatMoney(a) }}</button>
+              </div>
+              <div class="amount-input">
+                <span class="amount-currency">₦</span>
+                <input type="number" min="100" [value]="stakeAmount()" (input)="onAmountInput($event)" aria-label="Stake amount" />
+              </div>
+              <div class="payout-preview">
+                <span>Win pays</span>
+                <strong>{{ formatMoney(winPayout(game)) }}</strong>
+                <span class="odds">{{ game.multiplier.toFixed(1) }}x</span>
+              </div>
+              <button
+                mat-raised-button
+                class="play-btn"
+                [disabled]="playing() || !game.enabled"
+                (click)="play()">
+                @if (playing()) {
+                  <mat-spinner diameter="18" /> Rolling…
+                } @else {
+                  Play {{ formatMoney(stakeAmount()) }}
+                }
+              </button>
+              <p class="fair-note">
+                <mat-icon>verified_user</mat-icon>
+                Outcome is derived from a server seed — tap "Verify" after the round to confirm it locally.
+              </p>
+            </div>
+          </div>
+        </section>
+      }
+
+      <section class="history-section">
+        <div class="section-head">
+          <h3>My Plays</h3>
+          <span class="section-hint">{{ historyTotal() }} total</span>
+        </div>
+        @if (historyLoading() && history().length === 0) {
+          <div class="sk skel-row"></div>
+        } @else if (history().length === 0) {
+          <div class="empty-state compact">
+            <mat-icon>history</mat-icon>
+            <p>No plays yet — try a round above.</p>
+          </div>
+        } @else {
+          <div class="history-list">
+            @for (item of history(); track item._id) {
+              <div class="history-row" [class.win-row]="item.result === 'win'">
+                <mat-icon class="h-game-icon">{{ gameIcon(item.game) }}</mat-icon>
+                <div class="h-main">
+                  <span class="h-title">{{ gameName(item.game) }}</span>
+                  <span class="h-sub">{{ item.outcome }} ({{ item.choice }}) · {{ formatDate(item.playedAt) }}</span>
+                </div>
+                <div class="h-right">
+                  <span class="h-amount">{{ formatMoney(item.stakeAmount) }}</span>
+                  @if (item.result === 'win') {
+                    <span class="h-payout">+{{ formatMoney(item.payoutAmount) }}</span>
+                  } @else {
+                    <span class="h-loss">-{{ formatMoney(item.stakeAmount) }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+          @if (history().length < historyTotal()) {
+            <button class="load-more" (click)="loadMoreHistory()">
+              <mat-icon>expand_more</mat-icon> Load more
+            </button>
+          }
+        }
+      </section>
+    }
+  </div>
+}
+
+@if (lastResult(); as res) {
+  <div class="result-overlay" (click)="closeResult()">
+    <div class="result-modal" [class.win]="res.result === 'win'" (click)="$event.stopPropagation()">
+      <button class="close-btn" (click)="closeResult()" aria-label="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+      <div class="result-icon">
+        @if (res.result === 'win') {
+          <mat-icon>celebration</mat-icon>
+        } @else {
+          <mat-icon>mood_bad</mat-icon>
+        }
+      </div>
+      <h2>{{ res.result === 'win' ? 'You won!' : 'Not this time' }}</h2>
+      <p class="result-line">
+        @if (res.result === 'win') {
+          <strong class="win-amount">+{{ formatMoney(res.payoutAmount) }}</strong>
+          <span>payout credited to your wallet</span>
+        } @else {
+          <span>Outcome was <strong>{{ res.outcome }}</strong> — you picked {{ res.choice }}</span>
+        }
+      </p>
+      <div class="result-facts">
+        <div class="fact">
+          <span class="fact-label">Your pick</span>
+          <span class="fact-value">{{ res.choice }}</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label">Result</span>
+          <span class="fact-value">{{ res.outcome }}</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label">Stake</span>
+          <span class="fact-value">{{ formatMoney(res.stakeAmount) }}</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label">Balance</span>
+          <span class="fact-value">{{ formatMoney(res.balanceAfter) }}</span>
+        </div>
+      </div>
+
+      <button class="verify-btn" (click)="verify()" [disabled]="verifying()">
+        @if (verifying()) {
+          <mat-spinner diameter="16" />
+        } @else {
+          <mat-icon>verified_user</mat-icon>
+        }
+        {{ verified() === true ? '✓ Verified fair' : verified() === false ? 'Verification failed' : 'Verify this result' }}
+      </button>
+      <p class="seed-note" *ngIf="res.seed">
+        Seed: <code>{{ res.seed }}</code>
+      </p>
+
+      <button mat-raised-button class="again-btn" (click)="closeResult()">
+        <mat-icon>refresh</mat-icon> Play again
+      </button>
+    </div>
+  </div>
+}

@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,6 +20,7 @@ import { AppNavComponent, MobileNavComponent } from '../../core/components';
 export class NotificationsComponent implements OnInit, OnDestroy {
   notifService = inject(NotificationService);
   device = inject(DeviceService);
+  private router = inject(Router);
 
   page = signal(1);
   limit = signal(20);
@@ -132,6 +133,19 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       },
       error: () => this.bulkDeleting.set(false)
     });
+  }
+
+  openNotification(n: AppNotification) {
+    const data = n.data || {};
+    if (data['podId']) {
+      this.router.navigate(['/home'], { queryParams: { pod: data['podId'] } });
+      return;
+    }
+    if (data['coaching'] || data['cashback']) {
+      this.router.navigate(['/profile']);
+      return;
+    }
+    if (!n.read) this.markRead(n._id);
   }
 
   markRead(id: string) {

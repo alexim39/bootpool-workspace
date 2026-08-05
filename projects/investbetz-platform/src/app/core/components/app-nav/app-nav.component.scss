@@ -193,13 +193,244 @@
       border-color: rgba(0,230,118,0.5) !important;
     }
 
-    .logout-btn {
-      color: rgba(255,255,255,0.3);
-      transition: color 0.2s ease;
+    /* ---------- Nav menus (Play / Account) ---------- */
+    .nav-menu-wrap {
+      position: relative;
     }
 
-    .logout-btn:hover {
-      color: #f44336;
+    button.nav-link.nav-menu {
+      border: none;
+      background: none;
+      font-family: inherit;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .nav-menu .chevron {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      transition: transform 0.2s ease;
+    }
+
+    .nav-menu[aria-expanded="true"] .chevron {
+      transform: rotate(180deg);
+    }
+
+    .menu-panel {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 0;
+      min-width: 264px;
+      padding: 8px;
+      background: rgba(10, 20, 40, 0.97);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      box-shadow: 0 16px 44px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 230, 118, 0.04);
+      z-index: 300;
+      animation: menu-in 0.18s ease;
+    }
+
+    .account-panel {
+      left: auto;
+      right: 0;
+      min-width: 280px;
+    }
+
+    @keyframes menu-in {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: rgba(255, 255, 255, 0.75);
+      transition: background 0.15s ease, color 0.15s ease;
+      cursor: pointer;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+      }
+
+      &.active {
+        background: rgba(0, 230, 118, 0.1);
+        color: #00E676;
+      }
+    }
+
+    .menu-item-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: #00E676;
+      flex-shrink: 0;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .menu-item-icon.arcade { color: #F5B301; }
+    .menu-item-icon.gold { color: #F5B301; }
+    .menu-item-icon.danger { color: #f44336; }
+
+    .menu-item-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .menu-item-title {
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+
+    .menu-item-desc {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.4);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .menu-item-arrow {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: rgba(255, 255, 255, 0.25);
+    }
+
+    .menu-btn {
+      border: none;
+      background: none;
+      text-align: left;
+      font-family: inherit;
+      appearance: none;
+
+      &:hover {
+        background: rgba(244, 67, 54, 0.1);
+      }
+
+      .menu-item-title { color: #f44336; }
+    }
+
+    .menu-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.06);
+      margin: 6px 8px;
+    }
+
+    /* ---------- Account trigger ---------- */
+    .account-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px 4px 4px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+
+      &:hover,
+      &.active,
+      &[aria-expanded="true"] {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(0, 230, 118, 0.25);
+      }
+    }
+
+    .avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00E676, #00C853);
+      color: #0A1428;
+      font-size: 14px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .account-name {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      font-size: 13px;
+      font-weight: 600;
+
+      .chevron {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        color: rgba(255, 255, 255, 0.4);
+        transition: transform 0.2s ease;
+      }
+    }
+
+    .account-btn[aria-expanded="true"] .chevron {
+      transform: rotate(180deg);
+    }
+
+    .menu-acct-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px 12px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .menu-acct-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .menu-acct-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .menu-acct-sub {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: #00E676;
+
+      mat-icon {
+        font-size: 13px;
+        width: 13px;
+        height: 13px;
+      }
     }
 
     @media (max-width: 768px) {

@@ -52,20 +52,40 @@
               <span class="link-indicator"></span>
             }
           </a>
-          <a routerLink="/wallet" routerLinkActive="active" class="nav-link" #rla3="routerLinkActive">
-            <mat-icon>account_balance_wallet</mat-icon>
-            <span>Wallet</span>
-            @if (rla3.isActive) {
-              <span class="link-indicator"></span>
+
+          <div class="nav-menu-wrap">
+            <button
+              type="button"
+              class="nav-link nav-menu"
+              [class.active]="playActive() || playMenuOpen()"
+              [attr.aria-expanded]="playMenuOpen()"
+              aria-haspopup="menu"
+              (click)="togglePlayMenu(); $event.stopPropagation()">
+              <mat-icon>sports</mat-icon>
+              <span>Play</span>
+              <mat-icon class="chevron">keyboard_arrow_down</mat-icon>
+            </button>
+            @if (playMenuOpen()) {
+              <div class="menu-panel" role="menu" (click)="playMenuOpen.set(false)">
+                <a routerLink="/leaderboard" routerLinkActive="active" class="menu-item" role="menuitem">
+                  <span class="menu-item-icon"><mat-icon>emoji_events</mat-icon></span>
+                  <span class="menu-item-text">
+                    <span class="menu-item-title">Leaderboard</span>
+                    <span class="menu-item-desc">Compete for the top rank</span>
+                  </span>
+                  <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
+                </a>
+                <a routerLink="/virtual-games" routerLinkActive="active" class="menu-item" role="menuitem">
+                  <span class="menu-item-icon arcade"><mat-icon>casino</mat-icon></span>
+                  <span class="menu-item-text">
+                    <span class="menu-item-title">Arcade</span>
+                    <span class="menu-item-desc">Instant win games</span>
+                  </span>
+                  <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
+                </a>
+              </div>
             }
-          </a>
-          <a routerLink="/profile" routerLinkActive="active" class="nav-link" #rla4="routerLinkActive">
-            <mat-icon>person</mat-icon>
-            <span>Profile</span>
-            @if (rla4.isActive) {
-              <span class="link-indicator"></span>
-            }
-          </a>
+          </div>
         </nav>
 
         <div class="nav-right">
@@ -78,9 +98,56 @@
             Top Up
           </button>
           <app-notification-bell />
-          <button mat-icon-button (click)="auth.logout()" class="logout-btn">
-            <mat-icon>logout</mat-icon>
-          </button>
+
+          <div class="nav-menu-wrap account-wrap">
+            <button
+              type="button"
+              class="account-btn"
+              [class.active]="accountActive() || accountMenuOpen()"
+              [attr.aria-expanded]="accountMenuOpen()"
+              aria-haspopup="menu"
+              (click)="toggleAccountMenu(); $event.stopPropagation()">
+              <span class="avatar">{{ userInitial() }}</span>
+              <span class="account-name">
+                {{ displayName() }}
+                <mat-icon class="chevron">keyboard_arrow_down</mat-icon>
+              </span>
+            </button>
+            @if (accountMenuOpen()) {
+              <div class="menu-panel account-panel" role="menu" (click)="accountMenuOpen.set(false)">
+                <div class="menu-acct-header">
+                  <span class="avatar">{{ userInitial() }}</span>
+                  <div class="menu-acct-meta">
+                    <span class="menu-acct-name">{{ auth.user()?.fullName }}</span>
+                    <span class="menu-acct-sub">
+                      <mat-icon>verified_user</mat-icon> KYC {{ auth.isKycVerified() ? 'Verified' : 'Pending' }}
+                    </span>
+                  </div>
+                </div>
+                <a routerLink="/profile" routerLinkActive="active" class="menu-item" role="menuitem">
+                  <span class="menu-item-icon"><mat-icon>person</mat-icon></span>
+                  <span class="menu-item-text">
+                    <span class="menu-item-title">Profile</span>
+                    <span class="menu-item-desc">Manage your details</span>
+                  </span>
+                  <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
+                </a>
+                <a routerLink="/wallet" routerLinkActive="active" class="menu-item" role="menuitem">
+                  <span class="menu-item-icon gold"><mat-icon>account_balance_wallet</mat-icon></span>
+                  <span class="menu-item-text">
+                    <span class="menu-item-title">Wallet</span>
+                    <span class="menu-item-desc">Balance &amp; transaction history</span>
+                  </span>
+                  <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
+                </a>
+                <div class="menu-divider"></div>
+                <button type="button" class="menu-item menu-btn danger" (click)="auth.logout()" role="menuitem">
+                  <span class="menu-item-icon danger"><mat-icon>logout</mat-icon></span>
+                  <span class="menu-item-text"><span class="menu-item-title">Logout</span></span>
+                </button>
+              </div>
+            }
+          </div>
         </div>
       </div>
     </header>

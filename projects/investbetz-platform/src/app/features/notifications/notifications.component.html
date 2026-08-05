@@ -103,7 +103,7 @@
     }
 
     @for (notif of notifications(); track notif._id) {
-      <div class="notif-item" [class.unread]="!notif.read" [class.selected]="selectedIds().has(notif._id)" [class.mobile]="device.isMobile()">
+      <div class="notif-item" [class.unread]="!notif.read" [class.selected]="selectedIds().has(notif._id)" [class.mobile]="device.isMobile()" (click)="openNotification(notif)">
         <label class="notif-check" (click)="$event.stopPropagation()">
           <input type="checkbox" [checked]="selectedIds().has(notif._id)" (change)="toggleSelect(notif._id)" class="row-checkbox" />
         </label>

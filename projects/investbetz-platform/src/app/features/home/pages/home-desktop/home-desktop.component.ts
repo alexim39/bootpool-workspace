@@ -15,8 +15,9 @@ import { PodCardComponent } from '../../components/pod-card/pod-card.component';
 import { StakeModalComponent } from '../../components/stake-modal/stake-modal.component';
 import { BetSlipComponent } from '../../components/bet-slip/bet-slip.component';
 import { FeaturedBannerComponent } from '../../components/featured-banner/featured-banner.component';
-import { AppNavComponent, OraChatComponent } from '../../../../core/components';
+import { AppNavComponent, OraChatComponent, OraPickBannerComponent } from '../../../../core/components';
 import { HomeStore } from '../../stores/home.store';
+import { OraPick } from '../../../../core/services';
 
 @Component({
   selector: 'app-home-desktop',
@@ -39,7 +40,8 @@ import { HomeStore } from '../../stores/home.store';
     BetSlipComponent,
     FeaturedBannerComponent,
     AppNavComponent,
-    OraChatComponent
+    OraChatComponent,
+    OraPickBannerComponent
   ],
   templateUrl: './home-desktop.component.html',
   styleUrls: ['./home-desktop.component.scss']
@@ -59,6 +61,14 @@ export class HomeDesktopComponent implements OnInit {
   openOraChat() { this.showOraChat.set(true); }
 
   closeOraChat() { this.showOraChat.set(false); }
+
+  onOraPickStake(pick: OraPick) {
+    if (!this.store.auth.isAuthenticated()) {
+      this._snackBar.open('Please log in to place a stake', 'OK', { duration: 3000 });
+      return;
+    }
+    this.store.openPodById(pick.podId);
+  }
 
   openStakeModal(pod: any) {
     if (!this.store.auth.isAuthenticated()) {

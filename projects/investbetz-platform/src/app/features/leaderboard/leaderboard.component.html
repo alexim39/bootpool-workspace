@@ -1,0 +1,255 @@
+@if (isMobileView()) {
+  <div class="mobile-root">
+    <header class="mobile-header">
+      <button mat-icon-button routerLink="/home"><mat-icon>arrow_back</mat-icon></button>
+      <h1>Leaderboard</h1>
+    </header>
+
+    <div class="mobile-content">
+      <a mat-stroked-button class="ora-record-link mobile" routerLink="/ora-record">
+        <mat-icon>verified</mat-icon> Ora's Track Record
+      </a>
+
+      <div class="period-tabs">
+        @for (p of periods; track p) {
+          <button
+            class="period-tab"
+            [class.active]="period() === p"
+            (click)="setPeriod(p)">
+            {{ p === 'week' ? 'This Week' : p === 'month' ? 'This Month' : 'All Time' }}
+          </button>
+        }
+      </div>
+
+      @if (myRank()) {
+        <section class="my-rank-card">
+          <div class="my-rank-left">
+            <span class="my-rank-label">My Rank</span>
+            <div class="my-rank-value">
+              <span class="rank-no" [class]="rankClass(myRank()!.rank)">#{{ myRank()!.rank }}</span>
+              <span class="rank-suffix">of {{ board()?.total || '…' }} stakers</span>
+            </div>
+            <div class="my-rank-stats">
+              <span class="stat-pill">₦{{ myRank()!.totalStaked.toLocaleString() }} staked</span>
+              <span class="stat-pill">{{ myRank()!.stakeCount }} stakes</span>
+              <span class="stat-pill won">₦{{ myRank()!.totalWon.toLocaleString() }} won</span>
+            </div>
+          </div>
+          <div class="my-rank-right" (click)="loadLastWin()">
+            <span class="win-share-label">Share your last win</span>
+            @if (lastWin()) {
+              <div class="win-share-card">
+                <div class="win-share-main">
+                  <span class="win-share-amount">₦{{ lastWin()!.netPayout.toLocaleString() }}</span>
+                  <span class="win-share-desc">won on {{ lastWin()!.podTitle }} &#64; {{ lastWin()!.multiplier }}x</span>
+                </div>
+                <div class="win-share-actions">
+                  <button mat-stroked-button class="win-share-btn" (click)="shareWin(); $event.stopPropagation()">
+                    <mat-icon>{{ shareCopied() ? 'check' : 'content_copy' }}</mat-icon>
+                    {{ shareCopied() ? 'Copied!' : 'Copy summary' }}
+                  </button>
+                  <button mat-stroked-button class="win-share-btn wa" (click)="shareWinWhatsApp(); $event.stopPropagation()">
+                    <mat-icon>chat</mat-icon> WhatsApp
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <span class="win-share-empty">No win to share yet — tap to check</span>
+            }
+          </div>
+        </section>
+      }
+
+      @if (loading() && !board()) {
+        <div class="skel-page">
+          @for (item of skeletonRows; track item) {
+            <div class="sk skel-row"></div>
+          }
+        </div>
+      } @else if (error() && !board()) {
+        <div class="empty-state">
+          <mat-icon>error_outline</mat-icon>
+          <h3>Could not load the leaderboard</h3>
+          <p>{{ error() }}</p>
+        </div>
+      } @else if (board() && board()!.items.length === 0) {
+        <div class="empty-state">
+          <mat-icon>emoji_events</mat-icon>
+          <h3>No stakes yet</h3>
+          <p>Be the first to stake in this period and claim the top spot.</p>
+        </div>
+      } @else if (board()) {
+        <section class="board-table">
+          <div class="board-row board-head">
+            <span>#</span>
+            <span>Staker</span>
+            <span class="num-col">Stakes</span>
+            <span class="num-col">Volume</span>
+            <span class="num-col">Total Won</span>
+            <span class="num-col">Last Win</span>
+          </div>
+          @for (entry of board()!.items; track entry.userId; let i = $index) {
+            <div class="board-row" [class.self-row]="entry.userId === myRank()?.userId">
+              <span class="rank-cell">
+                @if (rankBadge(entry.rank)) {
+                  <span class="medal">{{ rankBadge(entry.rank) }}</span>
+                }
+                <span class="rank-no" [class]="rankClass(entry.rank)">{{ entry.rank }}</span>
+              </span>
+              <span class="staker-name">{{ entry.displayName }}</span>
+              <span class="num-col">{{ entry.stakeCount }}</span>
+              <span class="num-col strong">{{ formatMoney(entry.totalStaked) }}</span>
+              <span class="num-col won">{{ formatMoney(entry.totalWon) }}</span>
+              <span class="num-col">{{ formatDate(entry.lastWinAt) }}</span>
+            </div>
+          }
+        </section>
+
+        <div class="pagination">
+          <button
+            class="page-btn"
+            [disabled]="page() <= 1"
+            (click)="goToPage(page() - 1)">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <span class="page-info">Page {{ page() }} of {{ totalPages() }}</span>
+          <button
+            class="page-btn"
+            [disabled]="page() >= totalPages()"
+            (click)="goToPage(page() + 1)">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+
+    <app-mobile-nav />
+  </div>
+} @else {
+  <app-nav />
+
+  <div class="board-page">
+
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Leaderboard</h1>
+        <span class="page-subtitle">Top stakers by volume — updated live</span>
+      </div>
+      <a mat-stroked-button class="ora-record-link" routerLink="/ora-record">
+        <mat-icon>verified</mat-icon> Ora's Track Record
+      </a>
+    </div>
+
+    <div class="period-tabs">
+      @for (p of periods; track p) {
+        <button
+          class="period-tab"
+          [class.active]="period() === p"
+          (click)="setPeriod(p)">
+          {{ p === 'week' ? 'This Week' : p === 'month' ? 'This Month' : 'All Time' }}
+        </button>
+      }
+    </div>
+
+    @if (myRank()) {
+      <section class="my-rank-card">
+        <div class="my-rank-left">
+          <span class="my-rank-label">My Rank</span>
+          <div class="my-rank-value">
+            <span class="rank-no" [class]="rankClass(myRank()!.rank)">#{{ myRank()!.rank }}</span>
+            <span class="rank-suffix">of {{ board()?.total || '…' }} stakers</span>
+          </div>
+          <div class="my-rank-stats">
+            <span class="stat-pill">₦{{ myRank()!.totalStaked.toLocaleString() }} staked</span>
+            <span class="stat-pill">{{ myRank()!.stakeCount }} stakes</span>
+            <span class="stat-pill won">₦{{ myRank()!.totalWon.toLocaleString() }} won</span>
+          </div>
+        </div>
+        <div class="my-rank-right" (click)="loadLastWin()">
+          <span class="win-share-label">Share your last win</span>
+          @if (lastWin()) {
+            <div class="win-share-card">
+              <div class="win-share-main">
+                <span class="win-share-amount">₦{{ lastWin()!.netPayout.toLocaleString() }}</span>
+                <span class="win-share-desc">won on {{ lastWin()!.podTitle }} &#64; {{ lastWin()!.multiplier }}x</span>
+              </div>
+              <div class="win-share-actions">
+                <button mat-stroked-button class="win-share-btn" (click)="shareWin(); $event.stopPropagation()">
+                  <mat-icon>{{ shareCopied() ? 'check' : 'content_copy' }}</mat-icon>
+                  {{ shareCopied() ? 'Copied!' : 'Copy summary' }}
+                </button>
+                <button mat-stroked-button class="win-share-btn wa" (click)="shareWinWhatsApp(); $event.stopPropagation()">
+                  <mat-icon>chat</mat-icon> WhatsApp
+                </button>
+              </div>
+            </div>
+          } @else {
+            <span class="win-share-empty">No win to share yet — tap to check</span>
+          }
+        </div>
+      </section>
+    }
+
+    @if (loading() && !board()) {
+      <div class="skel-page">
+        @for (item of skeletonRows; track item) {
+          <div class="sk skel-row"></div>
+        }
+      </div>
+    } @else if (error() && !board()) {
+      <div class="empty-state">
+        <mat-icon>error_outline</mat-icon>
+        <h3>Could not load the leaderboard</h3>
+        <p>{{ error() }}</p>
+      </div>
+    } @else if (board() && board()!.items.length === 0) {
+      <div class="empty-state">
+        <mat-icon>emoji_events</mat-icon>
+        <h3>No stakes yet</h3>
+        <p>Be the first to stake in this period and claim the top spot.</p>
+      </div>
+    } @else if (board()) {
+      <section class="board-table">
+        <div class="board-row board-head">
+          <span>#</span>
+          <span>Staker</span>
+          <span class="num-col">Stakes</span>
+          <span class="num-col">Volume</span>
+          <span class="num-col">Total Won</span>
+          <span class="num-col">Last Win</span>
+        </div>
+        @for (entry of board()!.items; track entry.userId; let i = $index) {
+          <div class="board-row" [class.self-row]="entry.userId === myRank()?.userId">
+            <span class="rank-cell">
+              @if (rankBadge(entry.rank)) {
+                <span class="medal">{{ rankBadge(entry.rank) }}</span>
+              }
+              <span class="rank-no" [class]="rankClass(entry.rank)">{{ entry.rank }}</span>
+            </span>
+            <span class="staker-name">{{ entry.displayName }}</span>
+            <span class="num-col">{{ entry.stakeCount }}</span>
+            <span class="num-col strong">{{ formatMoney(entry.totalStaked) }}</span>
+            <span class="num-col won">{{ formatMoney(entry.totalWon) }}</span>
+            <span class="num-col">{{ formatDate(entry.lastWinAt) }}</span>
+          </div>
+        }
+      </section>
+
+      <div class="pagination">
+        <button
+          class="page-btn"
+          [disabled]="page() <= 1"
+          (click)="goToPage(page() - 1)">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span class="page-info">Page {{ page() }} of {{ totalPages() }}</span>
+        <button
+          class="page-btn"
+          [disabled]="page() >= totalPages()"
+          (click)="goToPage(page() + 1)">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    }
+  </div>
+}

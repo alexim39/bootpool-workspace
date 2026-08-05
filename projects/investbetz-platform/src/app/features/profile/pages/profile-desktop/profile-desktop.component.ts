@@ -14,8 +14,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { AppNavComponent, OraChatComponent, FaqSectionComponent } from '../../../../core/components';
 import { ProfileStore } from '../../stores/profile.store';
+import { LoyaltyService, CoachingService } from '../../../../core/services';
 
 @Component({
   selector: 'app-profile-desktop',
@@ -23,17 +25,21 @@ import { ProfileStore } from '../../stores/profile.store';
   imports: [
     CommonModule, ReactiveFormsModule, RouterModule, MatCardModule, MatButtonModule,
     MatIconModule, MatFormFieldModule, MatInputModule, MatProgressSpinnerModule,
-    MatSnackBarModule, MatChipsModule, MatTooltipModule, MatDividerModule, MatTabsModule, MatBadgeModule, AppNavComponent, OraChatComponent, FaqSectionComponent
+    MatSnackBarModule, MatChipsModule, MatTooltipModule, MatDividerModule, MatTabsModule, MatBadgeModule, MatProgressBarModule, AppNavComponent, OraChatComponent, FaqSectionComponent
   ],
     templateUrl: './profile-desktop.component.html',
   styleUrls: ['./profile-desktop.component.scss']
 })
 export class ProfileDesktopComponent implements OnInit {
   readonly store = inject(ProfileStore);
+  readonly loyalty = inject(LoyaltyService);
+  readonly coaching = inject(CoachingService);
   private _snackBar = inject(MatSnackBar);
 
   ngOnInit() {
     this.store.init();
+    this.loyalty.fetchSnapshot();
+    this.coaching.fetchInsights();
   }
 
   updateProfile() {

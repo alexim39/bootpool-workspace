@@ -1,0 +1,416 @@
+:host {
+  display: block;
+}
+
+.pick-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  max-width: 1200px;
+  width: calc(100% - 64px);
+  margin: 0 auto 18px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(245, 179, 1, 0.22);
+  background:
+    radial-gradient(140% 200% at -10% -20%, rgba(245, 179, 1, 0.16), transparent 55%),
+    radial-gradient(140% 200% at 110% 120%, rgba(0, 230, 118, 0.10), transparent 55%),
+    linear-gradient(135deg, rgba(20, 38, 70, 0.92), rgba(11, 24, 46, 0.97));
+  padding: 22px 26px;
+}
+
+.pick-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #F5B301 25%, #00E676 60%, transparent);
+  opacity: 0.85;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.pick-glow {
+  position: absolute;
+  top: -90px;
+  left: -60px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 179, 1, 0.20), transparent 70%);
+  pointer-events: none;
+}
+
+.pick-main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.pick-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px 5px 10px;
+  border-radius: 999px;
+  background: rgba(245, 179, 1, 0.10);
+  border: 1px solid rgba(245, 179, 1, 0.28);
+  color: #F5B301;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.badge-chip mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00E676;
+  box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.18), 0 0 8px rgba(0, 230, 118, 0.6);
+  animation: dotPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.pick-teams {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.team-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.team-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: rgba(255, 255, 255, 0.32);
+}
+
+.pick-team {
+  font-size: 19px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.95);
+  letter-spacing: -0.2px;
+}
+
+.pick-vs {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pick-league {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-left: 2px;
+}
+
+.pick-league mat-icon {
+  font-size: 13px;
+  width: 13px;
+  height: 13px;
+  color: #00E676;
+}
+
+.pick-meta {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.meta-chip mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  opacity: 0.85;
+}
+
+.pick-selection {
+  color: #00E676;
+  font-weight: 700;
+  border-color: rgba(0, 230, 118, 0.28);
+  background: rgba(0, 230, 118, 0.06);
+}
+
+.pick-odds {
+  color: #F5B301;
+  font-weight: 800;
+  border-color: rgba(245, 179, 1, 0.28);
+  background: rgba(245, 179, 1, 0.06);
+}
+
+.pick-kickoff {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.conf-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.conf-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1;
+}
+
+.conf-bar {
+  width: 84px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.10);
+  overflow: hidden;
+}
+
+.conf-fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #F5B301, #00E676);
+}
+
+.why-link {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.why-link mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.why-link:hover {
+  color: #F5B301;
+}
+
+.pick-reason {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 2px solid #F5B301;
+  border-radius: 0 10px 10px 0;
+  padding: 10px 14px;
+}
+
+.pick-action {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+  padding-left: 26px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stake-now-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  color: #0A1428;
+  background: linear-gradient(120deg, #F5B301, #00E676);
+  box-shadow: 0 6px 22px rgba(245, 179, 1, 0.28);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+}
+
+.stake-now-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(245, 179, 1, 0.42);
+  filter: brightness(1.05);
+}
+
+.stake-now-btn:active {
+  transform: translateY(0);
+}
+
+.stake-now-btn mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.stake-now-btn .btn-arrow {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  margin-left: -4px;
+}
+
+.pick-action-hint {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: center;
+  line-height: 1.45;
+  max-width: 170px;
+}
+
+.skel-banner {
+  height: 96px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 22px 26px;
+}
+
+.sk {
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+@media (max-width: 720px) {
+  .pick-banner {
+    width: calc(100% - 28px);
+    margin: 0 14px 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .pick-teams {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .pick-vs {
+    display: none;
+  }
+
+  .pick-league {
+    margin-left: 0;
+  }
+
+  .pick-team {
+    font-size: 16px;
+  }
+
+  .pick-meta {
+    gap: 6px;
+  }
+
+  .pick-action {
+    padding-left: 0;
+    border-left: none;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .stake-now-btn {
+    width: auto;
+    padding: 11px 20px;
+    flex-shrink: 0;
+  }
+
+  .pick-action-hint {
+    max-width: none;
+    text-align: left;
+    font-size: 10px;
+  }
+
+  .skel-banner {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 380px) {
+  .pick-action {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .stake-now-btn {
+    width: 100%;
+  }
+
+  .pick-action-hint {
+    text-align: center;
+  }
+}

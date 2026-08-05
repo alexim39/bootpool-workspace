@@ -1,0 +1,59 @@
+@if (loading() && !pick()) {
+  <div class="pick-banner skel-banner">
+    <div class="sk" style="width:180px;height:12px"></div>
+    <div class="sk" style="width:240px;height:20px"></div>
+  </div>
+} @else if (pick()) {
+  <div class="pick-banner">
+    <div class="pick-glow"></div>
+    <div class="pick-main">
+      <div class="pick-badge">
+        <span class="badge-chip">
+          <mat-icon>auto_awesome</mat-icon>
+          <span>Ora's Pick of the Day</span>
+        </span>
+        <span class="live-dot" aria-hidden="true"></span>
+      </div>
+      <div class="pick-teams">
+        <div class="team-block">
+          <span class="team-label">Home</span>
+          <span class="pick-team">{{ pick()!.homeTeam }}</span>
+        </div>
+        <span class="pick-vs">VS</span>
+        <div class="team-block">
+          <span class="team-label">Away</span>
+          <span class="pick-team">{{ pick()!.awayTeam }}</span>
+        </div>
+        <span class="pick-league"><mat-icon>sports_soccer</mat-icon> {{ pick()!.league }}</span>
+      </div>
+      <div class="pick-meta">
+        <span class="meta-chip pick-selection"><mat-icon>ads_click</mat-icon> {{ pick()!.pick }}</span>
+        <span class="meta-chip pick-confidence">
+          <span class="conf-row">
+            <span class="conf-text">{{ pick()!.confidence }}% confidence</span>
+            <span class="conf-bar"><span class="conf-fill" [style.width.%]="pick()!.confidence"></span></span>
+          </span>
+        </span>
+        <span class="meta-chip pick-odds">Odds {{ pick()!.gainsMultiplier }}x</span>
+        <span class="meta-chip pick-kickoff"><mat-icon>schedule</mat-icon> {{ kickoffLabel(pick()!) }}</span>
+      </div>
+      @if (pick()!.whyRecommended) {
+        <button class="why-link" (click)="showReason.set(!showReason())">
+          <mat-icon>{{ showReason() ? 'expand_less' : 'insights' }}</mat-icon>
+          {{ showReason() ? 'Hide reasoning' : 'Why this pick?' }}
+        </button>
+        @if (showReason()) {
+          <p class="pick-reason">{{ pick()!.whyRecommended }}</p>
+        }
+      }
+    </div>
+    <div class="pick-action">
+      <button class="stake-now-btn" (click)="stakeNow()">
+        <mat-icon>bolt</mat-icon>
+        Stake now
+        <mat-icon class="btn-arrow">chevron_right</mat-icon>
+      </button>
+      <span class="pick-action-hint">Opens the stake modal with this pod pre-loaded</span>
+    </div>
+  </div>
+}

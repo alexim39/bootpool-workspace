@@ -123,4 +123,46 @@
     .faq-back { display: inline-flex; align-items: center; gap: 4px; background: none; border: none; color: rgba(255,255,255,0.4); font-size: 13px; cursor: pointer; padding: 0; font-family: inherit; }
     .faq-back:hover { color: #00E676; }
     .faq-back mat-icon { font-size: 18px; width: 18px; height: 18px; }
+    /* ---- Leaderboard quick card ---- */
+    .stats-row { grid-template-columns: repeat(4, 1fr); }
+    .stat-icon.board { background: rgba(232,185,35,0.15); color: #E8B923; }
+    .stat-card-link { cursor: pointer; transition: transform 0.12s ease, border-color 0.12s ease; }
+    .stat-card-link:hover { transform: translateY(-1px); border-color: rgba(232,185,35,0.4); }
+    .stat-card-link .stat-value { color: #E8B923; }
+    .stat-card-link .chev { font-size: 14px; width: 14px; height: 14px; vertical-align: middle; }
+    /* ---- Loyalty & Coaching ---- */
+    .loyalty-card, .coaching-card { margin-bottom: 16px; background: #0D1A30; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; color: #FFFFFF; }
+    .loyalty-head, .coaching-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .loyalty-head mat-icon, .coaching-head mat-icon { font-size: 26px; width: 26px; height: 26px; color: #E8B923; }
+    .loyalty-title { display: flex; align-items: center; gap: 12px; flex: 1; }
+    .loyalty-title h3, .coaching-head h3 { margin: 0; font-size: 16px; font-weight: 600; }
+    .loyalty-title p, .coaching-head p { margin: 2px 0 0; font-size: 12.5px; color: rgba(255,255,255,0.5); }
+    .tier-badge { padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .tier-bronze { color: #CD7F32; background: rgba(205,127,50,0.15); }
+    .tier-silver { color: #C0C0C0; background: rgba(192,192,192,0.12); }
+    .tier-gold { color: #F5B301; background: rgba(245,179,1,0.15); }
+    .tier-platinum { color: #00E676; background: rgba(0,230,118,0.15); }
+    .loyalty-loading { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.5); font-size: 13px; padding: 8px 0; }
+    .loyalty-grid, .coaching-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+    .loyalty-cell { display: flex; flex-direction: column; gap: 2px; background: #162245; border-radius: 8px; padding: 10px 12px; }
+    .cell-value { font-size: 15px; font-weight: 700; color: #00E676; }
+    .cell-value small { font-size: 11px; color: rgba(255,255,255,0.5); }
+    .cell-label { font-size: 10.5px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.4px; }
+    .tier-progress-row { display: flex; justify-content: space-between; font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 6px; }
+    ::ng-deep .loyalty-card .mat-mdc-progress-bar .mdc-linear-progress__bar-inner { border-color: #00E676; }
+    .tier-hint { margin: 8px 0 0; font-size: 11.5px; color: rgba(255,255,255,0.45); }
+    .risk-chip { padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+    .risk-ok { color: #00E676; background: rgba(0,230,118,0.12); }
+    .risk-caution { color: #F5B301; background: rgba(245,179,1,0.12); }
+    .risk-high { color: #f44336; background: rgba(244,67,54,0.12); }
+    .nudge-list { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .nudge-list li { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; color: rgba(255,255,255,0.75); }
+    .nudge-list li mat-icon { font-size: 15px; width: 15px; height: 15px; color: #00E676; margin-top: 1px; }
+    .coach-tip { display: flex; gap: 8px; align-items: center; background: rgba(245,179,1,0.08); border: 1px solid rgba(245,179,1,0.2); border-radius: 8px; padding: 10px 12px; font-size: 12.5px; color: rgba(255,255,255,0.8); }
+    .coach-tip mat-icon { color: #F5B301; font-size: 16px; width: 16px; height: 16px; }
+    @media (max-width: 760px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .loyalty-grid, .coaching-grid { grid-template-columns: repeat(2, 1fr); }
+      .profile-body { padding: 0 14px 24px; }
+    }
   
