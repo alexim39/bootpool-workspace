@@ -43,6 +43,8 @@ export interface PlayHistoryItem {
   outcome: string;
   choice: string;
   playedAt: string;
+  seed?: string;
+  verificationHash?: string;
 }
 
 export interface VirtualGameStats {
@@ -81,7 +83,7 @@ export class VirtualGamesService {
     return { Authorization: `Bearer ${this.auth.token()}` };
   }
 
-  fetchCatalog(onLoaded?: () => void) {
+  fetchCatalog(onLoaded?: () => void, onError?: () => void) {
     this.loading.set(true);
     this.error.set(null);
     this.http.get<{ success: boolean; data: VirtualGame[] }>(
@@ -98,6 +100,7 @@ export class VirtualGamesService {
       error: (err) => {
         this.error.set(err.error?.message || 'Failed to load virtual games');
         this.loading.set(false);
+        onError?.();
       }
     });
   }

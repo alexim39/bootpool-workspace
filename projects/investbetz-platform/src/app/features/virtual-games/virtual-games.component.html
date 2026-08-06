@@ -4,7 +4,24 @@
   <app-nav />
 }
 
-<div class="vg-page" [class.vg-mobile]="isMobileView()">
+<div
+  class="vg-page"
+  [class.vg-mobile]="isMobileView()"
+  (touchstart)="onPtrStart($event)"
+  (touchmove)="onPtrMove($event)"
+  (touchend)="onPtrEnd()">
+  @if (isMobileView()) {
+    <div class="ptr-wrap" [style.height.px]="ptrOffset()" [class.ptr-anim]="ptrState() === 'refreshing' || ptrState() === 'idle'">
+      <div class="ptr-indicator" [class.ptr-ready]="ptrState() === 'ready'">
+        @if (ptrState() === 'refreshing') {
+          <mat-spinner diameter="15" />
+        } @else {
+          <mat-icon>arrow_downward</mat-icon>
+        }
+        <span>{{ ptrState() === 'ready' ? 'Release to refresh' : ptrState() === 'refreshing' ? 'Refreshing…' : 'Pull to refresh' }}</span>
+      </div>
+    </div>
+  }
   <header class="page-header">
     <div class="page-header-left">
       @if (isMobileView()) {
@@ -287,16 +304,29 @@
                   <span class="h-loss">-{{ formatMoney(item.stakeAmount) }}</span>
                 }
               </div>
+              @if (item.seed) {
+                <button
+                  class="row-verify"
+                  [class.verified-ok]="verifiedIds()[item._id] === true"
+                  [class.verified-bad]="verifiedIds()[item._id] === false"
+                  [disabled]="verifyingId() !== null"
+                  (click)="verifyHistoryItem(item)"
+                  [attr.aria-label]="verifiedIds()[item._id] === undefined ? 'Verify this result' : verifiedIds()[item._id] ? 'Verified fair' : 'Verification failed'">
+                  @if (verifyingId() === item._id) {
+                    <mat-spinner diameter="14" />
+                  } @else {
+                    <mat-icon>{{ verifiedIds()[item._id] === undefined ? 'verified_user' : verifiedIds()[item._id] ? 'verified' : 'error_outline' }}</mat-icon>
+                  }
+                  <span>
+                    {{ verifiedIds()[item._id] === undefined ? 'Verify' : verifiedIds()[item._id] ? 'Fair' : 'Failed' }}
+                  </span>
+                </button>
+              }
             </div>
           }
         </div>
-        @if (history().length < historyTotal()) {
-          <button class="load-more" (click)="loadMoreHistory()">
-            <mat-icon>expand_more</mat-icon>
-            Load more history
-          </button>
-        }
       }
+      <div class="scroll-sentinel" #scrollSentinel [class.visible]="hasMore()" aria-hidden="true"></div>
     </section>
   }
 </div>

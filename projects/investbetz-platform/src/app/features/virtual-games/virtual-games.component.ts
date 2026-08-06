@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { DeviceService, VirtualGamesService, WalletService, VirtualGameId, VirtualGame, PlayResult, VirtualGameStats, HistoryResultFilter } from '../../core/services';
+import { DeviceService, VirtualGamesService, WalletService, VirtualGameId, VirtualGame, PlayResult, PlayHistoryItem, VirtualGameStats, HistoryResultFilter } from '../../core/services';
 import { AppNavComponent, MobileNavComponent } from '../../core/components';
 
 @Component({
@@ -16,7 +16,7 @@ import { AppNavComponent, MobileNavComponent } from '../../core/components';
   templateUrl: './virtual-games.component.html',
   styleUrls: ['./virtual-games.component.scss']
 })
-export class VirtualGamesComponent implements OnInit {
+export class VirtualGamesComponent implements OnInit, AfterViewInit, OnDestroy {
   device = inject(DeviceService);
   isMobileView = computed(() => this.device.isMobile() || this.device.isTablet());
   service = inject(VirtualGamesService);
@@ -43,6 +43,17 @@ export class VirtualGamesComponent implements OnInit {
   historyGame = signal<VirtualGameId | 'all'>('all');
   historyResult = signal<HistoryResultFilter>('all');
   refreshing = signal(false);
+  verifyingId = signal<string | null>(null);
+  verifiedIds = signal<Record<string, boolean>>({});
+  ptrState = signal<'idle' | 'pulling' | 'ready' | 'refreshing'>('idle');
+  ptrOffset = signal(0);
+
+  @ViewChild('scrollSentinel') scrollSentinel!: ElementRef<HTMLDivElement>;
+  private io: IntersectionObserver | null = null;
+  private pullStartY = 0;
+  private pullActive = false;
+
+  hasMore = computed(() => this.history().length < this.historyTotal());
 
   quickAmounts = [100, 200, 500, 1000, 2000, 5000];
   diceFaces = ['1', '2', '3', '4', '5', '6'];
@@ -72,6 +83,23 @@ export class VirtualGamesComponent implements OnInit {
     this.service.fetchStats();
   }
 
+  ngAfterViewInit() {
+    if (typeof IntersectionObserver === 'undefined') return;
+    this.io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some(e => e.isIntersecting) && this.hasMore() && !this.historyLoading()) {
+          this.loadMoreHistory();
+        }
+      },
+      { rootMargin: '260px' }
+    );
+    this.io.observe(this.scrollSentinel.nativeElement);
+  }
+
+  ngOnDestroy() {
+    this.io?.disconnect();
+  }
+
   applyHomeChoice(gameId: VirtualGameId) {
     this.activeGameId.set(gameId);
     const cfg = this.catalog().find(g => g.id === gameId);
@@ -94,13 +122,51 @@ export class VirtualGamesComponent implements OnInit {
 
   refresh() {
     this.refreshing.set(true);
-    this.service.fetchCatalog(() => {
-      this.applyHomeChoice(this.activeGameId());
-      this.service.fetchHistory(1, 20, this.historyGame(), this.historyResult());
-      this.service.fetchStats();
-      this.wallet.fetchBalance();
-      this.refreshing.set(false);
-    });
+    this.service.fetchCatalog(
+      () => this.finishRefresh(),
+      () => this.finishRefresh()
+    );
+  }
+
+  private finishRefresh() {
+    this.applyHomeChoice(this.activeGameId());
+    this.service.fetchHistory(1, 20, this.historyGame(), this.historyResult());
+    this.service.fetchStats();
+    this.wallet.fetchBalance();
+    this.refreshing.set(false);
+    this.ptrState.set('idle');
+    this.ptrOffset.set(0);
+  }
+
+  onPtrStart(e: TouchEvent) {
+    if (this.isMobileView() && window.scrollY <= 0 && this.ptrState() !== 'refreshing') {
+      this.pullActive = true;
+      this.pullStartY = e.touches[0].clientY;
+    }
+  }
+
+  onPtrMove(e: TouchEvent) {
+    if (!this.pullActive || this.ptrState() === 'refreshing') return;
+    const dy = e.touches[0].clientY - this.pullStartY;
+    if (window.scrollY > 0 || dy <= 0) {
+      this.ptrOffset.set(0);
+      this.ptrState.set('idle');
+      return;
+    }
+    this.ptrOffset.set(Math.min(92, Math.round(dy * 0.5)));
+    this.ptrState.set(dy >= 140 ? 'ready' : 'pulling');
+  }
+
+  onPtrEnd() {
+    if (!this.pullActive) return;
+    this.pullActive = false;
+    if (this.ptrState() === 'ready') {
+      this.ptrState.set('refreshing');
+      this.refresh();
+    } else {
+      this.ptrState.set('idle');
+      this.ptrOffset.set(0);
+    }
   }
 
   formatMoney(n: number): string {
@@ -198,11 +264,46 @@ export class VirtualGamesComponent implements OnInit {
     });
   }
 
+  verifyHistoryItem(item: PlayHistoryItem) {
+    if (this.verifyingId() || this.verifiedIds()[item._id] === true) return;
+    const cfg = this.catalog().find(g => g.id === item.game);
+    if (!cfg || !item.seed) {
+      this.snackBar.open('This play has no verifiable seed', 'OK', { duration: 2500 });
+      return;
+    }
+    this.verifyingId.set(item._id);
+    const res: PlayResult = {
+      playId: item._id,
+      game: item.game,
+      choice: item.choice,
+      outcome: item.outcome,
+      result: item.result,
+      stakeAmount: item.stakeAmount,
+      multiplier: item.multiplier,
+      payoutAmount: item.payoutAmount,
+      seed: item.seed,
+      verificationHash: item.verificationHash || '',
+      balanceAfter: 0,
+      playedAt: item.playedAt,
+    };
+    this.service.verifyResult(res, cfg)
+      .then(ok => {
+        this.verifiedIds.update(m => ({ ...m, [item._id]: ok }));
+        this.verifyingId.set(null);
+        if (!ok) this.snackBar.open('Verification failed — seed/replay mismatch', 'OK', { duration: 3000 });
+      })
+      .catch(() => {
+        this.verifiedIds.update(m => ({ ...m, [item._id]: false }));
+        this.verifyingId.set(null);
+      });
+  }
+
   closeResult() {
     this.lastResult.set(null);
   }
 
   loadMoreHistory() {
+    if (this.historyLoading() || !this.hasMore()) return;
     this.historyPage.set(this.historyPage() + 1);
     this.service.fetchHistory(this.historyPage(), 20, this.historyGame(), this.historyResult(), true);
   }

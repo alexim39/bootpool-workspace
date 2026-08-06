@@ -739,24 +739,82 @@
 .h-payout { font-size: 14px; font-weight: 800; color: #00E676; }
 .h-loss { font-size: 14px; font-weight: 800; color: rgba(255, 255, 255, 0.4); }
 
-.load-more {
-  width: 100%;
-  margin-top: 10px;
-  padding: 11px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 12.5px;
-  font-weight: 700;
-  cursor: pointer;
+.row-verify {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 230, 118, 0.28);
+  background: rgba(0, 230, 118, 0.05);
+  color: #00E676;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
   transition: all 0.14s;
 
-  &:hover { color: #00E676; background: rgba(0, 230, 118, 0.08); }
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+
+  &:hover:not([disabled]) { background: rgba(0, 230, 118, 0.13); }
+
+  &[disabled] { opacity: 0.6; cursor: default; }
+
+  &.verified-ok {
+    background: rgba(0, 230, 118, 0.14);
+    border-color: rgba(0, 230, 118, 0.5);
+  }
+
+  &.verified-bad {
+    background: rgba(244, 67, 54, 0.1);
+    border-color: rgba(244, 67, 54, 0.5);
+    color: #F44336;
+  }
+}
+
+/* ---------- Infinite scroll sentinel ---------- */
+.scroll-sentinel {
+  height: 2px;
+  display: none;
+
+  &.visible { display: block; }
+}
+
+/* ---------- Pull-to-refresh ---------- */
+.ptr-wrap {
+  height: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.ptr-wrap.ptr-anim { transition: height 0.22s ease; }
+
+.ptr-indicator {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #00E676;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 8px 16px;
+  opacity: 0.75;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.ptr-indicator.ptr-ready mat-icon {
+  animation: ptrBounce 0.45s ease-in-out infinite alternate;
+}
+
+@keyframes ptrBounce {
+  from { transform: translateY(-3px); }
+  to { transform: translateY(3px); }
 }
 
 /* ---------- States ---------- */
@@ -1112,6 +1170,7 @@
 @media (max-width: 720px) {
   .vg-page {
     padding: 18px 16px 92px;
+    touch-action: pan-y;
   }
 
   .page-header {
