@@ -65,6 +65,18 @@
           <span class="info-value timer" [class.urgent]="timeRemaining() < 60000">{{ formatCountdown(timeRemaining()) }}</span>
         </div>
       </div>
+      @if (confidence() > 0) {
+        <div class="info-item" [matTooltip]="confidenceTooltip()" matTooltipPosition="above">
+          <mat-icon class="info-icon">insights</mat-icon>
+          <div class="info-text">
+            <span class="info-label">Ora Confidence</span>
+            <span class="info-value conf-value" [class.high]="confidenceLevel() === 'high'" [class.medium]="confidenceLevel() === 'medium'" [class.low]="confidenceLevel() === 'low'">{{ confidence() }}%</span>
+            <span class="conf-track">
+              <span class="conf-fill" [style.width.%]="confidence()" [class.high]="confidenceLevel() === 'high'" [class.medium]="confidenceLevel() === 'medium'" [class.low]="confidenceLevel() === 'low'"></span>
+            </span>
+          </div>
+        </div>
+      }
     </div>
 
     <div class="limits-row">

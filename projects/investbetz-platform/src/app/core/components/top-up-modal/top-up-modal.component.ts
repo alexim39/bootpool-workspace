@@ -32,10 +32,10 @@ export class TopUpModalComponent implements OnInit, OnDestroy {
 
   private wallet = inject(WalletService);
 
-  readonly MIN_DEPOSIT = 5000;
+  readonly MIN_DEPOSIT = 500;
   readonly MAX_DEPOSIT = 1_000_000;
 
-  quickAmounts = [5000, 10000, 20000, 50000, 100000, 500000];
+  quickAmounts = [500, 1000, 2000, 5000, 10000, 20000];
   selectedAmount = signal<number | null>(null);
   processing = signal(false);
   error = signal<string | null>(null);

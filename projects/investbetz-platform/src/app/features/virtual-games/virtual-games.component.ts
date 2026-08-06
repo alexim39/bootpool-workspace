@@ -39,7 +39,7 @@ export class VirtualGamesComponent implements OnInit {
   verified = signal<boolean | null>(null);
   historyPage = signal(1);
 
-  quickAmounts = [500, 1000, 2000, 5000];
+  quickAmounts = [100, 200, 500, 1000, 2000, 5000];
   diceFaces = ['1', '2', '3', '4', '5', '6'];
   colorChoices = ['emerald', 'gold', 'white'];
 
