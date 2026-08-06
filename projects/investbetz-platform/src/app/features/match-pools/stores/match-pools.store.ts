@@ -25,6 +25,11 @@ export class MatchPoolsStore {
   readonly showGuide = signal(false);
   readonly selectedMarket = signal<string>('');
 
+  readonly sortField = signal<string>('createdAt');
+  readonly sortOrder = signal<'asc' | 'desc'>('desc');
+  readonly fromDate = signal<string>('');
+  readonly toDate = signal<string>('');
+
   readonly mSummary = computed(() => {
     const open = this.openPools();
     return {
@@ -61,9 +66,16 @@ export class MatchPoolsStore {
     this.fetchPoolsPaginated(page, limit);
   }
 
-  fetchPoolsPaginated(page = 1, limit = 10, search = '', status = 'all') {
+  fetchPoolsPaginated(
+    page = 1,
+    limit = 10,
+    search = '',
+    status = 'all',
+    sort: { field: string; order: 'asc' | 'desc' } = { field: this.sortField(), order: this.sortOrder() },
+    range: { from?: string; to?: string } = { from: this.fromDate(), to: this.toDate() }
+  ) {
     this.loading.set(true);
-    this._service.fetchPools(page, limit, search, status).subscribe({
+    this._service.fetchPools(page, limit, search, status, sort, range).subscribe({
       next: (res) => {
         if (res.success) {
           this.pools.set(res.data.items.map(p => ({
@@ -171,5 +183,29 @@ export class MatchPoolsStore {
   getMarketRank(markets: { marketId: string; totalStaked: number }[], marketId: string): number {
     const sorted = [...markets].sort((a, b) => b.totalStaked - a.totalStaked);
     return sorted.findIndex(m => m.marketId === marketId);
+  }
+
+  statusMeta(status: string): { label: string; cls: string; icon: string } {
+    switch (status) {
+      case 'open': return { label: 'Open', cls: 'st-open', icon: 'water_pool' };
+      case 'staking_closed': return { label: 'Staking Closed', cls: 'st-closed', icon: 'schedule' };
+      case 'settled': return { label: 'Settled', cls: 'st-settled', icon: 'verified_user' };
+      case 'cancelled': return { label: 'Cancelled', cls: 'st-cancelled', icon: 'cancel' };
+      case 'won': return { label: 'Won', cls: 'st-won', icon: 'emoji_events' };
+      case 'lost': return { label: 'Lost', cls: 'st-lost', icon: 'autorenew' };
+      case 'confirmed': return { label: 'Confirmed', cls: 'st-confirmed', icon: 'schedule' };
+      case 'cancelled_refunded': return { label: 'Refunded', cls: 'st-refunded', icon: 'replay' };
+      default: return { label: status, cls: 'st-closed', icon: 'schedule' };
+    }
+  }
+
+  applySort(field: string, order: 'asc' | 'desc') {
+    this.sortField.set(field);
+    this.sortOrder.set(order);
+  }
+
+  applyDateRange(from: string, to: string) {
+    this.fromDate.set(from);
+    this.toDate.set(to);
   }
 }
