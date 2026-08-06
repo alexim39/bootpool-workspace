@@ -8,7 +8,7 @@
   <div class="page-header">
     <div class="page-header-left">
       @if (isMobileView()) {
-        <button mat-icon-button class="back-btn" routerLink="/home"><mat-icon>arrow_back</mat-icon></button>
+        <button mat-icon-button class="back-btn" routerLink="/home" aria-label="Back"><mat-icon>arrow_back</mat-icon></button>
       }
       <div class="header-title-block">
         <h1>Match Pools</h1>
@@ -16,11 +16,11 @@
       </div>
     </div>
     <div class="header-actions">
-      <button mat-icon-button class="icon-btn" (click)="store.showGuide.set(!store.showGuide())" matTooltip="How it works">
+      <button class="icon-btn" (click)="store.showGuide.set(!store.showGuide())" matTooltip="How it works">
         <mat-icon>info_outline</mat-icon>
       </button>
       @if (isMobileView()) {
-        <button mat-icon-button class="icon-btn" (click)="store.logout()" matTooltip="Logout"><mat-icon>logout</mat-icon></button>
+        <button class="icon-btn" (click)="store.logout()" matTooltip="Logout"><mat-icon>logout</mat-icon></button>
       }
     </div>
   </div>

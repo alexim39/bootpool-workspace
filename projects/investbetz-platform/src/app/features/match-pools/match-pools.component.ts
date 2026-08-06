@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal, effect, DestroyRef, computed } from '@angular/core';
 import { DatePipe, PercentPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -23,7 +24,7 @@ import { MatchPoolsStore } from './stores/match-pools.store';
 @Component({
   selector: 'app-match-pools',
   standalone: true,
-  imports: [DatePipe, FormsModule, PercentPipe,
+  imports: [DatePipe, FormsModule, PercentPipe, RouterModule,
     MatButtonModule, MatIconModule, MatCardModule, MatProgressSpinnerModule,
     MatFormFieldModule, MatInputModule, MatSelectModule, MatTooltipModule,
     MatTabsModule, MatChipsModule, MatTableModule, MatPaginatorModule,

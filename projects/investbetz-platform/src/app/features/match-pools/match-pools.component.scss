@@ -658,8 +658,13 @@
   .date-field { flex: 1 1 45%; width: auto; }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 720px) {
+  .page-header { margin-bottom: 18px; }
   .page-header h1 { font-size: 22px; }
+  .page-subtitle { display: none; }
+}
+
+@media (max-width: 600px) {
   .pc-total-val { font-size: 17px; }
   .psf-row { flex-direction: column; }
   .psf-input { width: 100%; }
