@@ -58,125 +58,143 @@
   </div>
 
   <div class="table-card">
-    @if (store.loading()) {
-      <div class="loading-overlay"><div class="spinner"></div></div>
-    }
-    <div class="table-scroll">
-      <table mat-table [dataSource]="store.items()" class="admin-table">
-        <ng-container matColumnDef="phone">
-          <th mat-header-cell *matHeaderCellDef class="sortable" (click)="store.setSort('phone')">
-            Phone <mat-icon class="sort-icon">{{ store.sortIcon('phone') }}</mat-icon>
-          </th>
-          <td mat-cell *matCellDef="let u" class="clickable" (click)="viewUser(u)">{{ u.phone }}</td>
-        </ng-container>
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef class="sortable" (click)="store.setSort('fullName')">
-            Name <mat-icon class="sort-icon">{{ store.sortIcon('fullName') }}</mat-icon>
-          </th>
-          <td mat-cell *matCellDef="let u" class="clickable" (click)="viewUser(u)">{{ u.fullName }}</td>
-        </ng-container>
-        <ng-container matColumnDef="email">
-          <th mat-header-cell *matHeaderCellDef>Email</th>
-          <td mat-cell *matCellDef="let u">{{ u.email || '-' }}</td>
-        </ng-container>
-        <ng-container matColumnDef="wallet">
-          <th mat-header-cell *matHeaderCellDef class="sortable" (click)="store.setSort('walletBalance')">
-            Balance <mat-icon class="sort-icon">{{ store.sortIcon('walletBalance') }}</mat-icon>
-          </th>
-          <td mat-cell *matCellDef="let u">
-            <span class="wallet-cell">{{ formatWallet(u.walletBalance) }}</span>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef>Status</th>
-          <td mat-cell *matCellDef="let u">
-            <span class="chip" [class.active]="!u.isSuspended" [class.suspended]="u.isSuspended">
-              {{ u.isSuspended ? 'Suspended' : 'Active' }}
-            </span>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="kyc">
-          <th mat-header-cell *matHeaderCellDef>KYC</th>
-          <td mat-cell *matCellDef="let u">
-            <span class="chip" [class.verified]="u.kycVerified" [class.unverified]="!u.kycVerified">
-              {{ u.kycVerified ? 'Verified' : 'Pending' }}
-            </span>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="lastActive">
-          <th mat-header-cell *matHeaderCellDef class="sortable" (click)="store.setSort('lastLoginAt')">
-            Last Active <mat-icon class="sort-icon">{{ store.sortIcon('lastLoginAt') }}</mat-icon>
-          </th>
-          <td mat-cell *matCellDef="let u">
-            <span class="last-active-cell">{{ formatDate(u.lastLoginAt) }}</span>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="registered">
-          <th mat-header-cell *matHeaderCellDef class="sortable" (click)="store.setSort('createdAt')">
-            Registered <mat-icon class="sort-icon">{{ store.sortIcon('createdAt') }}</mat-icon>
-          </th>
-          <td mat-cell *matCellDef="let u">
-            <span class="date-cell">{{ formatDate(u.createdAt) }}</span>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef class="actions-col">Actions</th>
-          <td mat-cell *matCellDef="let u" class="actions-col">
-            <button mat-icon-button (click)="store.toggleStatus(u); $event.stopPropagation()" [matTooltip]="u.isSuspended ? 'Activate user' : 'Suspend user'">
-              <mat-icon class="icon-act" [class.suspend]="!u.isSuspended" [class.activate]="u.isSuspended">{{ u.isSuspended ? 'check_circle' : 'block' }}</mat-icon>
-            </button>
-            <button mat-icon-button (click)="store.verifyKyc(u); $event.stopPropagation()" matTooltip="Toggle KYC verification">
-              <mat-icon class="icon-kyc" [class.verified]="u.kycVerified" [class.pending]="!u.kycVerified">verified</mat-icon>
-            </button>
-          </td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="store.columns"></tr>
-        <tr mat-row *matRowDef="let row; columns: store.columns;" (click)="viewUser(row)"></tr>
-      </table>
-    </div>
-
-    @if (!store.loading() && store.items().length === 0) {
-      <div class="empty-state">
-        <mat-icon class="empty-icon">people_outline</mat-icon>
-        <p>No users found</p>
-        @if (store.searchQuery() || store.statusFilter() !== 'all' || store.dateFrom() || store.dateTo()) {
-          <p class="empty-hint">Try adjusting your filters or search term</p>
+    @if (store.loading() && store.items().length === 0) {
+      <div class="skeleton-table">
+        @for (r of skeletonRows; track r) {
+          <div class="skel-row">
+            <span class="sk sk-phone"></span>
+            <span class="sk sk-name"></span>
+            <span class="sk sk-email"></span>
+            <span class="sk sk-balance"></span>
+            <span class="sk sk-chip"></span>
+            <span class="sk sk-chip"></span>
+            <span class="sk sk-date"></span>
+            <span class="sk sk-date"></span>
+            <span class="sk sk-actions"></span>
+          </div>
         }
       </div>
-    }
+    } @else {
+      <div class="table-scroll">
+        <table mat-table [dataSource]="store.items()" class="admin-table">
+          <ng-container matColumnDef="phone">
+            <th mat-header-cell *matHeaderCellDef class="sortable" (click)="store.setSort('phone')">
+              Phone <mat-icon class="sort-icon">{{ store.sortIcon('phone') }}</mat-icon>
+            </th>
+            <td mat-cell *matCellDef="let u" class="clickable" (click)="viewUser(u)">{{ u.phone }}</td>
+          </ng-container>
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef class="sortable" (click)="store.setSort('fullName')">
+              Name <mat-icon class="sort-icon">{{ store.sortIcon('fullName') }}</mat-icon>
+            </th>
+            <td mat-cell *matCellDef="let u" class="clickable" (click)="viewUser(u)">{{ u.fullName }}</td>
+          </ng-container>
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let u">{{ u.email || '-' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="wallet">
+            <th mat-header-cell *matHeaderCellDef class="sortable" (click)="store.setSort('walletBalance')">
+              Balance <mat-icon class="sort-icon">{{ store.sortIcon('walletBalance') }}</mat-icon>
+            </th>
+            <td mat-cell *matCellDef="let u">
+              <span class="wallet-cell">{{ formatWallet(u.walletBalance) }}</span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let u">
+              <span class="chip" [class.active]="!u.isSuspended" [class.suspended]="u.isSuspended">
+                {{ u.isSuspended ? 'Suspended' : 'Active' }}
+              </span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="kyc">
+            <th mat-header-cell *matHeaderCellDef>KYC</th>
+            <td mat-cell *matCellDef="let u">
+              <span class="chip" [class.verified]="u.kycVerified" [class.unverified]="!u.kycVerified">
+                {{ u.kycVerified ? 'Verified' : 'Pending' }}
+              </span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="lastActive">
+            <th mat-header-cell *matHeaderCellDef class="sortable" (click)="store.setSort('lastLoginAt')">
+              Last Active <mat-icon class="sort-icon">{{ store.sortIcon('lastLoginAt') }}</mat-icon>
+            </th>
+            <td mat-cell *matCellDef="let u">
+              <span class="last-active-cell">{{ formatDate(u.lastLoginAt) }}</span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="registered">
+            <th mat-header-cell *matHeaderCellDef class="sortable" (click)="store.setSort('createdAt')">
+              Registered <mat-icon class="sort-icon">{{ store.sortIcon('createdAt') }}</mat-icon>
+            </th>
+            <td mat-cell *matCellDef="let u">
+              <span class="date-cell">{{ formatDate(u.registrationDate || u.createdAt) }}</span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="actions-col">Actions</th>
+            <td mat-cell *matCellDef="let u" class="actions-col">
+              <button mat-icon-button (click)="store.toggleStatus(u); $event.stopPropagation()" [matTooltip]="u.isSuspended ? 'Activate user' : 'Suspend user'">
+                <mat-icon class="icon-act" [class.suspend]="!u.isSuspended" [class.activate]="u.isSuspended">{{ u.isSuspended ? 'check_circle' : 'block' }}</mat-icon>
+              </button>
+              <button mat-icon-button (click)="store.verifyKyc(u); $event.stopPropagation()" matTooltip="Toggle KYC verification">
+                <mat-icon class="icon-kyc" [class.verified]="u.kycVerified" [class.pending]="!u.kycVerified">verified</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="store.columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: store.columns;" (click)="viewUser(row)"></tr>
+        </table>
+      </div>
 
-    @if (store.totalPages() > 1) {
-      <div class="pagination-bar">
-        <div class="page-size-select">
-          <span>Rows:</span>
-          <select [ngModel]="store.limit()" (ngModelChange)="store.setLimit($event)">
-            <option [value]="20">20</option>
-            <option [value]="50">50</option>
-            <option [value]="100">100</option>
-            <option [value]="200">200</option>
-          </select>
-        </div>
-        <div class="page-nav">
-          <button class="page-btn" [disabled]="store.page() <= 1" (click)="store.setPage(1)" matTooltip="First page"><mat-icon>first_page</mat-icon></button>
-          <button class="page-btn" [disabled]="store.page() <= 1" (click)="store.setPage(store.page() - 1)" matTooltip="Previous"><mat-icon>chevron_left</mat-icon></button>
-          @for (p of store.visiblePages(); track p) {
-            @if (p === '...') {
-              <span class="page-ellipsis">...</span>
-            } @else {
-              <button class="page-num" [class.current]="p === store.page()" (click)="goToPage(p)">{{ p }}</button>
-            }
+      @if (!store.loading() && store.items().length === 0) {
+        <div class="empty-state">
+          <mat-icon class="empty-icon">people_outline</mat-icon>
+          <p>No users found</p>
+          @if (store.searchQuery() || store.statusFilter() !== 'all' || store.dateFrom() || store.dateTo()) {
+            <p class="empty-hint">Try adjusting your filters or search term</p>
           }
-          <button class="page-btn" [disabled]="store.page() >= store.totalPages()" (click)="store.setPage(store.page() + 1)" matTooltip="Next"><mat-icon>chevron_right</mat-icon></button>
-          <button class="page-btn" [disabled]="store.page() >= store.totalPages()" (click)="store.setPage(store.totalPages())" matTooltip="Last page"><mat-icon>last_page</mat-icon></button>
         </div>
-        <div class="page-info">
-          <span>{{ (store.page() - 1) * store.limit() + 1 }}–{{ store.rangeEnd() }} of {{ store.total() }}</span>
-          <div class="go-to-page">
-            <span>Go to</span>
-            <input type="number" #gotoInput (keydown.enter)="goToPageInput(gotoInput)" min="1" [max]="store.totalPages()">
+      }
+
+      @if (store.totalPages() > 1) {
+        <div class="pagination-bar">
+          <div class="page-size-select">
+            <span>Rows:</span>
+            <select [ngModel]="store.limit()" (ngModelChange)="store.setLimit($event)">
+              <option [value]="25">25</option>
+              <option [value]="50">50</option>
+              <option [value]="100">100</option>
+            </select>
+          </div>
+          <div class="page-nav">
+            <button class="page-btn" [disabled]="store.page() <= 1" (click)="store.setPage(1)" matTooltip="First page"><mat-icon>first_page</mat-icon></button>
+            <button class="page-btn" [disabled]="store.page() <= 1" (click)="store.setPage(store.page() - 1)" matTooltip="Previous"><mat-icon>chevron_left</mat-icon></button>
+            @for (p of store.visiblePages(); track p) {
+              @if (p === '...') {
+                <span class="page-ellipsis">...</span>
+              } @else {
+                <button class="page-num" [class.current]="p === store.page()" (click)="goToPage(p)">{{ p }}</button>
+              }
+            }
+            <button class="page-btn" [disabled]="store.page() >= store.totalPages()" (click)="store.setPage(store.page() + 1)" matTooltip="Next"><mat-icon>chevron_right</mat-icon></button>
+            <button class="page-btn" [disabled]="store.page() >= store.totalPages()" (click)="store.setPage(store.totalPages())" matTooltip="Last page"><mat-icon>last_page</mat-icon></button>
+          </div>
+          <div class="page-info">
+            <span>{{ (store.page() - 1) * store.limit() + 1 }}–{{ store.rangeEnd() }} of {{ store.total() }}</span>
+            <div class="go-to-page">
+              <span>Go to</span>
+              <input type="number" #gotoInput (keydown.enter)="goToPageInput(gotoInput)" min="1" [max]="store.totalPages()">
+            </div>
           </div>
         </div>
-      </div>
+      }
+
+      @if (store.loading() && store.items().length > 0) {
+        <div class="loading-overlay"><div class="spinner"></div></div>
+      }
     }
   </div>
 </div>

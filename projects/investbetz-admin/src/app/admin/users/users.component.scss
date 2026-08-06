@@ -96,3 +96,16 @@
 .go-to-page { display: flex; align-items: center; gap: 4px; }
 .go-to-page input { width: 40px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; color: #fff; padding: 3px 6px; font-size: 13px; text-align: center; outline: none; }
 .go-to-page input:focus { border-color: #00E676; }
+
+.skeleton-table { display: flex; flex-direction: column; padding: 4px 16px; }
+.skel-row { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.skel-row:last-child { border-bottom: none; }
+.sk { background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.05) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 6px; flex-shrink: 0; }
+.sk-phone { width: 13%; height: 13px; }
+.sk-name { width: 15%; height: 13px; }
+.sk-email { width: 20%; height: 13px; }
+.sk-balance { width: 10%; height: 13px; }
+.sk-chip { width: 64px; height: 20px; border-radius: 10px; }
+.sk-date { width: 10%; height: 12px; }
+.sk-actions { width: 64px; height: 26px; border-radius: 8px; margin-left: auto; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
