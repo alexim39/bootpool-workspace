@@ -45,6 +45,18 @@ export interface PlayHistoryItem {
   playedAt: string;
 }
 
+export interface VirtualGameStats {
+  totalPlays: number;
+  totalStaked: number;
+  totalWins: number;
+  totalPayout: number;
+  winRate: number;
+  today: { plays: number; staked: number; won: number };
+  bestWin: { amount: number; game: VirtualGameId } | null;
+}
+
+export type HistoryResultFilter = 'all' | 'win' | 'loss';
+
 async function sha256Hex(input: string): Promise<string> {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
@@ -58,7 +70,9 @@ export class VirtualGamesService {
   catalog = signal<VirtualGame[]>([]);
   history = signal<PlayHistoryItem[]>([]);
   historyTotal = signal(0);
+  stats = signal<VirtualGameStats | null>(null);
   loading = signal(false);
+  statsLoading = signal(false);
   historyLoading = signal(false);
   playing = signal(false);
   error = signal<string | null>(null);
@@ -98,21 +112,42 @@ export class VirtualGamesService {
     );
   }
 
-  fetchHistory(page = 1, limit = 20) {
+  fetchHistory(page = 1, limit = 20, game: VirtualGameId | 'all' = 'all', result: HistoryResultFilter = 'all', append = false) {
     this.historyLoading.set(true);
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (game !== 'all') params.set('game', game);
+    if (result !== 'all') params.set('result', result);
     this.http.get<{ success: boolean; data: { items: PlayHistoryItem[]; total: number } }>(
-      `${environment.apiUrl}/virtual-games/history?page=${page}&limit=${limit}`,
+      `${environment.apiUrl}/virtual-games/history?${params.toString()}`,
       { headers: this.getHeaders() }
     ).subscribe({
       next: (res) => {
         if (res.success) {
-          this.history.set(res.data.items);
+          this.history.set(append ? [...this.history(), ...res.data.items] : res.data.items);
           this.historyTotal.set(res.data.total);
         }
         this.historyLoading.set(false);
       },
       error: () => this.historyLoading.set(false)
     });
+  }
+
+  fetchStats() {
+    this.statsLoading.set(true);
+    this.http.get<{ success: boolean; data: VirtualGameStats }>(
+      `${environment.apiUrl}/virtual-games/stats`,
+      { headers: this.getHeaders() }
+    ).subscribe({
+      next: (res) => {
+        if (res.success) this.stats.set(res.data);
+        this.statsLoading.set(false);
+      },
+      error: () => this.statsLoading.set(false)
+    });
+  }
+
+  generateIdempotencyKey(): string {
+    return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   }
 
   isPlaying() {

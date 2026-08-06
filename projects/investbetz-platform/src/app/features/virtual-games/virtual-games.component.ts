@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { DeviceService, VirtualGamesService, WalletService, VirtualGameId, VirtualGame, PlayResult } from '../../core/services';
+import { DeviceService, VirtualGamesService, WalletService, VirtualGameId, VirtualGame, PlayResult, VirtualGameStats, HistoryResultFilter } from '../../core/services';
 import { AppNavComponent, MobileNavComponent } from '../../core/components';
 
 @Component({
@@ -26,7 +26,9 @@ export class VirtualGamesComponent implements OnInit {
   catalog = this.service.catalog;
   history = this.service.history;
   historyTotal = this.service.historyTotal;
+  stats = this.service.stats;
   loading = this.service.loading;
+  statsLoading = this.service.statsLoading;
   historyLoading = this.service.historyLoading;
   playing = this.service.playing;
   errorSig = this.service.error;
@@ -38,6 +40,9 @@ export class VirtualGamesComponent implements OnInit {
   verifying = signal(false);
   verified = signal<boolean | null>(null);
   historyPage = signal(1);
+  historyGame = signal<VirtualGameId | 'all'>('all');
+  historyResult = signal<HistoryResultFilter>('all');
+  refreshing = signal(false);
 
   quickAmounts = [100, 200, 500, 1000, 2000, 5000];
   diceFaces = ['1', '2', '3', '4', '5', '6'];
@@ -49,15 +54,53 @@ export class VirtualGamesComponent implements OnInit {
 
   balance = this.wallet.balance;
 
+  stakeError = computed<string | null>(() => {
+    const cfg = this.activeGame();
+    if (!cfg) return null;
+    const v = this.stakeAmount();
+    if (v <= 0) return null;
+    if (v < cfg.minStake) return `Minimum stake is ${this.formatMoney(cfg.minStake)}`;
+    if (v > cfg.maxStake) return `Max stake per play is ${this.formatMoney(cfg.maxStake)}`;
+    return null;
+  });
+
+  statsDisplay = computed<VirtualGameStats | null>(() => this.stats());
+
   ngOnInit() {
     this.service.fetchCatalog(() => this.applyHomeChoice(this.activeGameId()));
     this.service.fetchHistory();
+    this.service.fetchStats();
   }
 
   applyHomeChoice(gameId: VirtualGameId) {
     this.activeGameId.set(gameId);
     const cfg = this.catalog().find(g => g.id === gameId);
     if (cfg) this.choice.set(cfg.outcomes[0]);
+  }
+
+  setHistoryGame(game: VirtualGameId | 'all') {
+    if (this.historyGame() === game) return;
+    this.historyGame.set(game);
+    this.historyPage.set(1);
+    this.service.fetchHistory(1, 20, game, this.historyResult());
+  }
+
+  setHistoryResult(result: HistoryResultFilter) {
+    if (this.historyResult() === result) return;
+    this.historyResult.set(result);
+    this.historyPage.set(1);
+    this.service.fetchHistory(1, 20, this.historyGame(), result);
+  }
+
+  refresh() {
+    this.refreshing.set(true);
+    this.service.fetchCatalog(() => {
+      this.applyHomeChoice(this.activeGameId());
+      this.service.fetchHistory(1, 20, this.historyGame(), this.historyResult());
+      this.service.fetchStats();
+      this.wallet.fetchBalance();
+      this.refreshing.set(false);
+    });
   }
 
   formatMoney(n: number): string {
@@ -83,6 +126,13 @@ export class VirtualGamesComponent implements OnInit {
     this.stakeAmount.set(Number.isFinite(value) && value > 0 ? Math.floor(value) : 0);
   }
 
+  clampStake() {
+    const cfg = this.activeGame();
+    if (!cfg) return;
+    const v = Math.max(cfg.minStake, Math.min(this.stakeAmount(), cfg.maxStake));
+    this.stakeAmount.set(v);
+  }
+
   multiplierLabel(game: VirtualGame | null): string {
     return game ? `${game.multiplier.toFixed(1)}x` : '';
   }
@@ -96,6 +146,7 @@ export class VirtualGamesComponent implements OnInit {
   play() {
     const cfg = this.activeGame();
     if (!cfg || !cfg.enabled) return;
+    if (this.playing()) return;
     if (!this.choice()) {
       this.snackBar.open('Pick an outcome first', 'OK', { duration: 2000 });
       return;
@@ -111,14 +162,16 @@ export class VirtualGamesComponent implements OnInit {
 
     this.playing.set(true);
     this.verified.set(null);
-    this.service.play(cfg.id, this.choice(), this.stakeAmount()).subscribe({
+    const idempotencyKey = this.service.generateIdempotencyKey();
+    this.service.play(cfg.id, this.choice(), this.stakeAmount(), idempotencyKey).subscribe({
       next: (res) => {
         this.service.donePlaying();
         this.playing.set(false);
         if (res.success) {
           this.lastResult.set(res.data);
           this.wallet.fetchBalance();
-          this.service.fetchHistory();
+          this.service.fetchHistory(1, 20, this.historyGame(), this.historyResult());
+          this.service.fetchStats();
         } else {
           this.snackBar.open(res.message || 'Failed to play', 'OK', { duration: 3000 });
         }
@@ -151,6 +204,6 @@ export class VirtualGamesComponent implements OnInit {
 
   loadMoreHistory() {
     this.historyPage.set(this.historyPage() + 1);
-    this.service.fetchHistory(this.historyPage(), 20);
+    this.service.fetchHistory(this.historyPage(), 20, this.historyGame(), this.historyResult(), true);
   }
 }
