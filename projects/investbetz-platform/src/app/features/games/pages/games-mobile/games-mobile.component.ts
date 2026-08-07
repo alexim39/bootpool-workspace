@@ -35,6 +35,7 @@ export class GamesMobileComponent implements OnInit {
     { value: 'matchDate', label: 'Kickoff' },
     { value: 'confidence', label: 'Confidence' },
     { value: 'gainsMultiplier', label: 'Odds' },
+    { value: 'createdAt', label: 'Analyzed' },
   ];
 
   readonly statusOptions = [

@@ -1,7 +1,10 @@
 <div class="mobile-root">
   <header class="mobile-header">
-    <button mat-icon-button routerLink="/home"><mat-icon>arrow_back</mat-icon></button>
-    <h1>Games Today</h1>
+    <button mat-icon-button routerLink="/home" aria-label="Back"><mat-icon>arrow_back</mat-icon></button>
+    <div class="title-wrap">
+      <h1>Games Today</h1>
+      <span class="mobile-sub">Ora's match intelligence</span>
+    </div>
     <button mat-icon-button class="info-btn" (click)="showGuide.set(!showGuide())" matTooltip="How it works" [attr.aria-label]="'How it works'">
       <mat-icon>info_outline</mat-icon>
     </button>
@@ -17,6 +20,37 @@
   }
 
   <div class="mobile-content">
+    <div class="hero-stats">
+      <div class="stat-card">
+        <span class="stat-icon ic-green"><mat-icon>sports_soccer</mat-icon></span>
+        <div class="stat-text">
+          <span class="stat-value">{{ store.total() }}</span>
+          <span class="stat-label">Games analyzed</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon ic-blue"><mat-icon>verified_user</mat-icon></span>
+        <div class="stat-text">
+          <span class="stat-value">{{ store.stakableTotal() }}</span>
+          <span class="stat-label">Stakable now</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon ic-gold"><mat-icon>sensors</mat-icon></span>
+        <div class="stat-text">
+          <span class="stat-value">{{ store.liveCount() }}</span>
+          <span class="stat-label">Live now</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon ic-purple"><mat-icon>emoji_events</mat-icon></span>
+        <div class="stat-text">
+          <span class="stat-value">{{ store.leagues().length }}</span>
+          <span class="stat-label">Leagues covered</span>
+        </div>
+      </div>
+    </div>
+
     <p class="page-subtitle">Ora's picks for today's matches — analyzed with confidence.</p>
 
     @if (store.liveCount() > 0) {

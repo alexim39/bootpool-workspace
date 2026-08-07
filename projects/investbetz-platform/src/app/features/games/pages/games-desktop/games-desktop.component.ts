@@ -63,6 +63,7 @@ export class GamesDesktopComponent implements OnInit {
     { value: 'gainsMultiplier', label: 'Odds' },
     { value: 'league', label: 'League' },
     { value: 'homeTeam', label: 'Team' },
+    { value: 'createdAt', label: 'Analyzed' },
   ];
 
   ngOnInit() {
