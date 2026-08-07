@@ -129,6 +129,18 @@ export class HomeMobileComponent implements OnInit {
     this.store.openPodById(pick.podId);
   }
 
+  openLivePod(pod: Pod) {
+    if (!this.store.auth.isAuthenticated()) {
+      this._snackBar.open('Please log in to place a stake', 'OK', { duration: 3000 });
+      return;
+    }
+    if (this.store.isStakable(pod)) {
+      this.store.openStakeModal(pod);
+    } else {
+      this.store.openPodById(pod.id);
+    }
+  }
+
   onStakePlaced() {
     this.store.onStakePlaced();
     this._snackBar.open('Stake placed successfully!', 'OK', { duration: 2000 });

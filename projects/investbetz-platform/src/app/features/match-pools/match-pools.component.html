@@ -19,9 +19,6 @@
       <button class="icon-btn" (click)="store.showGuide.set(!store.showGuide())" matTooltip="How it works">
         <mat-icon>info_outline</mat-icon>
       </button>
-      @if (isMobileView()) {
-        <button class="icon-btn" (click)="store.logout()" matTooltip="Logout"><mat-icon>logout</mat-icon></button>
-      }
     </div>
   </div>
 

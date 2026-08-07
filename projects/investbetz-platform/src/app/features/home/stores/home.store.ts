@@ -4,6 +4,7 @@ import { PodService, Pod } from '../../../core/services';
 import { StakeService, PlaceAccumulatorRequest } from '../../../core/services';
 import { WalletService } from '../../../core/services';
 import { AuthService } from '../../../core/services';
+import { OraRecordService, OraRecord } from '../../../core/services';
 
 @Injectable({ providedIn: 'root' })
 export class HomeStore implements OnDestroy {
@@ -11,6 +12,7 @@ export class HomeStore implements OnDestroy {
   readonly auth = inject(AuthService);
   private _stake = inject(StakeService);
   private _wallet = inject(WalletService);
+  private _oraRecord = inject(OraRecordService);
 
   readonly selectedPod = signal<Pod | null>(null);
   readonly selectedSport = signal<string | null>(null);
@@ -27,6 +29,35 @@ export class HomeStore implements OnDestroy {
   readonly activeBetsCount = computed(() => this.activeBets().length);
   readonly walletBalance = computed(() => this._wallet.balance().available || 0);
   readonly isSearching = computed(() => this.searchQuery().length > 0);
+
+  readonly oraRecord = signal<OraRecord | null>(null);
+  readonly oraRecordLoading = signal(false);
+  readonly livePods = computed(() => this.pods.livePods());
+  readonly upcomingPods = this.pods.upcoming;
+  readonly oraWinRate = computed(() => {
+    const rec = this.oraRecord();
+    if (rec?.overall && rec.overall.played > 0) return Math.round(rec.overall.winRate);
+    return null;
+  });
+  readonly oraPots30d = computed(() => this.oraRecord()?.settledPots30d ?? null);
+  readonly oraPayoutAvg = computed(() => this.oraRecord()?.avgPayoutMs ?? null);
+  readonly topLeague = computed(() => {
+    const stats = this.oraRecord()?.byLeague ?? [];
+    const sorted = [...stats].sort((a, b) => b.played - a.played);
+    return sorted[0] ?? null;
+  });
+  readonly greeting = computed(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  });
+  readonly userFirstName = computed(() => {
+    const name = this.auth.user()?.fullName?.trim();
+    if (!name) return '';
+    return name.split(' ')[0];
+  });
+
   readonly displayedPods = computed(() => {
     const pods = this.activePods();
     const personalized = this.pods.personalized();
@@ -61,10 +92,57 @@ export class HomeStore implements OnDestroy {
 
   init() {
     this.pods.fetchFeed({ limit: this.PAGE_SIZE, personalized: this.isLoggedIn() });
-    this.pods.fetchUpcoming({ limit: 10 });
+    this.pods.fetchUpcoming({ limit: 12 });
     this.pods.fetchSports();
     this._wallet.fetchBalance();
     this._stake.fetchActiveStakes();
+    this.fetchOraRecord();
+  }
+
+  fetchOraRecord() {
+    if (this.oraRecordLoading()) return;
+    this.oraRecordLoading.set(true);
+    this._oraRecord.getRecord().subscribe({
+      next: (res) => {
+        if (res.success) this.oraRecord.set(res.data);
+        this.oraRecordLoading.set(false);
+      },
+      error: () => this.oraRecordLoading.set(false)
+    });
+  }
+
+  formatMoney(amount: number): string {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount || 0);
+  }
+
+  kickoffLabel(pod: Pod): string {
+    if (!pod?.matchDate) return '';
+    const date = new Date(pod.matchDate);
+    if (isNaN(date.getTime())) return '';
+    const now = new Date();
+    const diff = date.getTime() - now.getTime();
+    if (diff < 0) return 'Kicked off';
+    if (diff < 24 * 60 * 60 * 1000) {
+      const mins = Math.floor(diff / 60000);
+      if (mins < 60) return `in ${Math.max(mins, 1)}m`;
+      const hours = Math.floor(mins / 60);
+      return `in ${hours}h ${mins % 60}m`;
+    }
+    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  }
+
+  isStakable(pod: Pod): boolean {
+    return !!pod && pod.status === 'active' && !!pod.isOpen;
+  }
+
+  openUpcomingPod(pod: Pod) {
+    if (!this.isStakable(pod) || !this.auth.isAuthenticated()) return;
+    this.openStakeModal(pod);
   }
 
   onSearchInput(value: string) {

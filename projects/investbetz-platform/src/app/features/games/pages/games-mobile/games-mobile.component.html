@@ -5,7 +5,6 @@
     <button mat-icon-button class="info-btn" (click)="showGuide.set(!showGuide())" matTooltip="How it works" [attr.aria-label]="'How it works'">
       <mat-icon>info_outline</mat-icon>
     </button>
-    <button mat-icon-button (click)="auth.logout()"><mat-icon>logout</mat-icon></button>
   </header>
 
   @if (showGuide()) {
