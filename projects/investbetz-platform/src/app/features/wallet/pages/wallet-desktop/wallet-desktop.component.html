@@ -1,360 +1,248 @@
 <app-nav />
 <div class="wallet-container">
-  <div class="page-header"><h1>Wallet</h1></div>
+  <div class="page-header">
+    <h1>Wallet</h1>
+    <p class="page-subtitle">Deposit, withdraw and track every movement on your balance.</p>
+  </div>
   <div class="wallet-body">
 
-  <mat-card class="balance-card">
-    <mat-card-content>
-      <div class="balance-header">
-        <span class="balance-label">Available Balance</span>
-        <mat-chip-set>
-          <mat-chip class="chip-currency" selected>NGN</mat-chip>
-        </mat-chip-set>
-      </div>
-      <div class="balance-amount">{{ store.formatCurrency(store.walletBalance().available) }}</div>
-      <div class="balance-details">
-        <div class="detail">
-          <span class="detail-label">Total Balance</span>
-          <span class="detail-value">{{ store.formatCurrency(store.walletBalance().balance) }}</span>
+    <mat-card class="balance-card">
+      <mat-card-content>
+        <div class="balance-glow"></div>
+        <div class="balance-header">
+          <span class="balance-label">Available Balance</span>
+          <span class="currency-pill">NGN</span>
         </div>
-        <div class="detail" *ngIf="store.walletBalance().locked > 0">
-          <span class="detail-label">Locked (Active Stakes)</span>
-          <span class="detail-value locked">{{ store.formatCurrency(store.walletBalance().locked) }}</span>
+        <div class="balance-amount">{{ store.formatCurrency(store.walletBalance().available) }}</div>
+        <div class="balance-details">
+          <div class="detail">
+            <span class="detail-label">Total Balance</span>
+            <span class="detail-value">{{ store.formatCurrency(store.walletBalance().balance) }}</span>
+          </div>
+          <div class="detail" *ngIf="store.walletBalance().locked > 0">
+            <span class="detail-label">Locked (Active Stakes)</span>
+            <span class="detail-value locked">{{ store.formatCurrency(store.walletBalance().locked) }}</span>
+          </div>
         </div>
-      </div>
-      <div class="balance-actions">
-        <button mat-raised-button class="btn-emerald" (click)="openDeposit()">
-          <mat-icon>add</mat-icon> Deposit
-        </button>
-        <button mat-stroked-button class="btn-gold" (click)="store.openWithdraw()">
-          <mat-icon>remove</mat-icon> Withdraw
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-  <div class="stats-grid">
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <div class="stat-icon primary"><mat-icon>trending_up</mat-icon></div>
-        <div class="stat-value">{{ store.formatCurrency(store.totalDeposited()) }}</div>
-        <div class="stat-label">Total Deposited</div>
+        <div class="balance-actions">
+          <button mat-raised-button class="btn-emerald" (click)="openDeposit()">
+            <mat-icon>add</mat-icon> Deposit
+          </button>
+          <button mat-stroked-button class="btn-gold" (click)="store.openWithdraw()">
+            <mat-icon>remove</mat-icon> Withdraw
+          </button>
+        </div>
       </mat-card-content>
     </mat-card>
-    <mat-card class="stat-card">
+
+    <div class="stats-grid">
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon primary"><mat-icon>trending_up</mat-icon></div>
+          <div class="stat-value">{{ store.formatCurrency(store.totalDeposited()) }}</div>
+          <div class="stat-label">Total Deposited</div>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon warn"><mat-icon>trending_down</mat-icon></div>
+          <div class="stat-value">{{ store.formatCurrency(store.totalWithdrawn()) }}</div>
+          <div class="stat-label">Total Withdrawn</div>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon accent"><mat-icon>casino</mat-icon></div>
+          <div class="stat-value">{{ store.formatCurrency(store.totalStaked()) }}</div>
+          <div class="stat-label">Total Staked</div>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon success"><mat-icon>emoji_events</mat-icon></div>
+          <div class="stat-value">{{ store.formatCurrency(store.totalWon()) }}</div>
+          <div class="stat-label">Total Winnings</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <mat-card class="history-card">
       <mat-card-content>
-        <div class="stat-icon warn"><mat-icon>trending_down</mat-icon></div>
-        <div class="stat-value">{{ store.formatCurrency(store.totalWithdrawn()) }}</div>
-        <div class="stat-label">Total Withdrawn</div>
-      </mat-card-content>
-    </mat-card>
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <div class="stat-icon accent"><mat-icon>casino</mat-icon></div>
-        <div class="stat-value">{{ store.formatCurrency(store.totalStaked()) }}</div>
-        <div class="stat-label">Total Staked</div>
-      </mat-card-content>
-    </mat-card>
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <div class="stat-icon success"><mat-icon>emoji_events</mat-icon></div>
-        <div class="stat-value">{{ store.formatCurrency(store.totalWon()) }}</div>
-        <div class="stat-label">Total Winnings</div>
-      </mat-card-content>
-    </mat-card>
-  </div>
+        <div class="history-head">
+          <div>
+            <h2 class="history-title">Transaction History</h2>
+            <span class="history-sub">
+              {{ store.totalTransactions() }} transactions
+              @if (store.activeFilterCount() > 0) { · {{ store.activeFilterCount() }} active filter{{ store.activeFilterCount() > 1 ? 's' : '' }} }
+            </span>
+          </div>
+          @if (store.hasActiveFilters()) {
+            <button class="clear-filters" (click)="store.clearHistoryFilters()">Clear filters</button>
+          }
+        </div>
 
-  <mat-tab-group class="wallet-tabs">
-    <mat-tab label="Deposit">
-      <div class="tab-content">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>Deposit History</mat-card-title>
-            <mat-card-subtitle>{{ store.depositTransactions().length }} of {{ store.totalTransactions() }} transactions</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            @if (store.loading()) {
-              <div class="skel-page">
-                @for (item of [1,2,3,4]; track item) {
-                  <div class="skel-row">
-                    <div class="skel skel-text-sm" style="width:50px;margin:0"></div>
-                    <div class="skel skel-text-sm" style="width:60px;margin:0"></div>
-                    <div class="skel skel-text-sm" style="flex:1;margin:0"></div>
-                    <div class="skel skel-text-sm" style="width:70px;margin:0"></div>
-                    <div class="skel skel-badge" style="width:60px;height:20px"></div>
-                  </div>
-                }
-              </div>
-            } @else {
-              <div class="table-container">
-                @if (store.depositTransactions().length === 0) {
-                  <div class="empty-state-table">
-                    <mat-icon>account_balance_wallet</mat-icon>
-                    <p>No deposits yet</p>
-                  </div>
-                } @else {
-                <table mat-table [dataSource]="store.depositTransactions()" class="transactions-table">
-                  <ng-container matColumnDef="date">
-                    <th mat-header-cell *matHeaderCellDef>Date</th>
-                    <td mat-cell *matCellDef="let txn">
-                      <div class="txn-date">
-                        <span class="txn-day">{{ store.formatDay(txn.createdAt) }}</span>
-                        <span class="txn-time">{{ store.formatTime(txn.createdAt) }}</span>
-                      </div>
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="type">
-                    <th mat-header-cell *matHeaderCellDef>Type</th>
-                    <td mat-cell *matCellDef="let txn">
-                      <mat-chip [ngClass]="'chip-' + store.getTypeColor(txn.type)" selected>
-                        <mat-icon matChipAvatar>{{ store.getTransactionIcon(txn.type) }}</mat-icon>
-                        {{ store.formatType(txn.type) }}
-                      </mat-chip>
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="description">
-                    <th mat-header-cell *matHeaderCellDef>Details</th>
-                    <td mat-cell *matCellDef="let txn">
-                      <div class="txn-description">
-                        <span class="txn-desc">{{ txn.description || store.formatType(txn.type) }}</span>
-                        @if (txn.metadata?.description) {
-                          <span class="txn-meta">{{ txn.metadata.description }}</span>
-                        }
-                      </div>
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="amount">
-                    <th mat-header-cell *matHeaderCellDef>Amount</th>
-                    <td mat-cell *matCellDef="let txn">
-                      <div class="txn-amount" [class.credit]="store.isCredit(txn.type)" [class.debit]="store.isDebit(txn.type)">
-                        <span class="amount-sign">{{ store.isCredit(txn.type) ? '+' : '-' }}</span>
-                        <span class="amount-value">{{ store.formatCurrency(txn.amount) }}</span>
-                      </div>
-                      <span class="txn-balance">Bal: {{ store.formatCurrency(txn.balanceAfter) }}</span>
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="status">
-                    <th mat-header-cell *matHeaderCellDef>Status</th>
-                    <td mat-cell *matCellDef="let txn">
-                      <mat-chip [ngClass]="store.getStatusBadgeClass(txn.status)" selected>
-                        <mat-icon matChipAvatar>{{ store.getStatusIcon(txn.status) }}</mat-icon>
-                        {{ store.formatStatus(txn.status) }}
-                      </mat-chip>
-                    </td>
-                  </ng-container>
-
-                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                </table>
-                }
-              </div>
+        <div class="filter-deck">
+          <div class="filter-search">
+            <mat-icon>search</mat-icon>
+            <input
+              class="filter-input"
+              [value]="searchInput()"
+              (input)="onSearchInput($any($event.target).value)"
+              placeholder="Search reference, description or amount…"
+            />
+            @if (searchInput()) {
+              <button class="filter-clear-xs" (click)="clearSearch()">×</button>
             }
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </mat-tab>
+          </div>
 
-    <mat-tab label="Withdraw">
-      <div class="tab-content">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>Withdrawal History</mat-card-title>
-            <mat-card-subtitle>{{ store.withdrawalTransactions().length }} of {{ store.totalTransactions() }} transactions</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            @if (store.loading()) {
-              <div class="skel-page">
-                @for (item of [1,2,3,4]; track item) {
-                  <div class="skel-row">
-                    <div class="skel skel-text-sm" style="width:50px;margin:0"></div>
-                    <div class="skel skel-text-sm" style="width:60px;margin:0"></div>
-                    <div class="skel skel-text-sm" style="flex:1;margin:0"></div>
-                    <div class="skel skel-text-sm" style="width:70px;margin:0"></div>
-                    <div class="skel skel-badge" style="width:60px;height:20px"></div>
-                  </div>
-                }
-              </div>
-            } @else {
-              <div class="table-container">
-                @if (store.withdrawalTransactions().length === 0) {
-                  <div class="empty-state-table">
-                    <mat-icon>money_off</mat-icon>
-                    <p>No withdrawals yet</p>
-                  </div>
-                } @else {
-                <table mat-table [dataSource]="store.withdrawalTransactions()" class="transactions-table">
-                  <ng-container matColumnDef="date">
-                    <th mat-header-cell *matHeaderCellDef>Date</th>
-                    <td mat-cell *matCellDef="let txn">
-                      <div class="txn-date">
-                        <span class="txn-day">{{ store.formatDay(txn.createdAt) }}</span>
-                        <span class="txn-time">{{ store.formatTime(txn.createdAt) }}</span>
-                      </div>
-                    </td>
-                  </ng-container>
+          <div class="filter-group">
+            <span class="filter-label">Type</span>
+            <div class="filter-chips">
+              @for (chip of typeChips; track chip.key) {
+                <button class="chip-btn" [class.on]="store.historyType() === chip.key" (click)="setType(chip.key)">{{ chip.label }}</button>
+              }
+            </div>
+          </div>
 
-                  <ng-container matColumnDef="type">
-                    <th mat-header-cell *matHeaderCellDef>Type</th>
-                    <td mat-cell *matCellDef="let txn">
-                      <mat-chip [ngClass]="'chip-' + store.getTypeColor(txn.type)" selected>
-                        <mat-icon matChipAvatar>{{ store.getTransactionIcon(txn.type) }}</mat-icon>
-                        {{ store.formatType(txn.type) }}
-                      </mat-chip>
-                    </td>
-                  </ng-container>
+          <div class="filter-group">
+            <span class="filter-label">Status</span>
+            <div class="filter-chips">
+              @for (chip of statusChips; track chip.key) {
+                <button class="chip-btn" [class.on]="store.historyStatus() === chip.key" (click)="setStatus(chip.key)">{{ chip.label }}</button>
+              }
+            </div>
+          </div>
 
-                  <ng-container matColumnDef="description">
-                    <th mat-header-cell *matHeaderCellDef>Details</th>
-                    <td mat-cell *matCellDef="let txn">
-                      <div class="txn-description">
-                        <span class="txn-desc">{{ txn.description || store.formatType(txn.type) }}</span>
-                        @if (txn.metadata?.description) {
-                          <span class="txn-meta">{{ txn.metadata.description }}</span>
-                        }
-                      </div>
-                    </td>
-                  </ng-container>
+          <div class="filter-group">
+            <span class="filter-label">Date range</span>
+            <div class="filter-row">
+              <input class="filter-input date" type="date" [value]="store.historyFrom()" (change)="setFrom($any($event.target).value)" />
+              <span class="date-sep">→</span>
+              <input class="filter-input date" type="date" [value]="store.historyTo()" (change)="setTo($any($event.target).value)" />
+            </div>
+          </div>
 
-                  <ng-container matColumnDef="amount">
-                    <th mat-header-cell *matHeaderCellDef>Amount</th>
-                    <td mat-cell *matCellDef="let txn">
-                      <div class="txn-amount" [class.credit]="store.isCredit(txn.type)" [class.debit]="store.isDebit(txn.type)">
-                        <span class="amount-sign">{{ store.isCredit(txn.type) ? '+' : '-' }}</span>
-                        <span class="amount-value">{{ store.formatCurrency(txn.amount) }}</span>
-                      </div>
-                      <span class="txn-balance">Bal: {{ store.formatCurrency(txn.balanceAfter) }}</span>
-                    </td>
-                  </ng-container>
+          <div class="filter-group">
+            <span class="filter-label">Sort</span>
+            <div class="filter-chips">
+              <button class="chip-btn" [class.on]="store.historySortField() === 'createdAt' && store.historySortOrder() === 'desc'" (click)="setSort('createdAt', 'desc')">Newest</button>
+              <button class="chip-btn" [class.on]="store.historySortField() === 'createdAt' && store.historySortOrder() === 'asc'" (click)="setSort('createdAt', 'asc')">Oldest</button>
+              <button class="chip-btn" [class.on]="store.historySortField() === 'amount' && store.historySortOrder() === 'desc'" (click)="setSort('amount', 'desc')">Amount ↑</button>
+              <button class="chip-btn" [class.on]="store.historySortField() === 'amount' && store.historySortOrder() === 'asc'" (click)="setSort('amount', 'asc')">Amount ↓</button>
+            </div>
+          </div>
 
-                  <ng-container matColumnDef="status">
-                    <th mat-header-cell *matHeaderCellDef>Status</th>
-                    <td mat-cell *matCellDef="let txn">
-                      <mat-chip [ngClass]="store.getStatusBadgeClass(txn.status)" selected>
-                        <mat-icon matChipAvatar>{{ store.getStatusIcon(txn.status) }}</mat-icon>
-                        {{ store.formatStatus(txn.status) }}
-                      </mat-chip>
-                    </td>
-                  </ng-container>
+          <div class="filter-group">
+            <span class="filter-label">Page size</span>
+            <div class="filter-chips">
+              @for (size of pageSizes; track size) {
+                <button class="chip-btn" [class.on]="store.historyLimit() === size" (click)="setPageSize(size)">{{ size }}</button>
+              }
+            </div>
+          </div>
+        </div>
 
-                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                </table>
-                }
-              </div>
-            }
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </mat-tab>
+        @if (store.error() && store.transactions().length === 0) {
+          <div class="error-msg">{{ store.error() }}</div>
+        }
 
-    <mat-tab label="History">
-      <div class="tab-content">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>Transaction History</mat-card-title>
-            <mat-card-subtitle>{{ store.totalTransactions() }} transactions</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            @if (store.loading()) {
-              <div class="skel-page">
-                @for (item of [1,2,3,4]; track item) {
-                  <div class="skel-row">
-                    <div class="skel skel-text-sm" style="width:50px;margin:0"></div>
-                    <div class="skel skel-text-sm" style="width:60px;margin:0"></div>
-                    <div class="skel skel-text-sm" style="flex:1;margin:0"></div>
-                    <div class="skel skel-text-sm" style="width:70px;margin:0"></div>
-                    <div class="skel skel-badge" style="width:60px;height:20px"></div>
-                  </div>
-                }
-              </div>
-            } @else {
-              <div class="table-container" [class.loading-more]="store.loadingMore()">
-                @if (store.loadingMore()) {
-                  <div class="loading-more-overlay"><mat-spinner diameter="28"></mat-spinner></div>
-                }
-                @if (store.transactions().length === 0 && !store.loadingMore()) {
-                  <div class="empty-state-table">
-                    <mat-icon>receipt_long</mat-icon>
-                    <p>No transactions yet</p>
-                  </div>
-                } @else {
-                <table mat-table [dataSource]="store.transactions()" class="transactions-table">
-                  <ng-container matColumnDef="date">
-                    <th mat-header-cell *matHeaderCellDef>Date</th>
-                    <td mat-cell *matCellDef="let txn">
-                      <div class="txn-date">
-                        <span class="txn-day">{{ store.formatDay(txn.createdAt) }}</span>
-                        <span class="txn-time">{{ store.formatTime(txn.createdAt) }}</span>
-                      </div>
-                    </td>
-                  </ng-container>
+        <div class="table-wrap">
+          @if (store.loading() && store.transactions().length === 0) {
+            <div class="skel-page">
+              @for (item of [1,2,3,4,5,6]; track item) {
+                <div class="skel-row">
+                  <div class="skel skel-text-sm" style="width:70px;margin:0"></div>
+                  <div class="skel skel-text-sm" style="width:90px;margin:0"></div>
+                  <div class="skel skel-badge" style="width:70px;height:20px"></div>
+                  <div class="skel skel-text-sm" style="flex:1;margin:0"></div>
+                  <div class="skel skel-text-sm" style="width:80px;margin:0"></div>
+                  <div class="skel skel-text-sm" style="width:70px;margin:0"></div>
+                  <div class="skel skel-badge" style="width:70px;height:20px"></div>
+                </div>
+              }
+            </div>
+          } @else if (store.transactions().length === 0) {
+            <div class="history-empty">
+              <mat-icon>receipt_long</mat-icon>
+              @if (store.hasActiveFilters()) {
+                <h3>No records match your filters</h3>
+                <p>Try adjusting your search or clearing some filters.</p>
+                <button class="clear-filters inline" (click)="store.clearHistoryFilters()">Clear filters</button>
+              } @else {
+                <h3>No transactions yet</h3>
+                <p>Your deposits and withdrawals will appear here.</p>
+                <button class="btn-emerald empty-cta" (click)="openDeposit()">
+                  <mat-icon>add</mat-icon> Make your first deposit
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Reference</th>
+                    <th>Type</th>
+                    <th>Details</th>
+                    <th>Amount</th>
+                    <th>Balance</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (txn of store.transactions(); track txn.id) {
+                    <tr [class.txn-row-loading]="store.loading()">
+                      <td>
+                        <div class="txn-date">
+                          <span class="txn-day">{{ store.formatDay(txn.createdAt) }}</span>
+                          <span class="txn-time">{{ store.formatTime(txn.createdAt) }}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="ref-code">{{ txn.reference }}</span>
+                      </td>
+                      <td>
+                        <span class="type-badge" [class.type-deposit]="txn.type === 'deposit'" [class.type-withdrawal]="txn.type === 'withdrawal'" [class.type-stake]="txn.type === 'stake'" [class.type-payout]="txn.type === 'payout'" [class.type-bonus]="txn.type === 'bonus'">
+                          <mat-icon class="type-icon">{{ store.getTransactionIcon(txn.type) }}</mat-icon>
+                          {{ store.formatType(txn.type) }}
+                        </span>
+                      </td>
+                      <td>
+                        <div class="txn-description">
+                          <span class="txn-desc">{{ store.txnDescription(txn) }}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="txn-amount" [class.credit]="store.isCredit(txn.type)" [class.debit]="store.isDebit(txn.type)">
+                          <span class="amount-sign">{{ store.isCredit(txn.type) ? '+' : '−' }}</span>
+                          <span class="amount-value">{{ store.formatCurrency(txn.amount) }}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="txn-balance">{{ store.formatCurrency(txn.balanceAfter) }}</span>
+                      </td>
+                      <td>
+                        <span class="chip" [class]="store.getStatusBadgeClass(txn.status)">
+                          <mat-icon class="chip-icon">{{ store.getStatusIcon(txn.status) }}</mat-icon>
+                          {{ store.formatStatus(txn.status) }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
 
-                  <ng-container matColumnDef="type">
-                    <th mat-header-cell *matHeaderCellDef>Type</th>
-                    <td mat-cell *matCellDef="let txn">
-                      <mat-chip [ngClass]="'chip-' + store.getTypeColor(txn.type)" selected>
-                        <mat-icon matChipAvatar>{{ store.getTransactionIcon(txn.type) }}</mat-icon>
-                        {{ store.formatType(txn.type) }}
-                      </mat-chip>
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="description">
-                    <th mat-header-cell *matHeaderCellDef>Details</th>
-                    <td mat-cell *matCellDef="let txn">
-                      <div class="txn-description">
-                        <span class="txn-desc">{{ txn.description || store.formatType(txn.type) }}</span>
-                        @if (txn.metadata?.description) {
-                          <span class="txn-meta">{{ txn.metadata.description }}</span>
-                        }
-                      </div>
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="amount">
-                    <th mat-header-cell *matHeaderCellDef>Amount</th>
-                    <td mat-cell *matCellDef="let txn">
-                      <div class="txn-amount" [class.credit]="store.isCredit(txn.type)" [class.debit]="store.isDebit(txn.type)">
-                        <span class="amount-sign">{{ store.isCredit(txn.type) ? '+' : '-' }}</span>
-                        <span class="amount-value">{{ store.formatCurrency(txn.amount) }}</span>
-                      </div>
-                      <span class="txn-balance">Bal: {{ store.formatCurrency(txn.balanceAfter) }}</span>
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="status">
-                    <th mat-header-cell *matHeaderCellDef>Status</th>
-                    <td mat-cell *matCellDef="let txn">
-                      <mat-chip [ngClass]="store.getStatusBadgeClass(txn.status)" selected>
-                        <mat-icon matChipAvatar>{{ store.getStatusIcon(txn.status) }}</mat-icon>
-                        {{ store.formatStatus(txn.status) }}
-                      </mat-chip>
-                    </td>
-                  </ng-container>
-
-                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                </table>
-
-                <mat-paginator 
-                  [length]="store.totalTransactions()" 
-                  [pageSize]="20" 
-                  [pageSizeOptions]="[10, 20, 50]"
-                  (page)="onPageChange($event)"
-                  showFirstLastButtons>
-                </mat-paginator>
-                }
-              </div>
-            }
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
+            <div class="pagination">
+              <button class="page-btn" (click)="loadPage(store.historyPage() - 1)" [disabled]="store.historyPage() <= 1 || store.loading()">← Prev</button>
+              <span class="page-info">Page {{ store.historyPage() }} of {{ store.historyTotalPages() }} · {{ rangeStart }}–{{ rangeEnd }} of {{ store.totalTransactions() }}</span>
+              <button class="page-btn" (click)="loadPage(store.historyPage() + 1)" [disabled]="store.historyPage() >= store.historyTotalPages() || store.loading()">Next →</button>
+            </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
   </div>
 </div>
 <app-top-up-modal [visible]="displayTopUp()" [disableClose]="true" (close)="displayTopUp.set(false)" />
