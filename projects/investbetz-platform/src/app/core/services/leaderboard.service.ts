@@ -1,5 +1,5 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
@@ -46,13 +46,28 @@ export class LeaderboardService {
     return { Authorization: `Bearer ${this.auth.token()}` };
   }
 
-  fetchLeaderboard(period: LeaderboardPeriod, page = 1, limit = 25) {
+  fetchLeaderboard(
+    period: LeaderboardPeriod = 'month',
+    page = 1,
+    limit = 25,
+    search = '',
+    sortField: 'totalStaked' | 'stakeCount' | 'totalWon' | 'lastWinAt' = 'totalStaked',
+    sortOrder: 'asc' | 'desc' = 'desc'
+  ) {
     this.loading.set(true);
     this.error.set(null);
 
+    let params = new HttpParams()
+      .set('period', period)
+      .set('page', String(page))
+      .set('limit', String(limit))
+      .set('sortField', sortField)
+      .set('sortOrder', sortOrder);
+    if (search.trim()) params = params.set('search', search.trim());
+
     this.http.get<{ success: boolean; data: LeaderboardPage }>(
-      `${environment.apiUrl}/leaderboard?period=${period}&page=${page}&limit=${limit}`,
-      { headers: this.getHeaders() }
+      `${environment.apiUrl}/leaderboard`,
+      { headers: this.getHeaders(), params }
     ).subscribe({
       next: (res) => {
         if (res.success) this.board.set(res.data);

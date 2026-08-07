@@ -23,27 +23,54 @@ export class OraRecordComponent implements OnInit {
   record = signal<OraRecord | null>(null);
   loading = signal(true);
   error = signal<string | null>(null);
+  refreshing = signal(false);
+  league = signal('');
+  limit = signal(20);
+  limitOptions = [10, 20, 50];
 
   skeletonRows = Array.from({ length: 6 }, (_, i) => i);
+
+  leagues = computed(() => {
+    const r = this.record();
+    if (!r) return [];
+    return [...new Set(r.byLeague.map(l => l.league))].sort((a, b) => a.localeCompare(b));
+  });
 
   ngOnInit() {
     this.load();
   }
 
-  load() {
+  load(refresh = false) {
     this.loading.set(true);
     this.error.set(null);
-    this.oraRecord.getRecord().subscribe({
+    if (refresh) this.refreshing.set(true);
+    this.oraRecord.getRecord(this.league(), this.limit(), refresh).subscribe({
       next: (res) => {
         if (res.success) this.record.set(res.data);
         else this.error.set('Failed to load Ora record');
         this.loading.set(false);
+        this.refreshing.set(false);
       },
       error: (err) => {
         this.error.set(err.error?.message || 'Failed to load Ora record');
         this.loading.set(false);
+        this.refreshing.set(false);
       }
     });
+  }
+
+  setLeague(league: string) {
+    this.league.set(league);
+    this.load();
+  }
+
+  setLimit(limit: number) {
+    this.limit.set(limit);
+    this.load();
+  }
+
+  refresh() {
+    this.load(true);
   }
 
   formatDuration(ms: number | null): string {
@@ -61,6 +88,11 @@ export class OraRecordComponent implements OnInit {
   formatPercent(n: number | null): string {
     if (n === null) return '—';
     return `${Math.round(n)}%`;
+  }
+
+  formatRatio(n: number | null): string {
+    if (n === null) return '—';
+    return `${Math.round(n * 100)}%`;
   }
 
   formatDate(iso: string): string {

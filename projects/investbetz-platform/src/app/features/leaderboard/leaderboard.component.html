@@ -6,7 +6,40 @@
     </header>
 
     <div class="mobile-content">
-      <a mat-stroked-button class="ora-record-link mobile" routerLink="/ora-record">
+      <section class="hero hero--mobile">
+        <div class="hero-orbs" aria-hidden="true">
+          <span class="orb orb--gold"></span>
+          <span class="orb orb--green"></span>
+        </div>
+        <span class="hero-eyebrow"><mat-icon>emoji_events</mat-icon> Top Stakers</span>
+        <h2 class="hero-title">Climb to the <span class="hero-accent">top</span></h2>
+        <p class="hero-sub">Live rankings by staking volume</p>
+      </section>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <mat-icon class="stat-icon stat-icon--gold">military_tech</mat-icon>
+          <span class="stat-label">My Rank</span>
+          <span class="stat-value">{{ stats().myRank ? '#' + stats().myRank : '—' }}</span>
+        </div>
+        <div class="stat-card">
+          <mat-icon class="stat-icon stat-icon--green">groups</mat-icon>
+          <span class="stat-label">Total Stakers</span>
+          <span class="stat-value">{{ stats().totalPlayers.toLocaleString() }}</span>
+        </div>
+        <div class="stat-card">
+          <mat-icon class="stat-icon stat-icon--blue">paid</mat-icon>
+          <span class="stat-label">My Volume</span>
+          <span class="stat-value">₦{{ stats().myStaked.toLocaleString() }}</span>
+        </div>
+        <div class="stat-card">
+          <mat-icon class="stat-icon stat-icon--purple">emoji_events</mat-icon>
+          <span class="stat-label">My Winnings</span>
+          <span class="stat-value">₦{{ stats().myWon.toLocaleString() }}</span>
+        </div>
+      </div>
+
+      <a mat-stroked-button class="ora-record-link" routerLink="/ora-record">
         <mat-icon>verified</mat-icon> Ora's Track Record
       </a>
 
@@ -21,44 +54,50 @@
         }
       </div>
 
-      @if (myRank()) {
-        <section class="my-rank-card">
-          <div class="my-rank-left">
-            <span class="my-rank-label">My Rank</span>
-            <div class="my-rank-value">
-              <span class="rank-no" [class]="rankClass(myRank()!.rank)">#{{ myRank()!.rank }}</span>
-              <span class="rank-suffix">of {{ board()?.total || '…' }} stakers</span>
-            </div>
-            <div class="my-rank-stats">
-              <span class="stat-pill">₦{{ myRank()!.totalStaked.toLocaleString() }} staked</span>
-              <span class="stat-pill">{{ myRank()!.stakeCount }} stakes</span>
-              <span class="stat-pill won">₦{{ myRank()!.totalWon.toLocaleString() }} won</span>
-            </div>
-          </div>
-          <div class="my-rank-right" (click)="loadLastWin()">
-            <span class="win-share-label">Share your last win</span>
-            @if (lastWin()) {
-              <div class="win-share-card">
-                <div class="win-share-main">
-                  <span class="win-share-amount">₦{{ lastWin()!.netPayout.toLocaleString() }}</span>
-                  <span class="win-share-desc">won on {{ lastWin()!.podTitle }} &#64; {{ lastWin()!.multiplier }}x</span>
-                </div>
-                <div class="win-share-actions">
-                  <button mat-stroked-button class="win-share-btn" (click)="shareWin(); $event.stopPropagation()">
-                    <mat-icon>{{ shareCopied() ? 'check' : 'content_copy' }}</mat-icon>
-                    {{ shareCopied() ? 'Copied!' : 'Copy summary' }}
-                  </button>
-                  <button mat-stroked-button class="win-share-btn wa" (click)="shareWinWhatsApp(); $event.stopPropagation()">
-                    <mat-icon>chat</mat-icon> WhatsApp
-                  </button>
-                </div>
-              </div>
-            } @else {
-              <span class="win-share-empty">No win to share yet — tap to check</span>
+      <div class="filter-card">
+        <div class="search-box">
+          <mat-icon>search</mat-icon>
+          <input
+            type="text"
+            [value]="searchTerm()"
+            (input)="onSearchInput($any($event.target).value)"
+            placeholder="Find a staker…"
+            aria-label="Search stakers" />
+          @if (searchTerm()) {
+            <button class="search-clear" (click)="clearSearch()" aria-label="Clear search">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </div>
+        <div class="sort-chips">
+          @for (opt of sortOptions; track opt.key) {
+            <button
+              class="sort-chip"
+              [class.active]="isActiveSort(opt.key)"
+              (click)="setSort(opt.key)"
+              [attr.data-sort]="opt.key">
+              <mat-icon>{{ opt.icon }}</mat-icon>
+              {{ opt.label }}
+              @if (isActiveSort(opt.key)) {
+                <mat-icon class="sort-arrow">{{ sortOrder() === 'desc' ? 'arrow_drop_down' : 'arrow_drop_up' }}</mat-icon>
+              }
+            </button>
+          }
+        </div>
+        <div class="page-size-row">
+          <span class="page-size-label">Rows per page</span>
+          <div class="page-size-opts">
+            @for (size of pageSizes; track size) {
+              <button
+                class="page-size-opt"
+                [class.active]="pageSize() === size"
+                (click)="setPageSize(size)">
+                {{ size }}
+              </button>
             }
           </div>
-        </section>
-      }
+        </div>
+      </div>
 
       @if (loading() && !board()) {
         <div class="skel-page">
@@ -74,33 +113,39 @@
         </div>
       } @else if (board() && board()!.items.length === 0) {
         <div class="empty-state">
-          <mat-icon>emoji_events</mat-icon>
-          <h3>No stakes yet</h3>
-          <p>Be the first to stake in this period and claim the top spot.</p>
+          <mat-icon>{{ searchTerm() ? 'search_off' : 'emoji_events' }}</mat-icon>
+          <h3>{{ searchTerm() ? 'No stakers found' : 'No stakes yet' }}</h3>
+          <p>{{ searchTerm() ? 'Try a different name or number.' : 'Be the first to stake in this period and claim the top spot.' }}</p>
+          @if (searchTerm()) {
+            <button mat-stroked-button (click)="clearSearch()">Clear search</button>
+          }
         </div>
       } @else if (board()) {
-        <section class="board-table">
-          <div class="board-row board-head">
-            <span>#</span>
-            <span>Staker</span>
-            <span class="num-col">Stakes</span>
-            <span class="num-col">Volume</span>
-            <span class="num-col">Total Won</span>
-            <span class="num-col">Last Win</span>
-          </div>
-          @for (entry of board()!.items; track entry.userId; let i = $index) {
-            <div class="board-row" [class.self-row]="entry.userId === myRank()?.userId">
-              <span class="rank-cell">
-                @if (rankBadge(entry.rank)) {
-                  <span class="medal">{{ rankBadge(entry.rank) }}</span>
+        <section class="board-list">
+          @for (entry of board()!.items; track entry.userId) {
+            <div class="board-card" [class.self-row]="isMe(entry)">
+              <div class="board-card-top">
+                <span class="rank-emblem" [class]="rankClass(entry.rank)">{{ rankEmblem(entry.rank) }}</span>
+                <div class="board-card-user">
+                  <span class="staker-name">{{ entry.displayName }}</span>
+                  <span class="staker-sub">{{ entry.stakeCount }} stakes · last win {{ formatDate(entry.lastWinAt) }}</span>
+                </div>
+                <div class="board-card-volume">
+                  <span class="volume-value">{{ formatMoney(entry.totalStaked) }}</span>
+                  <span class="volume-label">volume</span>
+                </div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" [style.width.%]="progressWidth(entry)"></div>
+              </div>
+              <div class="board-card-bottom">
+                <span class="won-pill">
+                  <mat-icon>emoji_events</mat-icon> {{ formatMoney(entry.totalWon) }} won
+                </span>
+                @if (isMe(entry)) {
+                  <span class="me-pill">You</span>
                 }
-                <span class="rank-no" [class]="rankClass(entry.rank)">{{ entry.rank }}</span>
-              </span>
-              <span class="staker-name">{{ entry.displayName }}</span>
-              <span class="num-col">{{ entry.stakeCount }}</span>
-              <span class="num-col strong">{{ formatMoney(entry.totalStaked) }}</span>
-              <span class="num-col won">{{ formatMoney(entry.totalWon) }}</span>
-              <span class="num-col">{{ formatDate(entry.lastWinAt) }}</span>
+              </div>
             </div>
           }
         </section>
@@ -108,14 +153,14 @@
         <div class="pagination">
           <button
             class="page-btn"
-            [disabled]="page() <= 1"
+            [disabled]="!hasPrev()"
             (click)="goToPage(page() - 1)">
             <mat-icon>chevron_left</mat-icon>
           </button>
           <span class="page-info">Page {{ page() }} of {{ totalPages() }}</span>
           <button
             class="page-btn"
-            [disabled]="page() >= totalPages()"
+            [disabled]="!hasNext()"
             (click)="goToPage(page() + 1)">
             <mat-icon>chevron_right</mat-icon>
           </button>
@@ -129,11 +174,44 @@
   <app-nav />
 
   <div class="board-page">
+    <section class="hero">
+      <div class="hero-orbs" aria-hidden="true">
+        <span class="orb orb--gold"></span>
+        <span class="orb orb--green"></span>
+        <span class="orb orb--blue"></span>
+      </div>
+      <span class="hero-eyebrow"><mat-icon>emoji_events</mat-icon> Top Stakers</span>
+      <h1 class="hero-title">The BetPool <span class="hero-accent">Leaderboard</span></h1>
+      <p class="hero-sub">Top stakers by volume, wins and momentum — updated live every 60 seconds.</p>
+    </section>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <mat-icon class="stat-icon stat-icon--gold">military_tech</mat-icon>
+        <span class="stat-label">My Rank</span>
+        <span class="stat-value">{{ stats().myRank ? '#' + stats().myRank : '—' }}</span>
+      </div>
+      <div class="stat-card">
+        <mat-icon class="stat-icon stat-icon--green">groups</mat-icon>
+        <span class="stat-label">Total Stakers</span>
+        <span class="stat-value">{{ stats().totalPlayers.toLocaleString() }}</span>
+      </div>
+      <div class="stat-card">
+        <mat-icon class="stat-icon stat-icon--blue">paid</mat-icon>
+        <span class="stat-label">My Volume</span>
+        <span class="stat-value">₦{{ stats().myStaked.toLocaleString() }}</span>
+      </div>
+      <div class="stat-card">
+        <mat-icon class="stat-icon stat-icon--purple">emoji_events</mat-icon>
+        <span class="stat-label">My Winnings</span>
+        <span class="stat-value">₦{{ stats().myWon.toLocaleString() }}</span>
+      </div>
+    </div>
 
     <div class="page-header">
       <div class="page-header-left">
         <h1>Leaderboard</h1>
-        <span class="page-subtitle">Top stakers by volume — updated live</span>
+        <span class="page-subtitle">Rankings by {{ period() === 'week' ? 'this week' : period() === 'month' ? 'this month' : 'all time' }}</span>
       </div>
       <a mat-stroked-button class="ora-record-link" routerLink="/ora-record">
         <mat-icon>verified</mat-icon> Ora's Track Record
@@ -151,44 +229,50 @@
       }
     </div>
 
-    @if (myRank()) {
-      <section class="my-rank-card">
-        <div class="my-rank-left">
-          <span class="my-rank-label">My Rank</span>
-          <div class="my-rank-value">
-            <span class="rank-no" [class]="rankClass(myRank()!.rank)">#{{ myRank()!.rank }}</span>
-            <span class="rank-suffix">of {{ board()?.total || '…' }} stakers</span>
-          </div>
-          <div class="my-rank-stats">
-            <span class="stat-pill">₦{{ myRank()!.totalStaked.toLocaleString() }} staked</span>
-            <span class="stat-pill">{{ myRank()!.stakeCount }} stakes</span>
-            <span class="stat-pill won">₦{{ myRank()!.totalWon.toLocaleString() }} won</span>
-          </div>
-        </div>
-        <div class="my-rank-right" (click)="loadLastWin()">
-          <span class="win-share-label">Share your last win</span>
-          @if (lastWin()) {
-            <div class="win-share-card">
-              <div class="win-share-main">
-                <span class="win-share-amount">₦{{ lastWin()!.netPayout.toLocaleString() }}</span>
-                <span class="win-share-desc">won on {{ lastWin()!.podTitle }} &#64; {{ lastWin()!.multiplier }}x</span>
-              </div>
-              <div class="win-share-actions">
-                <button mat-stroked-button class="win-share-btn" (click)="shareWin(); $event.stopPropagation()">
-                  <mat-icon>{{ shareCopied() ? 'check' : 'content_copy' }}</mat-icon>
-                  {{ shareCopied() ? 'Copied!' : 'Copy summary' }}
-                </button>
-                <button mat-stroked-button class="win-share-btn wa" (click)="shareWinWhatsApp(); $event.stopPropagation()">
-                  <mat-icon>chat</mat-icon> WhatsApp
-                </button>
-              </div>
-            </div>
-          } @else {
-            <span class="win-share-empty">No win to share yet — tap to check</span>
+    <div class="filter-card">
+      <div class="search-box">
+        <mat-icon>search</mat-icon>
+        <input
+          type="text"
+          [value]="searchTerm()"
+          (input)="onSearchInput($any($event.target).value)"
+          placeholder="Find a staker by name or phone…"
+          aria-label="Search stakers" />
+        @if (searchTerm()) {
+          <button class="search-clear" (click)="clearSearch()" aria-label="Clear search">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+      <div class="sort-chips">
+        @for (opt of sortOptions; track opt.key) {
+          <button
+            class="sort-chip"
+            [class.active]="isActiveSort(opt.key)"
+            (click)="setSort(opt.key)"
+            [attr.data-sort]="opt.key">
+            <mat-icon>{{ opt.icon }}</mat-icon>
+            {{ opt.label }}
+            @if (isActiveSort(opt.key)) {
+              <mat-icon class="sort-arrow">{{ sortOrder() === 'desc' ? 'arrow_drop_down' : 'arrow_drop_up' }}</mat-icon>
+            }
+          </button>
+        }
+      </div>
+      <div class="page-size-row">
+        <span class="page-size-label">Rows per page</span>
+        <div class="page-size-opts">
+          @for (size of pageSizes; track size) {
+            <button
+              class="page-size-opt"
+              [class.active]="pageSize() === size"
+              (click)="setPageSize(size)">
+              {{ size }}
+            </button>
           }
         </div>
-      </section>
-    }
+      </div>
+    </div>
 
     @if (loading() && !board()) {
       <div class="skel-page">
@@ -204,9 +288,12 @@
       </div>
     } @else if (board() && board()!.items.length === 0) {
       <div class="empty-state">
-        <mat-icon>emoji_events</mat-icon>
-        <h3>No stakes yet</h3>
-        <p>Be the first to stake in this period and claim the top spot.</p>
+        <mat-icon>{{ searchTerm() ? 'search_off' : 'emoji_events' }}</mat-icon>
+        <h3>{{ searchTerm() ? 'No stakers found' : 'No stakes yet' }}</h3>
+        <p>{{ searchTerm() ? 'Try a different name or phone number.' : 'Be the first to stake in this period and claim the top spot.' }}</p>
+        @if (searchTerm()) {
+          <button mat-stroked-button (click)="clearSearch()">Clear search</button>
+        }
       </div>
     } @else if (board()) {
       <section class="board-table">
@@ -218,17 +305,25 @@
           <span class="num-col">Total Won</span>
           <span class="num-col">Last Win</span>
         </div>
-        @for (entry of board()!.items; track entry.userId; let i = $index) {
-          <div class="board-row" [class.self-row]="entry.userId === myRank()?.userId">
+        @for (entry of board()!.items; track entry.userId) {
+          <div class="board-row" [class.self-row]="isMe(entry)">
             <span class="rank-cell">
-              @if (rankBadge(entry.rank)) {
-                <span class="medal">{{ rankBadge(entry.rank) }}</span>
-              }
+              <span class="rank-emblem" [class]="rankClass(entry.rank)">{{ rankEmblem(entry.rank) }}</span>
               <span class="rank-no" [class]="rankClass(entry.rank)">{{ entry.rank }}</span>
             </span>
-            <span class="staker-name">{{ entry.displayName }}</span>
+            <span class="staker-name">
+              {{ entry.displayName }}
+              @if (isMe(entry)) {
+                <span class="me-pill">You</span>
+              }
+            </span>
             <span class="num-col">{{ entry.stakeCount }}</span>
-            <span class="num-col strong">{{ formatMoney(entry.totalStaked) }}</span>
+            <span class="num-col strong">
+              {{ formatMoney(entry.totalStaked) }}
+              <div class="progress-track">
+                <div class="progress-fill" [style.width.%]="progressWidth(entry)"></div>
+              </div>
+            </span>
             <span class="num-col won">{{ formatMoney(entry.totalWon) }}</span>
             <span class="num-col">{{ formatDate(entry.lastWinAt) }}</span>
           </div>
@@ -238,14 +333,14 @@
       <div class="pagination">
         <button
           class="page-btn"
-          [disabled]="page() <= 1"
+          [disabled]="!hasPrev()"
           (click)="goToPage(page() - 1)">
           <mat-icon>chevron_left</mat-icon>
         </button>
         <span class="page-info">Page {{ page() }} of {{ totalPages() }}</span>
         <button
           class="page-btn"
-          [disabled]="page() >= totalPages()"
+          [disabled]="!hasNext()"
           (click)="goToPage(page() + 1)">
           <mat-icon>chevron_right</mat-icon>
         </button>
