@@ -15,7 +15,7 @@
   overflow: hidden;
   max-width: 1200px;
   width: calc(100% - 32px);
-  margin: 0 auto;
+  margin: 12px auto 0;
   padding: 28px 28px 24px;
   border-radius: 20px;
   background:
@@ -288,12 +288,17 @@
   height: 46px;
   font-size: 14px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.45);
   opacity: 1;
+  --mat-tab-inactive-label-text-color: rgba(255, 255, 255, 0.62);
+  --mat-tab-active-label-text-color: #00E676;
 }
 
-::ng-deep .bets-tabs .mat-mdc-tab.mdc-tab--active {
-  color: #FFFFFF;
+::ng-deep .bets-tabs .mat-mdc-tab .mdc-tab__text-label {
+  color: var(--mat-tab-inactive-label-text-color);
+}
+
+::ng-deep .bets-tabs .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: var(--mat-tab-active-label-text-color);
 }
 
 ::ng-deep .bets-tabs .mat-mdc-tab-indicator {
