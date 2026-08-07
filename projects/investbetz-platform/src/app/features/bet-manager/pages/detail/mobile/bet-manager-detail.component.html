@@ -65,6 +65,7 @@
           <div>
             <div class="tier-name">{{ config.label }}</div>
             <div class="tier-strat">Min ₦{{ config.minDeposit | number }} &middot; 30-day lock</div>
+            <div class="tier-strategy">{{ config.strategy }}</div>
           </div>
         </div>
         <div class="hero-stats">
@@ -127,22 +128,67 @@
       }
 
       <div class="section-card">
-        <h3>History</h3>
+        <div class="section-head">
+          <h3>History</h3>
+          <span class="history-count">{{ store.historyTotal() | number }}</span>
+        </div>
+
+        <div class="filter-deck">
+          <input
+            class="filter-input"
+            type="text"
+            placeholder="Search reference / amount…"
+            [ngModel]="searchTerm"
+            (ngModelChange)="searchTerm = $event; onSearchInput()" />
+          <div class="filter-scroll">
+            <button class="chip-btn" [class.on]="!store.historyType()" (click)="setType('')">All</button>
+            <button class="chip-btn" [class.on]="store.historyType() === 'deposit'" (click)="setType('deposit')">Deposits</button>
+            <button class="chip-btn" [class.on]="store.historyType() === 'withdrawal'" (click)="setType('withdrawal')">Withdrawals</button>
+            <button class="chip-btn" [class.on]="!store.historyStatus()" (click)="setStatus('')">All statuses</button>
+            <button class="chip-btn" [class.on]="store.historyStatus() === 'locked'" (click)="setStatus('locked')">Locked</button>
+            <button class="chip-btn" [class.on]="store.historyStatus() === 'unlocked'" (click)="setStatus('unlocked')">Unlocked</button>
+            <button class="chip-btn" [class.on]="store.historyStatus() === 'withdrawn'" (click)="setStatus('withdrawn')">Withdrawn</button>
+            <button class="chip-btn" [class.on]="store.historySortField() === 'depositedAt' && store.historySortOrder() === 'desc'" (click)="setSort('depositedAt', 'desc')">Newest</button>
+            <button class="chip-btn" [class.on]="store.historySortField() === 'depositedAt' && store.historySortOrder() === 'asc'" (click)="setSort('depositedAt', 'asc')">Oldest</button>
+            <button class="chip-btn" [class.on]="store.historySortField() === 'amount' && store.historySortOrder() === 'desc'" (click)="setSort('amount', 'desc')">Amount ↑</button>
+            <button class="chip-btn" [class.on]="store.historySortField() === 'amount' && store.historySortOrder() === 'asc'" (click)="setSort('amount', 'asc')">Amount ↓</button>
+          </div>
+          @if (store.hasActiveFilters()) {
+            <button class="clear-filters" (click)="clearFilters()">Clear filters ({{ store.activeFilterCount() }})</button>
+          }
+        </div>
+
         @if (history.length > 0) {
           @for (rec of history; track rec._id) {
             <div class="history-row">
               <div class="history-left">
                 <span class="type-badge" [class.type-deposit]="rec.type === 'deposit'" [class.type-withdrawal]="rec.type === 'withdrawal'">{{ rec.type }}</span>
                 <span class="history-date">{{ rec.depositedAt | date:'shortDate' }}</span>
+                @if (rec.reference) {
+                  <span class="history-ref">{{ rec.reference }}</span>
+                }
               </div>
               <div class="history-right">
-                <span class="history-amount">₦{{ rec.amount | number }}</span>
+                <span class="history-amount">{{ rec.type === 'deposit' ? '+' : '−' }}₦{{ rec.amount | number }}</span>
                 <span class="chip" [class.chip-locked]="rec.status === 'locked'" [class.chip-unlocked]="rec.status === 'unlocked'" [class.chip-withdrawn]="rec.status === 'withdrawn'">{{ rec.status }}</span>
               </div>
             </div>
           }
+
+          <div class="pagination">
+            <button (click)="store.loadHistoryPage(store.historyPage() - 1)" [disabled]="store.historyPage() <= 1 || store.historyLoading()" class="page-btn">← Prev</button>
+            <span class="page-info">Page {{ store.historyPage() }}/{{ store.historyTotalPages() }}</span>
+            <button (click)="store.loadHistoryPage(store.historyPage() + 1)" [disabled]="store.historyPage() >= store.historyTotalPages() || store.historyLoading()" class="page-btn">Next →</button>
+          </div>
         } @else {
-          <p class="no-data">No history yet.</p>
+          <div class="history-empty">
+            @if (store.hasActiveFilters()) {
+              <p>No records match your filters.</p>
+              <button class="clear-filters inline" (click)="clearFilters()">Clear filters</button>
+            } @else {
+              <p class="no-data">No history yet.</p>
+            }
+          </div>
         }
       </div>
     }
@@ -157,7 +203,7 @@
       <h3>Confirm Withdrawal</h3>
       @let s = store.summary()!;
       <p>Withdraw <strong>₦{{ s.unlockedBalance | number }}</strong> from {{ config.label }}?</p>
-      <p class="confirm-note">All unlocked deposits withdrawn at current NAV. Units reset to 0.</p>
+      <p class="confirm-note">Unlocked deposits are redeemed at current NAV. Locked deposits stay invested; a 20% service charge applies to profit.</p>
       <div class="confirm-actions">
         <button class="btn-cancel" (click)="showConfirmWithdraw.set(false)">Cancel</button>
         <button class="btn-confirm" (click)="withdraw()" [disabled]="store.loading()">

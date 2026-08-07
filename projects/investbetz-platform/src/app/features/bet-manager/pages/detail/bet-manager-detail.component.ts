@@ -7,6 +7,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { AppNavComponent } from '../../../../core/components';
 import { BetManagerStore } from '../../stores/bet-manager.store';
+import { betManagerTierInfo } from '../../bet-manager.tier-config';
 
 @Component({
   selector: 'app-bet-manager-detail',
@@ -22,29 +23,24 @@ export class BetManagerDetailComponent implements OnInit {
 
   tier = '';
   showConfirmWithdraw = signal(false);
-  depositPage = signal(1);
-  historyPage = signal(1);
+  searchTerm = '';
+  private searchTimer: ReturnType<typeof setTimeout> | null = null;
 
-  readonly tierConfig: Record<string, { label: string; icon: string; minDeposit: number; color: string; strategy: string }> = {
-    goalkeeper: { label: 'Goalkeeper', icon: '🧤', minDeposit: 20_000, color: '#90CAF9', strategy: 'Starter — low entry, steady returns, minimal risk' },
-    defender: { label: 'Defender', icon: '🛡️', minDeposit: 50_000, color: '#00E676', strategy: 'Conservative — low-risk Pods, high refund confidence' },
-    midfielder: { label: 'Midfielder', icon: '⚡', minDeposit: 100_000, color: '#E8B923', strategy: 'Balanced — mix of Pods and Match Pools' },
-    striker: { label: 'Striker', icon: '🎯', minDeposit: 200_000, color: '#FF5252', strategy: 'Aggressive — higher multipliers, more Match Pools' },
-  };
+  readonly pageSizeOptions = [10, 20, 50];
 
   ngOnInit() {
     this.tier = this.route.snapshot.paramMap.get('tier') || '';
-    if (!this.tierConfig[this.tier]) {
+    if (!betManagerTierInfo(this.tier)) {
       this.router.navigate(['/bet-manager']);
       return;
     }
     this.store.fetchAccount(this.tier);
     this.store.fetchNav(this.tier);
     this.store.fetchPerformance(this.tier);
-    this.store.fetchDepositHistory(this.tier, 1);
+    this.store.fetchDepositHistory();
   }
 
-  get config() { return this.tierConfig[this.tier]!; }
+  get config() { return betManagerTierInfo(this.tier); }
 
   goBack() { this.router.navigate(['/bet-manager']); }
   goDeposit() { this.router.navigate(['/bet-manager/deposit', this.tier]); }
@@ -54,11 +50,35 @@ export class BetManagerDetailComponent implements OnInit {
     this.store.withdraw(this.tier, () => {
       this.store.fetchAccount(this.tier);
       this.store.fetchPerformance(this.tier);
+      this.store.fetchDepositHistory();
     });
   }
 
-  loadHistoryPage(page: number) {
-    this.historyPage.set(page);
-    this.store.fetchDepositHistory(this.tier, page);
+  onSearchInput() {
+    if (this.searchTimer) clearTimeout(this.searchTimer);
+    this.searchTimer = setTimeout(() => {
+      this.store.setHistoryFilters({ search: this.searchTerm });
+    }, 350);
+  }
+
+  setType(type: string) { this.store.setHistoryFilters({ type }); }
+  setStatus(status: string) { this.store.setHistoryFilters({ status }); }
+  setSort(sortField: string, sortOrder: 'asc' | 'desc') { this.store.setHistoryFilters({ sortField, sortOrder }); }
+  setPageSize(size: number) { this.store.setHistoryPageSize(size); }
+  clearFilters() { this.searchTerm = ''; this.store.clearHistoryFilters(); }
+
+  unlockDate(rec: { withdrawableAt: string | null; status: string }): string | null {
+    if (rec.status !== 'locked' || !rec.withdrawableAt) return null;
+    const d = new Date(rec.withdrawableAt);
+    return isNaN(d.getTime()) ? null : d.toLocaleDateString();
+  }
+
+  get rangeStart(): number {
+    return ((this.store.historyPage() - 1) * this.store.historyLimit()) + 1;
+  }
+
+  get rangeEnd(): number {
+    const end = this.store.historyPage() * this.store.historyLimit();
+    return end > this.store.historyTotal() ? this.store.historyTotal() : end;
   }
 }

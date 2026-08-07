@@ -1,6 +1,6 @@
 <app-nav />
 <div class="detail-root">
-  <button class="back-link" (click)="goBack()">← Back to Bet Manager</button>
+  <button class="back-link" (click)="goBack()"><mat-icon>arrow_back</mat-icon> Back to Bet Manager</button>
 
   @let cfg = config;
   @let summary = store.summary();
@@ -194,52 +194,139 @@
       }
 
       <div class="detail-card full-width">
-        <h3>Deposit &amp; Withdrawal History</h3>
-        @if (history.length > 0) {
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Units</th>
-                <th>NAV at Execution</th>
-                <th>Date</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (rec of history; track rec._id) {
-                <tr>
-                  <td>
-                    <span class="type-badge" [class.type-deposit]="rec.type === 'deposit'" [class.type-withdrawal]="rec.type === 'withdrawal'">
-                      {{ rec.type }}
-                    </span>
-                  </td>
-                  <td>₦{{ rec.amount | number }}</td>
-                  <td>{{ rec.units | number:'1.2-2' }}</td>
-                  <td>₦{{ rec.navAtExecution | number:'1.2-2' }}</td>
-                  <td>{{ rec.depositedAt | date:'mediumDate' }}</td>
-                  <td>
-                    <span class="chip"
-                      [class.chip-locked]="rec.status === 'locked'"
-                      [class.chip-unlocked]="rec.status === 'unlocked'"
-                      [class.chip-withdrawn]="rec.status === 'withdrawn'">
-                      {{ rec.status }}
-                    </span>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-          @if (store.historyTotal() > 20) {
-            <div class="pagination">
-              <button (click)="loadHistoryPage(historyPage() - 1)" [disabled]="historyPage() <= 1" class="page-btn">← Prev</button>
-              <span class="page-info">Page {{ historyPage() }} of {{ (store.historyTotal() / 20) | number:'1.0-0' }}</span>
-              <button (click)="loadHistoryPage(historyPage() + 1)" [disabled]="historyPage() * 20 >= store.historyTotal()" class="page-btn">Next →</button>
+        <div class="section-head">
+          <h3>Deposit &amp; Withdrawal History</h3>
+          <span class="history-count">{{ store.historyTotal() | number }} record{{ store.historyTotal() === 1 ? '' : 's' }}</span>
+        </div>
+
+        <div class="filter-deck">
+          <div class="filter-search">
+            <input
+              class="filter-input"
+              type="text"
+              placeholder="Search by reference or amount…"
+              [ngModel]="searchTerm"
+              (ngModelChange)="searchTerm = $event; onSearchInput()" />
+            @if (searchTerm) {
+              <button class="filter-clear-xs" (click)="clearFilters()">×</button>
+            }
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">Type</span>
+            <div class="filter-chips">
+              <button class="chip-btn" [class.on]="!store.historyType()" (click)="setType('')">All</button>
+              <button class="chip-btn" [class.on]="store.historyType() === 'deposit'" (click)="setType('deposit')">Deposits</button>
+              <button class="chip-btn" [class.on]="store.historyType() === 'withdrawal'" (click)="setType('withdrawal')">Withdrawals</button>
             </div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">Status</span>
+            <div class="filter-chips">
+              <button class="chip-btn" [class.on]="!store.historyStatus()" (click)="setStatus('')">All</button>
+              <button class="chip-btn" [class.on]="store.historyStatus() === 'locked'" (click)="setStatus('locked')">Locked</button>
+              <button class="chip-btn" [class.on]="store.historyStatus() === 'unlocked'" (click)="setStatus('unlocked')">Unlocked</button>
+              <button class="chip-btn" [class.on]="store.historyStatus() === 'withdrawn'" (click)="setStatus('withdrawn')">Withdrawn</button>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">Date range</span>
+            <div class="filter-dates">
+              <input class="filter-input date" type="date" [ngModel]="store.historyFrom()" (ngModelChange)="store.setHistoryFilters({ from: $event || '' })" />
+              <span class="date-sep">→</span>
+              <input class="filter-input date" type="date" [ngModel]="store.historyTo()" (ngModelChange)="store.setHistoryFilters({ to: $event || '' })" />
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">Sort</span>
+            <div class="filter-chips">
+              <button class="chip-btn" [class.on]="store.historySortField() === 'depositedAt' && store.historySortOrder() === 'desc'" (click)="setSort('depositedAt', 'desc')">Newest</button>
+              <button class="chip-btn" [class.on]="store.historySortField() === 'depositedAt' && store.historySortOrder() === 'asc'" (click)="setSort('depositedAt', 'asc')">Oldest</button>
+              <button class="chip-btn" [class.on]="store.historySortField() === 'amount' && store.historySortOrder() === 'desc'" (click)="setSort('amount', 'desc')">Amount ↑</button>
+              <button class="chip-btn" [class.on]="store.historySortField() === 'amount' && store.historySortOrder() === 'asc'" (click)="setSort('amount', 'asc')">Amount ↓</button>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">Page size</span>
+            <div class="filter-chips">
+              @for (size of pageSizeOptions; track size) {
+                <button class="chip-btn" [class.on]="store.historyLimit() === size" (click)="setPageSize(size)">{{ size }}</button>
+              }
+            </div>
+          </div>
+
+          @if (store.hasActiveFilters()) {
+            <button class="clear-filters" (click)="clearFilters()">
+              Clear filters ({{ store.activeFilterCount() }})
+            </button>
           }
+        </div>
+
+        @if (history.length > 0) {
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Reference</th>
+                  <th>Amount</th>
+                  <th>Units</th>
+                  <th>NAV at Execution</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (rec of history; track rec._id) {
+                  <tr>
+                    <td>
+                      <span class="type-badge" [class.type-deposit]="rec.type === 'deposit'" [class.type-withdrawal]="rec.type === 'withdrawal'">
+                        {{ rec.type }}
+                      </span>
+                    </td>
+                    <td><span class="ref-code">{{ rec.reference || '—' }}</span></td>
+                    <td [class.positive]="rec.type === 'deposit'">{{ rec.type === 'deposit' ? '+' : '−' }}₦{{ rec.amount | number }}</td>
+                    <td>{{ rec.units | number:'1.2-2' }}</td>
+                    <td>₦{{ rec.navAtExecution | number:'1.2-2' }}</td>
+                    <td>{{ rec.depositedAt | date:'mediumDate' }}</td>
+                    <td>
+                      <span class="chip"
+                        [class.chip-locked]="rec.status === 'locked'"
+                        [class.chip-unlocked]="rec.status === 'unlocked'"
+                        [class.chip-withdrawn]="rec.status === 'withdrawn'">
+                        {{ rec.status }}
+                      </span>
+                      @if (rec.status === 'locked' && unlockDate(rec)) {
+                        <div class="unlock-date">Unlocks {{ unlockDate(rec) }}</div>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination">
+            <button (click)="store.loadHistoryPage(store.historyPage() - 1)" [disabled]="store.historyPage() <= 1 || store.historyLoading()" class="page-btn">← Prev</button>
+            <span class="page-info">
+              Page {{ store.historyPage() }} of {{ store.historyTotalPages() }}
+              &middot; {{ rangeStart | number }}–{{ rangeEnd | number }} of {{ store.historyTotal() | number }}
+            </span>
+            <button (click)="store.loadHistoryPage(store.historyPage() + 1)" [disabled]="store.historyPage() >= store.historyTotalPages() || store.historyLoading()" class="page-btn">Next →</button>
+          </div>
         } @else {
-          <p class="no-data">No transaction history yet.</p>
+          <div class="history-empty">
+            @if (store.hasActiveFilters()) {
+              <p>No records match your filters.</p>
+              <button class="clear-filters inline" (click)="clearFilters()">Clear filters</button>
+            } @else {
+              <p>No transaction history yet.</p>
+            }
+          </div>
         }
       </div>
     </div>
@@ -247,7 +334,7 @@
 
   @if (summary && summary.unlockedBalance === 0 && summary.lockedBalance > 0) {
     <div class="lock-notice">
-      <span>🔒</span> Your deposits are locked for 30 days. Unlock date: {{ summary.account?._id ? 'Check deposit history' : '' }}
+      <span>🔒</span> Your deposits are locked for 30 days. Check the history table for exact unlock dates.
     </div>
   }
 </div>
@@ -258,7 +345,7 @@
       <h3>Confirm Withdrawal</h3>
       @let s = store.summary()!;
       <p>You are about to withdraw <strong>₦{{ s.unlockedBalance | number }}</strong> from your {{ config.label }} portfolio.</p>
-      <p class="confirm-note">All unlocked deposits will be withdrawn at current NAV. Your units will reset to 0.</p>
+      <p class="confirm-note">All unlocked deposits will be withdrawn at current NAV. Locked deposits stay invested, and a 20% service charge applies to any profit.</p>
       <div class="confirm-actions">
         <button class="btn-cancel" (click)="showConfirmWithdraw.set(false)">Cancel</button>
         <button class="btn-confirm" (click)="withdraw()" [disabled]="store.loading()">

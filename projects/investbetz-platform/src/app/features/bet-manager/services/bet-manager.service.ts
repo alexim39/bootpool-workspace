@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
@@ -36,6 +36,7 @@ export interface DepositRecord {
   depositedAt: string;
   withdrawableAt: string | null;
   status: 'locked' | 'unlocked' | 'withdrawn';
+  reference?: string;
 }
 
 export interface PerformanceData {
@@ -44,6 +45,25 @@ export interface PerformanceData {
   totalProfit: number;
   returnPct: number;
   cycles: Array<{ cycleNumber: number; startDate: string; endDate: string; returnPct: number; status: string }>;
+}
+
+export interface HistoryQuery {
+  page?: number;
+  limit?: number;
+  type?: string;
+  status?: string;
+  from?: string;
+  to?: string;
+  search?: string;
+  sortField?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface HistoryPage {
+  deposits: DepositRecord[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -73,7 +93,7 @@ export class BetManagerService {
   }
 
   getNav(tier: string): Observable<{ success: boolean; data: NavData }> {
-    return this.http.get<{ success: boolean; data: NavData }>(`${this.API_URL}/bet-manager/nav/${tier}`);
+    return this.http.get<{ success: boolean; data: NavData }>(`${this.API_URL}/bet-manager/nav/${tier}`, { headers: this.getHeaders() });
   }
 
   deposit(tier: string, amount: number): Observable<{ success: boolean; message: string }> {
@@ -88,9 +108,24 @@ export class BetManagerService {
     return this.http.post<{ success: boolean; message: string }>(`${this.API_URL}/bet-manager/withdraw`, { tier }, { headers: this.getHeaders() });
   }
 
-  getDepositHistory(tier: string, page = 1, limit = 20): Observable<{ success: boolean; data: { deposits: DepositRecord[]; total: number } }> {
-    return this.http.get<{ success: boolean; data: { deposits: DepositRecord[]; total: number } }>(
-      `${this.API_URL}/bet-manager/${tier}/history?page=${page}&limit=${limit}`, { headers: this.getHeaders() }
+  getDepositHistory(tier: string, query: HistoryQuery = {}): Observable<{ success: boolean; data: HistoryPage }> {
+    let params = new HttpParams();
+    const set = (key: string, value: unknown) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params = params.set(key, String(value));
+      }
+    };
+    set('page', query.page);
+    set('limit', query.limit);
+    set('type', query.type);
+    set('status', query.status);
+    set('from', query.from);
+    set('to', query.to);
+    set('search', query.search);
+    set('sortField', query.sortField);
+    set('sortOrder', query.sortOrder);
+    return this.http.get<{ success: boolean; data: HistoryPage }>(
+      `${this.API_URL}/bet-manager/${tier}/history`, { params, headers: this.getHeaders() }
     );
   }
 

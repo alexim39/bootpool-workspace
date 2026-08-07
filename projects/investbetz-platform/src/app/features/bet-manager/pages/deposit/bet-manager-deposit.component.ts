@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { BetManagerStore } from '../../stores/bet-manager.store';
+import { betManagerTierInfo } from '../../bet-manager.tier-config';
 import { DecimalPipe } from '@angular/common';
 import { AppNavComponent } from '../../../../core/components';
 
@@ -23,24 +24,19 @@ export class BetManagerDepositComponent implements OnInit {
   useCustom = false;
   amountOptions: number[] = [];
 
-  readonly tierConfig: Record<string, { label: string; icon: string; minDeposit: number; color: string }> = {
-    goalkeeper: { label: 'Goalkeeper', icon: '🧤', minDeposit: 20_000, color: '#90CAF9' },
-    defender: { label: 'Defender', icon: '🛡️', minDeposit: 50_000, color: '#00E676' },
-    midfielder: { label: 'Midfielder', icon: '⚡', minDeposit: 100_000, color: '#E8B923' },
-    striker: { label: 'Striker', icon: '🎯', minDeposit: 200_000, color: '#FF5252' },
-  };
-
   ngOnInit() {
     this.tier = this.route.snapshot.paramMap.get('tier') || '';
-    if (!this.tierConfig[this.tier]) {
+    if (!betManagerTierInfo(this.tier)) {
       this.router.navigate(['/bet-manager']);
+      return;
     }
-    this.amount = this.tierConfig[this.tier]!.minDeposit;
+    this.amount = this.config.minDeposit;
     this.amountOptions = [this.amount, this.amount * 2, this.amount * 5];
+    this.store.fetchNav(this.tier);
   }
 
   get config() {
-    return this.tierConfig[this.tier]!;
+    return betManagerTierInfo(this.tier);
   }
 
   selectAmount(val: number) {
@@ -57,6 +53,12 @@ export class BetManagerDepositComponent implements OnInit {
   get validAmount(): number {
     if (this.useCustom) return this.customAmount;
     return this.amount;
+  }
+
+  get estimatedUnits(): number | null {
+    const nav = this.store.navData()?.current?.nav;
+    if (!nav || nav <= 0) return null;
+    return this.validAmount / nav;
   }
 
   get canSubmit(): boolean {
