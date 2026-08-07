@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { WalletService } from '../../services';
+import { WalletService, DeviceService } from '../../services';
 
 @Component({
   selector: 'app-top-up-modal',
@@ -31,11 +31,14 @@ export class TopUpModalComponent implements OnInit, OnDestroy {
   @Output() close = new EventEmitter<void>();
 
   private wallet = inject(WalletService);
+  private device = inject(DeviceService);
 
-  readonly MIN_DEPOSIT = 5000;
+  readonly MIN_DEPOSIT = 500;
   readonly MAX_DEPOSIT = 1_000_000;
 
-  quickAmounts = [5000, 10000, 20000, 50000, 100000, 500000];
+  readonly isMobile = computed(() => this.device.isMobile());
+
+  quickAmounts = [500, 1000, 2000, 5000, 10000, 20000];
   selectedAmount = signal<number | null>(null);
   processing = signal(false);
   error = signal<string | null>(null);
@@ -77,6 +80,13 @@ export class TopUpModalComponent implements OnInit, OnDestroy {
     const value = (event.target as HTMLInputElement).value;
     const num = Number(value) || 0;
     this.selectedAmount.set(this.quickAmounts.includes(num) ? num : null);
+    this.error.set(null);
+  }
+
+  clearAmount() {
+    this.amountControl.setValue(null);
+    this.amountControl.markAsPristine();
+    this.selectedAmount.set(null);
     this.error.set(null);
   }
 

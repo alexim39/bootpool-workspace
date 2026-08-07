@@ -65,6 +65,10 @@
                 <span class="hero-stat-value">{{ formatDuration(record()!.avgPayoutMs) }}</span>
                 <span class="hero-stat-label">Avg payout speed</span>
               </div>
+              <div class="hero-stat">
+                <span class="hero-stat-value">{{ formatRatio(record()!.payoutRatio30d) }}</span>
+                <span class="hero-stat-label">Payout ratio (30d)</span>
+              </div>
             </div>
           </div>
         </section>
@@ -105,10 +109,55 @@
             <h3>Accuracy by League</h3>
             <span class="section-hint">Low-sample leagues are flagged honestly, not hidden</span>
           </div>
+          <div class="record-toolbar">
+            <div class="league-chips">
+              <button
+                class="league-chip"
+                [class.active]="league() === ''"
+                (click)="setLeague('')">
+                All leagues
+              </button>
+              @for (name of leagues(); track name) {
+                <button
+                  class="league-chip"
+                  [class.active]="league() === name"
+                  (click)="setLeague(name)">
+                  {{ name }}
+                </button>
+              }
+            </div>
+            <div class="toolbar-right">
+              <div class="page-size-row">
+                <span class="page-size-label">Rows</span>
+                <div class="page-size-opts">
+                  @for (opt of limitOptions; track opt) {
+                    <button
+                      class="page-size-opt"
+                      [class.active]="limit() === opt"
+                      (click)="setLimit(opt)">
+                      {{ opt }}
+                    </button>
+                  }
+                </div>
+              </div>
+              <button
+                mat-stroked-button
+                class="refresh-btn"
+                (click)="refresh()"
+                [disabled]="refreshing()">
+                <mat-icon [class.spinning]="refreshing()">refresh</mat-icon>
+                {{ refreshing() ? 'Refreshing…' : 'Refresh data' }}
+              </button>
+            </div>
+          </div>
           @if (record()!.byLeague.length === 0) {
             <div class="empty-state">
               <mat-icon>bar_chart</mat-icon>
-              <p>League breakdowns appear once picks settle.</p>
+              <h3>{{ league() ? 'No stats for this league yet' : 'No league breakdowns yet' }}</h3>
+              <p>{{ league() ? 'Pick another league or check back once picks settle.' : 'League breakdowns appear once picks settle.' }}</p>
+              @if (league()) {
+                <button mat-stroked-button (click)="setLeague('')">Show all leagues</button>
+              }
             </div>
           } @else {
             <div class="league-table">
@@ -227,6 +276,10 @@
               <span class="hero-stat-value">{{ formatDuration(record()!.avgPayoutMs) }}</span>
               <span class="hero-stat-label">Avg payout speed</span>
             </div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">{{ formatRatio(record()!.payoutRatio30d) }}</span>
+              <span class="hero-stat-label">Payout ratio (30d)</span>
+            </div>
           </div>
         </div>
       </section>
@@ -267,10 +320,55 @@
           <h3>Accuracy by League</h3>
           <span class="section-hint">Low-sample leagues are flagged honestly, not hidden</span>
         </div>
+        <div class="record-toolbar">
+          <div class="league-chips">
+            <button
+              class="league-chip"
+              [class.active]="league() === ''"
+              (click)="setLeague('')">
+              All leagues
+            </button>
+            @for (name of leagues(); track name) {
+              <button
+                class="league-chip"
+                [class.active]="league() === name"
+                (click)="setLeague(name)">
+                {{ name }}
+              </button>
+            }
+          </div>
+          <div class="toolbar-right">
+            <div class="page-size-row">
+              <span class="page-size-label">Rows</span>
+              <div class="page-size-opts">
+                @for (opt of limitOptions; track opt) {
+                  <button
+                    class="page-size-opt"
+                    [class.active]="limit() === opt"
+                    (click)="setLimit(opt)">
+                    {{ opt }}
+                  </button>
+                }
+              </div>
+            </div>
+            <button
+              mat-stroked-button
+              class="refresh-btn"
+              (click)="refresh()"
+              [disabled]="refreshing()">
+              <mat-icon [class.spinning]="refreshing()">refresh</mat-icon>
+              {{ refreshing() ? 'Refreshing…' : 'Refresh data' }}
+            </button>
+          </div>
+        </div>
         @if (record()!.byLeague.length === 0) {
           <div class="empty-state">
             <mat-icon>bar_chart</mat-icon>
-            <p>League breakdowns appear once picks settle.</p>
+            <h3>{{ league() ? 'No stats for this league yet' : 'No league breakdowns yet' }}</h3>
+            <p>{{ league() ? 'Pick another league or check back once picks settle.' : 'League breakdowns appear once picks settle.' }}</p>
+            @if (league()) {
+              <button mat-stroked-button (click)="setLeague('')">Show all leagues</button>
+            }
           </div>
         } @else {
           <div class="league-table">

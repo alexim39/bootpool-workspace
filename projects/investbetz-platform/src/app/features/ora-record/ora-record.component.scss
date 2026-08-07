@@ -165,7 +165,7 @@
 
 .hero-stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 12px;
 }
 
@@ -288,6 +288,125 @@
   background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
   padding: 18px 20px;
+}
+
+/* ---------- Record toolbar ---------- */
+.record-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  margin-bottom: 14px;
+}
+
+.league-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.league-chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+
+  &.active {
+    background: rgba(0, 230, 118, 0.14);
+    border-color: rgba(0, 230, 118, 0.4);
+    color: #00E676;
+  }
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.page-size-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-size-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.page-size-opts {
+  display: flex;
+  gap: 4px;
+}
+
+.page-size-opt {
+  min-width: 34px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+
+  &.active {
+    background: rgba(0, 230, 118, 0.14);
+    border-color: rgba(0, 230, 118, 0.4);
+    color: #00E676;
+  }
+}
+
+.refresh-btn {
+  font-size: 12px;
+  line-height: 30px;
+  color: #00E676;
+  border-color: rgba(0, 230, 118, 0.3);
+
+  mat-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+.mat-mdc-icon.spinning,
+mat-icon.spinning {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* ---------- League table ---------- */
@@ -470,6 +589,16 @@
 
 .mobile-content .hero-stats {
   grid-template-columns: repeat(2, 1fr);
+}
+
+.mobile-content .record-toolbar {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.mobile-content .toolbar-right {
+  justify-content: space-between;
 }
 
 .mobile-content .accuracy-card {

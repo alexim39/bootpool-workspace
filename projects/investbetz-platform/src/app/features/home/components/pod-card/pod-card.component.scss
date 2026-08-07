@@ -359,6 +359,49 @@ mat-card-content {
   color: #E8B923;
 }
 
+.conf-value {
+  color: $emerald;
+}
+
+.conf-value.high {
+  color: $emerald;
+}
+
+.conf-value.medium {
+  color: #E8B923;
+}
+
+.conf-value.low {
+  color: $error;
+}
+
+.conf-track {
+  display: block;
+  width: 100%;
+  max-width: 110px;
+  height: 4px;
+  margin-top: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: $radius-full;
+  overflow: hidden;
+}
+
+.conf-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, $emerald 0%, $emerald-light 100%);
+  transition: width $transition-slow;
+}
+
+.conf-fill.medium {
+  background: linear-gradient(90deg, #E8B923 0%, $warning 100%);
+}
+
+.conf-fill.low {
+  background: linear-gradient(90deg, rgba($error, 0.7) 0%, $error 100%);
+}
+
 .info-value.urgent {
   color: $error;
   animation: blink 1s ease-in-out infinite;

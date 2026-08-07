@@ -1,27 +1,45 @@
 
     <div class="mobile-bets">
       <header class="mobile-header">
-        <button mat-icon-button routerLink="/home"><mat-icon>arrow_back</mat-icon></button>
-        <h1>My Bets</h1>
-        <button mat-icon-button (click)="store.auth.logout()"><mat-icon>logout</mat-icon></button>
+        <button mat-icon-button routerLink="/home" aria-label="Back to home"><mat-icon>arrow_back</mat-icon></button>
+        <div class="header-title">
+          <h1>My Bets</h1>
+          <span class="header-sub">Track &amp; manage your stakes</span>
+        </div>
+        <button class="balance-chip" routerLink="/wallet" aria-label="View wallet">
+          <mat-icon>account_balance_wallet</mat-icon>
+          <span>{{ store.formatCurrency(store.walletBalance()) }}</span>
+        </button>
       </header>
 
-      <div class="stats-row">
-        <div class="stat-pill s-active">
-          <span class="stat-num">{{ store.activeCount() }}</span>
-          <span class="stat-lbl">Active</span>
+      <div class="stats-grid">
+        <a class="stat-card" routerLink="/home">
+          <span class="stat-icon stat-icon-gold"><mat-icon>schedule</mat-icon></span>
+          <div class="stat-meta">
+            <span class="stat-label">Active</span>
+            <span class="stat-value">{{ store.activeCount() }}</span>
+          </div>
+        </a>
+        <div class="stat-card">
+          <span class="stat-icon stat-icon-emerald"><mat-icon>emoji_events</mat-icon></span>
+          <div class="stat-meta">
+            <span class="stat-label">Won</span>
+            <span class="stat-value">{{ store.wonCount() }}</span>
+          </div>
         </div>
-        <div class="stat-pill s-won">
-          <span class="stat-num">{{ store.wonCount() }}</span>
-          <span class="stat-lbl">Won</span>
+        <div class="stat-card">
+          <span class="stat-icon stat-icon-red"><mat-icon>close</mat-icon></span>
+          <div class="stat-meta">
+            <span class="stat-label">Lost</span>
+            <span class="stat-value">{{ store.lostCount() }}</span>
+          </div>
         </div>
-        <div class="stat-pill s-lost">
-          <span class="stat-num">{{ store.lostCount() }}</span>
-          <span class="stat-lbl">Lost</span>
-        </div>
-        <div class="stat-pill s-void">
-          <span class="stat-num">{{ store.voidCount() }}</span>
-          <span class="stat-lbl">Void</span>
+        <div class="stat-card">
+          <span class="stat-icon stat-icon-blue"><mat-icon>remove_circle</mat-icon></span>
+          <div class="stat-meta">
+            <span class="stat-label">Void</span>
+            <span class="stat-value">{{ store.voidCount() }}</span>
+          </div>
         </div>
       </div>
 
@@ -59,10 +77,11 @@
               }
             </div>
           } @else if (store.activeStakes().length === 0) {
-            <div class="empty-state">
-              <mat-icon>sports_esports</mat-icon>
-              <p>No active bets</p>
-              <button class="btn-emerald" routerLink="/home">
+            <div class="empty-illustration">
+              <div class="empty-illustration-icon"><mat-icon>sports_esports</mat-icon></div>
+              <h3>No active bets</h3>
+              <p>Your active stakes will appear here — browse the odds feed to get started.</p>
+              <button class="empty-cta" routerLink="/home">
                 <mat-icon>casino</mat-icon> Browse Odds
               </button>
             </div>
@@ -129,7 +148,7 @@
                     <span>Payout: <strong class="emerald">{{ store.formatCurrency(stake.netPayout) }}</strong></span>
                   </div>
                   @if (!stake.isSettled && !stake.isParlay) {
-                    <button class="btn-cashout" (click)="store.requestCashout(stake.id)">
+                    <button class="btn-cashout" (click)="store.requestCashout(stake.id)" aria-label="Cash out">
                       <mat-icon>autorenew</mat-icon>
                     </button>
                   }
@@ -155,6 +174,54 @@
       }
 
       @if (activeTab() === 'history') {
+        <div class="history-filters">
+          <div class="search-box">
+            <mat-icon>search</mat-icon>
+            <input
+              placeholder="Search teams or picks..."
+              [value]="store.searchQuery()"
+              (input)="onSearchInput($event)"
+              aria-label="Search bets" />
+            @if (store.searchQuery()) {
+              <button class="search-clear" (click)="store.onSearchInput('')" aria-label="Clear search">
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+          </div>
+          <div class="status-chips">
+            @for (chip of statusOptions; track chip.value) {
+              <button
+                class="chip"
+                [class.active]="store.statusFilter() === chip.value"
+                (click)="setStatus(chip.value)">
+                {{ chip.label }}
+              </button>
+            }
+          </div>
+          <div class="filter-row">
+            <mat-select
+              class="sort-select"
+              [value]="store.sortField() + '-' + store.sortOrder()"
+              (selectionChange)="setSort($event.value)"
+              aria-label="Sort bets">
+              @for (opt of sortOptions; track opt.value) {
+                <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+              }
+            </mat-select>
+            <div class="date-field">
+              <input type="date" [value]="store.dateFrom() || ''" (input)="onDateFrom($event)" aria-label="From date" />
+            </div>
+            <div class="date-field">
+              <input type="date" [value]="store.dateTo() || ''" (input)="onDateTo($event)" aria-label="To date" />
+            </div>
+            @if (store.hasActiveFilters()) {
+              <button class="reset-btn" (click)="store.resetFilters()" aria-label="Reset filters">
+                <mat-icon>restart_alt</mat-icon>
+              </button>
+            }
+          </div>
+        </div>
+
         <div class="list-content">
           @if (store.loadingHistory()) {
             <div class="skel-page">
@@ -178,10 +245,20 @@
                 </div>
               }
             </div>
+          } @else if (store.settledStakes().length === 0 && store.hasActiveFilters()) {
+            <div class="empty-illustration">
+              <div class="empty-illustration-icon"><mat-icon>search_off</mat-icon></div>
+              <h3>No matches found</h3>
+              <p>Try adjusting your search or filters to find what you're looking for.</p>
+              <button class="empty-cta" (click)="store.resetFilters()">
+                <mat-icon>restart_alt</mat-icon> Reset filters
+              </button>
+            </div>
           } @else if (store.settledStakes().length === 0) {
-            <div class="empty-state">
-              <mat-icon>history</mat-icon>
-              <p>No settled bets yet</p>
+            <div class="empty-illustration">
+              <div class="empty-illustration-icon"><mat-icon>history</mat-icon></div>
+              <h3>No settled bets yet</h3>
+              <p>Your bet history will appear here once stakes are settled.</p>
             </div>
           } @else {
             @for (stake of store.settledStakes(); track stake.id) {
@@ -268,6 +345,20 @@
                 </div>
               </div>
             }
+
+            <div class="history-footer">
+              <span class="range-label">{{ store.rangeLabel() }}</span>
+              @if (store.page() < store.totalPages()) {
+                <button class="load-more-btn" (click)="loadMore()" [disabled]="store.loadingHistory()">
+                  @if (store.loadingHistory()) {
+                    <mat-spinner diameter="16"></mat-spinner>
+                  } @else {
+                    <mat-icon>expand_more</mat-icon>
+                  }
+                  Load more
+                </button>
+              }
+            </div>
           }
         </div>
       }
@@ -284,4 +375,3 @@
 
       <app-mobile-nav />
     </div>
-  

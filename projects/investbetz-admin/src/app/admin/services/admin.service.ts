@@ -100,6 +100,7 @@ export interface AdminUser {
   kycVerified: boolean;
   role?: string;
   createdAt: string;
+  registrationDate?: string;
   lastLoginAt?: string;
   walletBalance?: number;
   totalStakes?: number;
@@ -299,6 +300,10 @@ export class AdminService {
 
   getUser(id: string): Observable<{ success: boolean; data: any }> {
     return this.http.get<{ success: boolean; data: any }>(`${this.baseUrl}/users/${id}`);
+  }
+
+  updateUser(id: string, body: { fullName?: string; phone?: string; email?: string; role?: 'user' | 'admin'; isSuspended?: boolean }): Observable<{ success: boolean; data: AdminUser; message?: string }> {
+    return this.http.put<{ success: boolean; data: AdminUser; message?: string }>(`${this.baseUrl}/users/${id}`, body);
   }
 
   toggleUserStatus(id: string): Observable<{ success: boolean; data: AdminUser }> {

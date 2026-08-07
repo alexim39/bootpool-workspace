@@ -37,6 +37,29 @@ export class PodCardComponent {
     return (p.currentExposure || 0) / p.maxTotalExposure * 100;
   });
 
+  confidence = computed(() => {
+    const p = this.pod();
+    const ora = Number(p.metadata?.['oraConfidence'] ?? 0);
+    if (ora > 0) return Math.round(Math.min(100, Math.max(0, ora)));
+    const imp = p.impliedProbability || 0;
+    if (imp > 0) return Math.round(Math.min(100, Math.max(0, imp * 100)));
+    return 0;
+  });
+
+  confidenceLevel = computed<'high' | 'medium' | 'low'>(() => {
+    const c = this.confidence();
+    if (c >= 70) return 'high';
+    if (c >= 45) return 'medium';
+    return 'low';
+  });
+
+  confidenceTooltip = computed(() => {
+    const c = this.confidence();
+    if (c >= 70) return `High confidence (${c}%) — Ora's model strongly favors this pick`;
+    if (c >= 45) return `Moderate confidence (${c}%) — competitive fixture, consider your stake`;
+    return `Low confidence (${c}%) — high-variance fixture, a smaller stake is safer`;
+  });
+
   gainsTooltip = computed(() => {
     return `Gains: ${this.pod().gainsMultiplier.toFixed(1)}x`;
   });

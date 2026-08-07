@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -28,7 +28,10 @@ export interface OraRecord {
 export class OraRecordService {
   constructor(private http: HttpClient) {}
 
-  getRecord(): Observable<{ success: boolean; data: OraRecord }> {
-    return this.http.get<{ success: boolean; data: OraRecord }>(`${environment.apiUrl}/ora-record`);
+  getRecord(league = '', limit = 20, refresh = false): Observable<{ success: boolean; data: OraRecord }> {
+    let params = new HttpParams().set('limit', String(limit));
+    if (league.trim()) params = params.set('league', league.trim());
+    if (refresh) params = params.set('refresh', 'true');
+    return this.http.get<{ success: boolean; data: OraRecord }>(`${environment.apiUrl}/ora-record`, { params });
   }
 }

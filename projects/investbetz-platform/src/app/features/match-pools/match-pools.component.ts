@@ -1,6 +1,7 @@
-import { Component, inject, OnInit, signal, effect, DestroyRef } from '@angular/core';
+import { Component, inject, OnInit, signal, effect, DestroyRef, computed } from '@angular/core';
 import { DatePipe, PercentPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -23,7 +24,7 @@ import { MatchPoolsStore } from './stores/match-pools.store';
 @Component({
   selector: 'app-match-pools',
   standalone: true,
-  imports: [DatePipe, FormsModule, PercentPipe,
+  imports: [DatePipe, FormsModule, PercentPipe, RouterModule,
     MatButtonModule, MatIconModule, MatCardModule, MatProgressSpinnerModule,
     MatFormFieldModule, MatInputModule, MatSelectModule, MatTooltipModule,
     MatTabsModule, MatChipsModule, MatTableModule, MatPaginatorModule,
@@ -35,6 +36,8 @@ export class MatchPoolsComponent implements OnInit {
   device = inject(DeviceService);
   readonly store = inject(MatchPoolsStore);
   private destroyRef = inject(DestroyRef);
+
+  readonly isMobileView = computed(() => this.device.isMobile() || this.device.isTablet());
 
   readonly searchQuery = signal('');
   readonly statusFilter = signal<string>('all');
@@ -90,9 +93,48 @@ export class MatchPoolsComponent implements OnInit {
     this.store.fetchPoolsPaginated(1, this.pageSize(), this.searchQuery(), status);
   }
 
+  onSortChange(event: any) {
+    const value: string = event.value;
+    const order: 'asc' | 'desc' = value.endsWith('-asc') ? 'asc' : 'desc';
+    const field = value.replace(/-asc$/, '').replace(/-desc$/, '');
+    this.store.applySort(field, order);
+    this.pageIndex.set(0);
+    this.store.fetchPoolsPaginated(
+      1, this.pageSize(), this.searchQuery(), this.statusFilter(),
+      { field, order },
+      { from: this.store.fromDate(), to: this.store.toDate() }
+    );
+  }
+
+  onFromChange(value: string) {
+    this.store.applyDateRange(value, this.store.toDate());
+    this.pageIndex.set(0);
+    this.store.fetchPoolsPaginated(
+      1, this.pageSize(), this.searchQuery(), this.statusFilter(),
+      { field: this.store.sortField(), order: this.store.sortOrder() },
+      { from: value, to: this.store.toDate() }
+    );
+  }
+
+  onToChange(value: string) {
+    this.store.applyDateRange(this.store.fromDate(), value);
+    this.pageIndex.set(0);
+    this.store.fetchPoolsPaginated(
+      1, this.pageSize(), this.searchQuery(), this.statusFilter(),
+      { field: this.store.sortField(), order: this.store.sortOrder() },
+      { from: this.store.fromDate(), to: value }
+    );
+  }
+
+  sortValue(): string {
+    return `${this.store.sortField()}-${this.store.sortOrder()}`;
+  }
+
   resetFilters() {
     this.searchSubject.next('');
     this.statusFilter.set('all');
+    this.store.applySort('createdAt', 'desc');
+    this.store.applyDateRange('', '');
     this.pageIndex.set(0);
     this.store.fetchPoolsPaginated(1, this.pageSize());
   }

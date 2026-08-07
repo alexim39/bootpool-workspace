@@ -2,7 +2,7 @@
     .banner-root {
       position: relative;
       overflow: hidden;
-      margin: 0 32px 20px;
+      margin: 20px 32px 20px;
       border-radius: 20px;
     }
     .guide-info-btn {
@@ -220,7 +220,7 @@
 
     @media (max-width: 640px) {
       .banner-root {
-        margin: 0 0 14px;
+        margin: 16px 0 14px;
         border-radius: 0;
       }
       .featured-card {

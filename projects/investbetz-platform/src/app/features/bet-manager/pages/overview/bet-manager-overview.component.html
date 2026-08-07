@@ -1,20 +1,41 @@
 <app-nav />
 <div class="bm-root">
   <div class="page-header">
-    <h1>Bet Manager
-      <button mat-icon-button class="info-btn" (click)="showGuide.set(!showGuide())" matTooltip="How it works">
-        <mat-icon>info_outline</mat-icon>
-      </button>
-    </h1>
+    <div>
+      <h1>Bet Manager
+        <button mat-icon-button class="info-btn" (click)="showGuide.set(!showGuide())" matTooltip="How it works">
+          <mat-icon>info_outline</mat-icon>
+        </button>
+      </h1>
+      <p class="bm-subtitle">Let <strong>Ora AI</strong> invest your balance across live Pods and Match Pools. Choose your risk tier.</p>
+    </div>
   </div>
-  <p class="bm-subtitle">Let <strong>Ora AI</strong> invest your balance across live Pods and Match Pools. Choose your risk tier.</p>
+
+  <div class="hero-panel">
+    <div class="hero-glow"></div>
+    <div class="hero-stat">
+      <span class="hero-stat-label">Portfolio Value</span>
+      <span class="hero-stat-value">₦{{ totals.aum | number }}</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-label">Total Deposited</span>
+      <span class="hero-stat-value">₦{{ totals.deposited | number }}</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-label">Profit / Loss</span>
+      <span class="hero-stat-value" [class.positive]="totals.profit > 0" [class.negative]="totals.profit < 0">
+        {{ totals.profit > 0 ? '+' : '' }}₦{{ totals.profit | number }}
+      </span>
+    </div>
+  </div>
 
   @if (showGuide()) {
     <div class="guide-bar">
       <div class="guide-step"><span class="step-num">1</span> Deposit into a tier — funds are locked for a 30-day cycle</div>
-      <div class="guide-step"><span class="step-num">2</span> Our Ora AI automatically allocates your balance across live Pods and Match Pools</div>
-      <div class="guide-step"><span class="step-num">3</span> Returns are reinvested. BetPool earns a 20% performance fee only on net profit</div>
+      <div class="guide-step"><span class="step-num">2</span> Ora AI automatically allocates your balance across live Pods and Match Pools</div>
+      <div class="guide-step"><span class="step-num">3</span> Returns are reinvested. BetPool earns a 10% performance fee only on net profit</div>
       <div class="guide-step"><span class="step-num">4</span> Withdraw anytime after the 30-day lock period — instant settlement</div>
+      <div class="guide-step"><span class="step-num">5</span> You earn between 1% - 10% profit for each tier cycle</div>
     </div>
   }
 
@@ -54,6 +75,9 @@
             <h2 class="tier-name">{{ tier.label }}</h2>
             <span class="tier-min">From ₦{{ tier.minDeposit | number }}</span>
           </div>
+          @if (account && account.currentValue > 0) {
+            <span class="tier-nav">NAV ₦{{ (account.currentValue / (account.units || 1)) | number:'1.2-2' }}</span>
+          }
         </div>
 
         <div class="tier-strategy">{{ tier.strategy }}</div>
@@ -69,11 +93,23 @@
               <span class="stat-value">₦{{ account.totalDeposited | number }}</span>
             </div>
             <div class="stat">
+              <span class="stat-label">Units</span>
+              <span class="stat-value">{{ account.units | number:'1.2-2' }}</span>
+            </div>
+            <div class="stat">
               <span class="stat-label">Profit/Loss</span>
               <span class="stat-value" [class.positive]="account.totalProfit > 0" [class.negative]="account.totalProfit < 0">
                 {{ account.totalProfit > 0 ? '+' : '' }}₦{{ account.totalProfit | number }}
               </span>
             </div>
+          </div>
+
+          <div class="growth-track">
+            <div class="growth-bar" [style.width.%]="growthPct(account)" [style.background]="tier.color"></div>
+          </div>
+          <div class="growth-labels">
+            <span>Value vs deposited</span>
+            <span>{{ growthPct(account) | number:'1.0-0' }}%</span>
           </div>
 
           <div class="tier-actions">
@@ -83,7 +119,7 @@
 
           @if (account.currentValue > 0) {
             <button class="btn-link withdraw-link" (click)="withdraw(tier.key)">
-              Withdraw All (30-day lock applies)
+              Withdraw unlocked (30-day lock applies)
             </button>
           }
         } @else {
@@ -95,11 +131,11 @@
 
         <div class="tier-footer">
           <span class="tier-tag">{{ tier.allocation }}</span>
-          <span class="tier-tag">20% perf. fee on profit</span>
+          <span class="tier-tag">10% perf. fee on profit</span>
+          <span class="tier-tag">Min {{ tier.guaranteedMinPct }}% guaranteed per cycle</span>
           <span class="tier-tag">30-day lock</span>
         </div>
       </div>
     }
   </div>
-
 </div>

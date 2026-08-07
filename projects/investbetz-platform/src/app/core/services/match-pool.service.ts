@@ -86,11 +86,22 @@ export class MatchPoolService {
     return { Authorization: `Bearer ${token}` };
   }
 
-  fetchPools(page = 1, limit = 10, search = '', status = 'all') {
+  fetchPools(
+    page = 1,
+    limit = 10,
+    search = '',
+    status = 'all',
+    sort: { field: string; order: 'asc' | 'desc' } = { field: 'createdAt', order: 'desc' },
+    range: { from?: string; to?: string } = {}
+  ) {
     this._lastLimit = limit;
     const params = new URLSearchParams({ page: String(page), limit: String(limit) });
     if (search) params.set('search', search);
     if (status && status !== 'all') params.set('status', status);
+    if (sort?.field) params.set('sortField', sort.field);
+    if (sort?.order) params.set('sortOrder', sort.order);
+    if (range?.from) params.set('from', range.from);
+    if (range?.to) params.set('to', range.to);
     return this.http.get<MatchPoolFeedResponse>(
       `${this.API_URL}/match-pools?${params}`,
       { headers: this.getHeaders() }

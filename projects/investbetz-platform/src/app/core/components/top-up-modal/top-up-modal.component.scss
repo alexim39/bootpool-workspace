@@ -1,13 +1,15 @@
 .topup-overlay {
   position: fixed;
   inset: 0;
+  height: 100vh;
+  height: 100dvh;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1200;
   padding: 16px;
   animation: fadeIn 0.25s ease;
 }
@@ -24,6 +26,10 @@
   animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  max-height: 92vh;
+  max-height: 92dvh;
 }
 
 .topup-gradient-bar {
@@ -118,6 +124,32 @@
   height: 18px;
 }
 
+.topup-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topup-gateway-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(0, 230, 118, 0.08);
+  border: 1px solid rgba(0, 230, 118, 0.18);
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #00E676;
+  white-space: nowrap;
+}
+
+.topup-gateway-chip mat-icon {
+  font-size: 13px;
+  width: 13px;
+  height: 13px;
+}
+
 .topup-divider {
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
@@ -125,8 +157,19 @@
 }
 
 .topup-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
   padding: 16px 24px 24px;
 }
+
+.topup-overlay:not(.is-mobile) .topup-pay-bar { order: 1; }
+.topup-overlay:not(.is-mobile) .topup-payment-methods { order: 2; }
+.topup-overlay:not(.is-mobile) .topup-footer { order: 3; }
 
 .topup-balance-preview {
   display: flex;
@@ -136,6 +179,19 @@
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.preview-glow {
+  position: absolute;
+  top: -40px;
+  right: -30px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 230, 118, 0.12) 0%, transparent 65%);
+  pointer-events: none;
 }
 
 .preview-item {
@@ -268,12 +324,20 @@
 }
 
 .topup-hint {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   font-size: 12px;
   color: rgba(255, 255, 255, 0.3);
   margin-top: 6px;
   padding-left: 2px;
   transition: color 0.2s ease;
+}
+
+.topup-hint mat-icon {
+  font-size: 13px;
+  width: 13px;
+  height: 13px;
 }
 
 .topup-hint.error {
@@ -289,17 +353,17 @@
 }
 
 .topup-quick-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .topup-quick-btn {
-  padding: 10px 8px;
+  padding: 9px 16px;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 10px;
-  color: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  color: rgba(255, 255, 255, 0.55);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -323,9 +387,9 @@
 
 .topup-quick-btn.active {
   background: linear-gradient(135deg, rgba(0, 230, 118, 0.12), rgba(0, 200, 83, 0.06));
-  border-color: rgba(0, 230, 118, 0.3);
+  border-color: rgba(0, 230, 118, 0.35);
   color: #00E676;
-  box-shadow: 0 0 16px rgba(0, 230, 118, 0.06);
+  box-shadow: 0 0 16px rgba(0, 230, 118, 0.08);
 }
 
 .topup-error {
@@ -384,6 +448,19 @@
   height: 16px;
 }
 
+.topup-pay-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  margin-bottom: 18px;
+  margin-top: 4px;
+  background: linear-gradient(180deg, rgba(15, 29, 53, 0.92), rgba(10, 20, 40, 0.98));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 14px;
+  padding: 0 0 2px;
+}
+
 .topup-pay-btn {
   width: 100%;
   display: flex;
@@ -399,10 +476,25 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.25s ease;
-  margin-bottom: 18px;
   height: 54px;
   position: relative;
   overflow: hidden;
+}
+
+.pay-bar-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.pay-bar-hint mat-icon {
+  font-size: 12px;
+  width: 12px;
+  height: 12px;
 }
 
 .topup-pay-btn::before {
@@ -582,9 +674,6 @@
     max-width: 100%;
     border-radius: 24px 24px 0 0;
     border-bottom: none;
-    max-height: 92vh;
-    overflow-y: auto;
-    animation: slideUpMobile 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .topup-handle {
@@ -595,17 +684,36 @@
     padding: 12px 20px 0;
   }
 
-  .topup-body {
-    padding: 14px 20px 28px;
+  .topup-gateway-chip {
+    display: none;
   }
 
-  .topup-balance-preview {
-    margin-bottom: 16px;
+  .topup-body {
+    padding: 14px 20px 40px;
   }
 
   .topup-quick-grid {
+    display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 6px;
+  }
+
+  .topup-quick-btn {
+    padding: 9px 6px;
+    text-align: center;
+    font-size: 12px;
+  }
+
+  .topup-pay-bar {
+    margin: 4px 0 0;
+    padding: 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+
+  .pay-bar-hint {
+    display: none;
   }
 
   .topup-footer {
@@ -618,6 +726,70 @@
     width: 100%;
     justify-content: flex-start;
   }
+}
+
+.topup-overlay.is-mobile {
+  align-items: flex-end;
+  padding: 0;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.topup-overlay.is-mobile .topup-modal {
+  max-width: 100%;
+  border-radius: 24px 24px 0 0;
+  border-bottom: none;
+  animation: slideUpMobile 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.topup-overlay.is-mobile .topup-handle {
+  display: block;
+}
+
+.topup-overlay.is-mobile .topup-header {
+  padding: 12px 20px 0;
+}
+
+.topup-overlay.is-mobile .topup-gateway-chip {
+  display: none;
+}
+
+.topup-overlay.is-mobile .topup-body {
+  padding: 14px 20px 28px;
+}
+
+.topup-overlay.is-mobile .topup-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.topup-overlay.is-mobile .topup-quick-btn {
+  padding: 9px 6px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.topup-overlay.is-mobile .topup-pay-bar {
+  margin: 4px -20px -28px;
+  padding: 14px 20px calc(18px + env(safe-area-inset-bottom, 0px));
+  border-radius: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.topup-overlay.is-mobile .pay-bar-hint {
+  display: none;
+}
+
+.topup-overlay.is-mobile .topup-footer {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.topup-overlay.is-mobile .topup-features {
+  width: 100%;
+  justify-content: flex-start;
 }
 
 @keyframes slideUpMobile {

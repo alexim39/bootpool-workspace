@@ -1,6 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { BetManagerStore } from '../../../stores/bet-manager.store';
+import { BET_MANAGER_TIERS } from '../../../bet-manager.tier-config';
 import { DecimalPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,12 +22,7 @@ export class BetManagerOverviewComponent implements OnInit {
   readonly auth = inject(AuthService);
   readonly showGuide = signal(false);
 
-  readonly tiers = [
-    { key: 'goalkeeper', label: 'Goalkeeper', icon: '🧤', minDeposit: 20_000, color: '#90CAF9' },
-    { key: 'defender', label: 'Defender', icon: '🛡️', minDeposit: 50_000, color: '#00E676' },
-    { key: 'midfielder', label: 'Midfielder', icon: '⚡', minDeposit: 100_000, color: '#E8B923' },
-    { key: 'striker', label: 'Striker', icon: '🎯', minDeposit: 200_000, color: '#FF5252' },
-  ];
+  readonly tiers = BET_MANAGER_TIERS;
 
   ngOnInit() {
     this.store.fetchAccounts();
@@ -34,6 +30,15 @@ export class BetManagerOverviewComponent implements OnInit {
 
   getAccount(tier: string) {
     return this.store.accounts().find(a => a.tier === tier);
+  }
+
+  get totals() {
+    const accounts = this.store.accounts();
+    return {
+      aum: accounts.reduce((sum, a) => sum + a.currentValue, 0),
+      deposited: accounts.reduce((sum, a) => sum + a.totalDeposited, 0),
+      profit: accounts.reduce((sum, a) => sum + a.totalProfit, 0),
+    };
   }
 
   goDeposit(tier: string) {

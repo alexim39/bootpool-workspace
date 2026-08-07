@@ -80,6 +80,10 @@ export const routes: Routes = [
         loadComponent: () => import('./admin/betting/betting.component').then(m => m.BettingComponent)
       },
       {
+        path: 'virtual-games',
+        loadComponent: () => import('./admin/virtual-games/virtual-games.component').then(m => m.AdminVirtualGamesComponent)
+      },
+      {
         path: 'match-pools',
         loadComponent: () => import('./admin/match-pools/match-pools.component').then(m => m.AdminMatchPoolsComponent)
       },

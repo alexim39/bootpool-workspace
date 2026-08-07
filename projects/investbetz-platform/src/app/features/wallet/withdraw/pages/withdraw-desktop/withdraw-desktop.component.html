@@ -1,13 +1,24 @@
-
 <app-nav />
 <div class="withdraw-page">
   <div class="page-header">
-    <button mat-icon-button routerLink="/wallet"><mat-icon>arrow_back</mat-icon></button>
-    <h1>Withdraw Funds</h1>
+    <div class="page-head-left">
+      <a class="back-link" routerLink="/wallet"><mat-icon>arrow_back</mat-icon> Back to Wallet</a>
+      <h1>Withdraw Funds</h1>
+      <p class="page-subtitle">Transfer to any Nigerian bank account instantly — protected by your 6-digit PIN.</p>
+    </div>
   </div>
 
   <div class="page-body">
     <div class="main-panel">
+      <div class="steps">
+        @for (step of [1, 2, 3]; track step) {
+          <div class="step-pill" [class.on]="store.flowStep() === step" [class.done]="store.flowStep() > step">
+            <span class="step-num">{{ step }}</span>
+            <span class="step-label">{{ step === 1 ? 'Amount' : (step === 2 ? 'Account' : 'Confirm') }}</span>
+          </div>
+        }
+      </div>
+
       <mat-card class="form-card">
         <mat-card-content>
           <form [formGroup]="store.withdrawForm" class="withdraw-form">
@@ -39,18 +50,25 @@
             }
 
             <div class="balance-banner">
-              <span class="bb-label">Available Balance</span>
-              <span class="bb-value">{{ store.walletService.formatAmount(store.walletBalance().available) }}</span>
+              <div class="banner-glow"></div>
+              <div class="bb-text">
+                <span class="bb-label">Available Balance</span>
+                <span class="bb-value">{{ store.walletService.formatAmount(store.walletBalance().available) }}</span>
+              </div>
+              @if (store.walletBalance().locked > 0) {
+                <span class="bb-locked">Locked: {{ store.walletService.formatAmount(store.walletBalance().locked) }}</span>
+              }
             </div>
 
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Amount (NGN)</mat-label>
-              <input matInput type="number" formControlName="amount" placeholder="Enter amount" min="500" step="100" inputmode="numeric">
+              <mat-label>Amount</mat-label>
+              <span matTextPrefix class="amount-prefix">₦&nbsp;</span>
+              <input matInput type="number" formControlName="amount" placeholder="0" min="500" step="100" inputmode="numeric">
               @if (store.withdrawForm.get('amount')?.hasError('required')) {
                 <mat-error>Amount is required</mat-error>
               }
               @if (store.withdrawForm.get('amount')?.hasError('min')) {
-                <mat-error>Minimum withdrawal is ₦500</mat-error>
+                <mat-error>Minimum withdrawal is ₦{{ store.walletService.withdrawalLimits().min.toLocaleString() }}</mat-error>
               }
               @if (store.withdrawForm.get('amount')?.errors?.['insufficient']) {
                 <mat-error>Insufficient balance</mat-error>
@@ -61,6 +79,10 @@
               @for (amt of store.quickAmounts; track amt) {
                 <button type="button" class="quick-chip" [class.active]="store.withdrawForm.get('amount')?.value === amt" (click)="store.setAmount(amt)">₦{{ amt.toLocaleString() }}</button>
               }
+            </div>
+            <div class="limits-hint">
+              <mat-icon>info</mat-icon>
+              <span>Min ₦{{ store.walletService.withdrawalLimits().min.toLocaleString() }} · Max ₦{{ store.walletService.withdrawalLimits().max.toLocaleString() }} · Daily ₦{{ store.walletService.withdrawalLimits().dailyLimit.toLocaleString() }}</span>
             </div>
 
             <mat-form-field appearance="outline" class="full-width bank-search-field">
@@ -132,6 +154,7 @@
 
             <div class="fee-summary" *ngIf="store.withdrawForm.get('amount')?.valid">
               <div class="fee-row"><span>Amount</span><span>{{ store.walletService.formatAmount(store.calculatedAmount()) }}</span></div>
+              <div class="fee-row"><span>Fee</span><span>{{ store.walletService.withdrawalLimits().fee }}</span></div>
               <div class="fee-row total"><span>You receive</span><span>{{ store.walletService.formatAmount(store.calculatedAmount()) }}</span></div>
             </div>
 
@@ -163,6 +186,10 @@
                 <ng-container><mat-icon>send</mat-icon> Withdraw {{ store.walletService.formatAmount(store.calculatedAmount()) }}</ng-container>
               }
             </button>
+            <div class="submit-note">
+              <mat-icon>lock</mat-icon>
+              <span>Authorized with your 6-digit PIN · {{ store.walletService.withdrawalLimits().fee }}</span>
+            </div>
           </form>
         </mat-card-content>
       </mat-card>
@@ -171,10 +198,10 @@
     <div class="sidebar">
       <mat-card class="info-card">
         <mat-card-content>
-          <h3>Withdrawal Limits</h3>
-          <div class="info-row"><span class="info-label">Per Transaction</span><span class="info-value">₦500 - ₦5,000,000</span></div>
-          <div class="info-row"><span class="info-label">Daily Limit</span><span class="info-value">₦10,000,000</span></div>
-          <div class="info-row"><span class="info-label">Fee</span><span class="info-value">No fees</span></div>
+          <h3><mat-icon>speed</mat-icon> Withdrawal Limits</h3>
+          <div class="info-row"><span class="info-label">Per Transaction</span><span class="info-value">₦{{ store.walletService.withdrawalLimits().min.toLocaleString() }} - ₦{{ store.walletService.withdrawalLimits().max.toLocaleString() }}</span></div>
+          <div class="info-row"><span class="info-label">Daily Limit</span><span class="info-value">₦{{ store.walletService.withdrawalLimits().dailyLimit.toLocaleString() }}</span></div>
+          <div class="info-row"><span class="info-label">Fee</span><span class="info-value">{{ store.walletService.withdrawalLimits().fee }}</span></div>
           <div class="info-row"><span class="info-label">Processing</span><span class="info-value">Instant - 24hrs</span></div>
         </mat-card-content>
       </mat-card>
@@ -183,9 +210,13 @@
         <mat-card-content>
           <h3><mat-icon>security</mat-icon> Secure Withdrawal</h3>
           <p>Funds are transferred securely via Paystack. Your PIN is required to authorize each withdrawal.</p>
+          <ul class="security-list">
+            <li><mat-icon>check</mat-icon> PIN-protected transactions</li>
+            <li><mat-icon>check</mat-icon> Bank account verification</li>
+            <li><mat-icon>check</mat-icon> Instant notifications</li>
+          </ul>
         </mat-card-content>
       </mat-card>
     </div>
   </div>
 </div>
-  

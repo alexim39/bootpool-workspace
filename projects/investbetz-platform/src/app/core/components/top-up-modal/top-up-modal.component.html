@@ -1,6 +1,6 @@
 @if (visible) {
-  <div class="topup-overlay" (click)="onOverlayClick()">
-    <div class="topup-modal" (click)="$event.stopPropagation()">
+  <div class="topup-overlay" [class.is-mobile]="isMobile()" (click)="onOverlayClick()">
+    <div class="topup-modal" role="dialog" aria-modal="true" aria-label="Deposit funds">
       <div class="topup-handle"></div>
 
       <div class="topup-gradient-bar"></div>
@@ -15,15 +15,21 @@
             <p class="topup-subtitle">Add money to your betting wallet</p>
           </div>
         </div>
-        <button class="topup-close" (click)="close.emit()" aria-label="Close" matTooltip="Close">
-          <mat-icon>close</mat-icon>
-        </button>
+        <div class="topup-header-right">
+          <span class="topup-gateway-chip">
+            <mat-icon>verified</mat-icon> Paystack
+          </span>
+          <button class="topup-close" (click)="close.emit()" aria-label="Close" matTooltip="Close">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
       </div>
 
       <div class="topup-divider"></div>
 
       <div class="topup-body">
         <div class="topup-balance-preview">
+          <div class="preview-glow"></div>
           <div class="preview-item">
             <span class="preview-label">Current Balance</span>
             <span class="preview-value">{{ formatCurrency(currentBalance()) }}</span>
@@ -37,31 +43,33 @@
         </div>
 
         <div class="topup-amount-section">
-          <label class="topup-label">Enter Amount</label>
+          <label class="topup-label" for="topup-amount-input">Enter Amount</label>
           <div class="topup-input-wrap" [class.focused]="amountControl.dirty">
             <span class="topup-currency">₦</span>
             <input
+              id="topup-amount-input"
               type="number"
               class="topup-input"
               placeholder="0"
               [formControl]="amountControl"
               (input)="onAmountInput($event)"
+              (keydown.enter)="initiatePayment()"
               min="0"
               step="100"
               inputmode="numeric"
             />
             @if (amountValue() > 0) {
-              <button class="topup-clear" (click)="amountControl.setValue(null); amountControl.markAsPristine(); selectedAmount.set(null)">
+              <button class="topup-clear" (click)="clearAmount()" aria-label="Clear amount">
                 <mat-icon>close</mat-icon>
               </button>
             }
           </div>
           @if (amountControl.invalid && amountControl.dirty) {
-            <span class="topup-hint error">Enter an amount between ₦5,000 and ₦1,000,000</span>
+            <span class="topup-hint error">Enter an amount between ₦{{ MIN_DEPOSIT.toLocaleString() }} and ₦{{ MAX_DEPOSIT.toLocaleString() }}</span>
           } @else if (amountValue() > 0 && isValidAmount()) {
-            <span class="topup-hint valid">Amount accepted</span>
+            <span class="topup-hint valid"><mat-icon>check_circle</mat-icon> Amount accepted</span>
           } @else {
-            <span class="topup-hint">Min ₦5,000 – Max ₦1,000,000</span>
+            <span class="topup-hint">Min ₦{{ MIN_DEPOSIT.toLocaleString() }} – Max ₦{{ MAX_DEPOSIT.toLocaleString() }}</span>
           }
         </div>
 
@@ -70,11 +78,12 @@
           <div class="topup-quick-grid">
             @for (amt of quickAmounts; track amt) {
               <button
+                type="button"
                 class="topup-quick-btn"
                 [class.active]="selectedAmount() === amt"
                 (click)="selectAmount(amt)"
               >
-                <span class="quick-amount">₦{{ (amt / 1000).toFixed(0) }}K</span>
+                <span class="quick-amount">₦{{ amt.toLocaleString() }}</span>
               </button>
             }
           </div>
@@ -87,29 +96,11 @@
               <span class="error-title">Payment Failed</span>
               <span class="error-desc">{{ error() }}</span>
             </div>
-            <button class="error-dismiss" (click)="error.set(null)">
+            <button class="error-dismiss" (click)="error.set(null)" aria-label="Dismiss">
               <mat-icon>close</mat-icon>
             </button>
           </div>
         }
-
-        <button
-          class="topup-pay-btn"
-          [disabled]="!isValidAmount() || processing()"
-          (click)="initiatePayment()"
-        >
-          @if (processing()) {
-            <mat-spinner diameter="22"></mat-spinner>
-            <span>Redirecting to Paystack...</span>
-          } @else {
-            <svg class="paystack-icon" viewBox="0 0 512 512" fill="none">
-              <rect width="512" height="512" rx="80" fill="currentColor"/>
-              <path d="M160 192h192l-48 192H208L160 192z" fill="#0A1428"/>
-              <circle cx="256" cy="144" r="32" fill="#0A1428" opacity="0.8"/>
-            </svg>
-            <span>Pay <strong>{{ formatCurrency(amountValue()) }}</strong></span>
-          }
-        </button>
 
         <div class="topup-payment-methods">
           <span class="methods-label">Accepted payment methods</span>
@@ -147,6 +138,28 @@
               <span>Zero fees</span>
             </div>
           </div>
+        </div>
+
+        <div class="topup-pay-bar">
+          <button
+            type="button"
+            class="topup-pay-btn"
+            [disabled]="!isValidAmount() || processing()"
+            (click)="initiatePayment()"
+          >
+            @if (processing()) {
+              <mat-spinner diameter="22"></mat-spinner>
+              <span>Redirecting to Paystack...</span>
+            } @else {
+              <svg class="paystack-icon" viewBox="0 0 512 512" fill="none">
+                <rect width="512" height="512" rx="80" fill="currentColor"/>
+                <path d="M160 192h192l-48 192H208L160 192z" fill="#0A1428"/>
+                <circle cx="256" cy="144" r="32" fill="#0A1428" opacity="0.8"/>
+              </svg>
+              <span>Pay <strong>{{ formatCurrency(amountValue()) }}</strong></span>
+            }
+          </button>
+          <span class="pay-bar-hint"><mat-icon>keyboard_return</mat-icon> Press Enter to pay</span>
         </div>
       </div>
     </div>

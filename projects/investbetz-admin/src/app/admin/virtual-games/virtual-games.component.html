@@ -1,0 +1,108 @@
+
+<div class="mp-page">
+  <div class="page-header">
+    <h1>Virtual Games</h1>
+    <div class="header-actions">
+      <button mat-stroked-button (click)="store.clearRange()">Clear Range</button>
+      <button mat-raised-button class="btn-primary" (click)="store.applyRange()">Apply</button>
+    </div>
+  </div>
+
+  <mat-card class="table-card filters-card">
+    <div class="filters">
+      <mat-form-field appearance="fill" class="filter-field">
+        <mat-label>From</mat-label>
+        <input matInput type="date" [ngModel]="store.from()" (ngModelChange)="store.from.set($event)">
+      </mat-form-field>
+      <mat-form-field appearance="fill" class="filter-field">
+        <mat-label>To</mat-label>
+        <input matInput type="date" [ngModel]="store.to()" (ngModelChange)="store.to.set($event)">
+      </mat-form-field>
+      <span class="range-hint">Filters plays by the date they were placed.</span>
+    </div>
+  </mat-card>
+
+  @if (store.error()) {
+    <div class="error-msg">{{ store.error() }}</div>
+  }
+
+  @if (store.loading()) {
+    <div class="skel-table-wrap">
+      <div class="skel-row" style="gap:16px;margin:0">
+        <div class="skel skel-card" style="height:88px"></div>
+        <div class="skel skel-card" style="height:88px"></div>
+        <div class="skel skel-card" style="height:88px"></div>
+        <div class="skel skel-card" style="height:88px"></div>
+      </div>
+      <div class="skel-row" style="gap:16px;margin:16px 0 0">
+        <div class="skel skel-card" style="height:180px"></div>
+        <div class="skel skel-card" style="height:180px"></div>
+        <div class="skel skel-card" style="height:180px"></div>
+      </div>
+    </div>
+  } @else if (data) {
+    <div class="stats-row">
+      <mat-card class="stat-card"><span class="stat-value">{{ data.totals.plays | number }}</span><span class="stat-label">Total Plays</span></mat-card>
+      <mat-card class="stat-card"><span class="stat-value">&#x20A6;{{ data.totals.staked | number }}</span><span class="stat-label">Total Staked</span></mat-card>
+      <mat-card class="stat-card"><span class="stat-value">&#x20A6;{{ data.totals.payout | number }}</span><span class="stat-label">Total Payout</span></mat-card>
+      <mat-card class="stat-card"><span class="stat-value">{{ data.totals.wins | number }}</span><span class="stat-label">Wins</span></mat-card>
+      <mat-card class="stat-card"><span class="stat-value">{{ data.totals.winRate }}%</span><span class="stat-label">Win Rate</span></mat-card>
+      <mat-card class="stat-card"><span class="stat-value">&#x20A6;{{ data.totals.today.staked | number }}</span><span class="stat-label">Staked Today</span></mat-card>
+    </div>
+
+    @if (data.bestWin) {
+      <div class="best-win">
+        <mat-icon>emoji_events</mat-icon>
+        <div>
+          <span class="best-win-label">Biggest Win</span>
+          <span class="best-win-value">&#x20A6;{{ data.bestWin.amount | number }}</span>
+          <span class="best-win-game">on {{ data.bestWin.game }}</span>
+        </div>
+      </div>
+    }
+
+    <div class="game-grid">
+      @for (g of data.games; track g.game) {
+        <mat-card class="game-card">
+          <div class="game-header">
+            <span class="game-icon" [style.background]="gameColor(g.game)"><mat-icon>{{ g.icon }}</mat-icon></span>
+            <div class="game-title">
+              <strong>{{ g.name }}</strong>
+              <span class="game-multiplier">{{ g.multiplier }}x</span>
+            </div>
+          </div>
+          <div class="game-stats">
+            <div class="game-stat">
+              <span class="label">Plays</span>
+              <span class="value">{{ g.plays | number }}</span>
+            </div>
+            <div class="game-stat">
+              <span class="label">Staked</span>
+              <span class="value">&#x20A6;{{ g.staked | number }}</span>
+            </div>
+            <div class="game-stat">
+              <span class="label">Payout</span>
+              <span class="value">&#x20A6;{{ g.payout | number }}</span>
+            </div>
+            <div class="game-stat">
+              <span class="label">Wins</span>
+              <span class="value">{{ g.wins | number }}</span>
+            </div>
+            <div class="game-stat">
+              <span class="label">Win Rate</span>
+              <span class="value">{{ g.winRate }}%</span>
+            </div>
+          </div>
+          <div class="game-today">
+            <span class="today-label">Today</span>
+            <span>{{ g.today.plays | number }} plays</span>
+            <span>&#x20A6;{{ g.today.staked | number }} staked</span>
+            <span>&#x20A6;{{ g.today.won | number }} won</span>
+          </div>
+        </mat-card>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">No play data yet.</div>
+  }
+</div>

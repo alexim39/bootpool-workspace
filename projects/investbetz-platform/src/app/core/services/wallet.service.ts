@@ -16,6 +16,7 @@ export interface WalletBalance {
 
 export interface Transaction {
   id: string;
+  _id?: string;
   type: 'deposit' | 'withdrawal' | 'stake' | 'payout' | 'refund' | 'bonus' | 'fee';
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled' | 'reversed';
   amount: number;
@@ -40,7 +41,19 @@ export interface TransactionHistoryResponse {
   data: {
     transactions: Transaction[];
     total: number;
+    page: number;
+    limit: number;
   };
+}
+
+export interface WalletHistoryQuery {
+  type?: string;
+  status?: string;
+  search?: string;
+  from?: string;
+  to?: string;
+  sortField?: 'createdAt' | 'amount' | 'type' | 'status';
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface DepositInitResponse {
@@ -127,7 +140,7 @@ export class WalletService {
     });
   }
 
-  fetchTransactions(page = 1, limit = 20, filters: { type?: string; status?: string } = {}): Observable<TransactionHistoryResponse> {
+  fetchTransactions(page = 1, limit = 25, filters: WalletHistoryQuery = {}): Observable<TransactionHistoryResponse> {
     if (page === 1) this.loading.set(true);
     else this.loadingMore.set(true);
     this.error.set(null);
@@ -136,7 +149,12 @@ export class WalletService {
       page: String(page),
       limit: String(limit),
       ...(filters.type && { type: filters.type }),
-      ...(filters.status && { status: filters.status })
+      ...(filters.status && { status: filters.status }),
+      ...(filters.search && { search: filters.search }),
+      ...(filters.from && { from: filters.from }),
+      ...(filters.to && { to: filters.to }),
+      ...(filters.sortField && { sortField: filters.sortField }),
+      ...(filters.sortOrder && { sortOrder: filters.sortOrder })
     });
 
     return new Observable(observer => {
@@ -145,8 +163,9 @@ export class WalletService {
       }).subscribe({
         next: (res) => {
           if (res.success) {
-            if (page === 1) this.transactions.set(res.data.transactions);
-            else this.transactions.update(t => [...t, ...res.data.transactions]);
+            const rows = (res.data.transactions || []).map(t => ({ ...t, id: t.id || String(t._id) }));
+            if (page === 1) this.transactions.set(rows);
+            else this.transactions.update(t => [...t, ...rows]);
             this.totalTransactions.set(res.data.total);
             this.currentPage.set(page);
           }

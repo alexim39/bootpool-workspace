@@ -2,15 +2,16 @@
   <header class="mobile-header">
     <button mat-icon-button (click)="goBack()"><mat-icon>arrow_back</mat-icon></button>
     <h1>Deposit {{ config.label }}</h1>
-    <button mat-icon-button (click)="auth.logout()"><mat-icon>logout</mat-icon></button>
   </header>
 
   <div class="mobile-content">
     <div class="tier-badge" [style.--tier-color]="config.color">
+      <div class="tier-glow"></div>
       <span class="tier-icon">{{ config.icon }}</span>
       <div>
         <div class="tier-name">{{ config.label }}</div>
         <div class="tier-min">Min ₦{{ config.minDeposit | number }} · 30-day lock</div>
+        <div class="tier-strategy">{{ config.strategy }}</div>
       </div>
     </div>
 
@@ -25,7 +26,8 @@
       <div class="amount-grid">
         @for (amt of amountOptions; track amt) {
           <button class="amount-btn" [class.selected]="!useCustom && amount === amt" (click)="selectAmount(amt)">
-            ₦{{ amt | number }}
+            <span class="amount-val">₦{{ amt | number }}</span>
+            <span class="amount-sub">≈ {{ (amt / (store.navData()?.current?.nav || 1)) | number:'1.1-1' }} units</span>
           </button>
         }
         <button class="amount-btn custom" [class.selected]="useCustom" (click)="useCustomAmount()">Custom</button>
@@ -37,13 +39,16 @@
 
       <div class="summary">
         <div class="summary-row"><span>Deposit</span><span class="val">₦{{ validAmount | number }}</span></div>
+        <div class="summary-row"><span>Est. Units</span><span>{{ estimatedUnits === null ? '—' : (estimatedUnits | number:'1.2-2') }}</span></div>
         <div class="summary-row muted"><span>Lock</span><span>30 days</span></div>
-        <div class="summary-row muted"><span>Fee</span><span>20% of net profit</span></div>
+        <div class="summary-row muted"><span>Fee</span><span>10% of net profit</span></div>
+        <div class="summary-row muted"><span>Guaranteed</span><span>Min {{ config.guaranteedMinPct }}% - {{ config.maxReturnPct }}% per cycle</span></div>
       </div>
 
       <button class="btn-primary full" (click)="submit()" [disabled]="!canSubmit">
         @if (store.loading()) { <span class="spinner"></span> } @else { Deposit ₦{{ validAmount | number }} }
       </button>
+      <p class="deposit-note">Funds are allocated by Ora AI within 24 hours. Withdraw anytime after the 30-day lock.</p>
     }
   </div>
 

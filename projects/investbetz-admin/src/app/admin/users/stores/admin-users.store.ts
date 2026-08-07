@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { AdminService, AdminUser } from '../../services';
-import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, finalize, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AdminUsersStore {
@@ -19,6 +19,8 @@ export class AdminUsersStore {
   readonly sortBy = signal('createdAt');
   readonly sortOrder = signal<'asc' | 'desc'>('desc');
   readonly loading = signal(false);
+  readonly detailLoading = signal(false);
+  readonly saving = signal(false);
   readonly selectedUser = signal<any>(null);
   readonly stats = signal<{ total: number; active: number; suspended: number; kycVerified: number; kycPending: number; admins: number } | null>(null);
   readonly roleFilter = signal<'user' | 'admin'>('user');
@@ -131,9 +133,23 @@ export class AdminUsersStore {
   }
 
   loadUser(id: string) {
+    this.detailLoading.set(true);
     this.admin.getUser(id).subscribe((res: any) => {
+      this.detailLoading.set(false);
       if (res.success) this.selectedUser.set(res.data);
     });
+  }
+
+  updateUser(id: string, payload: { fullName?: string; phone?: string; email?: string; role?: 'user' | 'admin'; isSuspended?: boolean }) {
+    this.saving.set(true);
+    return this.admin.updateUser(id, payload).pipe(
+      tap(res => {
+        if (res.success && this.selectedUser()) {
+          this.selectedUser.set({ ...this.selectedUser(), user: res.data });
+        }
+      }),
+      finalize(() => this.saving.set(false)),
+    );
   }
 
   toggleStatus(u: AdminUser) {

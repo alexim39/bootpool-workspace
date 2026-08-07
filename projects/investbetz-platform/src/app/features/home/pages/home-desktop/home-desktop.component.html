@@ -1,9 +1,210 @@
 <app-nav />
 <div class="home-container">
 
+  <section class="home-hero">
+    <div class="hero-orb orb-one"></div>
+    <div class="hero-orb orb-two"></div>
+    <div class="hero-glow"></div>
+
+    <div class="hero-top">
+      <div class="hero-greeting">
+        <span class="hero-eyebrow"><mat-icon>auto_awesome</mat-icon> Ora-powered betting</span>
+        <h2 class="hero-title">
+          @if (store.userFirstName()) {
+            {{ store.greeting() }}, <span class="hero-name">{{ store.userFirstName() }}</span>
+          } @else {
+            Welcome to <span class="hero-name">BetPool</span>
+          }
+        </h2>
+        <p class="hero-sub">Live odds, Ora's picks and pools — all in one place.</p>
+      </div>
+      <div class="hero-actions">
+        <button class="wallet-pill" routerLink="/wallet" aria-label="View wallet">
+          <mat-icon>account_balance_wallet</mat-icon>
+          <span class="wallet-pill-label">Balance</span>
+          <span class="wallet-pill-amount">{{ store.formatMoney(store.walletBalance()) }}</span>
+        </button>
+        <button class="hero-topup" routerLink="/wallet">
+          <mat-icon>add</mat-icon>
+          <span>Top Up</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="stat-strip">
+      <a class="stat-card" routerLink="/wallet">
+        <span class="stat-icon stat-icon-emerald"><mat-icon>account_balance_wallet</mat-icon></span>
+        <div class="stat-meta">
+          <span class="stat-label">Available balance</span>
+          <span class="stat-value">{{ store.formatMoney(store.walletBalance()) }}</span>
+        </div>
+      </a>
+      <a class="stat-card" routerLink="/bets">
+        <span class="stat-icon stat-icon-gold"><mat-icon>sports_esports</mat-icon></span>
+        <div class="stat-meta">
+          <span class="stat-label">Active bets</span>
+          <span class="stat-value">{{ store.activeBetsCount() }}</span>
+        </div>
+      </a>
+      <div class="stat-card">
+        <span class="stat-icon stat-icon-mint"><mat-icon>insights</mat-icon></span>
+        <div class="stat-meta">
+          <span class="stat-label">Ora win rate</span>
+          <span class="stat-value">{{ store.oraWinRate() !== null ? store.oraWinRate() + '%' : '—' }}</span>
+        </div>
+      </div>
+      <a class="stat-card" routerLink="/games">
+        <span class="stat-icon stat-icon-blue"><mat-icon>sensors</mat-icon></span>
+        <div class="stat-meta">
+          <span class="stat-label">Live now</span>
+          <span class="stat-value">{{ store.livePods().length }}</span>
+        </div>
+      </a>
+    </div>
+
+    @if (store.livePods().length > 0) {
+      <div class="live-ticker">
+        <span class="ticker-label"><span class="live-dot"></span> LIVE</span>
+        <div class="ticker-track">
+          @for (pod of store.livePods(); track pod.id) {
+            <button class="ticker-chip" (click)="openLivePod(pod)">
+              <span class="ticker-score">{{ pod.homeTeam }} v {{ pod.awayTeam }}</span>
+              <span class="ticker-odds">{{ pod.gainsMultiplier }}x</span>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </section>
+
+  <section class="quick-play" aria-label="Quick play">
+    <a class="qp-card qp-arcade" routerLink="/virtual-games">
+      <span class="qp-icon"><mat-icon>casino</mat-icon></span>
+      <div class="qp-meta">
+        <span class="qp-title">Arcade</span>
+        <span class="qp-sub">Instant win games</span>
+      </div>
+      <mat-icon class="qp-arrow">chevron_right</mat-icon>
+    </a>
+    <a class="qp-card qp-pools" routerLink="/match-pools">
+      <span class="qp-icon"><mat-icon>pool</mat-icon></span>
+      <div class="qp-meta">
+        <span class="qp-title">Pools</span>
+        <span class="qp-sub">Join match pools</span>
+      </div>
+      <mat-icon class="qp-arrow">chevron_right</mat-icon>
+    </a>
+    <a class="qp-card qp-leaderboard" routerLink="/leaderboard">
+      <span class="qp-icon"><mat-icon>emoji_events</mat-icon></span>
+      <div class="qp-meta">
+        <span class="qp-title">Leaderboard</span>
+        <span class="qp-sub">Compete for the top</span>
+      </div>
+      <mat-icon class="qp-arrow">chevron_right</mat-icon>
+    </a>
+    <a class="qp-card qp-manager" routerLink="/bet-manager">
+      <span class="qp-icon"><mat-icon>auto_awesome</mat-icon></span>
+      <div class="qp-meta">
+        <span class="qp-title">Manager</span>
+        <span class="qp-sub">Ora bets for you</span>
+      </div>
+      <mat-icon class="qp-arrow">chevron_right</mat-icon>
+    </a>
+  </section>
+
   <app-featured-banner />
 
   <app-ora-pick-banner (stake)="onOraPickStake($event)" />
+
+  @if (store.upcomingPods().length > 0) {
+    <section class="upcoming-section">
+      <div class="section-head">
+        <div>
+          <span class="section-eyebrow"><mat-icon>event</mat-icon> Coming up</span>
+          <h3 class="section-title">Upcoming fixtures</h3>
+        </div>
+        <a class="section-link" routerLink="/games">View all <mat-icon>chevron_right</mat-icon></a>
+      </div>
+      <div class="upcoming-rail">
+        @for (pod of store.upcomingPods(); track pod.id) {
+          <button
+            class="upcoming-card"
+            [class.upcoming-live]="pod.isLive"
+            (click)="store.openUpcomingPod(pod)"
+            [disabled]="!store.isStakable(pod)">
+            <div class="uc-top">
+              <span class="uc-league"><mat-icon>sports_soccer</mat-icon> {{ pod.league || pod.sport }}</span>
+              @if (pod.isLive) {
+                <span class="uc-live"><span class="live-dot"></span> LIVE</span>
+              } @else {
+                <span class="uc-kickoff"><mat-icon>schedule</mat-icon> {{ store.kickoffLabel(pod) }}</span>
+              }
+            </div>
+            <div class="uc-teams">
+              <span class="uc-team">{{ pod.homeTeam }}</span>
+              <span class="uc-vs">VS</span>
+              <span class="uc-team">{{ pod.awayTeam }}</span>
+            </div>
+            <div class="uc-bottom">
+              <span class="uc-odds">Odds {{ pod.gainsMultiplier }}x</span>
+              <span class="uc-cta" [class.uc-cta-open]="store.isStakable(pod)">
+                {{ store.isStakable(pod) ? 'Stake' : 'Opens soon' }}
+                <mat-icon>{{ store.isStakable(pod) ? 'bolt' : 'lock_clock' }}</mat-icon>
+              </span>
+            </div>
+          </button>
+        }
+      </div>
+    </section>
+  }
+
+  @if (store.oraRecord()) {
+    <section class="insights-section">
+      <div class="section-head">
+        <div>
+          <span class="section-eyebrow"><mat-icon>auto_awesome</mat-icon> Powered by Ora</span>
+          <h3 class="section-title">Performance insights</h3>
+        </div>
+        <a class="section-link" routerLink="/leaderboard">Leaderboard <mat-icon>chevron_right</mat-icon></a>
+      </div>
+      <div class="insights-grid">
+        <div class="insight-card">
+          <span class="insight-icon insight-icon-emerald"><mat-icon>trending_up</mat-icon></span>
+          <div class="insight-meta">
+            <span class="insight-label">Ora win rate</span>
+            <span class="insight-value">{{ store.oraWinRate() !== null ? store.oraWinRate() + '%' : '—' }}</span>
+            <span class="insight-sub">Overall settled picks</span>
+          </div>
+        </div>
+        <div class="insight-card">
+          <span class="insight-icon insight-icon-gold"><mat-icon>emoji_events</mat-icon></span>
+          <div class="insight-meta">
+            <span class="insight-label">Pots settled</span>
+            <span class="insight-value">{{ store.oraPots30d() ?? '—' }}</span>
+            <span class="insight-sub">Last 30 days</span>
+          </div>
+        </div>
+        <div class="insight-card">
+          <span class="insight-icon insight-icon-blue"><mat-icon>schedule</mat-icon></span>
+          <div class="insight-meta">
+            <span class="insight-label">Avg payout time</span>
+            <span class="insight-value">{{ store.oraPayoutAvg() !== null ? store.oraPayoutAvg() + 's' : '—' }}</span>
+            <span class="insight-sub">From settlement</span>
+          </div>
+        </div>
+        @if (store.topLeague()) {
+          <div class="insight-card">
+            <span class="insight-icon insight-icon-mint"><mat-icon>sports_soccer</mat-icon></span>
+            <div class="insight-meta">
+              <span class="insight-label">Best league</span>
+              <span class="insight-value">{{ store.topLeague()!.league }}</span>
+              <span class="insight-sub">{{ store.topLeague()!.winRate }}% win rate · {{ store.topLeague()!.played }} picks</span>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
 
   <a class="games-teaser" routerLink="/games">
     <div class="games-teaser-left">
@@ -74,15 +275,17 @@
         </div>
       } @else if (store.displayedPods().length === 0 && !store.isSearching()) {
         <div class="empty-state">
-          <mat-icon>event_busy</mat-icon>
+          <span class="empty-illustration"><mat-icon>event_busy</mat-icon></span>
           <h3>No active odds</h3>
           <p>Check back later for new betting opportunities</p>
+          <a class="empty-cta" routerLink="/games">Explore today's games</a>
         </div>
       } @else if (store.noSearchResults()) {
         <div class="empty-state">
-          <mat-icon>search_off</mat-icon>
+          <span class="empty-illustration"><mat-icon>search_off</mat-icon></span>
           <h3>No results found</h3>
           <p>Try a different search term</p>
+          <button class="empty-cta" (click)="store.clearSearch()">Clear search</button>
         </div>
       } @else {
         <div class="odds-list">

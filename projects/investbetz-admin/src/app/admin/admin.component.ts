@@ -41,6 +41,7 @@ export class AdminComponent implements OnInit, OnDestroy {
       items: [
         { path: '/admin/pods', icon: 'sports_esports', label: 'Pods', exact: false, badge: true },
         { path: '/admin/betting', icon: 'sports_kabaddi', label: 'Betting', exact: false, badge: false },
+        { path: '/admin/virtual-games', icon: 'casino', label: 'Virtual Games', exact: false, badge: false },
         { path: '/admin/match-pools', icon: 'pool', label: 'Match Pools', exact: false, badge: false },
         { path: '/admin/featured-games', icon: 'star', label: 'Featured Games', exact: false, badge: false },
         { path: '/admin/stakes', icon: 'casino', label: 'Stakes', exact: false, badge: false },

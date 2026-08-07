@@ -27,6 +27,7 @@ import { FormsModule } from '@angular/forms';
 export class UsersComponent implements OnInit {
   readonly store = inject(AdminUsersStore);
   private router = inject(Router);
+  readonly skeletonRows = Array.from({ length: 8 }, (_, i) => i);
 
   ngOnInit() {
     this.store.load();

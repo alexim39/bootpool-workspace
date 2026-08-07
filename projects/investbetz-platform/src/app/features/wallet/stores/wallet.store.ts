@@ -1,6 +1,20 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { WalletService, Transaction, Bank, WithdrawalLimits, StakeService, AuthService } from '../../../core/services';
+import { WalletService, Transaction, Bank, WithdrawalLimits, StakeService, AuthService, WalletHistoryQuery } from '../../../core/services';
+
+export interface WalletHistoryFilters {
+  type?: string;
+  status?: string;
+  search?: string;
+  from?: string;
+  to?: string;
+  sortField?: 'createdAt' | 'amount' | 'type' | 'status';
+  sortOrder?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+}
+
+export const WALLET_PAGE_SIZES = [25, 50, 100];
 
 @Injectable({ providedIn: 'root' })
 export class WalletStore {
@@ -11,11 +25,22 @@ export class WalletStore {
 
   transactions = signal<Transaction[]>([]);
   banks = signal<Bank[]>([]);
-  withdrawalLimits = signal<WithdrawalLimits>({ min: 500, max: 5000000, dailyLimit: 10000000, fee: '1.5% (max ₦50)' });
+  withdrawalLimits = signal<WithdrawalLimits>({ min: 500, max: 5000000, dailyLimit: 10000000, fee: 'No fees' });
   loading = signal(false);
   loadingMore = signal(false);
+  error = signal<string | null>(null);
   totalTransactions = signal(0);
-  currentPage = signal(1);
+
+  // ---- server-side history filter state ----
+  historyType = signal<string>('');
+  historyStatus = signal<string>('');
+  historyFrom = signal<string>('');
+  historyTo = signal<string>('');
+  historySearch = signal<string>('');
+  historySortField = signal<'createdAt' | 'amount' | 'type' | 'status'>('createdAt');
+  historySortOrder = signal<'asc' | 'desc'>('desc');
+  historyPage = signal(1);
+  historyLimit = signal(25);
 
   readonly walletBalance = computed(() => this.walletService.balance());
   readonly totalDeposited = computed(() => this.walletService.balance().totalDeposited || 0);
@@ -24,8 +49,20 @@ export class WalletStore {
   readonly totalWon = computed(() => this.walletService.balance().totalWon || 0);
   readonly hasMore = computed(() => this.transactions().length < this.totalTransactions());
 
-  readonly depositTransactions = computed(() => this.transactions().filter(t => t.type === 'deposit'));
-  readonly withdrawalTransactions = computed(() => this.transactions().filter(t => t.type === 'withdrawal'));
+  readonly historyTotalPages = computed(() => Math.max(1, Math.ceil(this.totalTransactions() / this.historyLimit())));
+  readonly activeFilterCount = computed(() => {
+    let n = 0;
+    if (this.historyType()) n++;
+    if (this.historyStatus()) n++;
+    if (this.historyFrom() || this.historyTo()) n++;
+    if (this.historySearch()) n++;
+    if (this.historySortField() !== 'createdAt' || this.historySortOrder() !== 'desc') n++;
+    if (this.historyLimit() !== 25) n++;
+    return n;
+  });
+  readonly hasActiveFilters = computed(() => this.activeFilterCount() > 0);
+
+  readonly currentPage = computed(() => this.historyPage());
 
   init() {
     this.fetchBalance();
@@ -52,38 +89,92 @@ export class WalletStore {
     this.walletService.fetchWithdrawalLimits();
   }
 
-  fetchTransactions(page = 1) {
-    if (page === 1) {
-      this.loading.set(true);
-      this.transactions.set([]);
-    } else {
-      this.loadingMore.set(true);
-    }
-    this.walletService.fetchTransactions(page, 20).subscribe({
+  private buildQuery(): WalletHistoryQuery {
+    return {
+      type: this.historyType() || undefined,
+      status: this.historyStatus() || undefined,
+      search: this.historySearch() || undefined,
+      from: this.historyFrom() || undefined,
+      to: this.historyTo() || undefined,
+      sortField: this.historySortField(),
+      sortOrder: this.historySortOrder()
+    };
+  }
+
+  fetchTransactions(page = 1, limit?: number) {
+    const effLimit = limit ?? this.historyLimit();
+    this.loading.set(true);
+    this.error.set(null);
+    this.walletService.fetchTransactions(page, effLimit, this.buildQuery()).subscribe({
       next: (res) => {
         if (res.success) {
-          if (page === 1) {
-            this.transactions.set(res.data.transactions);
-          } else {
-            this.transactions.update(t => [...t, ...res.data.transactions]);
-          }
+          this.transactions.set(res.data.transactions);
           this.totalTransactions.set(res.data.total);
-          this.currentPage.set(page);
+          this.historyPage.set(res.data.page || page);
         }
         this.loading.set(false);
-        this.loadingMore.set(false);
       },
-      error: () => { this.loading.set(false); this.loadingMore.set(false); }
+      error: (err) => {
+        this.error.set(err.error?.message || 'Failed to fetch transactions');
+        this.loading.set(false);
+      }
     });
   }
 
-  onPageChange(pageIndex: number) {
-    this.fetchTransactions(pageIndex + 1);
+  setHistoryFilters(patch: WalletHistoryFilters) {
+    if (patch.type !== undefined) this.historyType.set(patch.type);
+    if (patch.status !== undefined) this.historyStatus.set(patch.status);
+    if (patch.search !== undefined) this.historySearch.set(patch.search);
+    if (patch.from !== undefined) this.historyFrom.set(patch.from);
+    if (patch.to !== undefined) this.historyTo.set(patch.to);
+    if (patch.sortField !== undefined) this.historySortField.set(patch.sortField);
+    if (patch.sortOrder !== undefined) this.historySortOrder.set(patch.sortOrder);
+    if (patch.limit !== undefined) this.historyLimit.set(patch.limit);
+    this.fetchTransactions(1, patch.limit ?? undefined);
+  }
+
+  clearHistoryFilters() {
+    this.historyType.set('');
+    this.historyStatus.set('');
+    this.historyFrom.set('');
+    this.historyTo.set('');
+    this.historySearch.set('');
+    this.historySortField.set('createdAt');
+    this.historySortOrder.set('desc');
+    this.historyLimit.set(25);
+    this.fetchTransactions(1, 25);
+  }
+
+  loadHistoryPage(page: number) {
+    const clamped = Math.max(1, Math.min(page, this.historyTotalPages()));
+    if (clamped === this.historyPage() && !this.loading()) return;
+    this.fetchTransactions(clamped);
+  }
+
+  setHistoryPageSize(size: number) {
+    if (!WALLET_PAGE_SIZES.includes(size)) return;
+    this.setHistoryFilters({ limit: size, page: 1 });
   }
 
   loadMore() {
-    if (!this.hasMore() || this.loadingMore()) return;
-    this.fetchTransactions(this.currentPage() + 1);
+    if (!this.hasMore() || this.loading() || this.loadingMore()) return;
+    this.loadingMore.set(true);
+    this.walletService.fetchTransactions(this.historyPage() + 1, this.historyLimit(), this.buildQuery()).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.transactions.update(t => [...t, ...res.data.transactions]);
+          this.totalTransactions.set(res.data.total);
+          this.historyPage.set(res.data.page);
+        }
+        this.loadingMore.set(false);
+      },
+      error: () => this.loadingMore.set(false)
+    });
+  }
+
+  refresh() {
+    this.fetchBalance();
+    this.fetchTransactions(this.historyPage());
   }
 
   openDeposit(displayTopUp: ReturnType<typeof signal<boolean>>) {
@@ -111,6 +202,10 @@ export class WalletStore {
 
   formatTime(dateStr: string): string {
     return new Date(dateStr).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  formatDateFull(dateStr: string): string {
+    return new Date(dateStr).toLocaleDateString('en-NG', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
   formatType(type: string): string {
@@ -167,5 +262,10 @@ export class WalletStore {
 
   formatStatus(status: string): string {
     return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+
+  txnDescription(txn: Transaction): string {
+    if (txn.metadata?.['description']) return String(txn.metadata['description']);
+    return txn.description || this.formatType(txn.type);
   }
 }

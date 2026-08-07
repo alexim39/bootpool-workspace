@@ -1,6 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { BetManagerStore } from '../../stores/bet-manager.store';
+import { BET_MANAGER_TIERS } from '../../bet-manager.tier-config';
 import { DecimalPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,44 +20,7 @@ export class BetManagerOverviewComponent implements OnInit {
   readonly showGuide = signal(false);
   private router = inject(Router);
 
-  readonly tiers = [
-    {
-      key: 'goalkeeper',
-      label: 'Goalkeeper',
-      icon: '🧤',
-      minDeposit: 20_000,
-      strategy: 'Starter — low entry, steady returns, minimal risk',
-      allocation: 'Low-risk Pods (1.1x–1.5x multiplier)',
-      color: '#90CAF9',
-    },
-    {
-      key: 'defender',
-      label: 'Defender',
-      icon: '🛡️',
-      minDeposit: 50_000,
-      strategy: 'Conservative — low-risk Pods, high refund confidence',
-      allocation: 'Mostly Pods, 1.2x–1.8x multiplier',
-      color: '#00E676',
-    },
-    {
-      key: 'midfielder',
-      label: 'Midfielder',
-      icon: '⚡',
-      minDeposit: 100_000,
-      strategy: 'Balanced — mix of Pods and Match Pools',
-      allocation: 'Mix of Pods (1.5x–2.5x) and Match Pools',
-      color: '#E8B923',
-    },
-    {
-      key: 'striker',
-      label: 'Striker',
-      icon: '🎯',
-      minDeposit: 200_000,
-      strategy: 'Aggressive — higher multipliers, more Match Pools',
-      allocation: 'Higher-multiplier Pods (2x–5x), more Match Pools',
-      color: '#FF5252',
-    },
-  ];
+  readonly tiers = BET_MANAGER_TIERS;
 
   ngOnInit() {
     this.store.fetchAccounts();
@@ -64,6 +28,20 @@ export class BetManagerOverviewComponent implements OnInit {
 
   getAccount(tier: string) {
     return this.store.accounts().find(a => a.tier === tier);
+  }
+
+  get totals() {
+    const accounts = this.store.accounts();
+    return {
+      aum: accounts.reduce((sum, a) => sum + a.currentValue, 0),
+      deposited: accounts.reduce((sum, a) => sum + a.totalDeposited, 0),
+      profit: accounts.reduce((sum, a) => sum + a.totalProfit, 0),
+    };
+  }
+
+  growthPct(account: { currentValue: number; totalDeposited: number } | undefined): number {
+    if (!account || account.totalDeposited <= 0) return 0;
+    return Math.max(0, Math.min(100, (account.currentValue / account.totalDeposited) * 100));
   }
 
   goDeposit(tier: string) {

@@ -31,15 +31,13 @@ export class WithdrawStore {
 
   readonly withdrawForm: FormGroup;
 
-  readonly formReady = computed(() => {
-    const accountNameValid = !!this.resolvedAccountName() || (this.withdrawForm.get('accountName')?.value?.trim()?.length >= 2);
-    return !!(this.withdrawForm.get('amount')?.valid && this.withdrawForm.get('bankCode')?.valid
-      && this.withdrawForm.get('accountNumber')?.valid && accountNameValid);
-  });
-
+  readonly formReady = signal(false);
   readonly canSubmit = computed(() => {
     return this.formReady() && this.pinDigits().every(d => d !== '') && !this.submitting();
   });
+
+  private readonly flowStepSignal = signal(1);
+  readonly flowStep = this.flowStepSignal.asReadonly();
 
   constructor() {
     this.withdrawForm = this._fb.group({
@@ -76,12 +74,26 @@ export class WithdrawStore {
         delete errs['insufficient'];
         this.withdrawForm.get('amount')?.setErrors(Object.keys(errs).length ? errs : null);
       }
+      this.syncFormState();
     });
+
+    this.withdrawForm.valueChanges.subscribe(() => this.syncFormState());
+    effect(() => { this.resolvedAccountName(); this.syncFormState(); });
+  }
+
+  private syncFormState() {
+    const amountOk = !!this.withdrawForm.get('amount')?.valid;
+    const bankOk = !!this.withdrawForm.get('bankCode')?.value;
+    const acctOk = !!this.withdrawForm.get('accountNumber')?.valid;
+    const acctNameOk = !!this.resolvedAccountName() || (this.withdrawForm.get('accountName')?.value?.trim()?.length ?? 0) >= 2;
+    this.formReady.set(amountOk && bankOk && acctOk && acctNameOk);
+    this.flowStepSignal.set(amountOk ? (bankOk && acctOk && acctNameOk ? 3 : 2) : 1);
   }
 
   init() {
     this._wallet.fetchBalance();
     this._wallet.fetchBanks();
+    this._wallet.fetchWithdrawalLimits();
     this.banks = this._wallet.banks;
     this.loadSavedAccounts();
   }

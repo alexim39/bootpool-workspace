@@ -1,9 +1,20 @@
-
 <div class="mobile-withdraw">
   <header class="mobile-header">
     <button mat-icon-button routerLink="/wallet"><mat-icon>arrow_back</mat-icon></button>
-    <h1>Withdraw</h1>
+    <div class="mh-text">
+      <h1>Withdraw Funds</h1>
+      <span class="mh-sub">Transfer to any Nigerian bank account</span>
+    </div>
   </header>
+
+  <div class="steps">
+    @for (step of [1, 2, 3]; track step) {
+      <div class="step-pill" [class.on]="store.flowStep() === step" [class.done]="store.flowStep() > step">
+        <span class="step-num">{{ step }}</span>
+        <span class="step-label">{{ step === 1 ? 'Amount' : (step === 2 ? 'Account' : 'Confirm') }}</span>
+      </div>
+    }
+  </div>
 
   @if (store.savedAccounts().length) {
     <div class="saved-section">
@@ -29,16 +40,23 @@
   }
 
   <div class="balance-bar">
-    <span class="bb-label">Available Balance</span>
-    <span class="bb-value">{{ store.walletService.formatAmount(store.walletBalance().available) }}</span>
+    <div class="bb-glow"></div>
+    <div class="bb-text">
+      <span class="bb-label">Available Balance</span>
+      <span class="bb-value">{{ store.walletService.formatAmount(store.walletBalance().available) }}</span>
+    </div>
+    @if (store.walletBalance().locked > 0) {
+      <span class="bb-locked">Locked: {{ store.walletService.formatAmount(store.walletBalance().locked) }}</span>
+    }
   </div>
 
   <div class="form-body" [formGroup]="store.withdrawForm">
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Amount (NGN)</mat-label>
-      <input matInput type="number" formControlName="amount" placeholder="Enter amount" min="500" step="100" inputmode="numeric">
+      <mat-label>Amount</mat-label>
+      <span matTextPrefix class="amount-prefix">₦&nbsp;</span>
+      <input matInput type="number" formControlName="amount" placeholder="0" min="500" step="100" inputmode="numeric">
       @if (store.withdrawForm.get('amount')?.hasError('required')) { <mat-error>Amount required</mat-error> }
-      @if (store.withdrawForm.get('amount')?.hasError('min')) { <mat-error>Min ₦500</mat-error> }
+      @if (store.withdrawForm.get('amount')?.hasError('min')) { <mat-error>Min ₦{{ store.walletService.withdrawalLimits().min.toLocaleString() }}</mat-error> }
       @if (store.withdrawForm.get('amount')?.errors?.['insufficient']) { <mat-error>Insufficient balance</mat-error> }
     </mat-form-field>
 
@@ -46,6 +64,10 @@
       @for (amt of store.quickAmounts; track amt) {
         <button type="button" class="quick-chip" [class.active]="store.withdrawForm.get('amount')?.value === amt" (click)="store.setAmount(amt)">₦{{ amt.toLocaleString() }}</button>
       }
+    </div>
+    <div class="limits-hint">
+      <mat-icon>info</mat-icon>
+      <span>Min ₦{{ store.walletService.withdrawalLimits().min.toLocaleString() }} · Max ₦{{ store.walletService.withdrawalLimits().max.toLocaleString() }} · Daily ₦{{ store.walletService.withdrawalLimits().dailyLimit.toLocaleString() }}</span>
     </div>
 
     <mat-form-field appearance="outline" class="full-width bank-search-field">
@@ -103,6 +125,7 @@
     @if (store.withdrawForm.get('amount')?.valid) {
       <div class="fee-summary">
         <div class="fee-row"><span>Amount</span><span>{{ store.walletService.formatAmount(store.calculatedAmount()) }}</span></div>
+        <div class="fee-row"><span>Fee</span><span>{{ store.walletService.withdrawalLimits().fee }}</span></div>
         <div class="fee-row total"><span>You receive</span><span>{{ store.walletService.formatAmount(store.calculatedAmount()) }}</span></div>
       </div>
     }
@@ -138,10 +161,13 @@
         <ng-container><mat-icon>send</mat-icon> Withdraw {{ store.walletService.formatAmount(store.calculatedAmount()) }}</ng-container>
       }
     </button>
+    <div class="submit-note">
+      <mat-icon>lock</mat-icon>
+      <span>Protected by your 6-digit PIN</span>
+    </div>
 
     <div class="limits-note">
-      <span>Min ₦500 • Max ₦5,000,000 • No fees</span>
+      <span>Min ₦{{ store.walletService.withdrawalLimits().min.toLocaleString() }} · Max ₦{{ store.walletService.withdrawalLimits().max.toLocaleString() }} · {{ store.walletService.withdrawalLimits().fee }}</span>
     </div>
   </div>
 </div>
-  
