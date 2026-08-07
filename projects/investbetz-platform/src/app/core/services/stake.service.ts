@@ -70,7 +70,21 @@ export interface StakesResponse {
   data: {
     stakes: Stake[];
     total: number;
+    page?: number;
+    limit?: number;
+    totalPages?: number;
   };
+}
+
+export interface StakesQuery {
+  page?: number;
+  limit?: number;
+  status?: string;
+  search?: string;
+  sortField?: string;
+  sortOrder?: 'asc' | 'desc';
+  from?: string;
+  to?: string;
 }
 
 export interface ActiveStakesResponse {
@@ -143,14 +157,25 @@ export class StakeService {
     };
   }
 
-  fetchMyStakes(page = 1, limit = 20, status?: string): Observable<StakesResponse> {
+  fetchMyStakes(queryOrPage: StakesQuery | number = 1, limit = 20, status?: string): Observable<StakesResponse> {
     this.loading.set(true);
     this.error.set(null);
 
+    const opts: StakesQuery =
+      typeof queryOrPage === 'number'
+        ? { page: queryOrPage, limit, status }
+        : queryOrPage;
+    const { page = 1, status: st } = opts;
+
     const query = new URLSearchParams({
       page: String(page),
-      limit: String(limit),
-      ...(status && { status })
+      limit: String(opts.limit ?? limit),
+      ...(st && st !== 'all' && { status: st }),
+      ...(opts.search && opts.search.trim() && { search: opts.search.trim() }),
+      ...(opts.sortField && { sortField: opts.sortField }),
+      ...(opts.sortOrder && { sortOrder: opts.sortOrder }),
+      ...(opts.from && { from: opts.from }),
+      ...(opts.to && { to: opts.to })
     });
 
     return new Observable(observer => {
@@ -182,7 +207,7 @@ export class StakeService {
 
   loadMoreStakes(status?: string) {
     if (this.stakes().length < this.totalStakes() && !this.loading()) {
-      this.fetchMyStakes(this.currentPage() + 1, 20, status);
+      this.fetchMyStakes({ page: this.currentPage() + 1, limit: 20, status });
     }
   }
 
