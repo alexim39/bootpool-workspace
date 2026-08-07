@@ -11,8 +11,9 @@
     <div class="guide-bar">
       <div class="guide-step"><span class="step-num">1</span> Deposit into a tier — funds are locked for a 30-day cycle</div>
       <div class="guide-step"><span class="step-num">2</span> Ora AI automatically allocates your balance across live Pods and Match Pools</div>
-      <div class="guide-step"><span class="step-num">3</span> Returns are reinvested. BetPool earns a 20% performance fee only on net profit</div>
+      <div class="guide-step"><span class="step-num">3</span> Returns are reinvested. BetPool earns a 10% performance fee only on net profit</div>
       <div class="guide-step"><span class="step-num">4</span> Withdraw anytime after the 30-day lock period — instant settlement</div>
+      <div class="guide-step"><span class="step-num">5</span> You earn between 1% - 10% profit for each tier cycle</div>
     </div>
   }
 
@@ -69,6 +70,7 @@
         </div>
 
         <p class="tier-strategy">{{ tier.strategy }}</p>
+        <div class="tier-guarantee">Min {{ tier.guaranteedMinPct }}% guaranteed return per cycle · 10% fee on profit only</div>
 
         @if (account) {
           <div class="tier-stats">

@@ -6,6 +6,8 @@ export interface BetManagerTierInfo {
   color: string;
   strategy: string;
   allocation: string;
+  guaranteedMinPct: number;
+  maxReturnPct: number;
 }
 
 export const BET_MANAGER_TIERS: BetManagerTierInfo[] = [
@@ -17,6 +19,8 @@ export const BET_MANAGER_TIERS: BetManagerTierInfo[] = [
     color: '#90CAF9',
     strategy: 'Starter — low entry, steady returns, minimal risk',
     allocation: 'Low-risk Pods (1.1x–1.5x)',
+    guaranteedMinPct: 1,
+    maxReturnPct: 10,
   },
   {
     key: 'defender',
@@ -26,6 +30,8 @@ export const BET_MANAGER_TIERS: BetManagerTierInfo[] = [
     color: '#00E676',
     strategy: 'Conservative — low-risk Pods, high refund confidence',
     allocation: 'Mostly Pods (1.2x–1.8x)',
+    guaranteedMinPct: 1,
+    maxReturnPct: 10,
   },
   {
     key: 'midfielder',
@@ -35,6 +41,8 @@ export const BET_MANAGER_TIERS: BetManagerTierInfo[] = [
     color: '#E8B923',
     strategy: 'Balanced — mix of Pods and Match Pools',
     allocation: 'Pods + Match Pools (1.5x–2.5x)',
+    guaranteedMinPct: 1,
+    maxReturnPct: 10,
   },
   {
     key: 'striker',
@@ -44,6 +52,8 @@ export const BET_MANAGER_TIERS: BetManagerTierInfo[] = [
     color: '#FF5252',
     strategy: 'Aggressive — higher multipliers, more Match Pools',
     allocation: 'High-multiplier Pods (2x–5x)',
+    guaranteedMinPct: 1,
+    maxReturnPct: 10,
   },
 ];
 

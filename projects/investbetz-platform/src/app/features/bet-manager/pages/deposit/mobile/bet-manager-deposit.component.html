@@ -41,7 +41,8 @@
         <div class="summary-row"><span>Deposit</span><span class="val">₦{{ validAmount | number }}</span></div>
         <div class="summary-row"><span>Est. Units</span><span>{{ estimatedUnits === null ? '—' : (estimatedUnits | number:'1.2-2') }}</span></div>
         <div class="summary-row muted"><span>Lock</span><span>30 days</span></div>
-        <div class="summary-row muted"><span>Fee</span><span>20% of net profit</span></div>
+        <div class="summary-row muted"><span>Fee</span><span>10% of net profit</span></div>
+        <div class="summary-row muted"><span>Guaranteed</span><span>Min {{ config.guaranteedMinPct }}% - {{ config.maxReturnPct }}% per cycle</span></div>
       </div>
 
       <button class="btn-primary full" (click)="submit()" [disabled]="!canSubmit">
