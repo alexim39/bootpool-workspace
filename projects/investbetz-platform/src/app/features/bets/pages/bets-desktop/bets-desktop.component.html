@@ -54,6 +54,11 @@
         </div>
       </div>
 
+      <app-bets-win-loss-chart
+        [summary]="store.betSummary()"
+        [loading]="store.summaryLoading()">
+      </app-bets-win-loss-chart>
+
       <mat-tab-group class="bets-tabs">
         <mat-tab label="Active">
           <div class="tab-content">

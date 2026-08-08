@@ -1,0 +1,75 @@
+<div class="wl-card" [class.loading]="loading()">
+  <div class="wl-head">
+    <div class="wl-title">
+      <span class="wl-title-text">Win / Loss</span>
+      <span class="wl-title-sub">Settled bets &middot; last 14 days</span>
+    </div>
+    <div class="wl-chips">
+      <span class="chip chip-rate" [class.rate-up]="(overall()?.winRate ?? 0) >= 50" [class.rate-down]="(overall()?.winRate ?? 0) < 50">
+        <mat-icon>trending_up</mat-icon>
+        {{ overall()?.winRate ?? 0 }}% win rate
+      </span>
+      <span class="chip chip-won">
+        <i class="dot dot-won"></i>
+        Won {{ totalWon() }}
+      </span>
+      <span class="chip chip-lost">
+        <i class="dot dot-lost"></i>
+        Lost {{ totalLost() }}
+      </span>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="wl-skeleton">
+      <div class="skeleton-bars">
+        @for (_ of [].constructor(14); track $index) {
+          <span class="skeleton-col"></span>
+        }
+      </div>
+    </div>
+  } @else if (!hasData()) {
+    <div class="wl-empty">
+      <mat-icon>insights</mat-icon>
+      <p>No settled bets in the last 14 days</p>
+      <span>Your win / loss trend will appear here as your bets settle.</span>
+    </div>
+  } @else {
+    <div class="wl-plot" (mousemove)="onMove($event)" (mouseleave)="hover.set(-1)">
+      @if (tooltip(); as t) {
+        <div class="wl-tooltip" [style.left.%]="t.left">
+          <span class="tt-date">{{ t.today ? 'Today' : t.date }}</span>
+          <span class="tt-row tt-won"><i class="dot dot-won"></i>{{ t.won }} won</span>
+          <span class="tt-row tt-lost"><i class="dot dot-lost"></i>{{ t.lost }} lost</span>
+          <span class="tt-rate">{{ t.rate }}% win rate</span>
+        </div>
+      }
+
+      <div class="wl-grid-h">
+        @for (_ of [0, 1, 2, 3]; track $index) {
+          <span class="grid-line"></span>
+        }
+      </div>
+
+      <div class="wl-bars">
+        @for (d of days(); track d.date; let i = $index) {
+          <div class="wl-col" [class.today]="isToday(d.date)" [class.active]="hover() === i">
+            <div class="wl-col-inner" [style.height.%]="barHeight(d)">
+              <span class="bar bar-won" [style.flex]="d.won"></span>
+              <span class="bar bar-lost" [style.flex]="d.lost"></span>
+            </div>
+            <span class="wl-tick" [class.tick-hidden]="isToday(d.date) ? false : i % 2 === 1">
+              {{ tickLabel(d.date) }}
+            </span>
+          </div>
+        }
+      </div>
+
+      <div class="wl-foot">
+        <span class="foot-legend"><i class="dot dot-won"></i>Won</span>
+        <span class="foot-legend"><i class="dot dot-lost"></i>Lost</span>
+        <span class="foot-note">W {{ overall()?.won ?? 0 }} &middot; L {{ overall()?.lost ?? 0 }} &middot; V {{ overall()?.void ?? 0 }} all-time</span>
+      </div>
+    </div>
+  }
+</div>
