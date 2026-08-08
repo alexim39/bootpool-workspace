@@ -30,7 +30,7 @@ export class FeaturedBannerComponent implements OnInit, OnDestroy {
   banners = signal<FeaturedBanner[]>([]);
   currentIndex = signal(0);
 
-  private readonly AUTO_MS = 5000;
+  private readonly AUTO_MS = 14000;
   private timer: ReturnType<typeof setInterval> | null = null;
   private touchStartX = 0;
   private touchEndX = 0;
