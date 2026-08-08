@@ -1,0 +1,77 @@
+<section class="ora-performance" aria-label="Ora picks performance">
+      @if (loading()) {
+        <div class="perf-loading">
+          <div class="skel skel-donut"></div>
+          <div class="skel-lines">
+            <div class="skel skel-line w70"></div>
+            <div class="skel skel-line w50"></div>
+            <div class="skel skel-line w80"></div>
+          </div>
+        </div>
+      } @else if (error() || !overall()) {
+        <div class="perf-empty">
+          <mat-icon>insights</mat-icon>
+          <span>Ora is still tracking settled picks — the win record will appear here once a few games are settled.</span>
+        </div>
+      } @else {
+        <div class="perf-body">
+          <div class="perf-donut-wrap">
+            <div class="perf-donut" role="img" [attr.aria-label]="'Ora win rate ' + winRate() + ' percent'">
+              <svg class="donut-svg" viewBox="0 0 120 120" width="132" height="132">
+                <defs>
+                  <linearGradient id="oraWinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#00E676" />
+                    <stop offset="55%" stop-color="#00C896" />
+                    <stop offset="100%" stop-color="#26A69A" />
+                  </linearGradient>
+                </defs>
+                <circle class="donut-track" cx="60" cy="60" r="52" />
+                <circle
+                  class="donut-value"
+                  cx="60"
+                  cy="60"
+                  r="52"
+                  [attr.stroke-dasharray]="CIRCUMFERENCE"
+                  [style.stroke-dashoffset]="dashOffset()" />
+              </svg>
+              <div class="donut-center">
+                <span class="donut-rate">{{ winRate() }}<em>%</em></span>
+                <span class="donut-label">win rate</span>
+              </div>
+            </div>
+            <div class="donut-legend">
+              <span class="legend-row"><i class="legend-dot win"></i>Won <strong>{{ won() }}</strong></span>
+              <span class="legend-row"><i class="legend-dot loss"></i>Lost <strong>{{ lost() }}</strong></span>
+            </div>
+          </div>
+
+          <div class="perf-leagues">
+            <div class="perf-title-row">
+              <h3 class="perf-title">Win rate by league</h3>
+              <span class="perf-played">{{ played() }} settled picks · 30 days</span>
+            </div>
+            <div class="league-bars">
+              @for (lg of leagues(); track lg.league) {
+                <div class="league-row">
+                  <div class="league-head">
+                    <span class="league-name" [attr.title]="lg.league">{{ lg.league }}</span>
+                    <span class="league-stats">
+                      {{ lg.won }}/{{ lg.played }}
+                      <span class="league-rate">{{ Math.round(lg.winRate) }}%</span>
+                      @if (lg.sample === 'low') {
+                        <span class="sample-tag">low sample</span>
+                      }
+                    </span>
+                  </div>
+                  <div class="league-bar">
+                    <span class="bar-win" [style.width.%]="lg.winRate"></span>
+                    <span class="bar-loss"></span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+        <div class="perf-foot">Ora's settled-pick record across all pools · refreshed hourly</div>
+      }
+    </section>

@@ -1,0 +1,110 @@
+.ora-performance {
+      position: relative;
+      margin: 20px 32px 0;
+      border-radius: 20px;
+      overflow: hidden;
+      background:
+        radial-gradient(1200px 300px at 15% -40%, rgba(0, 230, 118, 0.08), transparent 60%),
+        radial-gradient(900px 260px at 95% 120%, rgba(38, 166, 154, 0.06), transparent 60%),
+        linear-gradient(145deg, #0D1A30, #0A1426 70%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+    .ora-performance::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(0, 230, 118, 0.35), transparent 30%, transparent 70%, rgba(38, 166, 154, 0.3));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* loading + empty */
+    .perf-loading { display: flex; align-items: center; gap: 28px; padding: 26px 30px; }
+    .skel { background: rgba(255, 255, 255, 0.06); border-radius: 10px; animation: perfPulse 1.4s ease-in-out infinite; }
+    @keyframes perfPulse {
+      0%, 100% { opacity: 0.55; }
+      50% { opacity: 1; }
+    }
+    .perf-loading .skel-donut { width: 116px; height: 116px; border-radius: 50%; flex-shrink: 0; }
+    .perf-loading .skel-lines { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+    .skel-line { height: 16px; border-radius: 8px; }
+    .skel-line.w70 { width: 70%; } .skel-line.w50 { width: 50%; } .skel-line.w80 { width: 80%; }
+    .perf-empty { display: flex; align-items: center; gap: 12px; padding: 26px 30px; color: rgba(255, 255, 255, 0.55); font-size: 13px; }
+    .perf-empty mat-icon { color: #00E676; opacity: 0.7; }
+
+    /* body */
+    .perf-body { display: grid; grid-template-columns: 300px 1fr; gap: 8px 36px; padding: 24px 30px 14px; }
+    .perf-donut-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; border-right: 1px solid rgba(255, 255, 255, 0.06); padding-right: 36px; }
+    .perf-donut { position: relative; width: 132px; height: 132px; }
+    .donut-svg { display: block; }
+    .donut-svg circle { fill: none; stroke-width: 11; }
+    .donut-track { stroke: rgba(255, 255, 255, 0.07); }
+    .donut-value {
+      stroke: url(#oraWinGrad);
+      stroke-linecap: round;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      filter: drop-shadow(0 0 8px rgba(0, 230, 118, 0.45));
+      transition: stroke-dashoffset 1.4s cubic-bezier(0.22, 0.9, 0.3, 1);
+    }
+    .donut-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+    .donut-rate { font-size: 30px; font-weight: 800; letter-spacing: -1px; background: linear-gradient(180deg, #00E676, #26A69A); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1; }
+    .donut-rate em { font-style: normal; font-size: 16px; font-weight: 700; opacity: 0.85; }
+    .donut-label { font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase; color: rgba(255, 255, 255, 0.45); font-weight: 600; }
+    .donut-legend { display: flex; gap: 18px; font-size: 12px; color: rgba(255, 255, 255, 0.6); }
+    .legend-row { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-row strong { color: #fff; font-weight: 700; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .legend-dot.win { background: #00E676; box-shadow: 0 0 8px rgba(0, 230, 118, 0.6); }
+    .legend-dot.loss { background: rgba(255, 255, 255, 0.18); }
+
+    /* leagues */
+    .perf-leagues { min-width: 0; }
+    .perf-title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
+    .perf-title { font-size: 13px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: rgba(255, 255, 255, 0.85); margin: 0; }
+    .perf-played { font-size: 11px; color: rgba(255, 255, 255, 0.4); }
+    .league-bars { display: flex; flex-direction: column; gap: 12px; }
+    .league-row { display: flex; flex-direction: column; gap: 5px; }
+    .league-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .league-name { font-size: 12px; font-weight: 600; color: rgba(255, 255, 255, 0.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55%; }
+    .league-stats { font-size: 11px; color: rgba(255, 255, 255, 0.45); white-space: nowrap; }
+    .league-rate { font-weight: 700; color: #00E676; margin-left: 4px; }
+    .sample-tag { font-size: 9px; color: rgba(255, 255, 255, 0.4); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 9999px; padding: 1px 6px; margin-left: 6px; }
+    .league-bar { position: relative; height: 7px; border-radius: 9999px; background: rgba(255, 255, 255, 0.09); overflow: hidden; }
+    .bar-win {
+      position: absolute; inset: 0 auto 0 0;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, #00E676, #26A69A);
+      box-shadow: 0 0 10px rgba(0, 230, 118, 0.35);
+      transition: width 1s cubic-bezier(0.22, 0.9, 0.3, 1);
+    }
+    .bar-loss { position: absolute; inset: 0 0 0 auto; background: rgba(255, 255, 255, 0.09); }
+
+    .perf-foot { padding: 12px 30px 14px; font-size: 10.5px; color: rgba(255, 255, 255, 0.3); border-top: 1px solid rgba(255, 255, 255, 0.05); text-align: center; letter-spacing: 0.3px; }
+
+    @media (max-width: 900px) {
+      .ora-performance { margin: 16px 0 0; border-radius: 0; border-left: none; border-right: none; }
+      .ora-performance::before { border-radius: 0; }
+    }
+
+    @media (max-width: 640px) {
+      .perf-body { grid-template-columns: 1fr; gap: 22px; padding: 22px 18px 6px; }
+      .perf-donut-wrap { border-right: none; padding-right: 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding-bottom: 20px; }
+      .perf-title-row { flex-direction: column; gap: 4px; }
+      .perf-loading { flex-direction: column; gap: 18px; padding: 24px 20px; }
+      .perf-loading .skel-lines { width: 100%; }
+      .perf-empty { padding: 20px; align-items: flex-start; }
+    }

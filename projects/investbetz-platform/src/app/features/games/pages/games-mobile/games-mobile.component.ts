@@ -8,6 +8,7 @@ import { MobileNavComponent } from '../../../../core/components';
 import { AuthService } from '../../../../core/services';
 import { GamesStore } from '../../stores/games.store';
 import { GameCardComponent } from '../../components/game-card/game-card.component';
+import { OraPerformanceComponent } from '../../components/ora-performance/ora-performance.component';
 import { TodayGame } from '../../../../core/services';
 
 @Component({
@@ -20,6 +21,7 @@ import { TodayGame } from '../../../../core/services';
     MatTooltipModule,
     MobileNavComponent,
     GameCardComponent,
+    OraPerformanceComponent,
     RouterLink,
   ],
   templateUrl: './games-mobile.component.html',

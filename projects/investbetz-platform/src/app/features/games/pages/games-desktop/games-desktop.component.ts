@@ -7,6 +7,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { AppNavComponent } from '../../../../core/components';
 import { GamesStore } from '../../stores/games.store';
+import { OraPerformanceComponent } from '../../components/ora-performance/ora-performance.component';
 import { TodayGame } from '../../../../core/services';
 import {
   isLiveMatch,
@@ -34,6 +35,7 @@ import {
     MatButtonModule,
     MatTooltipModule,
     AppNavComponent,
+    OraPerformanceComponent,
   ],
   templateUrl: './games-desktop.component.html',
   styleUrls: ['./games-desktop.component.scss']
