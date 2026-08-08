@@ -71,8 +71,33 @@
     .legend-dot.win { background: #00E676; box-shadow: 0 0 8px rgba(0, 230, 118, 0.6); }
     .legend-dot.loss { background: rgba(255, 255, 255, 0.18); }
 
+    /* daily trend */
+    .perf-daily { min-width: 0; display: flex; flex-direction: column; }
+    .daily-legend { display: flex; gap: 18px; font-size: 11px; color: rgba(255, 255, 255, 0.5); margin-bottom: 10px; }
+    .daily-chart { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; align-items: end; }
+    .daily-col { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+    .daily-bar {
+      position: relative;
+      width: 100%;
+      max-width: 34px;
+      height: 108px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 2px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 1px;
+    }
+    .daily-seg { width: 100%; border-radius: 6px 6px 0 0; min-height: 0; transition: height 0.9s cubic-bezier(0.22, 0.9, 0.3, 1); }
+    .daily-seg.win { background: linear-gradient(180deg, #00E676, #26A69A); box-shadow: 0 0 10px rgba(0, 230, 118, 0.35); }
+    .daily-seg.loss { background: rgba(244, 82, 82, 0.55); }
+    .daily-day { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: rgba(255, 255, 255, 0.45); }
+    .daily-nums { font-size: 10px; color: rgba(255, 255, 255, 0.32); }
+    .daily-col.today .daily-day { color: #00E676; }
+    .daily-col.today .daily-nums { color: rgba(0, 230, 118, 0.7); }
+
     /* leagues */
-    .perf-leagues { min-width: 0; }
+    .perf-leagues { padding: 18px 30px 4px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
     .perf-title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
     .perf-title { font-size: 13px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: rgba(255, 255, 255, 0.85); margin: 0; }
     .perf-played { font-size: 11px; color: rgba(255, 255, 255, 0.4); }
@@ -107,4 +132,7 @@
       .perf-loading { flex-direction: column; gap: 18px; padding: 24px 20px; }
       .perf-loading .skel-lines { width: 100%; }
       .perf-empty { padding: 20px; align-items: flex-start; }
+      .perf-leagues { padding: 16px 18px 4px; }
+      .daily-chart { gap: 8px; }
+      .daily-bar { height: 96px; }
     }

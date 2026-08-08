@@ -45,31 +45,54 @@
             </div>
           </div>
 
-          <div class="perf-leagues">
+          <div class="perf-daily">
             <div class="perf-title-row">
-              <h3 class="perf-title">Win rate by league</h3>
-              <span class="perf-played">{{ played() }} settled picks · 30 days</span>
+              <h3 class="perf-title">Daily record</h3>
+              <span class="perf-played">Last 7 days</span>
             </div>
-            <div class="league-bars">
-              @for (lg of leagues(); track lg.league) {
-                <div class="league-row">
-                  <div class="league-head">
-                    <span class="league-name" [attr.title]="lg.league">{{ lg.league }}</span>
-                    <span class="league-stats">
-                      {{ lg.won }}/{{ lg.played }}
-                      <span class="league-rate">{{ Math.round(lg.winRate) }}%</span>
-                      @if (lg.sample === 'low') {
-                        <span class="sample-tag">low sample</span>
-                      }
-                    </span>
+            <div class="daily-legend">
+              <span class="legend-row"><i class="legend-dot win"></i>Won</span>
+              <span class="legend-row"><i class="legend-dot loss"></i>Lost</span>
+            </div>
+            <div class="daily-chart" role="img" [attr.aria-label]="'Ora wins and losses per day for the last 7 days'">
+              @for (d of daily(); track d.day) {
+                <div class="daily-col" [class.today]="isToday(d.day)" [attr.title]="dailyTooltip(d)">
+                  <div class="daily-bar">
+                    <span class="daily-seg win" [style.height.%]="barPct(d.won)"></span>
+                    <span class="daily-seg loss" [style.height.%]="barPct(d.lost)"></span>
                   </div>
-                  <div class="league-bar">
-                    <span class="bar-win" [style.width.%]="lg.winRate"></span>
-                    <span class="bar-loss"></span>
-                  </div>
+                  <span class="daily-day">{{ dayLabel(d.day) }}</span>
+                  <span class="daily-nums">{{ d.played ? d.won + '/' + d.played : '·' }}</span>
                 </div>
               }
             </div>
+          </div>
+        </div>
+
+        <div class="perf-leagues">
+          <div class="perf-title-row">
+            <h3 class="perf-title">Win rate by league</h3>
+            <span class="perf-played">{{ played() }} settled picks · 30 days</span>
+          </div>
+          <div class="league-bars">
+            @for (lg of leagues(); track lg.league) {
+              <div class="league-row">
+                <div class="league-head">
+                  <span class="league-name" [attr.title]="lg.league">{{ lg.league }}</span>
+                  <span class="league-stats">
+                    {{ lg.won }}/{{ lg.played }}
+                    <span class="league-rate">{{ Math.round(lg.winRate) }}%</span>
+                    @if (lg.sample === 'low') {
+                      <span class="sample-tag">low sample</span>
+                    }
+                  </span>
+                </div>
+                <div class="league-bar">
+                  <span class="bar-win" [style.width.%]="lg.winRate"></span>
+                  <span class="bar-loss"></span>
+                </div>
+              </div>
+            }
           </div>
         </div>
         <div class="perf-foot">Ora's settled-pick record across all pools · refreshed hourly</div>
