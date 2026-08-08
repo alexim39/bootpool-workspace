@@ -9,7 +9,7 @@
   position: relative;
   max-width: 1120px;
   margin: 0 auto;
-  padding: 84px 32px 72px;
+  padding: 48px 32px 72px;
   isolation: isolate;
 }
 
@@ -32,9 +32,8 @@
 .page-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 16px;
-  margin-bottom: 26px;
+  padding: 12px 0 20px;
 }
 
 .page-header-left {
@@ -44,58 +43,72 @@
   min-width: 0;
 }
 
-.back-btn {
-  color: rgba(255, 255, 255, 0.7);
-  margin-right: 4px;
-}
-
-.back-btn:hover { color: #00E676; }
-
 .header-title-block { min-width: 0; }
 
 .page-header h1 {
   margin: 0;
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
-  background: linear-gradient(92deg, #00E676 10%, #2BD9A5 45%, #F5B301 95%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-header .info-btn { color: rgba(255, 255, 255, 0.25); }
+.page-header .info-btn:hover { color: #00E676; }
+
+/* ---------- Mobile header (matches Bet Manager) ---------- */
+.mp-mobile-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: #0D1A30;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.mp-mobile-header h1 {
+  flex: 1;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+.mp-mobile-header button { color: rgba(255, 255, 255, 0.7); }
+.mp-mobile-header button:hover { color: #00E676; }
+
+.mp-mobile-header .info-btn {
+  color: rgba(255, 255, 255, 0.3);
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+}
+
+.mp-mobile-header .info-btn mat-icon { font-size: 18px; width: 18px; height: 18px; }
+.mp-mobile-header .info-btn:hover { color: #00E676; }
+
+.mp-mobile-subtitle {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  margin: 0 0 16px;
 }
 
 .page-subtitle {
-  display: block;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
-  margin-top: 3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 15px;
+  max-width: 560px;
+  line-height: 1.5;
+  margin: 6px 0 0;
 }
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.icon-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.icon-btn:hover { color: #00E676; background: rgba(0, 230, 118, 0.08); }
 
 /* ---------- Guide bar ---------- */
 .guide-bar {
@@ -651,7 +664,7 @@
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
   .stats-strip { grid-template-columns: repeat(2, 1fr); }
-  .mp-page { padding: 24px 16px 40px; }
+  .mp-page { padding: 20px 16px 40px; }
   .filter-bar { align-items: stretch; }
   .search-field { flex: 1 1 100%; }
   .status-field { flex: 1 1 45%; width: auto; }
@@ -659,9 +672,7 @@
 }
 
 @media (max-width: 720px) {
-  .page-header { margin-bottom: 18px; }
-  .page-header h1 { font-size: 22px; }
-  .page-subtitle { display: none; }
+  .page-header { display: none; }
 }
 
 @media (max-width: 600px) {

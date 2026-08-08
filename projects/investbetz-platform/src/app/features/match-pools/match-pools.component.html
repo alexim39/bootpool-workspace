@@ -1,4 +1,11 @@
 @if (isMobileView()) {
+  <header class="mp-mobile-header">
+    <button mat-icon-button routerLink="/home" aria-label="Back"><mat-icon>arrow_back</mat-icon></button>
+    <h1>Match Pools</h1>
+    <button mat-icon-button class="info-btn" (click)="store.showGuide.set(!store.showGuide())" matTooltip="How it works">
+      <mat-icon>info_outline</mat-icon>
+    </button>
+  </header>
   <app-mobile-nav />
 } @else {
   <app-nav />
@@ -7,20 +14,20 @@
 <div class="mp-page" [class.mp-mobile]="isMobileView()">
   <div class="page-header">
     <div class="page-header-left">
-      @if (isMobileView()) {
-        <button mat-icon-button class="back-btn" routerLink="/home" aria-label="Back"><mat-icon>arrow_back</mat-icon></button>
-      }
       <div class="header-title-block">
-        <h1>Match Pools</h1>
-        <span class="page-subtitle">Predict winning markets &amp; split the pool</span>
+        <h1>Match Pools
+          <button mat-icon-button class="info-btn" (click)="store.showGuide.set(!store.showGuide())" matTooltip="How it works">
+            <mat-icon>info_outline</mat-icon>
+          </button>
+        </h1>
+        <p class="page-subtitle">Predict winning markets &amp; split the pool</p>
       </div>
     </div>
-    <div class="header-actions">
-      <button class="icon-btn" (click)="store.showGuide.set(!store.showGuide())" matTooltip="How it works">
-        <mat-icon>info_outline</mat-icon>
-      </button>
-    </div>
   </div>
+
+  @if (isMobileView()) {
+    <p class="mp-mobile-subtitle">Predict winning markets &amp; split the pool</p>
+  }
 
   @if (store.showGuide()) {
     <div class="guide-bar">
