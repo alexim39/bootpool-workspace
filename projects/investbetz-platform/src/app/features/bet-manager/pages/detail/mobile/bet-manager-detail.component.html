@@ -97,34 +97,75 @@
         </div>
       </div>
 
-      @if (nav && nav.history.length > 0) {
-        <div class="section-card">
-          <h3>NAV History</h3>
-          @for (cycle of nav.history.slice().reverse(); track cycle.cycleNumber) {
-            <div class="nav-row">
-              <span class="nav-label">Cycle {{ cycle.cycleNumber }}</span>
-              <span class="nav-ret" [class.positive]="cycle.returnPct > 0" [class.negative]="cycle.returnPct < 0">
-                {{ cycle.returnPct > 0 ? '+' : '' }}{{ cycle.returnPct | number:'1.1-1' }}%
-              </span>
-              @if (cycle.endingNav) {
-                <span class="nav-val">₦{{ cycle.endingNav | number:'1.2-2' }}</span>
-              } @else {
-                <span class="nav-val active">Active</span>
-              }
-            </div>
-          }
-        </div>
+      @if (nav) {
+        <app-tier-progress-chart class="progress-chart" [nav]="nav" [color]="config.color" />
       }
 
       @if (perf) {
-        <div class="section-card">
-          <h3>Performance</h3>
-          <div class="perf-row">
-            <span>Return</span>
-            <strong [class.positive]="perf.returnPct > 0" [class.negative]="perf.returnPct < 0">
+        <div class="perf-card" [style.--tier]="config.color">
+          <div class="perf-head">
+            <div class="perf-head-title">
+              <h3>Performance</h3>
+              <span class="perf-sub">Ora AI allocation summary</span>
+            </div>
+            <span class="perf-trend" [class.up]="perf.returnPct > 0" [class.down]="perf.returnPct < 0">
+              <mat-icon>{{ perf.returnPct >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
               {{ perf.returnPct > 0 ? '+' : '' }}{{ perf.returnPct | number:'1.1-1' }}%
-            </strong>
+            </span>
           </div>
+
+          <div class="perf-stats">
+            <div class="perf-tile">
+              <span class="perf-tile-icon"><mat-icon>account_balance_wallet</mat-icon></span>
+              <div class="perf-tile-body">
+                <span class="perf-tile-label">Current Value</span>
+                <strong class="perf-tile-val">₦{{ perf.currentValue | number }}</strong>
+              </div>
+            </div>
+            <div class="perf-tile">
+              <span class="perf-tile-icon"><mat-icon>savings</mat-icon></span>
+              <div class="perf-tile-body">
+                <span class="perf-tile-label">Total Deposited</span>
+                <strong class="perf-tile-val">₦{{ perf.totalDeposited | number }}</strong>
+              </div>
+            </div>
+            <div class="perf-tile">
+              <span class="perf-tile-icon" [class.up]="perf.returnPct > 0" [class.down]="perf.returnPct < 0">
+                <mat-icon>{{ perf.returnPct >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+              </span>
+              <div class="perf-tile-body">
+                <span class="perf-tile-label">Return</span>
+                <strong class="perf-tile-val" [class.up]="perf.returnPct > 0" [class.down]="perf.returnPct < 0">
+                  {{ perf.returnPct > 0 ? '+' : '' }}{{ perf.returnPct | number:'1.1-1' }}%
+                </strong>
+              </div>
+            </div>
+          </div>
+
+          @if (perf.cycles.length > 0) {
+            <div class="perf-cycles">
+              <div class="perf-cycles-head">
+                <span class="perf-cycles-title">Cycle History</span>
+                <span class="perf-cycle-count">{{ perf.cycles.length }}</span>
+              </div>
+              <div class="cycle-list">
+                @for (c of perf.cycles; track c.cycleNumber) {
+                  <div class="cycle-row">
+                    <span class="cycle-badge">C{{ c.cycleNumber }}</span>
+                    <div class="cycle-meta">
+                      <span class="cycle-dates">{{ c.startDate | date:'MMM d' }} &rarr; {{ c.endDate | date:'MMM d' }}</span>
+                    </div>
+                    <span class="cycle-return" [class.up]="c.returnPct > 0" [class.down]="c.returnPct < 0">
+                      {{ c.returnPct > 0 ? '+' : '' }}{{ c.returnPct | number:'1.1-1' }}%
+                    </span>
+                    <span class="cycle-status" [class.active]="c.status === 'active'" [class.settled]="c.status === 'settled'">
+                      <i class="status-dot"></i>{{ c.status }}
+                    </span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
         </div>
       }
 
