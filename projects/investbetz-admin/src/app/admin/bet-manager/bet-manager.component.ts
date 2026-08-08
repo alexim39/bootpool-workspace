@@ -43,6 +43,8 @@ export class AdminBetManagerComponent implements OnInit {
   topUpAmount = signal(0);
   topUpLoading = signal(false);
   topUpResult = signal<{ success: boolean; message: string } | null>(null);
+  seedLoading = signal(false);
+  seedResult = signal<{ success: boolean; message: string } | null>(null);
 
   readonly tiers = [
     { key: 'goalkeeper', label: 'Goalkeeper', icon: '🧤', color: '#90CAF9' },
@@ -153,6 +155,27 @@ export class AdminBetManagerComponent implements OnInit {
         this.topUpResult.set({ success: false, message: err.error?.message || 'Top-up failed' });
       }
     });
+  }
+
+  seedReserve() {
+    this.seedLoading.set(true);
+    this.seedResult.set(null);
+    this.admin.seedBetManagerReserve().pipe(finalize(() => this.seedLoading.set(false))).subscribe({
+      next: res => {
+        this.seedResult.set({ success: res.success, message: res.message });
+        this.loadStats();
+      },
+      error: err => {
+        this.seedResult.set({ success: false, message: err.error?.message || 'Seed failed' });
+      }
+    });
+  }
+
+  reserveHealth(): 'ok' | 'low' | 'empty' {
+    const r = this.stats?.guaranteeReserve || 0;
+    if (r <= 0) return 'empty';
+    if (r < 1000000) return 'low';
+    return 'ok';
   }
 
   viewAccount(id: string) {
