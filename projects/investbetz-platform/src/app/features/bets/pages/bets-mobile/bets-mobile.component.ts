@@ -10,6 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { CashoutModalComponent } from '../../../home/components/cashout-modal/cashout-modal.component';
 import { MobileNavComponent } from '../../../../core/components';
 import { BetsStore, HistoryStatus } from '../../stores/bets.store';
+import { kickoffCountdown } from '../../../games/game-status.util';
 
 @Component({
   selector: 'app-bets-mobile',
@@ -70,5 +71,27 @@ export class BetsMobileComponent implements OnInit {
 
   loadMore() {
     this.store.loadMoreHistory();
+  }
+
+  matchTime(matchDate: string): string {
+    return new Date(matchDate).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  matchDay(matchDate: string): string {
+    const d = new Date(matchDate);
+    const today = new Date();
+    const tomorrow = new Date(today.getTime() + 86400000);
+    const day = d.toLocaleDateString('en-NG', { month: 'short', day: 'numeric' });
+    if (d.toDateString() === today.toDateString()) return `Today · ${day}`;
+    if (d.toDateString() === tomorrow.toDateString()) return `Tomorrow · ${day}`;
+    return day;
+  }
+
+  matchCountdown(matchDate: string): string {
+    return kickoffCountdown(matchDate);
+  }
+
+  isUpcomingMatchDate(matchDate: string): boolean {
+    return new Date(matchDate).getTime() > Date.now();
   }
 }

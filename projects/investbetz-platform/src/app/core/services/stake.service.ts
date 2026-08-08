@@ -32,6 +32,7 @@ export interface StakeItem {
   pod: string;
   homeTeam: string;
   awayTeam: string;
+  league?: string;
   selection: string;
   gainsMultiplier: number;
   matchDate: string;

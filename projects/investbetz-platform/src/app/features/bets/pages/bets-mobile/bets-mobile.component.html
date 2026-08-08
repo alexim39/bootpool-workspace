@@ -104,6 +104,15 @@
                         <span class="parlay-mobile-leg-index">{{ i + 1 }}</span>
                         <div class="parlay-mobile-leg-info">
                           <span class="parlay-mobile-leg-match">{{ item.homeTeam }} vs {{ item.awayTeam }}</span>
+                          <span class="parlay-mobile-leg-meta">
+                            <span>{{ matchTime(item.matchDate) }} · {{ matchDay(item.matchDate) }}</span>
+                            @if (item.league) {
+                              <span class="parlay-mobile-leg-league">{{ item.league }}</span>
+                            }
+                            @if (isUpcomingMatchDate(item.matchDate) && matchCountdown(item.matchDate)) {
+                              <span class="parlay-mobile-leg-countdown">{{ matchCountdown(item.matchDate) }}</span>
+                            }
+                          </span>
                           <span class="parlay-mobile-leg-pick">{{ item.selection }}</span>
                         </div>
                         <div class="parlay-mobile-leg-odds-block">
@@ -131,14 +140,21 @@
                 }
                 @if (!stake.isParlay) {
                   <div class="bet-meta">
+                    <span class="bet-league" *ngIf="stake.pod.league">{{ stake.pod.league }}</span>
                     <span class="bet-market" *ngIf="stake.pod.marketType">{{ stake.pod.marketType }}</span>
                     <span class="bet-refund" *ngIf="stake.pod.refundPercent">{{ stake.pod.refundPercent }}% cash back</span>
                   </div>
+                  @if (stake.pod.matchDate) {
+                    <div class="bet-time-row">
+                      <span class="bet-time">{{ matchTime(stake.pod.matchDate) }} · {{ matchDay(stake.pod.matchDate) }}</span>
+                      @if (isUpcomingMatchDate(stake.pod.matchDate) && matchCountdown(stake.pod.matchDate)) {
+                        <span class="bet-countdown">{{ matchCountdown(stake.pod.matchDate) }}</span>
+                      }
+                    </div>
+                  }
                   <div class="bet-pick">
-                    @if (stake.isSettled) {
-                      <span class="pick-label">Pick:</span>
-                      <span class="pick-value">{{ stake.pod.selection }}</span>
-                    }
+                    <span class="pick-label">Pick:</span>
+                    <span class="pick-value">{{ stake.pod.selection }}</span>
                     <span class="pick-odds">{{ stake.pod.gainsMultiplier.toFixed(2) }}x</span>
                   </div>
                 }
@@ -279,6 +295,15 @@
                         <span class="parlay-mobile-leg-index">{{ i + 1 }}</span>
                         <div class="parlay-mobile-leg-info">
                           <span class="parlay-mobile-leg-match">{{ item.homeTeam }} vs {{ item.awayTeam }}</span>
+                          <span class="parlay-mobile-leg-meta">
+                            <span>{{ matchTime(item.matchDate) }} · {{ matchDay(item.matchDate) }}</span>
+                            @if (item.league) {
+                              <span class="parlay-mobile-leg-league">{{ item.league }}</span>
+                            }
+                            @if (isUpcomingMatchDate(item.matchDate) && matchCountdown(item.matchDate)) {
+                              <span class="parlay-mobile-leg-countdown">{{ matchCountdown(item.matchDate) }}</span>
+                            }
+                          </span>
                           <span class="parlay-mobile-leg-pick">{{ item.selection }}</span>
                         </div>
                         @if (item.homeScore != null && item.awayScore != null) {
@@ -312,14 +337,21 @@
                 }
                 @if (!stake.isParlay) {
                   <div class="bet-meta">
+                    <span class="bet-league" *ngIf="stake.pod.league">{{ stake.pod.league }}</span>
                     <span class="bet-market" *ngIf="stake.pod.marketType">{{ stake.pod.marketType }}</span>
                     <span class="bet-refund" *ngIf="stake.pod.refundPercent">{{ stake.pod.refundPercent }}% cash back</span>
                   </div>
+                  @if (stake.pod.matchDate) {
+                    <div class="bet-time-row">
+                      <span class="bet-time">{{ matchTime(stake.pod.matchDate) }} · {{ matchDay(stake.pod.matchDate) }}</span>
+                      @if (isUpcomingMatchDate(stake.pod.matchDate) && matchCountdown(stake.pod.matchDate)) {
+                        <span class="bet-countdown">{{ matchCountdown(stake.pod.matchDate) }}</span>
+                      }
+                    </div>
+                  }
                   <div class="bet-pick">
-                    @if (stake.isSettled) {
-                      <span class="pick-label">Pick:</span>
-                      <span class="pick-value">{{ stake.pod.selection }}</span>
-                    }
+                    <span class="pick-label">Pick:</span>
+                    <span class="pick-value">{{ stake.pod.selection }}</span>
                     <span class="pick-odds">{{ stake.pod.gainsMultiplier.toFixed(2) }}x</span>
                   </div>
                 }
