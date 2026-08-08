@@ -14,6 +14,8 @@ export class BetsWinLossChartComponent {
   readonly summary = input<BetSummary | null>(null);
   readonly loading = input(false);
 
+  readonly Math = Math;
+
   readonly hover = signal(-1);
 
   readonly overall = computed(() => this.summary()?.overall ?? null);
@@ -59,10 +61,21 @@ export class BetsWinLossChartComponent {
       won: d.won,
       lost: d.lost,
       played: d.played,
+      staked: d.staked,
+      net: d.net,
       rate: d.won + d.lost > 0 ? Math.round((d.won / (d.won + d.lost)) * 100) : 0,
       today: this.isToday(d.date)
     };
   });
+
+  formatNaira(amount: number): string {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(Math.round(amount));
+  }
 
   onMove(ev: MouseEvent): void {
     const el = ev.currentTarget as HTMLElement;

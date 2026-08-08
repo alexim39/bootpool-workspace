@@ -98,6 +98,9 @@ export interface BetDayStat {
   won: number;
   lost: number;
   played: number;
+  staked: number;
+  returns: number;
+  net: number;
 }
 
 export interface BetSummary {
@@ -108,6 +111,9 @@ export interface BetSummary {
     void: number;
     cashedOut: number;
     winRate: number;
+    totalStaked: number;
+    totalReturns: number;
+    netPnl: number;
   } | null;
   daily: BetDayStat[];
 }

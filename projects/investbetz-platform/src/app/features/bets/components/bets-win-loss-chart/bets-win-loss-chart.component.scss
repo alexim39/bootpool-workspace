@@ -1,9 +1,15 @@
+:host {
+  display: block;
+  max-width: 1200px;
+  width: calc(100% - 32px);
+  margin: 28px auto 0;
+}
+
 .wl-card {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.015) 100%);
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 18px;
   padding: 18px 20px 14px;
-  margin: 0 0 20px;
   overflow: hidden;
   transition: border-color 0.25s ease;
 
@@ -73,6 +79,24 @@
   background: rgba(255, 183, 77, 0.1);
 }
 
+.chip-pl {
+  color: #69f0ae;
+  border-color: rgba(105, 240, 174, 0.3);
+  background: rgba(105, 240, 174, 0.1);
+
+  &.rate-up {
+    color: #69f0ae;
+    border-color: rgba(105, 240, 174, 0.3);
+    background: rgba(105, 240, 174, 0.1);
+  }
+
+  &.rate-down {
+    color: #ff8a80;
+    border-color: rgba(255, 138, 128, 0.3);
+    background: rgba(255, 138, 128, 0.1);
+  }
+}
+
 .chip-rate.rate-up {
   color: #69f0ae;
   border-color: rgba(105, 240, 174, 0.25);
@@ -101,6 +125,82 @@
 .dot-lost {
   background: #ff5252;
   box-shadow: 0 0 6px rgba(255, 82, 82, 0.6);
+}
+
+.wl-money {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.money-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+
+  .money-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.45);
+
+    mat-icon {
+      font-size: 13px;
+      width: 13px;
+      height: 13px;
+    }
+  }
+
+  .money-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 15px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.92);
+    white-space: nowrap;
+  }
+}
+
+.money-tile-pl {
+  border-color: rgba(105, 240, 174, 0.22);
+  background: rgba(105, 240, 174, 0.07);
+
+  .money-label {
+    color: #69f0ae;
+  }
+
+  .money-value {
+    color: #69f0ae;
+  }
+}
+
+.money-tile-pl.pl-down {
+  border-color: rgba(255, 138, 128, 0.22);
+  background: rgba(255, 138, 128, 0.07);
+
+  .money-label {
+    color: #ff8a80;
+  }
+
+  .money-value {
+    color: #ff8a80;
+  }
+}
+
+.pl-arrow {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
 }
 
 .wl-plot {
@@ -231,11 +331,22 @@
     color: rgba(255, 255, 255, 0.85);
   }
 
+  .tt-meta {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.55);
+    margin-top: 2px;
+  }
+
   .tt-rate {
     font-size: 10px;
     font-weight: 700;
     color: #00e676;
     margin-top: 2px;
+
+    &.rate-down {
+      color: #ff5252;
+    }
   }
 }
 
@@ -330,10 +441,32 @@
 }
 
 @media (max-width: 600px) {
+  :host {
+    width: calc(100% - 28px);
+    margin: 12px 14px 16px;
+  }
+
   .wl-card {
-    margin: 0 14px 4px;
     padding: 14px 14px 12px;
     border-radius: 14px;
+  }
+
+  .wl-money {
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .money-tile {
+    padding: 8px 8px;
+    gap: 3px;
+
+    .money-label {
+      font-size: 9px;
+    }
+
+    .money-value {
+      font-size: 12.5px;
+    }
   }
 
   .wl-bars,
