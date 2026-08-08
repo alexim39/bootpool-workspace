@@ -5,15 +5,47 @@
 <div class="notif-page" [class.mobile]="device.isMobile()">
 
   @if (!device.isMobile()) {
-    <div class="notif-header">
-      <div class="notif-header-left">
-        <h1>Notifications</h1>
-        <span class="notif-count">{{ total() }} total</span>
+    <!-- Hero header -->
+    <div class="page-hero">
+      <div class="hero-glow"></div>
+      <div class="hero-left">
+        <div class="hero-icon"><mat-icon>notifications_active</mat-icon></div>
+        <div class="hero-text">
+          <h1>Notifications</h1>
+          <p>Deposits, bets, payouts and account updates — all in one place</p>
+        </div>
       </div>
-      <div class="notif-header-actions">
+      <div class="hero-actions">
         @if (notifications().length > 0) {
-          <button class="mark-all-link" (click)="markAllRead()"><mat-icon>done_all</mat-icon> Mark all read</button>
+          <button class="hero-btn" (click)="markAllRead()" [disabled]="unreadTotal() === 0">
+            <mat-icon>done_all</mat-icon> Mark all read
+          </button>
         }
+      </div>
+    </div>
+
+    <!-- Stat deck -->
+    <div class="stat-deck">
+      <div class="stat-card">
+        <div class="stat-icon total"><mat-icon>inbox</mat-icon></div>
+        <div class="stat-meta">
+          <span class="stat-value">{{ total() }}</span>
+          <span class="stat-label">Total</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon unread"><mat-icon>mark_email_unread</mat-icon></div>
+        <div class="stat-meta">
+          <span class="stat-value">{{ unreadTotal() }}</span>
+          <span class="stat-label">Unread</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon read"><mat-icon>mark_email_read</mat-icon></div>
+        <div class="stat-meta">
+          <span class="stat-value">{{ readTotal() }}</span>
+          <span class="stat-label">Read</span>
+        </div>
       </div>
     </div>
   }
@@ -22,61 +54,129 @@
     <header class="mobile-header">
       <button mat-icon-button routerLink="/home"><mat-icon>arrow_back</mat-icon></button>
       <h1>Notifications</h1>
-      @if (notifications().length > 0) {
+      @if (notifications().length > 0 && unreadTotal() > 0) {
         <button class="mark-all-link" (click)="markAllRead()">Mark all read</button>
       }
     </header>
+
+    <div class="mobile-stats">
+      <div class="mobile-stat">
+        <span class="ms-value">{{ total() }}</span>
+        <span class="ms-label">Total</span>
+      </div>
+      <div class="mobile-stat unread">
+        <span class="ms-value">{{ unreadTotal() }}</span>
+        <span class="ms-label">Unread</span>
+      </div>
+      <div class="mobile-stat read">
+        <span class="ms-value">{{ readTotal() }}</span>
+        <span class="ms-label">Read</span>
+      </div>
+    </div>
   }
 
-  <div class="filter-bar">
-    <div class="filter-row">
-      <div class="filter-select">
-        <select [ngModel]="typeFilter()" (ngModelChange)="typeFilter.set($event); onFilterChange()" class="filter-dropdown">
-          <option value="">All Types</option>
-          @for (t of NOTIF_TYPES; track t) {
-            <option [value]="t">{{ t }}</option>
-          }
-        </select>
+  <!-- Search + filters -->
+  <div class="filter-panel" [class.mobile]="device.isMobile()">
+    <div class="search-box">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        placeholder="Search notifications..."
+        [ngModel]="search()"
+        (ngModelChange)="onSearchInput($event)"
+        (keydown.enter)="$event.preventDefault()"
+      />
+      @if (search()) {
+        <button class="search-clear" (click)="clearSearch()"><mat-icon>close</mat-icon></button>
+      }
+    </div>
+
+    <div class="filter-controls">
+      <select [ngModel]="typeFilter()" (ngModelChange)="typeFilter.set($event); onFilterChange()" class="filter-select">
+        <option value="">All Types</option>
+        @for (t of NOTIF_TYPES; track t) {
+          <option [value]="t">{{ t }}</option>
+        }
+      </select>
+
+      <select [ngModel]="readFilter()" (ngModelChange)="readFilter.set($event); onFilterChange()" class="filter-select">
+        <option value="">All Status</option>
+        <option value="false">Unread</option>
+        <option value="true">Read</option>
+      </select>
+
+      <select [ngModel]="currentSort()" (ngModelChange)="onSortChange($event)" class="filter-select">
+        @for (opt of SORT_OPTIONS; track opt.value) {
+          <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+
+      <select [ngModel]="limit()" (ngModelChange)="onPageSizeChange($event)" class="filter-select size">
+        @for (s of PAGE_SIZES; track s) {
+          <option [value]="s">{{ s }} / page</option>
+        }
+      </select>
+
+      <div class="date-fields">
+        <input type="date" [ngModel]="dateFrom()" (ngModelChange)="dateFrom.set($event); onFilterChange()" class="date-input" title="From date" />
+        <span class="date-sep">→</span>
+        <input type="date" [ngModel]="dateTo()" (ngModelChange)="dateTo.set($event); onFilterChange()" class="date-input" title="To date" />
       </div>
-      <div class="filter-select">
-        <select [ngModel]="readFilter()" (ngModelChange)="readFilter.set($event); onFilterChange()" class="filter-dropdown">
-          <option value="">All Status</option>
-          <option value="false">Unread</option>
-          <option value="true">Read</option>
-        </select>
-      </div>
-      <div class="filter-date">
-        <input type="date" [ngModel]="dateFrom()" (ngModelChange)="dateFrom.set($event); onFilterChange()" class="filter-input" placeholder="From" />
-      </div>
-      <div class="filter-date">
-        <input type="date" [ngModel]="dateTo()" (ngModelChange)="dateTo.set($event); onFilterChange()" class="filter-input" placeholder="To" />
-      </div>
+
       @if (hasActiveFilters()) {
-        <button class="clear-filters" (click)="clearFilters()"><mat-icon>close</mat-icon> Clear</button>
+        <button class="clear-filters" (click)="clearFilters()">
+          <mat-icon>filter_alt_off</mat-icon> Reset
+        </button>
       }
     </div>
   </div>
 
-  @if (hasSelection()) {
-    <div class="bulk-bar">
-      <div class="bulk-info">
-        <mat-icon>checklist</mat-icon>
-        <span>{{ selectedCount() }} selected</span>
-      </div>
+  <!-- List header with select-all -->
+  <div class="list-header" [class.selection]="hasSelection()">
+    <label class="master-check">
+      <input
+        type="checkbox"
+        class="checkbox"
+        [checked]="allSelected()"
+        [indeterminate]="someSelected()"
+        (change)="toggleSelectAll()"
+      />
+      <span>Select all</span>
+    </label>
+
+    @if (hasSelection()) {
       <div class="bulk-actions">
-        <button class="bulk-delete-btn" (click)="bulkDelete()" [disabled]="bulkDeleting()">
-          <mat-icon>delete</mat-icon>
-          {{ bulkDeleting() ? 'Deleting...' : 'Delete Selected' }}
+        <span class="sel-count">{{ selectedCount() }} selected</span>
+        <button class="bulk-btn read" (click)="bulkMarkRead()" [disabled]="bulkMarking() || unreadSelected() === 0" matTooltip="Mark selected as read">
+          <mat-icon>mark_email_read</mat-icon>
+          <span class="bulk-label">Read</span>
         </button>
-        <button class="bulk-cancel-btn" (click)="clearSelection()">Cancel</button>
+        <button class="bulk-btn unread" (click)="bulkMarkUnread()" [disabled]="bulkMarking()" matTooltip="Mark selected as unread">
+          <mat-icon>mark_email_unread</mat-icon>
+          <span class="bulk-label">Unread</span>
+        </button>
+        <button class="bulk-btn danger" (click)="armBulkDelete()" [disabled]="bulkDeleting()" matTooltip="Delete selected">
+          <mat-icon>{{ bulkDeleting() ? 'hourglass_top' : 'delete' }}</mat-icon>
+          <span class="bulk-label">{{ armedDelete() ? 'Confirm?' : (bulkDeleting() ? 'Deleting…' : 'Delete') }}</span>
+        </button>
+        <button class="bulk-cancel" (click)="clearSelection()">Cancel</button>
       </div>
-    </div>
-  }
+    } @else {
+      <span class="list-hint">
+        @if (totalPages() > 1) {
+          Page {{ page() }} of {{ totalPages() }} · {{ total() }} total
+        } @else {
+          {{ total() }} total
+        }
+      </span>
+    }
+  </div>
 
   <div class="notif-list">
     @if (loading() && notifications().length === 0) {
       @for (_ of skeletonItems; track _) {
         <div class="notif-skeleton">
+          <div class="sk-check"></div>
           <div class="sk-avatar"></div>
           <div class="sk-lines">
             <div class="sk-line sk-line-title"></div>
@@ -87,17 +187,42 @@
       }
     } @else if (notifications().length === 0) {
       <div class="empty-state">
-        <mat-icon class="empty-icon">notifications_off</mat-icon>
-        <span class="empty-title">No notifications</span>
+        <div class="empty-art">
+          <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="48" cy="48" r="44" fill="url(#emptyGrad)" opacity="0.25" />
+            <path d="M30 62a18 18 0 0136 0H30z" fill="#1B2B4D" />
+            <rect x="36" y="38" width="24" height="18" rx="10" fill="#1B2B4D" />
+            <rect x="36" y="38" width="24" height="18" rx="10" stroke="#00E676" stroke-opacity="0.55" />
+            <rect x="42" y="31" width="12" height="5" rx="2.5" fill="#00E676" fill-opacity="0.55" />
+            <path d="M32 60h32" stroke="#00E676" stroke-opacity="0.4" stroke-width="2" stroke-linecap="round" />
+            <circle cx="24" cy="34" r="3" fill="#00E676" fill-opacity="0.6" />
+            <circle cx="72" cy="42" r="2.5" fill="#CE93D8" fill-opacity="0.6" />
+            <circle cx="26" cy="66" r="2" fill="#90CAF9" fill-opacity="0.6" />
+            <circle cx="70" cy="26" r="2" fill="#FFD54F" fill-opacity="0.7" />
+            <defs>
+              <radialGradient id="emptyGrad" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0" stop-color="#00E676" />
+                <stop offset="1" stop-color="#0A1428" />
+              </radialGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="empty-title">
+          @if (hasActiveFilters()) {
+            No notifications found
+          } @else {
+            You're all caught up
+          }
+        </span>
         <span class="empty-desc">
           @if (hasActiveFilters()) {
-            No notifications match your filters. Try adjusting them.
+            Nothing matches your search or filters. Try adjusting them.
           } @else {
-            You have no notifications yet. They'll appear here when something happens.
+            New alerts about deposits, bets and payouts will appear here.
           }
         </span>
         @if (hasActiveFilters()) {
-          <button class="clear-filters-link" (click)="clearFilters()">Clear filters</button>
+          <button class="clear-filters-link" (click)="clearFilters()">Clear all filters</button>
         }
       </div>
     }
@@ -105,24 +230,27 @@
     @for (notif of notifications(); track notif._id) {
       <div class="notif-item" [class.unread]="!notif.read" [class.selected]="selectedIds().has(notif._id)" [class.mobile]="device.isMobile()" (click)="openNotification(notif)">
         <label class="notif-check" (click)="$event.stopPropagation()">
-          <input type="checkbox" [checked]="selectedIds().has(notif._id)" (change)="toggleSelect(notif._id)" class="row-checkbox" />
+          <input type="checkbox" class="checkbox" [checked]="selectedIds().has(notif._id)" (change)="toggleSelect(notif._id)" />
         </label>
         <div class="notif-icon" [style.--notif-color]="notifService.getNotificationColor(notif.type)">
           <mat-icon>{{ notifService.getNotificationIcon(notif.type) }}</mat-icon>
         </div>
-        <div class="notif-body" (click)="!notif.read ? markRead(notif._id) : markUnread(notif._id)">
+        <div class="notif-body">
           <div class="notif-title-row">
+            @if (!notif.read) {
+              <span class="unread-dot"></span>
+            }
             <span class="notif-title">{{ notif.title }}</span>
             <span class="notif-type-badge" [style.--badge-color]="notifService.getNotificationColor(notif.type)">{{ notif.type }}</span>
           </div>
           <div class="notif-message">{{ notif.message }}</div>
-          <div class="notif-time">{{ notifService.timeAgo(notif.createdAt) }} &middot; {{ notif.createdAt | date:'MMM d, y HH:mm' }}</div>
+          <div class="notif-time">{{ notifService.timeAgo(notif.createdAt) }} · {{ notif.createdAt | date:'MMM d, y HH:mm' }}</div>
         </div>
         <div class="notif-actions">
-          <button class="action-btn" (click)="notif.read ? markUnread(notif._id) : markRead(notif._id)" [matTooltip]="notif.read ? 'Mark unread' : 'Mark read'">
+          <button class="action-btn" (click)="$event.stopPropagation(); notif.read ? markUnread(notif._id) : markRead(notif._id)" [matTooltip]="notif.read ? 'Mark unread' : 'Mark read'">
             <mat-icon>{{ notif.read ? 'mark_email_unread' : 'done' }}</mat-icon>
           </button>
-          <button class="action-btn delete" (click)="deleteSingle(notif._id)" matTooltip="Delete">
+          <button class="action-btn delete" (click)="$event.stopPropagation(); deleteSingle(notif._id)" matTooltip="Delete">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
@@ -137,7 +265,7 @@
         <button class="page-num" [class.active]="p === page()" (click)="goToPage(p)">{{ p }}</button>
       }
       <button class="page-btn" [disabled]="page() >= totalPages()" (click)="goToPage(page() + 1)"><mat-icon>chevron_right</mat-icon></button>
-      <span class="page-info">{{ (page() - 1) * limit() + 1 }}&ndash;{{ Math.min(page() * limit(), total()) }} of {{ total() }}</span>
+      <span class="page-info">{{ (page() - 1) * limit() + 1 }}–{{ Math.min(page() * limit(), total()) }} of {{ total() }}</span>
     </div>
   }
 
