@@ -15,6 +15,10 @@
     .league { background: rgba(0,230,118,0.1); color: #00E676; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
     .market-type { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); padding: 2px 6px; border-radius: 4px; font-weight: 500; }
     .refund-chip { background: rgba(232,185,35,0.15); color: #E8B923; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+    .match-time-row { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 6px; }
+    .match-time-row mat-icon { font-size: 13px; width: 13px; height: 13px; color: rgba(255,255,255,0.35); }
+    .match-time { font-weight: 500; }
+    .match-countdown { background: rgba(0,230,118,0.12); color: #00E676; padding: 2px 8px; border-radius: 9999px; font-weight: 700; }
     .bet-selection { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); }
     .selection { font-size: 13px; font-weight: 500; color: #00E676; display: block; }
     .odds { font-size: 18px; font-weight: 700; color: #E8B923; }
@@ -60,6 +64,10 @@
     .parlay-leg-match { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .parlay-leg-pick { font-size: 11px; color: rgba(255,255,255,0.4); display: flex; align-items: center; gap: 4px; }
     .parlay-leg-pick::before { content: 'Pick:'; color: rgba(255,255,255,0.25); font-weight: 500; }
+    .parlay-leg-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 2px; }
+    .parlay-leg-time { font-size: 10.5px; color: rgba(255,255,255,0.4); font-weight: 500; }
+    .parlay-leg-league { font-size: 9.5px; color: #00E676; background: rgba(0,230,118,0.1); padding: 1px 6px; border-radius: 9999px; font-weight: 600; }
+    .parlay-leg-countdown { font-size: 10px; color: #00E676; font-weight: 700; }
     .parlay-leg-multiplier { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
     .parlay-leg-odds { font-size: 15px; font-weight: 800; color: #E8B923; letter-spacing: -0.3px; }
     .parlay-leg-outcome { font-size: 9px; font-weight: 800; padding: 1px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; }

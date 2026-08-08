@@ -458,11 +458,18 @@
 }
 
 .bet-market,
-.bet-refund {
+.bet-refund,
+.bet-league {
   font-size: 10px;
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 9999px;
+}
+
+.bet-league {
+  background: rgba(0, 230, 118, 0.1);
+  color: #00E676;
+  border: 1px solid rgba(0, 230, 118, 0.25);
 }
 
 .bet-market {
@@ -506,6 +513,29 @@
   font-size: 13px;
   font-weight: 800;
   color: #00E676;
+}
+
+.bet-time-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.bet-time {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.bet-countdown {
+  font-size: 10px;
+  font-weight: 700;
+  color: #00E676;
+  background: rgba(0, 230, 118, 0.12);
+  padding: 2px 8px;
+  border-radius: 9999px;
 }
 
 .bet-card-footer {
@@ -676,6 +706,31 @@
 .parlay-mobile-leg-pick {
   font-size: 10.5px;
   color: rgba(255, 255, 255, 0.5);
+}
+
+.parlay-mobile-leg-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+}
+
+.parlay-mobile-leg-league {
+  font-size: 9px;
+  font-weight: 700;
+  color: #00E676;
+  background: rgba(0, 230, 118, 0.1);
+  padding: 1px 6px;
+  border-radius: 9999px;
+}
+
+.parlay-mobile-leg-countdown {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #00E676;
 }
 
 .parlay-mobile-leg-odds-block {

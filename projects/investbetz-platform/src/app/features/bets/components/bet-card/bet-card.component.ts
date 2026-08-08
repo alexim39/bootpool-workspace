@@ -7,6 +7,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatDividerModule } from '@angular/material/divider';
 import { Stake } from '../../../../core/services';
+import { kickoffCountdown } from '../../../games/game-status.util';
 
 @Component({
   selector: 'app-bet-card',
@@ -57,13 +58,26 @@ export class BetCardComponent {
     return new Date(dateStr).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' });
   }
 
-  formatMatchTime(dateStr: string): string {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffHours = (date.getTime() - now.getTime()) / (1000 * 60 * 60);
-    if (diffHours < 1) return 'Starting soon';
-    if (diffHours < 24) return `In ${Math.floor(diffHours)}h`;
-    return date.toLocaleDateString('en-NG', { month: 'short', day: 'numeric' });
+  matchTime(matchDate: string): string {
+    return new Date(matchDate).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  matchDay(matchDate: string): string {
+    const d = new Date(matchDate);
+    const today = new Date();
+    const tomorrow = new Date(today.getTime() + 86400000);
+    const day = d.toLocaleDateString('en-NG', { month: 'short', day: 'numeric' });
+    if (d.toDateString() === today.toDateString()) return `Today · ${day}`;
+    if (d.toDateString() === tomorrow.toDateString()) return `Tomorrow · ${day}`;
+    return day;
+  }
+
+  matchCountdown(matchDate: string): string {
+    return kickoffCountdown(matchDate);
+  }
+
+  isUpcomingMatchDate(matchDate: string): boolean {
+    return new Date(matchDate).getTime() > Date.now();
   }
 
   getStatusClass(status: Stake['status']): string {

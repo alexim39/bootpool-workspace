@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, inject, effect } from '@angular/core';
 import { NgIf, NgFor } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -25,13 +25,19 @@ export interface FeaturedBanner {
   templateUrl: './featured-banner.component.html',
   styleUrls: ['./featured-banner.component.scss']
 })
-export class FeaturedBannerComponent implements OnInit {
+export class FeaturedBannerComponent implements OnInit, OnDestroy {
   private http = inject(HttpClient);
   banners = signal<FeaturedBanner[]>([]);
   currentIndex = signal(0);
 
+  private readonly AUTO_MS = 14000;
+  private timer: ReturnType<typeof setInterval> | null = null;
   private touchStartX = 0;
   private touchEndX = 0;
+
+  private bannerWatcher = effect(() => {
+    if (this.banners().length > 0) this.startAuto();
+  });
 
   ngOnInit() {
     this.http.get<{ success: boolean; data: FeaturedBanner[] }>(`${environment.apiUrl}/featured-games`).subscribe({
@@ -40,7 +46,42 @@ export class FeaturedBannerComponent implements OnInit {
     });
   }
 
+  ngOnDestroy() {
+    this.stopAuto();
+  }
+
+  goTo(i: number) {
+    const len = this.banners().length;
+    if (len === 0) return;
+    this.currentIndex.set((i + len) % len);
+    this.startAuto();
+  }
+
+  next() { this.goTo(this.currentIndex() + 1); }
+
+  prev() { this.goTo(this.currentIndex() - 1); }
+
+  private startAuto() {
+    this.stopAuto();
+    if (this.banners().length < 2) return;
+    this.timer = setInterval(() => {
+      this.currentIndex.set((this.currentIndex() + 1) % this.banners().length);
+    }, this.AUTO_MS);
+  }
+
+  private stopAuto() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+  }
+
+  pause() { this.stopAuto(); }
+
+  resume() { this.startAuto(); }
+
   onTouchStart(e: TouchEvent) {
+    this.pause();
     this.touchStartX = e.touches[0].clientX;
   }
   onTouchMove(e: TouchEvent) {
@@ -50,11 +91,13 @@ export class FeaturedBannerComponent implements OnInit {
     const diff = this.touchStartX - this.touchEndX;
     const len = this.banners().length;
     if (Math.abs(diff) > 50) {
-      if (diff > 0 && this.currentIndex() < len - 1) {
-        this.currentIndex.set(this.currentIndex() + 1);
-      } else if (diff < 0 && this.currentIndex() > 0) {
-        this.currentIndex.set(this.currentIndex() - 1);
+      if (diff > 0) {
+        this.next();
+      } else {
+        this.prev();
       }
+    } else {
+      this.resume();
     }
   }
 

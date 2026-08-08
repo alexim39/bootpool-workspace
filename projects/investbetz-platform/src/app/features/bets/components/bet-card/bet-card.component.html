@@ -30,6 +30,15 @@
                 <div class="parlay-leg-info">
                   <div class="parlay-leg-match">{{ item.homeTeam }} vs {{ item.awayTeam }}</div>
                   <div class="parlay-leg-pick">{{ item.selection }}</div>
+                  <div class="parlay-leg-meta">
+                    <span class="parlay-leg-time">{{ matchTime(item.matchDate) }} · {{ matchDay(item.matchDate) }}</span>
+                    @if (item.league) {
+                      <span class="parlay-leg-league">{{ item.league }}</span>
+                    }
+                    @if (isUpcomingMatchDate(item.matchDate) && matchCountdown(item.matchDate)) {
+                      <span class="parlay-leg-countdown">{{ matchCountdown(item.matchDate) }}</span>
+                    }
+                  </div>
                 </div>
                 <div class="parlay-leg-multiplier">
                   <span class="parlay-leg-odds">{{ item.gainsMultiplier.toFixed(2) }}x</span>
@@ -55,27 +64,30 @@
               <span class="team away">{{ stake.pod.awayTeam }}</span>
             </div>
             <div class="match-info">
+              @if (stake.pod.league) {
+                <span class="league">{{ stake.pod.league }}</span>
+              }
               @if (stake.pod.marketType) {
                 <span class="market-type">{{ stake.pod.marketType }}</span>
               }
               @if (stake.pod.refundPercent) {
                 <span class="refund-chip">{{ stake.pod.refundPercent }}% cash back</span>
               }
-              @if (stake.pod.matchDate) {
-                <span class="match-time">{{ formatMatchTime(stake.pod.matchDate) }}</span>
-              }
             </div>
+            @if (stake.pod.matchDate) {
+              <div class="match-time-row">
+                <mat-icon>schedule</mat-icon>
+                <span class="match-time">{{ matchTime(stake.pod.matchDate) }} · {{ matchDay(stake.pod.matchDate) }}</span>
+                @if (isUpcomingMatchDate(stake.pod.matchDate) && matchCountdown(stake.pod.matchDate)) {
+                  <span class="match-countdown">{{ matchCountdown(stake.pod.matchDate) }}</span>
+                }
+              </div>
+            }
           </div>
-          @if (stake.isSettled) {
-            <div class="bet-selection">
-              <span class="selection">{{ stake.pod.selection }}</span>
-              <span class="odds">{{ stake.pod.gainsMultiplier.toFixed(2) }}x</span>
-            </div>
-          } @else {
-            <div class="bet-selection">
-              <span class="odds">{{ stake.pod.gainsMultiplier.toFixed(2) }}x</span>
-            </div>
-          }
+          <div class="bet-selection">
+            <span class="selection">{{ stake.pod.selection }}</span>
+            <span class="odds">{{ stake.pod.gainsMultiplier.toFixed(2) }}x</span>
+          </div>
         }
 
         <mat-divider></mat-divider>

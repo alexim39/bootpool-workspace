@@ -196,6 +196,37 @@
     .cta-arrow { transition: transform 0.2s ease; }
     .featured-card:hover .cta-arrow { transform: translateX(3px); }
 
+    .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 6;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10, 20, 40, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: rgba(255, 255, 255, 0.9);
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      transition: all 0.2s ease;
+    }
+    .carousel-arrow:hover {
+      background: rgba(0, 230, 118, 0.25);
+      border-color: rgba(0, 230, 118, 0.5);
+      color: #00E676;
+      transform: translateY(-50%) scale(1.08);
+    }
+    .carousel-arrow:active {
+      transform: translateY(-50%) scale(0.94);
+    }
+    .carousel-arrow svg { display: block; }
+    .arrow-prev { left: 14px; }
+    .arrow-next { right: 14px; }
+
     .carousel-dots {
       display: flex;
       justify-content: center;
@@ -257,5 +288,9 @@
       .carousel-dots { padding: 8px 0 2px; gap: 6px; }
       .dot { width: 5px; height: 5px; }
       .dot.active { width: 18px; }
+      .carousel-arrow { width: 30px; height: 30px; }
+      .carousel-arrow svg { width: 14px; height: 14px; }
+      .arrow-prev { left: 8px; }
+      .arrow-next { right: 8px; }
     }
   

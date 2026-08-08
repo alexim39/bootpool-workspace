@@ -123,8 +123,64 @@
             <span class="stat-value">{{ stats.activeCycles }}</span>
           </div>
         </div>
+        <div class="stat-card" [style.outline]="reserveHealth() !== 'ok' ? '1px solid #FF9800' : 'none'">
+          <div class="stat-icon" style="background:rgba(255,152,0,0.1);color:#FFB74D">🛡️</div>
+          <div class="stat-body">
+            <span class="stat-label">Guarantee Reserve</span>
+            <span class="stat-value" [style.color]="reserveHealth() === 'ok' ? '#FFB74D' : '#FF5252'">₦{{ stats.guaranteeReserve | number }}</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(255,82,82,0.1);color:#FF8A80">🏦</div>
+          <div class="stat-body">
+            <span class="stat-label">Business Wallet</span>
+            <span class="stat-value">₦{{ stats.businessBalance | number }}</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(0,229,255,0.1);color:#80DEEA">📤</div>
+          <div class="stat-body">
+            <span class="stat-label">Guarantee Top-ups Given</span>
+            <span class="stat-value">₦{{ stats.totalGuaranteeTopUps | number }}</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(255,82,82,0.1);color:#FF5252">⚠️</div>
+          <div class="stat-body">
+            <span class="stat-label">Guarantee Shortfalls</span>
+            <span class="stat-value" [style.color]="(stats.totalGuaranteeShortfalls || 0) > 0 ? '#FF5252' : 'inherit'">₦{{ stats.totalGuaranteeShortfalls | number }}</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(0,230,118,0.1);color:#00E676">🧮</div>
+          <div class="stat-body">
+            <span class="stat-label">Excess Capped</span>
+            <span class="stat-value">₦{{ stats.totalExcessCapped | number }}</span>
+          </div>
+        </div>
       }
     </div>
+
+    @if (stats && reserveHealth() !== 'ok') {
+      <div class="reserve-warning" [class.reserve-empty]="reserveHealth() === 'empty'">
+        <mat-icon>{{ reserveHealth() === 'empty' ? 'error_outline' : 'warning_amber' }}</mat-icon>
+        <div class="reserve-warning-body">
+          @if (reserveHealth() === 'empty') {
+            <strong>Guarantee reserve is empty (₦0)</strong>
+            <span>The 1% minimum return guarantee cannot be paid until the reserve is funded. Fund the business wallet (Financials → Adjust Wallet, MongoDB User ID <code>000000000000000000000006</code>, credit ₦1,000,000), then click "Seed Reserve".</span>
+          } @else {
+            <strong>Guarantee reserve below target (₦1,000,000)</strong>
+            <span>Reserve is ₦{{ stats.guaranteeReserve | number }}. Fund the business wallet, then click "Seed Reserve" to top it up.</span>
+          }
+        </div>
+        <button mat-stroked-button class="btn-seed" (click)="seedReserve()" [disabled]="seedLoading()">
+          <mat-icon>savings</mat-icon> {{ seedLoading() ? 'Seeding...' : 'Seed Reserve' }}
+        </button>
+      </div>
+      @if (seedResult(); as r) {
+        <div class="seed-result" [class.seed-err]="!r.success">{{ r.message }}</div>
+      }
+    }
 
     <div class="tier-cards">
       @for (t of tiers; track t.key) {

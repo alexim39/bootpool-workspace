@@ -620,6 +620,10 @@ export class AdminService {
     return this.http.post<{ success: boolean; message: string; data: { balance: number } }>(`${this.baseUrl}/bet-manager/pools/top-up`, { tier, amount });
   }
 
+  seedBetManagerReserve(): Observable<{ success: boolean; message: string; data: { seeded: boolean; reserve: number; business: number } }> {
+    return this.http.post<{ success: boolean; message: string; data: { seeded: boolean; reserve: number; business: number } }>(`${this.baseUrl}/bet-manager/reserve/seed`, {});
+  }
+
   getChatStats(): Observable<{ success: boolean; data: ChatStats }> {
     return this.http.get<{ success: boolean; data: ChatStats }>(`${this.baseUrl}/chat/stats`);
   }
