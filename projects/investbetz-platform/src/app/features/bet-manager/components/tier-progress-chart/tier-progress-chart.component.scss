@@ -1,0 +1,278 @@
+.tpc {
+  --tier: #00E676;
+  position: relative;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(700px 220px at 0% -60%, color-mix(in srgb, var(--tier) 12%, transparent), transparent 60%),
+    linear-gradient(160deg, rgba(13, 26, 48, 0.9), rgba(10, 20, 38, 0.95));
+  padding: 20px 22px 16px;
+  overflow: hidden;
+}
+
+.tpc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.tpc-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.tpc-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.tpc-chip {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 9999px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.tpc-chip.ret.up { color: #00E676; border-color: rgba(0, 230, 118, 0.3); background: rgba(0, 230, 118, 0.08); }
+.tpc-chip.ret.down { color: #FF5252; border-color: rgba(255, 82, 82, 0.3); background: rgba(255, 82, 82, 0.08); }
+
+/* plot */
+.tpc-plot {
+  position: relative;
+  width: 100%;
+  height: 250px;
+}
+
+.tpc-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tpc-grid {
+  stroke: rgba(255, 255, 255, 0.07);
+  stroke-width: 1;
+  stroke-dasharray: 3 5;
+  vector-effect: non-scaling-stroke;
+}
+
+.tpc-line {
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--tier) 55%, transparent));
+}
+
+.tpc-area {
+  stroke: none;
+  pointer-events: none;
+}
+
+/* y labels */
+.tpc-ylab {
+  position: absolute;
+  right: 6px;
+  transform: translateY(-50%);
+  font-size: 9px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.3px;
+  pointer-events: none;
+}
+
+/* cycle markers */
+.tpc-marker {
+  position: absolute;
+  top: 4px;
+  bottom: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.tpc-marker-line {
+  position: absolute;
+  top: 0;
+  bottom: 8px;
+  left: 0;
+  width: 1px;
+  border-left: 1px dashed rgba(255, 255, 255, 0.16);
+}
+
+.tpc-marker-chip {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  padding: 1px 6px;
+  letter-spacing: 0.4px;
+}
+
+/* hover */
+.tpc-cross {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.tpc-tip {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 10px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  background: rgba(10, 20, 38, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  padding: 7px 10px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  z-index: 5;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.tip-date { font-size: 10px; color: rgba(255, 255, 255, 0.45); }
+.tip-nav { font-size: 12px; font-weight: 700; color: #fff; }
+.tip-delta { font-size: 10px; font-weight: 700; }
+.tip-delta.up { color: #00E676; }
+.tip-delta.down { color: #FF5252; }
+
+/* live endpoint */
+.tpc-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--tier);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 12px var(--tier);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: tpcPulse 1.8s ease-out infinite;
+}
+
+.tpc-endval {
+  position: absolute;
+  transform: translate(6px, calc(-100% - 4px));
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--tier);
+  background: rgba(7, 14, 31, 0.85);
+  border: 1px solid color-mix(in srgb, var(--tier) 35%, transparent);
+  border-radius: 6px;
+  padding: 1px 6px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+@keyframes tpcPulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--tier) 55%, transparent); }
+  70% { box-shadow: 0 0 0 9px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+/* x labels */
+.tpc-xlabels {
+  position: relative;
+  width: 100%;
+  height: 18px;
+}
+
+.tpc-xlabels span {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 9.5px;
+  color: rgba(255, 255, 255, 0.38);
+  white-space: nowrap;
+}
+
+/* empty */
+.tpc-empty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 26px 10px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.tpc-empty mat-icon { color: var(--tier); opacity: 0.8; flex-shrink: 0; }
+
+/* cycle progress */
+.tpc-cycle {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tpc-cycle-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 7px;
+}
+
+.tpc-cycle-pct {
+  font-weight: 700;
+  color: #fff;
+}
+
+.tpc-track {
+  height: 7px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.tpc-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--tier), color-mix(in srgb, var(--tier) 55%, #fff));
+  box-shadow: 0 0 10px color-mix(in srgb, var(--tier) 45%, transparent);
+  transition: width 1s cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+
+/* footer */
+.tpc-foot {
+  margin-top: 10px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.tpc-foot strong { color: rgba(255, 255, 255, 0.75); font-weight: 700; }
+
+@media (max-width: 640px) {
+  .tpc { padding: 16px 14px 14px; }
+  .tpc-plot { height: 190px; }
+  .tpc-head { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .tpc-badges { justify-content: flex-start; }
+}

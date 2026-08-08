@@ -25,6 +25,7 @@ export interface BetManagerSummary {
 export interface NavData {
   current: { nav: number; totalValue: number; units: number };
   history: Array<{ cycleNumber: number; startDate: string; endDate: string; startingNav: number; endingNav: number | null; returnPct: number }>;
+  daily: Array<{ date: string; nav: number }>;
 }
 
 export interface DepositRecord {

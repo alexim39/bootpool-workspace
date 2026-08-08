@@ -1,7 +1,7 @@
 import { Injectable, signal, computed, inject, effect, OnDestroy } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { StakeService, Stake, WalletService, AuthService } from '../../../core/services';
+import { StakeService, Stake, WalletService, AuthService, BetSummary } from '../../../core/services';
 
 export type HistoryStatus = 'all' | 'settled' | Stake['status'];
 
@@ -25,6 +25,9 @@ export class BetsStore implements OnDestroy {
   lostCount = signal(0);
   voidCount = signal(0);
   settledStakes = signal<Stake[]>([]);
+
+  readonly betSummary = signal<BetSummary | null>(null);
+  readonly summaryLoading = signal(false);
 
   searchQuery = signal('');
   statusFilter = signal<HistoryStatus>('settled');
@@ -69,7 +72,19 @@ export class BetsStore implements OnDestroy {
   init() {
     this.stakeService.fetchActiveStakes();
     this.fetchHistory(1);
+    this.fetchSummary();
     this._wallet.fetchBalance();
+  }
+
+  fetchSummary() {
+    this.summaryLoading.set(true);
+    this.stakeService.fetchBetSummary().subscribe({
+      next: (res) => {
+        if (res.success) this.betSummary.set(res.data);
+        this.summaryLoading.set(false);
+      },
+      error: () => this.summaryLoading.set(false)
+    });
   }
 
   private loadCounts() {
@@ -173,6 +188,7 @@ export class BetsStore implements OnDestroy {
     this._wallet.fetchBalance();
     this.stakeService.fetchActiveStakes();
     this.fetchHistory(1);
+    this.fetchSummary();
   }
 
   formatCurrency(amount: number): string {

@@ -8,6 +8,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSelectModule } from '@angular/material/select';
 import { CashoutModalComponent } from '../../../home/components/cashout-modal/cashout-modal.component';
+import { BetsWinLossChartComponent } from '../../components/bets-win-loss-chart/bets-win-loss-chart.component';
 import { MobileNavComponent } from '../../../../core/components';
 import { BetsStore, HistoryStatus } from '../../stores/bets.store';
 import { kickoffCountdown } from '../../../games/game-status.util';
@@ -18,7 +19,7 @@ import { kickoffCountdown } from '../../../games/game-status.util';
   imports: [
     CommonModule, RouterModule, MatButtonModule, MatIconModule,
     MatProgressSpinnerModule, MatSnackBarModule, MatChipsModule, MatSelectModule,
-    CashoutModalComponent, MobileNavComponent
+    CashoutModalComponent, BetsWinLossChartComponent, MobileNavComponent
   ],
   templateUrl: './bets-mobile.component.html',
   styleUrls: ['./bets-mobile.component.scss']

@@ -6,13 +6,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../../core/services';
 import { MobileNavComponent } from '../../../../../core/components';
+import { TierProgressChartComponent } from '../../../components/tier-progress-chart/tier-progress-chart.component';
 import { BetManagerStore } from '../../../stores/bet-manager.store';
 import { betManagerTierInfo } from '../../../bet-manager.tier-config';
 
 @Component({
   selector: 'app-mobile-bet-manager-detail',
   standalone: true,
-  imports: [DecimalPipe, DatePipe, MatButtonModule, MatIconModule, FormsModule, MobileNavComponent],
+  imports: [DecimalPipe, DatePipe, MatButtonModule, MatIconModule, FormsModule, MobileNavComponent, TierProgressChartComponent],
   templateUrl: './bet-manager-detail.component.html',
   styleUrls: ['./bet-manager-detail.component.scss'],
 })

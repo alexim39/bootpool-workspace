@@ -13,6 +13,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatChipsModule } from '@angular/material/chips';
 import { Stake } from '../../../../core/services';
 import { BetCardComponent } from '../../components/bet-card/bet-card.component';
+import { BetsWinLossChartComponent } from '../../components/bets-win-loss-chart/bets-win-loss-chart.component';
 import { CashoutModalComponent } from '../../../home/components/cashout-modal/cashout-modal.component';
 import { AppNavComponent } from '../../../../core/components';
 import { BetsStore, HistoryStatus } from '../../stores/bets.store';
@@ -24,7 +25,7 @@ import { BetsStore, HistoryStatus } from '../../stores/bets.store';
     CommonModule, RouterModule, MatCardModule, MatButtonModule, MatIconModule,
     MatTabsModule, MatTableModule, MatPaginatorModule, MatSelectModule,
     MatProgressSpinnerModule, MatBadgeModule, MatChipsModule,
-    BetCardComponent, CashoutModalComponent, AppNavComponent
+    BetCardComponent, BetsWinLossChartComponent, CashoutModalComponent, AppNavComponent
   ],
   templateUrl: './bets-desktop.component.html',
   styleUrls: ['./bets-desktop.component.scss']

@@ -1,0 +1,93 @@
+<div class="tpc" [style.--tier]="color()">
+  @let cp = cycleProgress();
+  @let tip = tooltip();
+  @let last = lastPoint();
+  <div class="tpc-head">
+    <h3 class="tpc-title">Plan Progress</h3>
+    <div class="tpc-badges">
+      @if (cp) {
+        <span class="tpc-chip">Cycle {{ cp.cycleNumber }} &middot; Day {{ cp.day }} of 30</span>
+        @if (cp.liveReturn !== 0) {
+          <span class="tpc-chip ret" [class.up]="cp.liveReturn > 0" [class.down]="cp.liveReturn < 0">
+            {{ cp.liveReturn > 0 ? '+' : '' }}{{ cp.liveReturn | number:'1.2-2' }}% live
+          </span>
+        }
+      }
+    </div>
+  </div>
+
+  @if (pts().length >= 2) {
+    <div class="tpc-plot" (mousemove)="onMove($event)" (mouseleave)="hover.set(-1)">
+      <svg class="tpc-svg" [attr.viewBox]="'0 0 ' + W + ' ' + H" preserveAspectRatio="none">
+        <defs>
+          <linearGradient [attr.id]="gradId" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" [attr.stop-color]="color()" stop-opacity="0.30" />
+            <stop offset="100%" [attr.stop-color]="color()" stop-opacity="0.02" />
+          </linearGradient>
+        </defs>
+        @for (g of grid(); track g.label) {
+          <line class="tpc-grid" [attr.x1]="PAD_L" [attr.x2]="W - PAD_R" [attr.y1]="g.y" [attr.y2]="g.y" />
+        }
+        <path class="tpc-area" [attr.d]="areaPath()" [attr.fill]="'url(#' + gradId + ')'" />
+        <path class="tpc-line" [attr.d]="linePath()" [attr.stroke]="color()" />
+      </svg>
+
+      @for (g of grid(); track g.label) {
+        <span class="tpc-ylab" [style.top.%]="g.top">{{ g.label }}</span>
+      }
+
+      @for (m of cycleMarkers(); track m.label) {
+        <span class="tpc-marker" [style.left.%]="m.left" [attr.title]="'Cycle ' + m.label + ' start'">
+          <span class="tpc-marker-line"></span>
+          <span class="tpc-marker-chip">{{ m.label }}</span>
+        </span>
+      }
+
+      @if (tip) {
+        <span class="tpc-cross" [style.left.%]="tip.left"></span>
+        <div class="tpc-tip" [style.left.%]="tip.left" [style.top.%]="tip.top">
+          <span class="tip-date">{{ tip.date }}</span>
+          <span class="tip-nav">₦{{ tip.nav | number:'1.4-4' }}</span>
+          <span class="tip-delta" [class.up]="tip.delta >= 0" [class.down]="tip.delta < 0">
+            {{ tip.delta >= 0 ? '+' : '' }}{{ tip.delta | number:'1.2-2' }}%
+          </span>
+        </div>
+      }
+
+      @if (last) {
+        <span class="tpc-dot" [style.left.%]="lastLeft()" [style.top.%]="lastTop()"></span>
+        <span class="tpc-endval" [style.left.%]="lastLeft()" [style.top.%]="lastTop()">₦{{ last.nav | number:'1.4-4' }}</span>
+      }
+    </div>
+    <div class="tpc-xlabels">
+      @for (t of xTicks(); track t.label) {
+        <span [style.left.%]="t.left">{{ t.label }}</span>
+      }
+    </div>
+  } @else {
+    <div class="tpc-empty">
+      <mat-icon>show_chart</mat-icon>
+      <span>The progress curve fills in day by day as Ora manages your plan &mdash; check back soon.</span>
+    </div>
+  }
+
+  @if (cp) {
+    <div class="tpc-cycle">
+      <div class="tpc-cycle-head">
+        <span>Current cycle progress</span>
+        <span class="tpc-cycle-pct">{{ cp.pct | number:'1.0-0' }}%</span>
+      </div>
+      <div class="tpc-track">
+        <div class="tpc-fill" [style.width.%]="cp.pct"></div>
+      </div>
+    </div>
+  }
+
+  @if (nav()?.current) {
+    <div class="tpc-foot">
+      Current NAV <strong>₦{{ nav()!.current.nav | number:'1.4-4' }}</strong>
+      &middot; Pool ₦{{ nav()!.current.totalValue | number }}
+      &middot; Units {{ nav()!.current.units | number }}
+    </div>
+  }
+</div>

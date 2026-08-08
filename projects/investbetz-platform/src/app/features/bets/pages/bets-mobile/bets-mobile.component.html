@@ -43,6 +43,11 @@
         </div>
       </div>
 
+      <app-bets-win-loss-chart
+        [summary]="store.betSummary()"
+        [loading]="store.summaryLoading()">
+      </app-bets-win-loss-chart>
+
       <div class="tab-bar">
         <button class="tab-btn" [class.active]="activeTab() === 'active'" (click)="activeTab.set('active')">
           <mat-icon>schedule</mat-icon> Active

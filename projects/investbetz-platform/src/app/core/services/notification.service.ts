@@ -44,15 +44,30 @@ export class NotificationService {
     return { Authorization: `Bearer ${token}` };
   }
 
-  fetchNotifications(page = 1, limit = 20, filters?: { type?: string; read?: string; from?: string; to?: string }): Observable<NotificationsResponse> {
+  fetchNotifications(
+    page = 1,
+    limit = 20,
+    filters?: {
+      type?: string;
+      read?: string;
+      from?: string;
+      to?: string;
+      search?: string;
+      sortField?: string;
+      sortOrder?: string;
+    }
+  ): Observable<NotificationsResponse> {
     this.loading.set(true);
     this.error.set(null);
 
     let url = `${this.API_URL}/notifications?page=${page}&limit=${limit}`;
-    if (filters?.type) url += `&type=${filters.type}`;
+    if (filters?.type) url += `&type=${encodeURIComponent(filters.type)}`;
     if (filters?.read !== undefined) url += `&read=${filters.read}`;
-    if (filters?.from) url += `&from=${filters.from}`;
-    if (filters?.to) url += `&to=${filters.to}`;
+    if (filters?.from) url += `&from=${encodeURIComponent(filters.from)}`;
+    if (filters?.to) url += `&to=${encodeURIComponent(filters.to)}`;
+    if (filters?.search) url += `&search=${encodeURIComponent(filters.search)}`;
+    if (filters?.sortField) url += `&sortField=${encodeURIComponent(filters.sortField)}`;
+    if (filters?.sortOrder) url += `&sortOrder=${encodeURIComponent(filters.sortOrder)}`;
 
     return new Observable(observer => {
       this.http.get<NotificationsResponse>(url, { headers: this.getHeaders() }).subscribe({
@@ -102,6 +117,22 @@ export class NotificationService {
   bulkDelete(ids: string[]): Observable<any> {
     return this.http.post<any>(
       `${this.API_URL}/notifications/bulk-delete`,
+      { ids },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  bulkMarkAsRead(ids: string[]): Observable<any> {
+    return this.http.put<any>(
+      `${this.API_URL}/notifications/bulk-read`,
+      { ids },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  bulkMarkAsUnread(ids: string[]): Observable<any> {
+    return this.http.put<any>(
+      `${this.API_URL}/notifications/bulk-unread`,
       { ids },
       { headers: this.getHeaders() }
     );

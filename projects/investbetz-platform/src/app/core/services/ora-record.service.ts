@@ -11,8 +11,17 @@ export interface OraLeagueStat {
   sample: 'sufficient' | 'low';
 }
 
+export interface OraDailyStat {
+  day: string;
+  played: number;
+  won: number;
+  lost: number;
+  winRate: number;
+}
+
 export interface OraRecord {
   byLeague: OraLeagueStat[];
+  daily: OraDailyStat[];
   overall: { played: number; won: number; winRate: number } | null;
   settledPots30d: number;
   avgSettlementMs: number | null;

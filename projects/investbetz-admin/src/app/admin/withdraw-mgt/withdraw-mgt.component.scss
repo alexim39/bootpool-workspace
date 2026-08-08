@@ -64,10 +64,13 @@
     .jump-input:focus { border-color: rgba(0,230,118,0.3); }
     .jump-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-    .detail-panel { background: #0D1A30; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 16px; padding: 20px; border-left: 4px solid rgba(255,255,255,0.1); }
-    .detail-panel.panel-processing { border-left-color: #90CAF9; }
-    .detail-panel.panel-failed { border-left-color: #f44336; }
-    .detail-panel.panel-completed { border-left-color: #00E676; }
+    .detail-modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .detail-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(2px); }
+    .detail-dialog { position: relative; background: #0D1A30; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); border-left: 4px solid rgba(255,255,255,0.1); padding: 20px; width: 100%; max-width: 560px; max-height: calc(100vh - 40px); overflow-y: auto; animation: detailIn 0.18s ease-out; box-shadow: 0 24px 60px rgba(0,0,0,0.5); }
+    .detail-dialog.panel-processing { border-left-color: #90CAF9; }
+    .detail-dialog.panel-failed { border-left-color: #f44336; }
+    .detail-dialog.panel-completed { border-left-color: #00E676; }
+    @keyframes detailIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
     .detail-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
     .detail-badges { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .status-chip-lg { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid; }

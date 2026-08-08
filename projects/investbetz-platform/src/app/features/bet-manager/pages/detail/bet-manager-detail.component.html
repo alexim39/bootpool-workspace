@@ -101,94 +101,75 @@
       </div>
     </div>
 
+    @if (nav) {
+      <app-tier-progress-chart class="progress-chart" [nav]="nav" [color]="config.color" />
+    }
+
     <div class="detail-grid">
-      @if (nav) {
-        <div class="detail-card">
-          <h3>NAV History</h3>
-          @if (nav.history.length > 0) {
-            <div class="nav-chart">
-              <div class="nav-bar-track">
-                @for (cycle of nav.history.slice().reverse(); track cycle.cycleNumber) {
-                  <div class="nav-bar-item">
-                    <div class="nav-bar-label">Cycle {{ cycle.cycleNumber }}</div>
-                    <div class="nav-bar-fill-wrap">
-                      <div class="nav-bar-fill"
-                        [style.width.%]="cycle.endingNav ? ((cycle.endingNav / nav.history[0].startingNav) * 100) : 0"
-                        [class.positive]="cycle.returnPct > 0"
-                        [class.negative]="cycle.returnPct < 0">
-                      </div>
+      @if (perf) {
+        <div class="detail-card perf-card full-width" [style.--tier]="config.color">
+          <div class="perf-head">
+            <div class="perf-head-title">
+              <h3>Performance</h3>
+              <p class="perf-sub">Ora AI allocation summary</p>
+            </div>
+            <span class="perf-trend" [class.up]="perf.returnPct > 0" [class.down]="perf.returnPct < 0">
+              <mat-icon>{{ perf.returnPct >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+              {{ perf.returnPct > 0 ? '+' : '' }}{{ perf.returnPct | number:'1.1-1' }}% overall
+            </span>
+          </div>
+
+          <div class="perf-stats">
+            <div class="perf-tile">
+              <span class="perf-tile-icon"><mat-icon>account_balance_wallet</mat-icon></span>
+              <div class="perf-tile-body">
+                <span class="perf-tile-label">Current Value</span>
+                <strong class="perf-tile-val">₦{{ perf.currentValue | number }}</strong>
+              </div>
+            </div>
+            <div class="perf-tile">
+              <span class="perf-tile-icon"><mat-icon>savings</mat-icon></span>
+              <div class="perf-tile-body">
+                <span class="perf-tile-label">Total Deposited</span>
+                <strong class="perf-tile-val">₦{{ perf.totalDeposited | number }}</strong>
+              </div>
+            </div>
+            <div class="perf-tile">
+              <span class="perf-tile-icon" [class.up]="perf.returnPct > 0" [class.down]="perf.returnPct < 0">
+                <mat-icon>{{ perf.returnPct >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+              </span>
+              <div class="perf-tile-body">
+                <span class="perf-tile-label">Return</span>
+                <strong class="perf-tile-val" [class.up]="perf.returnPct > 0" [class.down]="perf.returnPct < 0">
+                  {{ perf.returnPct > 0 ? '+' : '' }}{{ perf.returnPct | number:'1.1-1' }}%
+                </strong>
+              </div>
+            </div>
+          </div>
+
+          @if (perf.cycles.length > 0) {
+            <div class="perf-cycles">
+              <div class="perf-cycles-head">
+                <span class="perf-cycles-title">Cycle History</span>
+                <span class="perf-cycle-count">{{ perf.cycles.length }} cycle{{ perf.cycles.length === 1 ? '' : 's' }}</span>
+              </div>
+              <div class="cycle-list">
+                @for (c of perf.cycles; track c.cycleNumber) {
+                  <div class="cycle-row">
+                    <span class="cycle-badge">C{{ c.cycleNumber }}</span>
+                    <div class="cycle-meta">
+                      <span class="cycle-dates">{{ c.startDate | date:'MMM d' }} &rarr; {{ c.endDate | date:'MMM d, y' }}</span>
                     </div>
-                    <div class="nav-bar-value" [class.positive]="cycle.returnPct > 0" [class.negative]="cycle.returnPct < 0">
-                      @if (cycle.endingNav) {
-                        ₦{{ cycle.endingNav | number:'1.2-2' }}
-                        <span class="return-pct">({{ cycle.returnPct > 0 ? '+' : '' }}{{ cycle.returnPct | number:'1.1-1' }}%)</span>
-                      } @else {
-                        ₦{{ cycle.startingNav | number:'1.2-2' }} (Active)
-                      }
-                    </div>
+                    <span class="cycle-return" [class.up]="c.returnPct > 0" [class.down]="c.returnPct < 0">
+                      <mat-icon>{{ c.returnPct >= 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                      {{ c.returnPct > 0 ? '+' : '' }}{{ c.returnPct | number:'1.1-1' }}%
+                    </span>
+                    <span class="cycle-status" [class.active]="c.status === 'active'" [class.settled]="c.status === 'settled'">
+                      <i class="status-dot"></i>{{ c.status }}
+                    </span>
                   </div>
                 }
               </div>
-            </div>
-          } @else {
-            <p class="no-data">No cycle history yet.</p>
-          }
-          @if (nav.current) {
-            <div class="nav-current">
-              Current NAV: <strong>₦{{ nav.current.nav | number:'1.2-2' }}</strong>
-              &middot; Pool: ₦{{ nav.current.totalValue | number }}
-              &middot; Units: {{ nav.current.units | number }}
-            </div>
-          }
-        </div>
-      }
-
-      @if (perf) {
-        <div class="detail-card">
-          <h3>Performance</h3>
-          <div class="perf-summary">
-            <div class="perf-stat">
-              <span>Current Value</span>
-              <strong>₦{{ perf.currentValue | number }}</strong>
-            </div>
-            <div class="perf-stat">
-              <span>Total Deposited</span>
-              <strong>₦{{ perf.totalDeposited | number }}</strong>
-            </div>
-            <div class="perf-stat">
-              <span>Return</span>
-              <strong [class.positive]="perf.returnPct > 0" [class.negative]="perf.returnPct < 0">
-                {{ perf.returnPct > 0 ? '+' : '' }}{{ perf.returnPct | number:'1.1-1' }}%
-              </strong>
-            </div>
-          </div>
-          @if (perf.cycles.length > 0) {
-            <div class="perf-cycles">
-              <h4>Cycle History</h4>
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Cycle</th>
-                    <th>Start</th>
-                    <th>End</th>
-                    <th>Return</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (c of perf.cycles; track c.cycleNumber) {
-                    <tr>
-                      <td>{{ c.cycleNumber }}</td>
-                      <td>{{ c.startDate | date:'shortDate' }}</td>
-                      <td>{{ c.endDate | date:'shortDate' }}</td>
-                      <td [class.positive]="c.returnPct > 0" [class.negative]="c.returnPct < 0">
-                        {{ c.returnPct > 0 ? '+' : '' }}{{ c.returnPct | number:'1.1-1' }}%
-                      </td>
-                      <td><span class="chip" [class.chip-active]="c.status === 'active'" [class.chip-settled]="c.status === 'settled'">{{ c.status }}</span></td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
             </div>
           }
         </div>

@@ -143,7 +143,7 @@
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let d">
           <button mat-icon-button (click)="store.toggleDetail(d)" matTooltip="View details">
-            <mat-icon>{{ store.detailId() === d.id ? 'expand_less' : 'expand_more' }}</mat-icon>
+            <mat-icon>visibility</mat-icon>
           </button>
         </td>
       </ng-container>
@@ -174,13 +174,15 @@
     </div>
   </mat-card>
 
-  <!-- Detail Panel -->
-  <div class="detail-panel" *ngIf="store.detail() as detail">
-    <div class="detail-header">
-      <h3>Deposit Details</h3>
-      <button mat-icon-button (click)="store.detail.set(null)"><mat-icon>close</mat-icon></button>
-    </div>
-    <div class="detail-grid">
+  <!-- Detail Dialog -->
+  <div class="detail-modal" *ngIf="store.detail() as detail">
+    <div class="detail-overlay" (click)="store.detail.set(null)"></div>
+    <div class="detail-dialog">
+      <div class="detail-header">
+        <h3>Deposit Details</h3>
+        <button mat-icon-button (click)="store.detail.set(null)"><mat-icon>close</mat-icon></button>
+      </div>
+      <div class="detail-grid">
       <div class="detail-item"><span class="d-label">Reference</span><span class="d-value">{{ detail.reference }}</span></div>
       <div class="detail-item"><span class="d-label">User</span><span class="d-value">{{ detail.user?.phone || '—' }} {{ detail.user?.name ? '(' + (detail.user?.name || '') + ')' : '' }}</span></div>
       <div class="detail-item"><span class="d-label">Amount</span><span class="d-value">₦{{ detail.amount | number }}</span></div>
@@ -192,6 +194,7 @@
       <div class="detail-item"><span class="d-label">Completed</span><span class="d-value">{{ detail.completedAt ? (detail.completedAt | date:'MMM d, y HH:mm:ss') : '—' }}</span></div>
       <div class="detail-item"><span class="d-label">Description</span><span class="d-value">{{ detail.metadata?.description || '—' }}</span></div>
       <div class="detail-item" *ngIf="detail.failureReason"><span class="d-label">Failure Reason</span><span class="d-value" style="color:#f44336">{{ detail.failureReason }}</span></div>
+      </div>
     </div>
   </div>
 </div>

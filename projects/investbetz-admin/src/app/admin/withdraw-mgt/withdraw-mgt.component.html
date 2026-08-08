@@ -101,7 +101,7 @@
                 </button>
               }
               <button mat-icon-button (click)="store.toggleDetail(w); $event.stopPropagation()" matTooltip="Details">
-                <mat-icon>{{ store.detailId() === w._id ? 'expand_less' : 'expand_more' }}</mat-icon>
+                <mat-icon>visibility</mat-icon>
               </button>
             </td>
           </ng-container>
@@ -140,7 +140,9 @@
       </mat-card>
 
       @if (store.detail(); as d) {
-        <div class="detail-panel" [class.panel-processing]="d.status === 'processing'" [class.panel-failed]="d.status === 'failed'" [class.panel-completed]="d.status === 'completed'">
+        <div class="detail-modal" role="dialog" aria-modal="true" aria-label="Withdrawal details">
+          <div class="detail-overlay" (click)="store.toggleDetail(d)"></div>
+          <div class="detail-dialog" [class.panel-processing]="d.status === 'processing'" [class.panel-failed]="d.status === 'failed'" [class.panel-completed]="d.status === 'completed'">
           <div class="detail-top">
             <div class="detail-badges">
               <span class="status-chip-lg" [style]="statusStyle(d.status)">
@@ -247,6 +249,7 @@
               </div>
             </div>
           }
+          </div>
         </div>
       }
 

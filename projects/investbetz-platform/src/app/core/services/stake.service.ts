@@ -93,6 +93,36 @@ export interface ActiveStakesResponse {
   data: Stake[];
 }
 
+export interface BetDayStat {
+  date: string;
+  won: number;
+  lost: number;
+  played: number;
+  staked: number;
+  returns: number;
+  net: number;
+}
+
+export interface BetSummary {
+  overall: {
+    played: number;
+    won: number;
+    lost: number;
+    void: number;
+    cashedOut: number;
+    winRate: number;
+    totalStaked: number;
+    totalReturns: number;
+    netPnl: number;
+  } | null;
+  daily: BetDayStat[];
+}
+
+export interface BetSummaryResponse {
+  success: boolean;
+  data: BetSummary;
+}
+
 export interface PlaceStakeRequest {
   podId: string;
   stakeAmount: number;
@@ -238,6 +268,12 @@ export class StakeService {
       `${environment.apiUrl}/stakes/${id}`,
       { headers: this.getHeaders() }
     );
+  }
+
+  fetchBetSummary(): Observable<BetSummaryResponse> {
+    return this.http.get<BetSummaryResponse>(`${environment.apiUrl}/stakes/summary`, {
+      headers: this.getHeaders()
+    });
   }
 
   placeStake(data: PlaceStakeRequest) {
