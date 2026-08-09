@@ -52,7 +52,7 @@
           <div class="fact"><span>Min</span><strong>₦{{ config.minDeposit | number }}</strong></div>
           <div class="fact"><span>Lock</span><strong>30 days</strong></div>
           <div class="fact"><span>Fee</span><strong>10% on profit</strong></div>
-          <div class="fact"><span>Guaranteed</span><strong>Min {{ config.guaranteedMinPct }}% / cycle</strong></div>
+          <div class="fact"><span>Guaranteed</span><strong>Min {{ config.guaranteedMinPct }}% - {{ config.maxReturnPct }}% / cycle</strong></div>
         </div>
         <button class="btn-primary" (click)="goDeposit()">Fund {{ config.label }}</button>
         <button class="btn-withdraw" (click)="goBack()">Back to Bet Manager</button>
