@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, input, output } from '@angular/core';
+import { Component, inject, signal, computed, effect, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,6 +29,7 @@ export class BetSlipComponent {
 
   selections = input<Pod[]>([]);
   open = input(false);
+  placeBetResult = input<{ success: boolean; message?: string } | null>(null);
   remove = output<string>();
   clearAllSelections = output<void>();
   closePanel = output<void>();
@@ -37,6 +38,10 @@ export class BetSlipComponent {
 
   stakeAmount = signal<number>(0);
   submitting = signal(false);
+
+  private resultWatcher = effect(() => {
+    if (this.placeBetResult()) this.submitting.set(false);
+  });
 
   stakeError = signal<string | null>(null);
 

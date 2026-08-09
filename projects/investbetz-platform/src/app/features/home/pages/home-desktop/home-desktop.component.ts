@@ -51,6 +51,7 @@ export class HomeDesktopComponent implements OnInit {
   private route = inject(ActivatedRoute);
   readonly store = inject(HomeStore);
   readonly showOraChat = signal(false);
+  readonly slipResult = signal<{ success: boolean; message?: string } | null>(null);
 
   ngOnInit() {
     this.store.init();
@@ -112,9 +113,11 @@ export class HomeDesktopComponent implements OnInit {
         } else {
           this._snackBar.open(res.message || 'Failed to place accumulator', 'OK', { duration: 3000 });
         }
+        this.slipResult.set({ success: res.success, message: res.message });
       },
       error: (err) => {
         this._snackBar.open(err.error?.message || 'Failed to place accumulator', 'OK', { duration: 3000 });
+        this.slipResult.set({ success: false, message: err.error?.message });
       }
     });
   }
