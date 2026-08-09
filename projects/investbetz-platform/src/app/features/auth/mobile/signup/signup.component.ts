@@ -29,7 +29,11 @@ export class SignupComponent {
   }
 
   get isFormValid(): boolean {
-    return this.fullName.trim().length >= 2 && this.phone.trim().length >= 10 && this.termsAccepted;
+    return this.fullName.trim().length >= 2 && this.phone.trim().length >= 10 && this.isValidEmail(this.email) && this.termsAccepted;
+  }
+
+  private isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
   }
 
   goBack() { this.router.navigate(['/auth/login']); }
@@ -40,7 +44,7 @@ export class SignupComponent {
 
   createAccount() {
     if (!this.isFormValid) return;
-    this.store.requestSignupOtp(this.phone.trim(), this.email.trim() || undefined, () =>
+    this.store.requestSignupOtp(this.phone.trim(), this.email.trim(), () =>
       this.router.navigate(['/auth/verify-otp'], {
         state: {
           phone: this.phone.trim(),
