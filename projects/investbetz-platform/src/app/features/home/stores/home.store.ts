@@ -69,7 +69,7 @@ export class HomeStore implements OnDestroy {
   readonly hasSearchResults = computed(() => this.isSearching() && !this.pods.loading() && this.displayedPods().length > 0);
   readonly noSearchResults = computed(() => this.isSearching() && !this.pods.loading() && this.displayedPods().length === 0);
 
-  private readonly PAGE_SIZE = 5;
+  private readonly PAGE_SIZE = 12;
 
   constructor() {
     this.searchSub = this.search$.pipe(
