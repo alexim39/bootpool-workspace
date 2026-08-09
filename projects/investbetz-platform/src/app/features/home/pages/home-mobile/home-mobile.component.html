@@ -387,6 +387,7 @@
   <app-bet-slip
     [selections]="store.betSlipSelections()"
     [open]="store.betSlipOpen()"
+    [placeBetResult]="slipResult()"
     (remove)="store.removeFromSlip($event)"
     (clearAllSelections)="store.clearSelections()"
     (closePanel)="closeSlip()"

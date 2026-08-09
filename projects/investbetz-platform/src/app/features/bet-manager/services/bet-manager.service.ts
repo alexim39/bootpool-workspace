@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 export interface BetManagerAccount {
-  tier: 'defender' | 'midfielder' | 'striker' | 'goalkeeper';
+  tier: 'academy' | 'goalkeeper' | 'defender' | 'midfielder' | 'striker' | 'chairman';
   currentValue: number;
   units: number;
   totalDeposited: number;

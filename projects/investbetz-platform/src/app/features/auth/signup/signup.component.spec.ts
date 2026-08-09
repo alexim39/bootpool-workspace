@@ -47,13 +47,30 @@ describe('SignupComponent', () => {
   it('validates terms - isFormValid false when terms not accepted', () => {
     component.fullName = 'Test User';
     component.phone = '1234567890';
+    component.email = 'test@example.com';
     component.termsAccepted = false;
+    expect(component.isFormValid).toBeFalse();
+  });
+
+  it('validates email - isFormValid false when email is empty', () => {
+    component.fullName = 'Test User';
+    component.phone = '1234567890';
+    component.termsAccepted = true;
+    expect(component.isFormValid).toBeFalse();
+  });
+
+  it('validates email - isFormValid false when email is invalid', () => {
+    component.fullName = 'Test User';
+    component.phone = '1234567890';
+    component.email = 'not-an-email';
+    component.termsAccepted = true;
     expect(component.isFormValid).toBeFalse();
   });
 
   it('isFormValid true when all fields are valid', () => {
     component.fullName = 'Test User';
     component.phone = '1234567890';
+    component.email = 'test@example.com';
     component.termsAccepted = true;
     expect(component.isFormValid).toBeTrue();
   });
@@ -75,6 +92,7 @@ describe('SignupComponent', () => {
   it('enables submit button when form is valid', () => {
     component.fullName = 'Test User';
     component.phone = '1234567890';
+    component.email = 'test@example.com';
     component.termsAccepted = true;
     fixture.detectChanges();
     const button = fixture.nativeElement.querySelector('.btn-primary') as HTMLButtonElement;
@@ -85,12 +103,13 @@ describe('SignupComponent', () => {
     mockAuthService.requestSignupOtp.and.returnValue(of({ success: true }).pipe(delay(0)));
     component.fullName = 'Test User';
     component.phone = '1234567890';
+    component.email = 'test@example.com';
     component.termsAccepted = true;
 
     component.createAccount();
     tick();
 
-    expect(mockAuthService.requestSignupOtp).toHaveBeenCalledWith('1234567890', undefined);
+    expect(mockAuthService.requestSignupOtp).toHaveBeenCalledWith('1234567890', 'test@example.com');
   }));
 
   it('does not call API when form is invalid', () => {
@@ -102,6 +121,7 @@ describe('SignupComponent', () => {
     mockAuthService.requestSignupOtp.and.returnValue(of({ success: true }).pipe(delay(0)));
     component.fullName = 'Test User';
     component.phone = '1234567890';
+    component.email = 'test@example.com';
     component.termsAccepted = true;
 
     component.createAccount();
@@ -119,6 +139,7 @@ describe('SignupComponent', () => {
     mockAuthService.requestSignupOtp.and.returnValue(of({ success: true }).pipe(delay(0)));
     component.fullName = 'Test User';
     component.phone = '1234567890';
+    component.email = 'test@example.com';
     component.termsAccepted = true;
 
     component.createAccount();
@@ -133,6 +154,7 @@ describe('SignupComponent', () => {
     );
     component.fullName = 'Test User';
     component.phone = '1234567890';
+    component.email = 'test@example.com';
     component.termsAccepted = true;
 
     component.createAccount();

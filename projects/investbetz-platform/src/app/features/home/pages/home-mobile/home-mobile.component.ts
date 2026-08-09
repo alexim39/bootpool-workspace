@@ -56,6 +56,7 @@ export class HomeMobileComponent implements OnInit {
   showTopUp = signal(false);
   showOraChat = signal(false);
   showNotifPanel = signal(false);
+  readonly slipResult = signal<{ success: boolean; message?: string } | null>(null);
 
   openOraChat() { this.showOraChat.set(true); }
 
@@ -164,13 +165,15 @@ export class HomeMobileComponent implements OnInit {
         if (res.success) {
           this.store.clearSelections();
           this.store.onStakePlaced();
-          this._snackBar.open('Accumulator placed successfully!', 'OK', { duration: 3000 });
+          this._snackBar.open('Accumulator placed successfully!', 'OK', { duration: 3000, verticalPosition: 'top' });
         } else {
-          this._snackBar.open(res.message || 'Failed to place accumulator', 'OK', { duration: 3000 });
+          this._snackBar.open(res.message || 'Failed to place accumulator', 'OK', { duration: 3000, verticalPosition: 'top' });
         }
+        this.slipResult.set({ success: res.success, message: res.message });
       },
       error: (err) => {
-        this._snackBar.open(err.error?.message || 'Failed to place accumulator', 'OK', { duration: 3000 });
+        this._snackBar.open(err.error?.message || 'Failed to place accumulator', 'OK', { duration: 3000, verticalPosition: 'top' });
+        this.slipResult.set({ success: false, message: err.error?.message });
       }
     });
   }

@@ -12,6 +12,17 @@ export interface BetManagerTierInfo {
 
 export const BET_MANAGER_TIERS: BetManagerTierInfo[] = [
   {
+    key: 'academy',
+    label: 'Academy',
+    icon: '🏫',
+    minDeposit: 10_000,
+    color: '#B0BEC5',
+    strategy: 'Growth starter — lowest entry, learn the ropes, minimal risk',
+    allocation: 'Ultra-low-risk Pods (1.0x–1.3x)',
+    guaranteedMinPct: 1,
+    maxReturnPct: 10,
+  },
+  {
     key: 'goalkeeper',
     label: 'Goalkeeper',
     icon: '🧤',
@@ -52,6 +63,17 @@ export const BET_MANAGER_TIERS: BetManagerTierInfo[] = [
     color: '#FF5252',
     strategy: 'Aggressive — higher multipliers, more Match Pools',
     allocation: 'High-multiplier Pods (2x–5x)',
+    guaranteedMinPct: 1,
+    maxReturnPct: 10,
+  },
+  {
+    key: 'chairman',
+    label: 'Chairman',
+    icon: '🏛️',
+    minDeposit: 500_000,
+    color: '#FFD700',
+    strategy: 'Ownership tier — highest multipliers, premium Match Pools exposure',
+    allocation: 'Elite Pods + Match Pools (2.5x–6x)',
     guaranteedMinPct: 1,
     maxReturnPct: 10,
   },

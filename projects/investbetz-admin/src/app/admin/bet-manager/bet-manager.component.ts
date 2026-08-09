@@ -47,10 +47,12 @@ export class AdminBetManagerComponent implements OnInit {
   seedResult = signal<{ success: boolean; message: string } | null>(null);
 
   readonly tiers = [
+    { key: 'academy', label: 'Academy', icon: '🏫', color: '#B0BEC5' },
     { key: 'goalkeeper', label: 'Goalkeeper', icon: '🧤', color: '#90CAF9' },
     { key: 'defender', label: 'Defender', icon: '🛡️', color: '#00E676' },
     { key: 'midfielder', label: 'Midfielder', icon: '⚡', color: '#E8B923' },
     { key: 'striker', label: 'Striker', icon: '🎯', color: '#FF5252' },
+    { key: 'chairman', label: 'Chairman', icon: '🏛️', color: '#FFD700' },
   ];
 
   ngOnInit() {
