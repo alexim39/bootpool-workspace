@@ -20,6 +20,66 @@
     </div>
   </div>
 
+  <div class="growth-card">
+    <div class="growth-header">
+      <div class="growth-title-block">
+        <h2>User Growth</h2>
+        <p class="growth-sub">New user signups per {{ store.growthPeriod() }} over the selected window</p>
+      </div>
+      <div class="period-toggle">
+        <button class="period-btn" [class.active]="store.growthPeriod() === 'day'" (click)="setGrowthPeriod('day')">Day</button>
+        <button class="period-btn" [class.active]="store.growthPeriod() === 'week'" (click)="setGrowthPeriod('week')">Week</button>
+        <button class="period-btn" [class.active]="store.growthPeriod() === 'month'" (click)="setGrowthPeriod('month')">Month</button>
+        <button class="period-btn" [class.active]="store.growthPeriod() === 'year'" (click)="setGrowthPeriod('year')">Year</button>
+      </div>
+    </div>
+
+    @if (store.growth(); as g) {
+      <div class="growth-stats">
+        <div class="growth-stat">
+          <span class="g-label">New signups</span>
+          <span class="g-value">{{ g.total | number }}</span>
+        </div>
+        <div class="growth-stat">
+          <span class="g-label">Avg / {{ g.periodUnit }}</span>
+          <span class="g-value">{{ g.avgPerBucket | number }}</span>
+        </div>
+        <div class="growth-stat">
+          <span class="g-label">Best {{ g.periodUnit }}</span>
+          <span class="g-value">{{ formatPeak(g.peak) }}</span>
+        </div>
+        <div class="growth-stat">
+          <span class="g-label">Trend</span>
+          <span class="g-value g-delta" [class.up]="growthDeltaUp()" [class.flat]="g.changePct === null">
+            <mat-icon class="g-delta-icon">{{ g.changePct === null ? 'remove' : growthDeltaUp() ? 'trending_up' : 'trending_down' }}</mat-icon>
+            {{ growthDelta() }}
+          </span>
+        </div>
+      </div>
+
+      <div class="growth-bars" [class.dimmed]="store.growthLoading()">
+        @for (point of g.series; track point.key; let i = $index) {
+          <div class="g-bar-item" [attr.title]="point.label + ' — ' + point.count + (point.count === 1 ? ' signup' : ' signups')">
+            <span class="g-bar-value" [class.zero]="point.count === 0">{{ point.count }}</span>
+            <div class="g-bar-track">
+              <div class="g-bar-fill" [style.height.%]="growthBarHeight(point.count)"></div>
+            </div>
+            <span class="g-bar-label">{{ showGrowthBarLabel(i) ? point.label : '' }}</span>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="growth-bars growth-skeleton">
+        @for (s of skeletonRows.slice(0, 12); track s) {
+          <div class="g-bar-item">
+            <div class="g-bar-track"><div class="sk g-sk-fill"></div></div>
+            <span class="g-bar-label"></span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
   <div class="filter-section">
     <div class="tabs-row">
       <button class="tab-btn" [class.active]="store.roleFilter() === 'user'" (click)="store.setRoleFilter('user')">Users</button>

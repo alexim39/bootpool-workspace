@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, computed } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { AdminUser } from '../services';
 import { Router } from '@angular/router';
 import { AdminUsersStore } from './stores/admin-users.store';
@@ -17,7 +18,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [FormsModule,
+  imports: [FormsModule, DecimalPipe,
     MatTableModule, MatButtonModule, MatIconModule, MatTooltipModule,
     MatFormFieldModule, MatInputModule, MatCardModule, MatSelectModule,
     MatDatepickerModule, MatNativeDateModule],
@@ -31,6 +32,43 @@ export class UsersComponent implements OnInit {
 
   ngOnInit() {
     this.store.load();
+    this.store.loadGrowth(this.store.growthPeriod());
+  }
+
+  readonly growthMax = computed(() => {
+    const series = this.store.growth()?.series ?? [];
+    return Math.max(1, ...series.map(s => s.count));
+  });
+
+  growthBarHeight(count: number): number {
+    return Math.max(2, (count / this.growthMax()) * 100);
+  }
+
+  showGrowthBarLabel(index: number): boolean {
+    const period = this.store.growthPeriod();
+    if (period === 'day') return index % 5 === 0;
+    if (period === 'week') return index % 3 === 0;
+    return true;
+  }
+
+  setGrowthPeriod(period: 'day' | 'week' | 'month' | 'year') {
+    this.store.setGrowthPeriod(period);
+  }
+
+  growthDelta(): string {
+    const pct = this.store.growth()?.changePct;
+    if (pct === null || pct === undefined) return 'new window';
+    return `${pct >= 0 ? '+' : ''}${pct}% vs prev. ${this.store.growth()?.periodUnit}s`;
+  }
+
+  growthDeltaUp(): boolean {
+    const pct = this.store.growth()?.changePct;
+    return pct !== null && pct !== undefined && pct >= 0;
+  }
+
+  formatPeak(peak: { label: string; count: number } | null): string {
+    if (!peak) return '—';
+    return `${peak.label} · ${peak.count.toLocaleString()}`;
   }
 
   viewUser(u: AdminUser) {

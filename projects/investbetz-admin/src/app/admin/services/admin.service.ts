@@ -107,6 +107,22 @@ export interface AdminUser {
   kycType?: string;
 }
 
+export interface UserGrowthPoint {
+  key: string;
+  label: string;
+  count: number;
+}
+
+export interface UserGrowthData {
+  period: 'day' | 'week' | 'month' | 'year';
+  periodUnit: string;
+  total: number;
+  avgPerBucket: number;
+  peak: { label: string; count: number } | null;
+  changePct: number | null;
+  series: UserGrowthPoint[];
+}
+
 export interface AdminStake {
   id: string;
   _id?: string;
@@ -296,6 +312,12 @@ export class AdminService {
     if (params?.sortOrder) hp = hp.set('sortOrder', params.sortOrder);
     if (params?.role) hp = hp.set('role', params.role);
     return this.http.get<{ success: boolean; data: PaginatedResponse<AdminUser> }>(`${this.baseUrl}/users`, { params: hp });
+  }
+
+  getUserGrowth(period: 'day' | 'week' | 'month' | 'year'): Observable<{ success: boolean; data: UserGrowthData }> {
+    let hp = new HttpParams();
+    hp = hp.set('period', period);
+    return this.http.get<{ success: boolean; data: UserGrowthData }>(`${this.baseUrl}/users/growth`, { params: hp });
   }
 
   getUser(id: string): Observable<{ success: boolean; data: any }> {

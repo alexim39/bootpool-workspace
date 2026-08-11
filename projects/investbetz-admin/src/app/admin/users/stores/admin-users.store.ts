@@ -1,5 +1,5 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { AdminService, AdminUser } from '../../services';
+import { AdminService, AdminUser, UserGrowthData } from '../../services';
 import { Subject, debounceTime, distinctUntilChanged, finalize, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
@@ -24,6 +24,9 @@ export class AdminUsersStore {
   readonly selectedUser = signal<any>(null);
   readonly stats = signal<{ total: number; active: number; suspended: number; kycVerified: number; kycPending: number; admins: number } | null>(null);
   readonly roleFilter = signal<'user' | 'admin'>('user');
+  readonly growthPeriod = signal<'day' | 'week' | 'month' | 'year'>('day');
+  readonly growth = signal<UserGrowthData | null>(null);
+  readonly growthLoading = signal(false);
 
   readonly columns = ['phone', 'name', 'email', 'wallet', 'status', 'kyc', 'lastActive', 'registered', 'actions'];
 
@@ -82,6 +85,20 @@ export class AdminUsersStore {
       }
       this.loading.set(false);
     });
+  }
+
+  loadGrowth(period: 'day' | 'week' | 'month' | 'year') {
+    this.growthPeriod.set(period);
+    this.growthLoading.set(true);
+    this.admin.getUserGrowth(period).subscribe(res => {
+      if (res.success) this.growth.set(res.data);
+      this.growthLoading.set(false);
+    });
+  }
+
+  setGrowthPeriod(period: 'day' | 'week' | 'month' | 'year') {
+    if (period === this.growthPeriod()) return;
+    this.loadGrowth(period);
   }
 
   setPage(p: number) {
