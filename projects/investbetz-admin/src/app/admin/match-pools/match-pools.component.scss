@@ -28,27 +28,6 @@
     .filters { margin-bottom: 12px; }
     .filter-field { width: 200px; }
     .loading-center { display: flex; justify-content: center; padding: 40px; }
-    .detail-page { display: flex; flex-direction: column; gap: 16px; }
-    .detail-header { display: flex; align-items: center; gap: 12px; }
-    .detail-header h2 { color: #fff; font-size: 20px; font-weight: 600; margin: 0; flex: 1; }
-    .info-card { background: #0D1A30; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); padding: 20px; }
-    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
-    .info-grid .label { display: block; font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; font-weight: 600; }
-    .info-grid .value { font-size: 14px; color: #fff; font-weight: 500; }
-    .action-bar { display: flex; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
-    .action-close { color: #E8B923 !important; border-color: #E8B923 !important; }
-    .action-cancel { color: #f44336 !important; border-color: #f44336 !important; }
-    .action-win { background: #00E676 !important; color: #0A1428 !important; }
-    .settle-section { margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
-    .settle-row { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
-    .settle-preview { background: rgba(0,230,118,0.04); border-radius: 8px; padding: 12px; margin-top: 8px; border: 1px solid rgba(0,230,118,0.1); }
-    .preview-row { display: flex; justify-content: space-between; font-size: 13px; color: rgba(255,255,255,0.7); padding: 2px 0; }
-    .market-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
-    .market-card { background: #0D1A30; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); padding: 16px; }
-    .market-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .market-header strong { color: #fff; font-size: 14px; }
-    .market-stats { display: flex; gap: 16px; font-size: 12px; color: rgba(255,255,255,0.5); }
-    .report-btn { margin-top: 8px; font-size: 12px; }
     .reports-page { display: flex; flex-direction: column; gap: 16px; }
     .reports-header { display: flex; align-items: center; justify-content: space-between; }
     .reports-header h2 { color: #fff; font-size: 20px; font-weight: 600; margin: 0; }
@@ -56,14 +35,3 @@
     .stat-card { background: #0D1A30; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; text-align: center; }
     .stat-value { display: block; font-size: 22px; font-weight: 700; color: #00E676; }
     .stat-label { display: block; font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; text-transform: uppercase; }
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; align-items: center; justify-content: center; }
-    .modal-content { background: #0F1B30; border-radius: 14px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.08); }
-    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
-    .modal-header h3 { color: #fff; font-size: 16px; font-weight: 600; margin: 0; }
-    .modal-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
-    .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .report-grid .label { display: block; font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; font-weight: 600; }
-    .report-grid .value { font-size: 14px; color: #fff; font-weight: 500; }
-    .market-breakdown-item { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
-    .market-name { color: #fff; font-weight: 500; }
-  

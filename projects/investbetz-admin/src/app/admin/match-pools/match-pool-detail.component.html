@@ -1,0 +1,394 @@
+
+    <div class="mp-detail">
+      @if (store.loading()) {
+        <div class="skel-page"><div class="skel skel-card" style="height:220px"><div style="padding:20px;display:flex;flex-direction:column;gap:12px"><div class="skel-row"><div class="skel skel-title" style="width:60%;margin:0"></div><div class="skel skel-badge" style="margin:0"></div></div><div class="skel-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px"><div><div class="skel skel-text-sm" style="width:100%;margin:0"></div><div class="skel skel-title" style="width:80%;margin:0;height:18px"></div></div><div><div class="skel skel-text-sm" style="width:100%;margin:0"></div><div class="skel skel-title" style="width:80%;margin:0;height:18px"></div></div><div><div class="skel skel-text-sm" style="width:100%;margin:0"></div><div class="skel skel-title" style="width:80%;margin:0;height:18px"></div></div></div></div></div><div class="skel-row" style="gap:16px;margin:0"><div class="skel skel-card" style="flex:1;height:120px;margin:0"></div><div class="skel skel-card" style="flex:1;height:120px;margin:0"></div></div></div>
+      }
+      @if (!store.loading() && store.detail(); as d) {
+        <div class="detail-header">
+          <button mat-icon-button (click)="goBack()" aria-label="Back"><mat-icon>arrow_back</mat-icon></button>
+          <div class="detail-title">
+            <span class="detail-eyebrow">Match pool</span>
+            <h2>{{ d.pool.eventTitle }}</h2>
+          </div>
+          <span class="chip" [style.background]="statusColor(d.pool.status)">{{ d.pool.status }}</span>
+        </div>
+
+        <mat-card class="info-card">
+          <div class="info-grid">
+            <div><span class="label">Staking Closes</span><span class="value">{{ d.pool.stakingClosesAt | date:'medium' }}</span></div>
+            <div><span class="label">Total Pool</span><span class="value">&#x20A6;{{ d.pool.totalPool | number }}</span></div>
+            <div><span class="label">Platform Fee (15%)</span><span class="value">&#x20A6;{{ d.pool.platformFeeAmount | number }}</span></div>
+            <div><span class="label">Distributable</span><span class="value">&#x20A6;{{ d.pool.distributableAmount | number }}</span></div>
+            <div><span class="label">Min / Max Stake</span><span class="value">&#x20A6;{{ d.pool.minStake | number }} / &#x20A6;{{ d.pool.maxStake | number }}</span></div>
+            <div><span class="label">Total Stakers</span><span class="value">{{ d.totalStakes }}</span></div>
+          </div>
+          @if (d.pool.status === 'open') {
+            <div class="action-bar">
+              <button mat-stroked-button class="action-close" (click)="store.closeStaking(d.pool._id)">Close Staking</button>
+              <button mat-stroked-button class="action-cancel" (click)="store.cancelPool(d.pool._id)">Cancel Pool</button>
+            </div>
+          }
+          @if (d.pool.status === 'open' || d.pool.status === 'staking_closed') {
+            <div class="settle-section">
+              <div class="section-label">Settle Pool</div>
+              <div class="settle-row">
+                <mat-form-field appearance="fill">
+                  <mat-label>Winning Market</mat-label>
+                  <mat-select [ngModel]="store.selectedMarketId()" (ngModelChange)="store.selectedMarketId.set($event)">
+                    @for (m of d.pool.markets; track m.marketId) {
+                      <mat-option [value]="m.marketId">{{ m.label }} (&#x20A6;{{ m.totalStaked | number }})</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <button mat-raised-button class="action-win" (click)="store.settlePool(d.pool._id)" [disabled]="!store.selectedMarketId() || store.settling()">
+                  {{ store.settling() ? 'Settling...' : 'Settle' }}
+                </button>
+              </div>
+              @if (store.settlePreview(); as sp) {
+                <div class="settle-preview">
+                  <div class="preview-row"><span>Total Pool:</span><span>&#x20A6;{{ sp.totalPool | number }}</span></div>
+                  <div class="preview-row"><span>Platform Fee (15%):</span><span>&#x20A6;{{ sp.platformFee | number }}</span></div>
+                  <div class="preview-row"><span>Distributable:</span><span>&#x20A6;{{ sp.distributable | number }}</span></div>
+                  <div class="preview-row"><span>Winning Market Total:</span><span>&#x20A6;{{ sp.winningTotal | number }}</span></div>
+                  <div class="preview-row"><span>Winners:</span><span>{{ sp.winnerCount }}</span></div>
+                </div>
+              }
+            </div>
+          }
+        </mat-card>
+
+        <!-- Market breakdown -->
+        <div class="market-cards">
+          @for (m of d.marketBreakdown; track m.marketId) {
+            <mat-card class="market-card">
+              <div class="market-header">
+                <strong>{{ m.label }}</strong>
+                <span class="chip" [style.background]="m.marketId === d.pool.winningMarketId ? '#00E676' : 'rgba(255,255,255,0.1)'">
+                  {{ m.marketId === d.pool.winningMarketId ? 'WINNER' : '' }}
+                </span>
+              </div>
+              <div class="market-stats">
+                <span>Total: &#x20A6;{{ m.totalStaked | number }}</span>
+                <span>Stakers: {{ m.stakerCount }}</span>
+              </div>
+              <div class="market-actions">
+                <button mat-stroked-button (click)="openStakers(m.marketId)" class="stakers-btn">
+                  <mat-icon>visibility</mat-icon> Stakers
+                </button>
+                @if (d.pool.status === 'settled' || d.pool.status === 'cancelled') {
+                  <button mat-stroked-button (click)="store.showReport(d.pool._id)" class="report-btn">View Report</button>
+                }
+              </div>
+            </mat-card>
+          }
+        </div>
+
+        <!-- Stakers (full-width section) -->
+        @if (store.stakesOpen() && store.detail(); as dd) {
+          <section class="stakers-section" #stakersSection>
+            <div class="stakers-head">
+              <div class="stakers-title">
+                <span class="head-icon people"><mat-icon>groups</mat-icon></span>
+                <div class="head-text">
+                  <span class="head-eyebrow">Participant list</span>
+                  <h3>Stakers</h3>
+                </div>
+              </div>
+              <div class="stakers-head-actions">
+                <span class="head-count" [class.empty]="store.stakesTotal() === 0">
+                  <mat-icon>person</mat-icon> {{ store.stakesTotal() }}
+                </span>
+                <button mat-stroked-button (click)="store.closeStakers()"><mat-icon>close</mat-icon> Close</button>
+              </div>
+            </div>
+
+            <div class="d-filterbar">
+              <mat-form-field appearance="outline" class="filter-search">
+                <mat-label>Search staker</mat-label>
+                <mat-icon matPrefix>search</mat-icon>
+                <input matInput type="search" placeholder="Phone, name or email"
+                  [ngModel]="store.stakesSearch()" (ngModelChange)="store.stakesSearch.set($event); onStakesSearchChange()">
+                @if (store.stakesSearch()) {
+                  <button matSuffix mat-icon-button (click)="clearStakesSearch()" aria-label="Clear search"><mat-icon>close</mat-icon></button>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Market</mat-label>
+                <mat-select [ngModel]="store.stakesMarket()" (ngModelChange)="onStakesMarket($event)">
+                  <mat-option value="">All markets</mat-option>
+                  @for (mk of dd.pool.markets; track mk.marketId) {
+                    <mat-option [value]="mk.marketId">{{ mk.label }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Status</mat-label>
+                <mat-select [ngModel]="store.stakesStatus()" (ngModelChange)="onStakesStatus($event)">
+                  <mat-option value="">All statuses</mat-option>
+                  <mat-option value="confirmed">Confirmed</mat-option>
+                  <mat-option value="won">Won</mat-option>
+                  <mat-option value="lost">Lost</mat-option>
+                  <mat-option value="cancelled_refunded">Refunded</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <div class="date-pair">
+                <mat-form-field appearance="outline">
+                  <mat-label>From</mat-label>
+                  <input matInput type="date" [ngModel]="store.stakesFrom()" (ngModelChange)="store.stakesFrom.set($event); onStakesDate()">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>To</mat-label>
+                  <input matInput type="date" [ngModel]="store.stakesTo()" (ngModelChange)="store.stakesTo.set($event); onStakesDate()">
+                </mat-form-field>
+              </div>
+
+              <div class="filterbar-extra">
+                <mat-form-field appearance="outline">
+                  <mat-label>Per page</mat-label>
+                  <mat-select [ngModel]="store.stakesLimit()" (ngModelChange)="store.stakesLimit.set($event); onStakesLimit()">
+                    <mat-option [value]="25">25</mat-option>
+                    <mat-option [value]="50">50</mat-option>
+                    <mat-option [value]="100">100</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                @if (store.stakesMarket() || store.stakesStatus() || store.stakesSearch() || store.stakesFrom() || store.stakesTo()) {
+                  <button mat-stroked-button class="filter-clear" (click)="clearStakesFilters()">
+                    <mat-icon>filter_alt_off</mat-icon> Clear
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div class="stakers-body">
+              @if (store.stakesLoading()) {
+                <div class="stakers-skeleton">
+                  @for (r of [1,2,3,4,5]; track r) {
+                    <div class="skel-row" style="gap:16px;border-bottom:1px solid rgba(255,255,255,0.04);padding:12px 0;margin:0">
+                      <div class="skel skel-text-sm" style="flex:1;margin:0"></div>
+                      <div class="skel skel-text" style="flex:2;margin:0"></div>
+                      <div class="skel skel-text-sm" style="flex:1;margin:0"></div>
+                      <div class="skel skel-text-sm" style="flex:1;margin:0"></div>
+                    </div>
+                  }
+                </div>
+              } @else if (store.stakes().length === 0) {
+                <div class="stakers-empty">
+                  <span class="empty-icon"><mat-icon>group_off</mat-icon></span>
+                  <p class="empty-title">No stakers found</p>
+                  <p class="empty-hint">Try adjusting the filters or search to see more results.</p>
+                  @if (store.stakesMarket() || store.stakesStatus() || store.stakesSearch() || store.stakesFrom() || store.stakesTo()) {
+                    <button mat-stroked-button (click)="clearStakesFilters()">Clear all filters</button>
+                  }
+                </div>
+              } @else {
+                <div class="stakers-table-wrap">
+                  <table class="stakers-table">
+                    <colgroup>
+                      <col style="width:13%">
+                      <col style="width:28%">
+                      <col style="width:17%">
+                      <col style="width:13%">
+                      <col style="width:14%">
+                      <col style="width:15%">
+                    </colgroup>
+                    <thead>
+                      <tr>
+                        <th class="sortable" (click)="toggleStakesSort('createdAt')">
+                          Date
+                          <span class="sort-ind" [class.active]="store.stakesSort() === 'createdAt'">{{ store.stakesSort() === 'createdAt' ? (store.stakesOrder() === 'asc' ? '▲' : '▼') : '' }}</span>
+                        </th>
+                        <th>Staker</th>
+                        <th>Market</th>
+                        <th class="num sortable" (click)="toggleStakesSort('amount')">
+                          Amount
+                          <span class="sort-ind" [class.active]="store.stakesSort() === 'amount'">{{ store.stakesSort() === 'amount' ? (store.stakesOrder() === 'asc' ? '▲' : '▼') : '' }}</span>
+                        </th>
+                        <th class="sortable" (click)="toggleStakesSort('status')">
+                          Status
+                          <span class="sort-ind" [class.active]="store.stakesSort() === 'status'">{{ store.stakesSort() === 'status' ? (store.stakesOrder() === 'asc' ? '▲' : '▼') : '' }}</span>
+                        </th>
+                        <th class="num">Payout</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (st of store.stakes(); track st._id) {
+                        <tr>
+                          <td class="date-cell">{{ st.createdAt | date:'dd MMM, HH:mm' }}</td>
+                          <td>
+                            <div class="staker-cell">
+                              <span class="avatar" [style.background]="avatarColor(st.user?.fullName)">{{ initials(st.user?.fullName) }}</span>
+                              <div class="staker-id">
+                                <span class="staker-name">{{ st.user?.fullName || 'Unknown' }}</span>
+                                <span class="staker-meta">{{ st.user?.phone || '—' }}</span>
+                                @if (st.user?.email) { <span class="staker-meta">{{ st.user?.email }}</span> }
+                              </div>
+                            </div>
+                          </td>
+                          <td><span class="market-chip">{{ marketLabel(st.marketId) }}</span></td>
+                          <td class="num amount">&#x20A6;{{ st.amount | number }}</td>
+                          <td>
+                            <span class="badge" [style.color]="stakeStatusColor(st.status)" [style.background]="stakeStatusColor(st.status) + '1A'">
+                              <span class="badge-dot" [style.background]="stakeStatusColor(st.status)"></span>
+                              {{ stakeStatusLabel(st.status) }}
+                            </span>
+                          </td>
+                          <td class="num">
+                            @if (st.payoutAmount > 0) {
+                              <span class="payout">&#x20A6;{{ st.payoutAmount | number }}</span>
+                            } @else {
+                              <span class="muted">—</span>
+                            }
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+            </div>
+
+            @if (store.stakesTotal() > 0) {
+              <div class="d-footer">
+                <span class="footer-info">Showing {{ stakesRangeLabel() }} of {{ store.stakesTotal() }} stakers</span>
+                <div class="pager">
+                  <button mat-stroked-button [disabled]="store.stakesPage() <= 1" (click)="setStakesPage(store.stakesPage() - 1)">
+                    <mat-icon>chevron_left</mat-icon> Prev
+                  </button>
+                  @for (p of stakesPagesArray(); track p) {
+                    <button mat-flat-button class="page-btn" [class.page-on]="p === store.stakesPage()" (click)="setStakesPage(p)">{{ p }}</button>
+                  }
+                  <button mat-stroked-button [disabled]="store.stakesPage() >= stakesPages()" (click)="setStakesPage(store.stakesPage() + 1)">
+                    Next <mat-icon>chevron_right</mat-icon>
+                  </button>
+                </div>
+              </div>
+            }
+          </section>
+        }
+      }
+      @if (!store.loading() && !store.detail()) {
+        <div class="not-found">
+          <span class="empty-icon"><mat-icon>error_outline</mat-icon></span>
+          <p class="empty-title">Pool not found</p>
+          <button mat-stroked-button (click)="goBack()">Back to Match Pools</button>
+        </div>
+      }
+
+      <!-- Report modal -->
+      @if (store.reportModal(); as rm) {
+        <div class="modal-backdrop" (click)="store.reportModal.set(null)">
+          <div class="modal-content report-modal" (click)="$event.stopPropagation()">
+            <div class="modal-head">
+              <div class="head-left">
+                <span class="head-icon report"><mat-icon>description</mat-icon></span>
+                <div class="head-text">
+                  <span class="head-eyebrow">Settlement report</span>
+                  <h3 class="head-title">{{ rm.eventTitle }}</h3>
+                </div>
+              </div>
+              <div class="head-right">
+                <span class="head-chip" [style.background]="statusColorLite(rm.status)" [style.color]="statusColor(rm.status)">{{ rm.status }}</span>
+                <button mat-icon-button (click)="store.reportModal.set(null)" aria-label="Close"><mat-icon>close</mat-icon></button>
+              </div>
+            </div>
+
+            <div class="report-stats">
+              <div class="rep-stat">
+                <span class="rep-icon"><mat-icon>account_balance_wallet</mat-icon></span>
+                <span class="rep-label">Total pool</span>
+                <span class="rep-value">&#x20A6;{{ rm.totalPool | number }}</span>
+              </div>
+              <div class="rep-stat">
+                <span class="rep-icon fee"><mat-icon>percent</mat-icon></span>
+                <span class="rep-label">Platform fee (15%)</span>
+                <span class="rep-value">&#x20A6;{{ rm.platformFeeAmount | number }}</span>
+              </div>
+              <div class="rep-stat">
+                <span class="rep-icon pay"><mat-icon>payments</mat-icon></span>
+                <span class="rep-label">Distributable</span>
+                <span class="rep-value">&#x20A6;{{ rm.distributableAmount | number }}</span>
+              </div>
+              <div class="rep-stat">
+                <span class="rep-icon win"><mat-icon>emoji_events</mat-icon></span>
+                <span class="rep-label">Win rate</span>
+                <span class="rep-value">{{ rm.totalStakers > 0 ? ((rm.totalWinners / rm.totalStakers) * 100 | number:'1.0-1') : '0' }}%</span>
+              </div>
+              <div class="rep-stat">
+                <span class="rep-icon people"><mat-icon>groups</mat-icon></span>
+                <span class="rep-label">Total stakers</span>
+                <span class="rep-value">{{ rm.totalStakers }}</span>
+              </div>
+              <div class="rep-stat">
+                <span class="rep-icon gold"><mat-icon>military_tech</mat-icon></span>
+                <span class="rep-label">Winners</span>
+                <span class="rep-value gold-txt">{{ rm.totalWinners }}</span>
+              </div>
+            </div>
+
+            @if (winningMarketInfo(rm); as wm) {
+              <div class="winner-callout">
+                <mat-icon>military_tech</mat-icon>
+                <div class="callout-text">
+                  <span class="callout-label">Winning market</span>
+                  <span class="callout-value">{{ wm.label }} — {{ wm.winners }} winner{{ wm.winners === 1 ? '' : 's' }}</span>
+                </div>
+              </div>
+            }
+
+            <div class="breakdown-head">
+              <span class="section-label">Market breakdown</span>
+              <span class="section-sub">{{ rm.totalStakers }} stakers · {{ rm.totalWinners }} winners</span>
+            </div>
+
+            <div class="report-table-wrap">
+              <table class="report-table">
+                <colgroup>
+                  <col style="width:30%">
+                  <col style="width:20%">
+                  <col style="width:15%">
+                  <col style="width:15%">
+                  <col style="width:20%">
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>Market</th>
+                    <th class="num">Staked</th>
+                    <th class="num">Stakers</th>
+                    <th class="num">Winners</th>
+                    <th class="num">Share of pool</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (mb of rm.marketBreakdown; track mb.marketId) {
+                    <tr [class.winner-row]="mb.marketId === rm.winningMarketId">
+                      <td>
+                        <span class="market-chip">{{ mb.label }}</span>
+                        @if (mb.marketId === rm.winningMarketId) {
+                          <span class="win-tag">WINNER</span>
+                        }
+                      </td>
+                      <td class="num">&#x20A6;{{ mb.totalStaked | number }}</td>
+                      <td class="num">{{ mb.stakerCount }}</td>
+                      <td class="num">{{ mb.winners }}</td>
+                      <td class="num">{{ (rm.totalPool > 0 ? (mb.totalStaked / rm.totalPool) * 100 : 0) | number:'1.0-1' }}%</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <div class="modal-foot">
+              <span class="foot-note">
+                <mat-icon>info_outline</mat-icon>
+                Platform retains &#x20A6;{{ rm.platformFeeAmount | number }} in fees
+                @if (rm.settledAt) { · settled {{ rm.settledAt | date:'medium' }} }
+              </span>
+              <button mat-raised-button class="btn-primary" (click)="store.reportModal.set(null)">Done</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>

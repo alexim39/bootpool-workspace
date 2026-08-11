@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { AdminMatchPoolService, AdminMatchPool, AdminPoolDetail, PoolReport, PoolReportsAgg } from '../../services';
+import { AdminMatchPoolService, AdminMatchPool, AdminPoolDetail, PoolReport, PoolReportsAgg, PoolStakeRow, PaginatedPoolStakes } from '../../services';
 
 export type ViewMode = 'list' | 'create' | 'detail' | 'reports';
 
@@ -29,6 +29,78 @@ export class AdminMatchPoolsStore {
 
   readonly reportsData = signal<PoolReportsAgg | null>(null);
   readonly reportModal = signal<PoolReport | null>(null);
+
+  readonly stakes = signal<PoolStakeRow[]>([]);
+  readonly stakesTotal = signal(0);
+  readonly stakesPage = signal(1);
+  readonly stakesLimit = signal(25);
+  readonly stakesLoading = signal(false);
+  readonly stakesOpen = signal(false);
+  readonly stakesSearch = signal('');
+  readonly stakesMarket = signal('');
+  readonly stakesStatus = signal('');
+  readonly stakesFrom = signal('');
+  readonly stakesTo = signal('');
+  readonly stakesSort = signal<'createdAt' | 'amount' | 'status'>('createdAt');
+  readonly stakesOrder = signal<'asc' | 'desc'>('desc');
+
+  loadStakes(opts?: { page?: number; search?: string }) {
+    const id = this.detail()?.pool._id;
+    if (!id) return;
+    if (opts?.page) this.stakesPage.set(opts.page);
+    if (opts?.search !== undefined) this.stakesSearch.set(opts.search);
+    this.stakesLoading.set(true);
+    this.service.getPoolStakes(id, {
+      page: this.stakesPage(),
+      limit: this.stakesLimit(),
+      marketId: this.stakesMarket() || undefined,
+      search: this.stakesSearch() || undefined,
+      status: this.stakesStatus() || undefined,
+      from: this.stakesFrom() || undefined,
+      to: this.stakesTo() || undefined,
+      sortField: this.stakesSort(),
+      sortOrder: this.stakesOrder(),
+    }).subscribe({
+      next: (res) => {
+        if (res.success) {
+          const data: PaginatedPoolStakes = res.data;
+          this.stakes.set(data.items);
+          this.stakesTotal.set(data.total);
+        }
+        this.stakesLoading.set(false);
+      },
+      error: () => this.stakesLoading.set(false)
+    });
+  }
+
+  openStakers(marketId = '') {
+    this.stakesMarket.set(marketId);
+    this.stakesSearch.set('');
+    this.stakesStatus.set('');
+    this.stakesFrom.set('');
+    this.stakesTo.set('');
+    this.stakesSort.set('createdAt');
+    this.stakesOrder.set('desc');
+    this.stakesPage.set(1);
+    this.stakesOpen.set(true);
+    this.loadStakes({ page: 1 });
+  }
+
+  closeStakers() { this.stakesOpen.set(false); }
+
+  resetStakes() {
+    this.stakes.set([]);
+    this.stakesTotal.set(0);
+    this.stakesPage.set(1);
+    this.stakesLoading.set(false);
+    this.stakesSearch.set('');
+    this.stakesMarket.set('');
+    this.stakesStatus.set('');
+    this.stakesFrom.set('');
+    this.stakesTo.set('');
+    this.stakesSort.set('createdAt');
+    this.stakesOrder.set('desc');
+  }
 
   loadList() {
     this.loading.set(true);
@@ -78,6 +150,7 @@ export class AdminMatchPoolsStore {
           this.detail.set(res.data);
           this.selectedMarketId.set('');
           this.settlePreview.set(null);
+          this.resetStakes();
         }
         this.loading.set(false);
       },

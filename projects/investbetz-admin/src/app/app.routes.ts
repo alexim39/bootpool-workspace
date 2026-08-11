@@ -88,6 +88,10 @@ export const routes: Routes = [
         loadComponent: () => import('./admin/match-pools/match-pools.component').then(m => m.AdminMatchPoolsComponent)
       },
       {
+        path: 'match-pools/:id',
+        loadComponent: () => import('./admin/match-pools/match-pool-detail.component').then(m => m.MatchPoolDetailComponent)
+      },
+      {
         path: 'settings',
         loadComponent: () => import('./admin/settings/settings.component').then(m => m.SettingsComponent)
       },

@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { NgIf, NgFor, DatePipe, DecimalPipe } from '@angular/common';
+import { NgIf, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,15 +10,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AdminMatchPoolsStore } from './stores/admin-match-pools.store';
 
 @Component({
   selector: 'app-admin-match-pools',
   standalone: true,
-  imports: [NgIf, DatePipe, DecimalPipe, FormsModule,
+  imports: [NgIf, DatePipe, DecimalPipe, FormsModule, RouterLink,
     MatTableModule, MatButtonModule, MatIconModule, MatTooltipModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule, MatCardModule, MatProgressSpinnerModule],
+    MatFormFieldModule, MatInputModule, MatSelectModule, MatCardModule],
   templateUrl: './match-pools.component.html',
   styleUrls: ['./match-pools.component.scss']
 })

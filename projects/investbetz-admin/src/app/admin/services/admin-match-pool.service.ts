@@ -21,6 +21,7 @@ export interface AdminMatchPool {
   distributableAmount: number;
   minStake: number;
   maxStake: number;
+  stakerCount?: number;
   createdByAdminId: string;
   createdAt: string;
   settledAt?: string;
@@ -37,6 +38,26 @@ export interface AdminPoolStake {
   payoutAmount: number;
   createdAt: string;
   settledAt?: string;
+}
+
+export interface PoolStakeRow {
+  _id: string;
+  userId?: string;
+  marketId: string;
+  amount: number;
+  status: 'confirmed' | 'won' | 'lost' | 'cancelled_refunded';
+  payoutAmount: number;
+  createdAt: string;
+  settledAt?: string;
+  user?: { _id?: string; phone?: string; fullName?: string; email?: string };
+}
+
+export interface PaginatedPoolStakes {
+  items: PoolStakeRow[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 export interface AdminPoolDetail {
@@ -102,6 +123,23 @@ export class AdminMatchPoolService {
 
   getReport(id: string): Observable<{ success: boolean; data: PoolReport }> {
     return this.http.get<any>(`${this.baseUrl}/${id}/report`);
+  }
+
+  getPoolStakes(id: string, params?: {
+    page?: number; limit?: number; marketId?: string; search?: string; status?: string;
+    from?: string; to?: string; sortField?: string; sortOrder?: 'asc' | 'desc';
+  }): Observable<{ success: boolean; data: PaginatedPoolStakes }> {
+    let hp = new HttpParams();
+    if (params?.page) hp = hp.set('page', params.page);
+    if (params?.limit) hp = hp.set('limit', params.limit);
+    if (params?.marketId) hp = hp.set('marketId', params.marketId);
+    if (params?.search) hp = hp.set('search', params.search);
+    if (params?.status) hp = hp.set('status', params.status);
+    if (params?.from) hp = hp.set('from', params.from);
+    if (params?.to) hp = hp.set('to', params.to);
+    if (params?.sortField) hp = hp.set('sortField', params.sortField);
+    if (params?.sortOrder) hp = hp.set('sortOrder', params.sortOrder);
+    return this.http.get<any>(`${this.baseUrl}/${id}/stakes`, { params: hp });
   }
 
   closeStaking(id: string): Observable<{ success: boolean; data: AdminMatchPool; message: string }> {
