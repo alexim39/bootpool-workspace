@@ -1,5 +1,6 @@
 import { Injectable, signal, computed, inject, OnDestroy } from '@angular/core';
 import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 import { PodService, Pod } from '../../../core/services';
 import { StakeService, PlaceAccumulatorRequest } from '../../../core/services';
 import { WalletService } from '../../../core/services';
@@ -201,7 +202,7 @@ export class HomeStore implements OnDestroy {
       if (exists) {
         return selected.filter(s => s.id !== pod.id);
       }
-      if (selected.length >= 5) {
+      if (selected.length >= environment.maxAccumulatorLegs) {
         return selected;
       }
       return [...selected, pod];
@@ -226,7 +227,7 @@ export class HomeStore implements OnDestroy {
   }
 
   isSelectionDisabled(): boolean {
-    return this.betSlipSelections().length >= 5;
+    return this.betSlipSelections().length >= environment.maxAccumulatorLegs;
   }
 
   clearSelections() {
