@@ -227,7 +227,7 @@ export class AuthService {
     return this.http.post<{ success: boolean; message?: string; data?: { phoneVerified: boolean; user?: User } }>(`${this.API_URL}/auth/verify-phone/confirm`, { phone, code });
   }
 
-  getReferralStats(): Observable<{ success: boolean; data: { referralCode: string; totalReferrals: number; referralBonus: number; referrals: Array<{ fullName: string; createdAt: string }> } }> {
+  getReferralStats(): Observable<{ success: boolean; data: { referralCode: string; isAffiliate: boolean; totalReferrals: number; referralBonus: number; referrals: Array<{ fullName: string; createdAt: string }> } }> {
     return this.http.get<{ success: boolean; data: any }>(`${environment.apiUrl}/auth/referrals`, { headers: this.getAuthHeaders() });
   }
 

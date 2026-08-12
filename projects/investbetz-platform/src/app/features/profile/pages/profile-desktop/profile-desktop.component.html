@@ -341,8 +341,15 @@
                   <mat-icon>card_giftcard</mat-icon>
                   <div>
                     <h3>Refer & Earn</h3>
-                    <p>Share your code, earn ₦500 when friends join and place their first bet</p>
+                    @if (store.referralStats()?.isAffiliate) {
+                      <p class="ref-aff-note">You're marked as an affiliate (promoter) — referrals you drive don't earn bonuses.</p>
+                    } @else {
+                      <p>Share your code, earn ₦500 when friends join and place their first bet</p>
+                    }
                   </div>
+                  @if (store.referralStats()?.isAffiliate) {
+                    <mat-chip class="chip-affiliate" selected matTooltip="Marked as affiliate by BetPool admin">Affiliate</mat-chip>
+                  }
                 </div>
 
                 <div class="referral-code-display">
@@ -372,6 +379,27 @@
                     <div class="stat-value">₦{{ store.referralStats()?.referralBonus?.toLocaleString() || '0' }}</div>
                     <div class="stat-label">Earned</div>
                   </div>
+                </div>
+
+                @if (!store.referralStats()?.isAffiliate) {
+                  <p class="ref-hint">You earn ₦500 when a friend signs up with your code and places their first bet on any product.</p>
+                }
+
+                <div class="ref-list">
+                  <div class="ref-list-title">Your Referrals</div>
+                  @if ((store.referralStats()?.referrals?.length || 0) > 0) {
+                    <div class="ref-list-scroll">
+                      @for (ref of store.referralStats()?.referrals || []; track ref) {
+                        <div class="ref-item">
+                          <mat-icon>person</mat-icon>
+                          <span>{{ ref.fullName }}</span>
+                          <span class="ref-date">{{ store.formatJoinDate(ref.createdAt) }}</span>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div class="ref-empty">No referrals yet — share your code to start earning</div>
+                  }
                 </div>
               </mat-card-content>
             </mat-card>

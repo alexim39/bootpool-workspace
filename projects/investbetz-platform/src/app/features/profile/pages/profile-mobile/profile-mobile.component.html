@@ -267,7 +267,12 @@
           <div class="bottom-sheet" (click)="$event.stopPropagation()">
             <div class="sheet-handle"></div>
             <div class="sheet-header">
-              <h3>Refer & Earn</h3>
+              <div class="sheet-title-wrap">
+                <h3>Refer & Earn</h3>
+                @if (store.referralStats()?.isAffiliate) {
+                  <mat-chip class="chip-affiliate" selected>Affiliate</mat-chip>
+                }
+              </div>
               <button mat-icon-button (click)="store.activeTab.set('')"><mat-icon>close</mat-icon></button>
             </div>
             <div class="sheet-body">
@@ -286,19 +291,28 @@
                 <div class="ref-stat"><strong>{{ store.referralStats()?.totalReferrals || 0 }}</strong><span>Referrals</span></div>
                 <div class="ref-stat"><strong>₦{{ store.referralStats()?.referralBonus?.toLocaleString() || '0' }}</strong><span>Earned</span></div>
               </div>
-              <p class="ref-hint">You earn ₦500 when a friend signs up with your code and places their first bet on any product.</p>
-              @if ((store.referralStats()?.referrals?.length || 0) > 0) {
-                <div class="ref-list">
-                  <div class="ref-list-title">Your Referrals</div>
-                  @for (ref of store.referralStats()?.referrals || []; track ref) {
-                    <div class="ref-item">
-                      <mat-icon>person</mat-icon>
-                      <span>{{ ref.fullName }}</span>
-                      <span class="ref-date">{{ store.formatJoinDate(ref.createdAt) }}</span>
-                    </div>
-                  }
-                </div>
+              @if (!store.referralStats()?.isAffiliate) {
+                <p class="ref-hint">You earn ₦500 when a friend signs up with your code and places their first bet on any product.</p>
               }
+              @if (store.referralStats()?.isAffiliate) {
+                <p class="ref-hint ref-hint-aff">You're marked as an affiliate (promoter) — referrals you drive don't earn bonuses.</p>
+              }
+              <div class="ref-list">
+                <div class="ref-list-title">Your Referrals</div>
+                @if ((store.referralStats()?.referrals?.length || 0) > 0) {
+                  <div class="ref-list-scroll">
+                    @for (ref of store.referralStats()?.referrals || []; track ref) {
+                      <div class="ref-item">
+                        <mat-icon>person</mat-icon>
+                        <span>{{ ref.fullName }}</span>
+                        <span class="ref-date">{{ store.formatJoinDate(ref.createdAt) }}</span>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="ref-empty">No referrals yet — share your code to start earning</div>
+                }
+              </div>
             </div>
           </div>
         </div>

@@ -20,7 +20,7 @@ export class ProfileStore {
   readonly showFaq = signal(false);
   readonly kycType = signal<'bvn' | 'nin'>('bvn');
   readonly submittingKyc = signal(false);
-  readonly referralStats = signal<{ totalReferrals: number; referralBonus: number; referrals: Array<{ fullName: string; createdAt: string }> } | null>(null);
+  readonly referralStats = signal<{ totalReferrals: number; referralBonus: number; isAffiliate: boolean; referrals: Array<{ fullName: string; createdAt: string }> } | null>(null);
   readonly showPhoneOtp = signal(false);
   readonly verifyingPhone = signal(false);
   readonly activeTab = signal<string>('');
