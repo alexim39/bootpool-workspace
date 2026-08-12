@@ -94,12 +94,13 @@
 .chip.suspended { background: rgba(255,82,82,0.15); color: #FF8A80; }
 .chip.verified { background: rgba(129,212,250,0.15); color: #81D4FA; }
 .chip.unverified { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
+.chip.affiliate { background: rgba(255,213,79,0.15); color: #FFD54F; text-transform: uppercase; font-size: 10px; letter-spacing: 0.4px; }
 
 .wallet-cell { font-variant-numeric: tabular-nums; color: #fff; font-weight: 500; }
 .last-active-cell { color: rgba(255,255,255,0.5); font-size: 12px; }
 .date-cell { color: rgba(255,255,255,0.5); font-size: 12px; }
 
-.actions-col { width: 100px; white-space: nowrap; }
+.actions-col { width: 150px; white-space: nowrap; }
 ::ng-deep .admin-table .mat-mdc-cell.actions-col { padding: 4px 12px !important; }
 .icon-act { font-size: 18px; width: 18px; height: 18px; }
 .icon-act.suspend { color: #FF8A80; }
@@ -107,6 +108,8 @@
 .icon-kyc { font-size: 18px; width: 18px; height: 18px; }
 .icon-kyc.verified { color: #81D4FA; }
 .icon-kyc.pending { color: rgba(255,255,255,0.25); }
+.icon-aff { font-size: 18px; width: 18px; height: 18px; color: rgba(255,255,255,0.25); }
+.icon-aff.affiliate { color: #FFD54F; }
 
 .empty-state { padding: 48px 32px; text-align: center; color: rgba(255,255,255,0.3); }
 .empty-icon { font-size: 40px; width: 40px; height: 40px; margin-bottom: 8px; opacity: 0.4; }

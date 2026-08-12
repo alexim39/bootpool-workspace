@@ -53,6 +53,7 @@
     .ref-stat { display: flex; flex-direction: column; align-items: center; }
     .ref-stat strong { font-size: 22px; color: #00E676; }
     .ref-stat span { font-size: 12px; color: rgba(255,255,255,0.5); }
+    .ref-hint { margin: 12px 0 0; padding: 10px 12px; background: rgba(232,185,35,0.08); border: 1px solid rgba(232,185,35,0.2); border-radius: 10px; font-size: 12px; line-height: 1.5; color: rgba(255,255,255,0.65); }
     .support-item { display: flex; align-items: center; gap: 12px; padding: 14px; background: #162245; border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; width: 100%; cursor: pointer; color: #FFFFFF; text-align: left; }
     .support-item mat-icon:first-child { color: #00E676; }
     .support-item div { flex: 1; }

@@ -104,6 +104,21 @@ export class UserDetailComponent implements OnInit {
     if (id) this.store.toggleUserById(id);
   }
 
+  toggleAffiliate() {
+    const id = this.route.snapshot.paramMap.get('id');
+    const u = this.user();
+    if (id && u) {
+      this.store.updateUser(id, { isAffiliate: !u.isAffiliate }).subscribe({
+        next: (res) => {
+          this.snackBar.open(res.message || 'Affiliate status updated', 'OK', { duration: 3000, panelClass: 'snack-success' });
+        },
+        error: (err) => {
+          this.snackBar.open(err?.error?.message || 'Failed to update affiliate status', 'OK', { duration: 4000, panelClass: 'snack-error' });
+        },
+      });
+    }
+  }
+
   verifyKyc() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) this.store.verifyUserKycById(id);

@@ -157,7 +157,7 @@ export class AdminUsersStore {
     });
   }
 
-  updateUser(id: string, payload: { fullName?: string; phone?: string; email?: string; role?: 'user' | 'admin'; isSuspended?: boolean }) {
+  updateUser(id: string, payload: { fullName?: string; phone?: string; email?: string; role?: 'user' | 'admin'; isSuspended?: boolean; isAffiliate?: boolean }) {
     this.saving.set(true);
     return this.admin.updateUser(id, payload).pipe(
       tap(res => {
@@ -171,6 +171,10 @@ export class AdminUsersStore {
 
   toggleStatus(u: AdminUser) {
     this.admin.toggleUserStatus(u._id || u.id).subscribe(() => this.load());
+  }
+
+  toggleAffiliate(u: AdminUser) {
+    this.updateUser(u._id || u.id, { isAffiliate: !u.isAffiliate }).subscribe(() => this.load());
   }
 
   toggleUserById(id: string) {

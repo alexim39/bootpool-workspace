@@ -147,7 +147,10 @@
             <th mat-header-cell *matHeaderCellDef class="sortable" (click)="store.setSort('fullName')">
               Name <mat-icon class="sort-icon">{{ store.sortIcon('fullName') }}</mat-icon>
             </th>
-            <td mat-cell *matCellDef="let u" class="clickable" (click)="viewUser(u)">{{ u.fullName }}</td>
+            <td mat-cell *matCellDef="let u" class="clickable" (click)="viewUser(u)">
+              {{ u.fullName }}
+              @if (u.isAffiliate) { <span class="chip affiliate">Affiliate</span> }
+            </td>
           </ng-container>
           <ng-container matColumnDef="email">
             <th mat-header-cell *matHeaderCellDef>Email</th>
@@ -201,6 +204,9 @@
               </button>
               <button mat-icon-button (click)="store.verifyKyc(u); $event.stopPropagation()" matTooltip="Toggle KYC verification">
                 <mat-icon class="icon-kyc" [class.verified]="u.kycVerified" [class.pending]="!u.kycVerified">verified</mat-icon>
+              </button>
+              <button mat-icon-button (click)="store.toggleAffiliate(u); $event.stopPropagation()" [matTooltip]="u.isAffiliate ? 'Unmark as affiliate (promoter)' : 'Mark as affiliate (paid promoter)'">
+                <mat-icon class="icon-aff" [class.affiliate]="u.isAffiliate">campaign</mat-icon>
               </button>
             </td>
           </ng-container>

@@ -145,6 +145,10 @@
               <mat-icon>verified</mat-icon>
               {{ data.user?.kycVerified ? 'Unverify KYC' : 'Verify KYC' }}
             </button>
+            <button mat-stroked-button class="action-btn" [class.btn-aff]="data.user?.isAffiliate" (click)="toggleAffiliate()">
+              <mat-icon>campaign</mat-icon>
+              {{ data.user?.isAffiliate ? 'Unmark Affiliate' : 'Mark Affiliate' }}
+            </button>
           </mat-card-content>
         </mat-card>
       </div>

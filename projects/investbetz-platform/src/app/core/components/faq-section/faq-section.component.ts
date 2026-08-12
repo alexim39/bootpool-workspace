@@ -21,7 +21,7 @@ export class FaqSectionComponent {
     { question: 'What is a pod?', answer: 'A pod is a curated betting pool on BetPool. Each pod bundles one or more sporting events into a single betting unit with a fixed payout multiplier. You stake on the pod as a whole, not on individual matches.', open: false },
     { question: 'How do deposits work?', answer: 'Deposits are processed instantly via Paystack. You can fund your wallet from the Wallet page with amounts from ₦500 to ₦500,000. Zero fees on deposits.', open: false },
     { question: 'What is KYC and why do I need it?', answer: 'KYC (Know Your Customer) verification is required to unlock higher withdrawal limits. Submit your BVN or NIN from your Profile page under Security. Your information is encrypted and securely stored.', open: false },
-    { question: 'How does the referral program work?', answer: 'Share your unique referral code with friends. When they sign up and place a bet, you earn referral bonuses. Your code and stats are on your Profile page.', open: false }
+    { question: 'How does the referral program work?', answer: 'Share your unique referral code with friends. When they sign up and place their first bet on any product (Pods, Bet Manager, or Match Pools), you earn a ₦500 bonus. Your code and stats are on your Profile page.', open: false }
   ];
   toggle(item: FaqItem) { item.open = !item.open; }
 }

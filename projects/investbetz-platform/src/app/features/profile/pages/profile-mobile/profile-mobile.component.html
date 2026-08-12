@@ -286,6 +286,7 @@
                 <div class="ref-stat"><strong>{{ store.referralStats()?.totalReferrals || 0 }}</strong><span>Referrals</span></div>
                 <div class="ref-stat"><strong>₦{{ store.referralStats()?.referralBonus?.toLocaleString() || '0' }}</strong><span>Earned</span></div>
               </div>
+              <p class="ref-hint">You earn ₦500 when a friend signs up with your code and places their first bet on any product.</p>
               @if ((store.referralStats()?.referrals?.length || 0) > 0) {
                 <div class="ref-list">
                   <div class="ref-list-title">Your Referrals</div>
