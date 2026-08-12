@@ -9,7 +9,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatBadgeModule } from '@angular/material/badge';
-import { environment } from '../../../../../environments/environment';
 import { Pod } from '../../../../core/services';
 import { NotificationService } from '../../../../core/services';
 import { OraPick } from '../../../../core/services';
@@ -153,8 +152,8 @@ export class HomeMobileComponent implements OnInit {
       this._snackBar.open('Please log in to place a stake', 'OK', { duration: 3000 });
       return;
     }
-    if (this.store.betSlipSelections().length >= environment.maxAccumulatorLegs && !this.store.isSelected(pod.id)) {
-      this._snackBar.open(`Maximum of ${environment.maxAccumulatorLegs} selections allowed`, 'OK', { duration: 2000 });
+    if (this.store.betSlipSelections().length >= this.store.maxAccumulatorLegs() && !this.store.isSelected(pod.id)) {
+      this._snackBar.open(`Maximum of ${this.store.maxAccumulatorLegs()} selections allowed`, 'OK', { duration: 2000 });
       return;
     }
     this.store.toggleSelection(pod);

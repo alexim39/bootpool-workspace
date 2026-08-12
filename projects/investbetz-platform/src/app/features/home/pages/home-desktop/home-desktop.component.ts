@@ -11,7 +11,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { environment } from '../../../../../environments/environment';
 import { PodCardComponent } from '../../components/pod-card/pod-card.component';
 import { StakeModalComponent } from '../../components/stake-modal/stake-modal.component';
 import { BetSlipComponent } from '../../components/bet-slip/bet-slip.component';
@@ -97,8 +96,8 @@ export class HomeDesktopComponent implements OnInit {
       this._snackBar.open('Please log in to place a stake', 'OK', { duration: 3000 });
       return;
     }
-    if (this.store.betSlipSelections().length >= environment.maxAccumulatorLegs && !this.store.isSelected(pod.id)) {
-      this._snackBar.open(`Maximum of ${environment.maxAccumulatorLegs} selections allowed`, 'OK', { duration: 2000 });
+    if (this.store.betSlipSelections().length >= this.store.maxAccumulatorLegs() && !this.store.isSelected(pod.id)) {
+      this._snackBar.open(`Maximum of ${this.store.maxAccumulatorLegs()} selections allowed`, 'OK', { duration: 2000 });
       return;
     }
     this.store.toggleSelection(pod);

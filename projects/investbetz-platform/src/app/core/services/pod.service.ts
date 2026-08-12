@@ -63,6 +63,7 @@ export interface PaginatedPodFeedResponse {
     items: Pod[];
     total: number;
     hasMore: boolean;
+    maxAccumulatorLegs?: number;
   };
 }
 
@@ -90,6 +91,7 @@ export class PodService {
   totalPods = signal(0);
   hasMorePods = signal(false);
   personalized = signal(false);
+  maxAccumulatorLegs = signal(5);
 
   activePods = computed(() => 
     this.pods().filter(p => 
@@ -150,7 +152,7 @@ export class PodService {
     this.http.get<PaginatedPodFeedResponse>(`${environment.apiUrl}/pods/feed?${query}`).subscribe({
       next: (res) => {
         if (res.success) {
-          const { items, total, hasMore } = res.data;
+          const { items, total, hasMore, maxAccumulatorLegs } = res.data;
           const mapped = items.map(p => this.mapPod(p));
           if (isLoadMore) {
             this.pods.update(existing => [...existing, ...mapped]);
@@ -159,6 +161,7 @@ export class PodService {
           }
           this.totalPods.set(total);
           this.hasMorePods.set(hasMore);
+          this.maxAccumulatorLegs.set(maxAccumulatorLegs || 5);
           if (!isLoadMore) {
             this.personalized.set(!!params?.personalized);
           }

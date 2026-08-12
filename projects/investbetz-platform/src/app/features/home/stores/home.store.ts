@@ -1,6 +1,5 @@
 import { Injectable, signal, computed, inject, OnDestroy } from '@angular/core';
 import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
-import { environment } from '../../../../environments/environment';
 import { PodService, Pod } from '../../../core/services';
 import { StakeService, PlaceAccumulatorRequest } from '../../../core/services';
 import { WalletService } from '../../../core/services';
@@ -194,6 +193,8 @@ export class HomeStore implements OnDestroy {
     this.selectedPod.set(null);
   }
 
+  readonly maxAccumulatorLegs = computed(() => this.pods.maxAccumulatorLegs());
+
   toggleSelection(pod: Pod) {
     if (!this.auth.isAuthenticated()) return;
 
@@ -202,7 +203,7 @@ export class HomeStore implements OnDestroy {
       if (exists) {
         return selected.filter(s => s.id !== pod.id);
       }
-      if (selected.length >= environment.maxAccumulatorLegs) {
+      if (selected.length >= this.maxAccumulatorLegs()) {
         return selected;
       }
       return [...selected, pod];
@@ -227,7 +228,7 @@ export class HomeStore implements OnDestroy {
   }
 
   isSelectionDisabled(): boolean {
-    return this.betSlipSelections().length >= environment.maxAccumulatorLegs;
+    return this.betSlipSelections().length >= this.maxAccumulatorLegs();
   }
 
   clearSelections() {
