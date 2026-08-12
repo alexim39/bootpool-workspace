@@ -38,12 +38,12 @@ export class LandingMobileComponent implements AfterViewInit {
 
   faqItems = [
     {
-      question: 'How does BetPool make money with a stake-back guarantee?',
-      answer: 'BetPool only earns when you win — we take a 30% fee on successful payouts. We manage risk by carefully limiting each offer\'s total stake and maintaining dedicated reserves, so refunds are always fully backed.'
+      question: 'How does BetPool make money with cashback on losses?',
+      answer: 'BetPool only earns when you win — we take a 30% fee on successful payouts. We manage risk by carefully limiting each offer\'s total stake and maintaining dedicated reserves, so cashbacks are always fully backed.'
     },
     {
-      question: 'Is my stake really guaranteed to be refunded if I lose?',
-      answer: 'Absolutely. If the prediction doesn\'t go your way, your full stake is returned to your wallet — no deductions, no delays, no fine print.'
+      question: 'Is my stake protected if my pick loses?',
+      answer: 'Yes — every pod carries cashback on losses. If a pod doesn\'t win, a percentage of your stake is returned to your wallet automatically. The rate is set by the pod\'s odds and shown on each pod before you stake: from 5% on higher-odds pods up to 35% on the safest offers.'
     },
     {
       question: 'Is BetPool considered gambling?',

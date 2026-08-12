@@ -99,9 +99,9 @@
             <div class="win-refund-row">
               <mat-icon class="refund-icon">autorenew</mat-icon>
               @if (pod().refundPercent) {
-                <span>If it doesn't win: <strong>{{ pod().refundPercent }}% refunded</strong> (₦{{ (stakeAmount() * (pod().refundPercent || 0) / 100) | number:'1.0-0' }})</span>
+                <span>If it doesn't win: <strong>{{ pod().refundPercent }}% cashback</strong> (₦{{ (stakeAmount() * (pod().refundPercent || 0) / 100) | number:'1.0-0' }})</span>
               } @else {
-                <span>If it doesn't win: your <strong>{{ formatAmount(amountForm.get('amount')?.value) }}</strong> is refunded</span>
+                <span>If it doesn't win: <strong>no cashback applies</strong> on this pod</span>
               }
             </div>
           </div>
