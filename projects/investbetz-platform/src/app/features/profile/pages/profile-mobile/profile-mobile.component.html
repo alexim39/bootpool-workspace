@@ -298,7 +298,7 @@
                 <p class="ref-hint ref-hint-aff">You're marked as an affiliate (promoter) — referrals you drive don't earn bonuses.</p>
               }
               <div class="ref-list">
-                <div class="ref-list-title">Your Referrals</div>
+                <div class="ref-list-title">Your Referrals ({{ store.referralStats()?.totalReferrals || 0 }})</div>
                 @if ((store.referralStats()?.referrals?.length || 0) > 0) {
                   <div class="ref-list-scroll">
                     @for (ref of store.referralStats()?.referrals || []; track ref) {
