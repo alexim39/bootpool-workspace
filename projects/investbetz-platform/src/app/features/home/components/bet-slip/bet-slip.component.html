@@ -92,6 +92,10 @@
         </div>
 
         <!-- Place Bet -->
+        <div class="accum-note">
+          <mat-icon>info</mat-icon>
+          <span>Accumulator bets are not covered by the stake-back guarantee.</span>
+        </div>
         <button class="place-bet-btn" [disabled]="!canPlace()" (click)="placeBet()">
           @if (submitting()) {
             <span>Placing...</span>
