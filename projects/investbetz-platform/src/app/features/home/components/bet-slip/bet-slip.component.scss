@@ -103,11 +103,21 @@
     .slip-overlay { display: none; }
 
     @media (max-width: 768px) {
-      .bet-slip { position: fixed; bottom: 60px; left: 0; right: 0; z-index: 1000; border-radius: 16px 16px 0 0; max-height: calc(70vh - 60px); transform: translateY(calc(100% - 50px)); transition: transform 0.3s ease; padding-bottom: env(safe-area-inset-bottom, 0); }
+      .bet-slip { position: fixed; bottom: 60px; left: 0; right: 0; z-index: 1000; border-radius: 16px 16px 0 0; max-height: calc(85vh - 60px); display: flex; flex-direction: column; overflow: hidden; transform: translateY(calc(100% - 50px)); transition: transform 0.3s ease; padding-bottom: env(safe-area-inset-bottom, 0); }
       .bet-slip.open { transform: translateY(0); }
       .bet-slip.open .slip-clear-btn { margin-left: auto; }
       .slip-toggle-btn { display: flex !important; }
       .slip-overlay { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: -1; }
+      /* Selections list takes all remaining space and scrolls internally as legs grow */
+      .slip-selections { flex: 1 1 auto; min-height: 0; max-height: none; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+      /* Fixed sections stay pinned to the bottom and are never clipped */
+      .slip-header,
+      .slip-combined,
+      .slip-stake,
+      .slip-payout,
+      .accum-note,
+      .slip-booking,
+      .place-bet-btn { flex-shrink: 0; }
       .bet-slip:not(.open) .slip-selections,
       .bet-slip:not(.open) .slip-combined,
       .bet-slip:not(.open) .slip-stake,
