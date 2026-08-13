@@ -60,8 +60,6 @@ export class HomeStore implements OnDestroy {
 
   readonly displayedPods = computed(() => {
     const pods = this.activePods();
-    const personalized = this.pods.personalized();
-    if (personalized) return pods;
     return [...pods].sort((a, b) =>
       new Date(a.stakingClosesAt).getTime() - new Date(b.stakingClosesAt).getTime()
     );
