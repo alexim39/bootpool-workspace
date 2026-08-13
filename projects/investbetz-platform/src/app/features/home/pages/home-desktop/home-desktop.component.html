@@ -318,7 +318,7 @@
       }
     </main>
 
-    <aside class="bet-slip-sidebar" *ngIf="store.betSlipSelections().length > 0 || store.betSlipOpen()">
+    <aside class="bet-slip-sidebar">
       <app-bet-slip
         [selections]="store.betSlipSelections()"
         [open]="store.betSlipOpen()"
