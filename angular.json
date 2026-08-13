@@ -38,6 +38,11 @@
                 "input": "projects/investbetz-platform/public"
               },
               {
+                "glob": ".htaccess",
+                "input": "projects/investbetz-platform/public",
+                "output": "/"
+              },
+              {
                 "glob": "manifest.webmanifest",
                 "input": "projects/investbetz-platform/src"
               }
@@ -109,6 +114,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/investbetz-platform/public"
+              },
+              {
+                "glob": ".htaccess",
+                "input": "projects/investbetz-platform/public",
+                "output": "/"
               }
             ],
             "styles": [
@@ -151,6 +161,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/investbetz-admin/public"
+              },
+              {
+                "glob": ".htaccess",
+                "input": "projects/investbetz-admin/public",
+                "output": "/"
               }
             ],
             "styles": [
@@ -220,6 +235,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/investbetz-admin/public"
+              },
+              {
+                "glob": ".htaccess",
+                "input": "projects/investbetz-admin/public",
+                "output": "/"
               }
             ],
             "styles": [
