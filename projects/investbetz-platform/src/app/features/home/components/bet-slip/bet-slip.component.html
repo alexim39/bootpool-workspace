@@ -23,6 +23,29 @@
           <mat-icon>touch_app</mat-icon>
           <p>Tap the <mat-icon>add_2</mat-icon> on odds to add selections</p>
         </div>
+        <div class="slip-booking">
+          <div class="booking-title">
+            <mat-icon>ticket_stub</mat-icon>
+            <span>Have a booking code?</span>
+          </div>
+          <div class="booking-row">
+            <input
+              class="booking-input"
+              type="text"
+              placeholder="Enter code e.g. K7M2Q9DX"
+              [value]="bookingCodeInput()"
+              (input)="bookingCodeInput.set($any($event.target).value)"
+              (keyup.enter)="applyBookingCode()"
+              [disabled]="store.redeemLoading()"
+              maxlength="12" />
+            <button class="booking-apply" (click)="applyBookingCode()" [disabled]="store.redeemLoading() || !bookingCodeInput().trim()">
+              {{ store.redeemLoading() ? 'Checking…' : 'Apply' }}
+            </button>
+          </div>
+          @if (store.bookingCodeError()) {
+            <div class="booking-error">{{ store.bookingCodeError() }}</div>
+          }
+        </div>
       } @else {
         <!-- Selections List -->
         <div class="slip-selections">
@@ -90,6 +113,39 @@
             <span class="net-value">{{ formatCurrency(netPayout()) }}</span>
           </div>
         </div>
+
+        <!-- Booking Code -->
+        @if (selections().length >= 2) {
+          <div class="slip-booking share">
+            @if (!store.bookingCode()) {
+              <button class="share-code-btn" (click)="shareBookingCode()" [disabled]="store.bookingCodeLoading()">
+                <mat-icon>share</mat-icon>
+                {{ store.bookingCodeLoading() ? 'Generating…' : 'Share Booking Code' }}
+              </button>
+            } @else {
+              <div class="code-box">
+                <div class="code-box-head">
+                  <mat-icon>ticket_stub</mat-icon>
+                  <span>Booking code</span>
+                  <button class="code-clear" (click)="clearBookingCode()" aria-label="Clear booking code">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+                <div class="code-value">{{ store.bookingCode() }}</div>
+                <div class="code-sub">
+                  <span>Expires {{ formatExpiry(store.bookingCodeExpiry()) }}</span>
+                  <button class="code-copy" (click)="copyBookingCode()">
+                    <mat-icon>content_copy</mat-icon>
+                    Copy
+                  </button>
+                </div>
+              </div>
+            }
+            @if (store.bookingCodeError()) {
+              <div class="booking-error">{{ store.bookingCodeError() }}</div>
+            }
+          </div>
+        }
 
         <!-- Place Bet -->
         <div class="accum-note">

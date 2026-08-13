@@ -1,7 +1,8 @@
-import { Injectable, signal, computed, inject, OnDestroy } from '@angular/core';
-import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Injectable, signal, computed, inject, effect, OnDestroy } from '@angular/core';
+import { Subject, Subscription, Observable, debounceTime, distinctUntilChanged, finalize, map } from 'rxjs';
 import { PodService, Pod } from '../../../core/services';
 import { StakeService, PlaceAccumulatorRequest } from '../../../core/services';
+import { BookingCodeLeg } from '../../../core/services';
 import { WalletService } from '../../../core/services';
 import { AuthService } from '../../../core/services';
 import { OraRecordService, OraRecord } from '../../../core/services';
@@ -79,6 +80,12 @@ export class HomeStore implements OnDestroy {
       } else {
         this.clearSearch();
       }
+    });
+
+    effect(() => {
+      this.betSlipSelections();
+      this.bookingCode.set(null);
+      this.bookingCodeError.set(null);
     });
   }
 
@@ -242,5 +249,106 @@ export class HomeStore implements OnDestroy {
     this.selectedPod.set(null);
     this._wallet.fetchBalance();
     this._stake.fetchActiveStakes();
+  }
+
+  readonly bookingCode = signal<string | null>(null);
+  readonly bookingCodeExpiry = signal<string | null>(null);
+  readonly bookingCodeLoading = signal(false);
+  readonly redeemLoading = signal(false);
+  readonly bookingCodeError = signal<string | null>(null);
+
+  clearBookingCode() {
+    this.bookingCode.set(null);
+    this.bookingCodeExpiry.set(null);
+    this.bookingCodeError.set(null);
+  }
+
+  createBookingCode() {
+    const podIds = this.betSlipSelections().map(s => s.id);
+    if (podIds.length < 2 || this.bookingCodeLoading()) return;
+
+    this.bookingCodeLoading.set(true);
+    this.bookingCodeError.set(null);
+    this._stake.createBookingCode(podIds).subscribe({
+      next: (res) => {
+        if (res.success && res.data?.code) {
+          this.bookingCode.set(res.data.code);
+          this.bookingCodeExpiry.set(res.data.expiresAt);
+        } else {
+          this.bookingCodeError.set(res.message || 'Could not generate booking code');
+        }
+        this.bookingCodeLoading.set(false);
+      },
+      error: (err) => {
+        this.bookingCodeError.set(err.error?.message || 'Could not generate booking code');
+        this.bookingCodeLoading.set(false);
+      }
+    });
+  }
+
+  redeemBookingCode(code: string): Observable<boolean> {
+    const trimmed = (code || '').trim();
+    this.redeemLoading.set(true);
+    this.bookingCodeError.set(null);
+
+    return this._stake.redeemBookingCode(trimmed).pipe(
+      finalize(() => this.redeemLoading.set(false)),
+      map((res) => {
+        const legs = res.data?.legs || [];
+        const available = legs.filter(l => l.available);
+        if (res.success && available.length > 0) {
+          this.betSlipSelections.set(available.map(l => this.mapBookingLegToPod(l)));
+          this.betSlipOpen.set(true);
+          this.bookingCode.set(null);
+          if (available.length < legs.length) {
+            this.bookingCodeError.set(
+              `${legs.length - available.length} selection(s) already closed — ${available.length} added to slip`
+            );
+          }
+          return true;
+        }
+        this.bookingCodeError.set(
+          res.success
+            ? 'None of the selections are still available'
+            : (res.message || 'Booking code could not be redeemed')
+        );
+        return false;
+      })
+    );
+  }
+
+  private mapBookingLegToPod(leg: BookingCodeLeg): Pod {
+    const closesAt = leg.stakingClosesAt || new Date().toISOString();
+    return {
+      id: leg.podId,
+      title: `${leg.homeTeam} vs ${leg.awayTeam}`,
+      sport: '',
+      league: leg.league,
+      homeTeam: leg.homeTeam,
+      awayTeam: leg.awayTeam,
+      matchDate: closesAt,
+      selection: leg.selection,
+      gainsMultiplier: leg.multiplier,
+      impliedProbability: 0,
+      minStake: 10,
+      maxStake: 5000,
+      maxPayout: 0,
+      maxTotalExposure: 0,
+      currentExposure: 0,
+      currentParticipants: 0,
+      status: 'active',
+      stakingClosesAt: closesAt,
+      settlementEstimateLabel: '',
+      settlementEstimateAt: new Date().toISOString(),
+      openedAt: new Date().toISOString(),
+      isLive: false,
+      displayOrder: 0,
+      legs: [],
+      createdBy: '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      timeRemaining: Math.max(0, new Date(closesAt).getTime() - Date.now()),
+      isOpen: true,
+    };
   }
 }
