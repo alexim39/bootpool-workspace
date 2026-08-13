@@ -46,6 +46,10 @@ export class LandingDesktopComponent implements AfterViewInit {
       answer: 'Yes — every pod carries cashback on losses. If a pod doesn\'t win, a percentage of your stake is returned to your wallet automatically. The rate is set by the pod\'s odds and shown on each pod before you stake: from 5% on higher-odds pods up to 35% on the safest offers.'
     },
     {
+      question: 'What happens if one leg of my accumulator fails?',
+      answer: 'Accumulators with 4 or more selections carry one-leg insurance: if exactly one selection fails while the rest win, your slip still pays a reduced accumulator on the winning selections — automatically, with no extra fee. Voided selections are excluded and don\'t count as the failing leg.'
+    },
+    {
       question: 'Is BetPool considered gambling?',
       answer: 'BetPool is a betting-support platform that lets you back predictions on real sporting outcomes. Unlike traditional betting, your stake is never at risk. We encourage all users to participate responsibly and within their means.'
     },

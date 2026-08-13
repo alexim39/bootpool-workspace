@@ -369,6 +369,9 @@
                 <div class="bet-result">
                   @if (stake.status === 'won') {
                     <span>Won</span>
+                    @if (stake.insuranceApplied) {
+                      <span class="insurance-chip" title="One selection failed — reduced payout paid">Insured</span>
+                    }
                     <span class="positive">+{{ store.formatCurrency(stake.profit!) }}</span>
                   } @else if (stake.status === 'cashed_out') {
                     <span>Cashed Out</span>

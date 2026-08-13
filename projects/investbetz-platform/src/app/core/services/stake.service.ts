@@ -61,6 +61,7 @@ export interface Stake {
   isSettled: boolean;
   isParlay: boolean;
   refundAmount?: number;
+  insuranceApplied?: boolean;
   cashoutAmount?: number;
   cashoutFee?: number;
   cashedOutAt?: string;

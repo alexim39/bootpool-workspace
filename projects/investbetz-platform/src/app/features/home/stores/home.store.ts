@@ -199,6 +199,7 @@ export class HomeStore implements OnDestroy {
   }
 
   readonly maxAccumulatorLegs = computed(() => this.pods.maxAccumulatorLegs());
+  readonly insuranceMinLegs = computed(() => this.pods.insuranceMinLegs());
 
   toggleSelection(pod: Pod) {
     if (!this.auth.isAuthenticated()) return;

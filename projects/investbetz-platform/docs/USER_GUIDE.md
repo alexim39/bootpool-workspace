@@ -148,6 +148,7 @@ Each Pod is a curated betting market with:
 - **Stake:** Enter one amount for all legs.
 - **Payout:** Combined odds × stake (minus platform fee).
 - **Place:** Click "Place Accumulator" → `POST /stakes` with multiple `podIds`.
+- **One-leg insurance:** Slips with 4+ selections (config `ACCUMULATOR_INSURANCE_MIN_LEGS`, served as `insuranceMinLegs` in the feed) are covered automatically: if exactly one leg fails and the rest win, the stake pays as a reduced accumulator on the winning legs (10% platform fee still applies to the reduced payout). Voided legs are excluded and do not count as the failing leg. Settled insurance stakes are marked `insuranceApplied: true` and show an "Insured" chip in Bet History.
 
 ### 3.7 Search
 
