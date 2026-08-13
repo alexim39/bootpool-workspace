@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { HomeStore } from '../../stores/home.store';
 import { Pod } from '../../../../core/services';
 import { WalletService } from '../../../../core/services';
 
@@ -26,6 +27,7 @@ export interface BetSlipSelection {
 export class BetSlipComponent {
   private wallet = inject(WalletService);
   private snackBar = inject(MatSnackBar);
+  readonly store = inject(HomeStore);
 
   selections = input<Pod[]>([]);
   open = input(false);
@@ -38,6 +40,7 @@ export class BetSlipComponent {
 
   stakeAmount = signal<number>(0);
   submitting = signal(false);
+  bookingCodeInput = signal('');
 
   private resultWatcher = effect(() => {
     if (this.placeBetResult()) this.submitting.set(false);
@@ -111,5 +114,54 @@ export class BetSlipComponent {
     return new Intl.NumberFormat('en-NG', {
       style: 'currency', currency: 'NGN', minimumFractionDigits: 0, maximumFractionDigits: 0
     }).format(amount || 0);
+  }
+
+  applyBookingCode() {
+    const code = this.bookingCodeInput().trim();
+    if (!code || this.store.redeemLoading()) return;
+    this.store.redeemBookingCode(code).subscribe({
+      next: (ok) => {
+        if (ok) {
+          this.bookingCodeInput.set('');
+          this.snackBar.open('Booking code applied', 'OK', { duration: 2500 });
+        }
+      }
+    });
+  }
+
+  shareBookingCode() {
+    if (this.store.bookingCode()) return;
+    this.store.createBookingCode();
+  }
+
+  clearBookingCode() {
+    this.store.clearBookingCode();
+  }
+
+  async copyBookingCode() {
+    const code = this.store.bookingCode();
+    if (!code) return;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(code);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = code;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+      this.snackBar.open('Booking code copied', 'OK', { duration: 2500 });
+    } catch {
+      this.snackBar.open(`Copy failed — code: ${code}`, 'OK', { duration: 6000 });
+    }
+  }
+
+  formatExpiry(iso: string | null): string {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   }
 }

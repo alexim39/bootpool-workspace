@@ -133,6 +133,28 @@ export interface PlaceAccumulatorRequest {
   stakeAmount: number;
 }
 
+export interface BookingCodeLeg {
+  podId: string;
+  homeTeam: string;
+  awayTeam: string;
+  selection: string;
+  multiplier: number;
+  league?: string;
+  status: string;
+  available: boolean;
+  stakingClosesAt: string | null;
+}
+
+export interface BookingCodeResponse {
+  success: boolean;
+  message?: string;
+  data?: {
+    code: string;
+    expiresAt: string;
+    legs?: BookingCodeLeg[];
+  };
+}
+
 export interface PlaceStakeResponse {
   success: boolean;
   message?: string;
@@ -291,6 +313,21 @@ export class StakeService {
   calculatePayout(podId: string, stakeAmount: number) {
     return this.http.get<CalculatePayoutResponse>(
       `${environment.apiUrl}/stakes/calculate?podId=${podId}&stakeAmount=${stakeAmount}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  createBookingCode(podIds: string[]) {
+    return this.http.post<BookingCodeResponse>(
+      `${environment.apiUrl}/stakes/booking-codes`,
+      { podIds },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  redeemBookingCode(code: string) {
+    return this.http.get<BookingCodeResponse>(
+      `${environment.apiUrl}/stakes/booking-codes/${encodeURIComponent(code)}`,
       { headers: this.getHeaders() }
     );
   }
