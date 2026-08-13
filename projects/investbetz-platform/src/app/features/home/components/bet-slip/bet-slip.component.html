@@ -148,9 +148,13 @@
         }
 
         <!-- Place Bet -->
-        <div class="accum-note">
-          <mat-icon>info</mat-icon>
-          <span>Accumulator bets are not covered by the stake-back guarantee.</span>
+        <div class="accum-note" [class.insurance]="insuranceActive()">
+          <mat-icon>{{ insuranceActive() ? 'security' : 'info' }}</mat-icon>
+          @if (insuranceActive()) {
+            <span>One-leg insurance active: if exactly one selection fails, you're still paid on the winning selections.</span>
+          } @else {
+            <span>Accumulator bets with fewer than {{ store.insuranceMinLegs() }} selections are not covered by the stake-back guarantee.</span>
+          }
         </div>
         <button class="place-bet-btn" [disabled]="!canPlace()" (click)="placeBet()">
           @if (submitting()) {

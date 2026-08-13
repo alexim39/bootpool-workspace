@@ -304,6 +304,9 @@
                     <td mat-cell *matCellDef="let stake">
                       <div class="result-info">
                         @if (stake.status === 'won') {
+                          @if (stake.insuranceApplied) {
+                            <span class="insurance-chip" title="One selection failed — reduced payout paid">Insured</span>
+                          }
                           <span class="profit positive">+{{ store.formatCurrency(stake.profit!) }}</span>
                         } @else if (stake.status === 'cashed_out') {
                           <span class="profit neutral">{{ store.formatCurrency(stake.profit!) }}</span>

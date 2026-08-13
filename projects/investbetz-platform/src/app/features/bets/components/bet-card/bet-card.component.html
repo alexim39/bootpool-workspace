@@ -116,6 +116,9 @@
         <div class="settled-result" *ngIf="stake.isSettled">
           @if (stake.status === 'won') {
             <div class="result-label">Won</div>
+            @if (stake.insuranceApplied) {
+              <div class="insurance-chip" title="One selection failed — reduced payout paid">Insured: 1 leg failed</div>
+            }
             <div class="profit positive">+{{ formatCurrency(stake.profit!) }}</div>
           } @else if (stake.status === 'cashed_out') {
             <div class="result-label">Cashed Out</div>

@@ -54,6 +54,10 @@ export class BetSlipComponent {
     return this.selections().reduce((acc, p) => acc * p.gainsMultiplier, 1);
   });
 
+  insuranceActive = computed(() => {
+    return this.selections().length >= this.store.insuranceMinLegs();
+  });
+
   potentialPayout = computed(() => {
     return Math.floor(this.stakeAmount() * this.combinedMultiplier());
   });

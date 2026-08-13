@@ -39,6 +39,7 @@
     .profit.negative { color: rgba(255,255,255,0.5); }
     .profit.neutral { color: rgba(255,255,255,0.5); }
     .settled-time { font-size: 11px; color: rgba(255,255,255,0.4); }
+    .insurance-chip { display: inline-block; margin: 2px 0 6px; padding: 3px 8px; border-radius: 20px; background: rgba(0,230,118,0.12); border: 1px solid rgba(0,230,118,0.35); color: #00E676; font-size: 10px; font-weight: 600; letter-spacing: 0.3px; }
     mat-card-content { padding: 16px; }
     ::ng-deep .mat-mdc-chip.mat-mdc-standard-chip { background: transparent; }
     ::ng-deep .chip-emerald { background: rgba(0,230,118,0.15) !important; --mdc-chip-label-text-color: #00E676; }
