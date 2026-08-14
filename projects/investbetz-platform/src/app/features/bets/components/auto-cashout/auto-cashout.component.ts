@@ -38,12 +38,31 @@ export class AutoCashoutComponent implements OnInit {
     return this.status?.maxTarget ?? 0;
   }
 
+  get sliderMin(): number {
+    return Math.min(100, this.maxTarget || 100);
+  }
+
+  get sliderMax(): number {
+    return Math.max(this.sliderMin, this.maxTarget);
+  }
+
+  get sliderStep(): number {
+    return 100;
+  }
+
+  get sliderPct(): number {
+    const span = this.sliderMax - this.sliderMin;
+    if (span <= 0) return 0;
+    return Math.min(100, Math.max(0, ((this.target - this.sliderMin) / span) * 100));
+  }
+
   loadStatus() {
     this.loading = true;
     this.stakeService.getAutoCashout(this.stake.id).subscribe({
       next: (res) => {
         this.status = res.data;
-        this.target = res.data.quote;
+        const quote = res.data.quote;
+        this.target = Math.min(Math.max(quote, this.sliderMin), this.sliderMax);
       },
       error: () => {},
       complete: () => { this.loading = false; }

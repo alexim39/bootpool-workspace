@@ -15,10 +15,24 @@
 
 <div class="ac-panel" *ngIf="panelOpen && !status?.enabled">
   <div class="ac-live">Live quote: <strong>{{ formatCurrency(quote) }}</strong> · max {{ formatCurrency(maxTarget) }}</div>
-  <div class="ac-controls">
-    <input class="ac-input" type="number" [value]="target" (change)="onTargetChange($event)" placeholder="Target amount" />
-    <button mat-flat-button class="ac-arm" (click)="arm()" [disabled]="saving">Arm</button>
+  <div class="ac-target-display">Payout target: <strong>{{ formatCurrency(target) }}</strong></div>
+  <div class="ac-slider-row">
+    <span class="ac-slider-label">{{ formatCurrency(sliderMin) }}</span>
+    <input
+      class="ac-slider"
+      type="range"
+      [min]="sliderMin"
+      [max]="sliderMax"
+      [step]="sliderStep"
+      [value]="target"
+      [style.--ac-pct]="sliderPct + '%'"
+      (input)="onTargetChange($event)"
+      (change)="onTargetChange($event)"
+      aria-label="Auto-cashout target amount"
+    />
+    <span class="ac-slider-label">{{ formatCurrency(sliderMax) }}</span>
   </div>
+  <button mat-flat-button class="ac-arm" (click)="arm()" [disabled]="saving">Arm</button>
   @if (error) {
     <div class="ac-error">{{ error }}</div>
   }
