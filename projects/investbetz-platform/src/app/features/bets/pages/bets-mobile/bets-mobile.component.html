@@ -174,7 +174,7 @@
                     </button>
                   }
                 </div>
-                @if (!stake.isSettled && stake.isParlay) {
+                @if (!stake.isSettled) {
                   <app-auto-cashout [stake]="stake"></app-auto-cashout>
                 }
                 @if (stake.isSettled) {

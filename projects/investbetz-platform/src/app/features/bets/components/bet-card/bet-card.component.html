@@ -113,7 +113,7 @@
           </button>
         </div>
 
-        <div class="bet-actions" *ngIf="showActions && !stake.isSettled && stake.isParlay">
+        <div class="bet-actions" *ngIf="showActions && !stake.isSettled">
           <app-auto-cashout [stake]="stake"></app-auto-cashout>
         </div>
 
