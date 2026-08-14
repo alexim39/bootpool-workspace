@@ -94,6 +94,15 @@ export interface ActiveStakesResponse {
   data: Stake[];
 }
 
+export interface AutoCashoutStatus {
+  enabled: boolean;
+  targetAmount: number | null;
+  triggeredAt: string | null;
+  triggerQuote: number | null;
+  quote: number;
+  maxTarget: number;
+}
+
 export interface BetDayStat {
   date: string;
   won: number;
@@ -289,6 +298,28 @@ export class StakeService {
   getStakeById(id: string) {
     return this.http.get<{ success: boolean; data: Stake }>(
       `${environment.apiUrl}/stakes/${id}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getAutoCashout(id: string) {
+    return this.http.get<{ success: boolean; data: AutoCashoutStatus }>(
+      `${environment.apiUrl}/stakes/${id}/auto-cashout`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  armAutoCashout(id: string, targetAmount: number) {
+    return this.http.post<{ success: boolean; message: string; data: Stake }>(
+      `${environment.apiUrl}/stakes/${id}/auto-cashout`,
+      { targetAmount },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  disableAutoCashout(id: string) {
+    return this.http.delete<{ success: boolean; message: string; data: Stake }>(
+      `${environment.apiUrl}/stakes/${id}/auto-cashout`,
       { headers: this.getHeaders() }
     );
   }

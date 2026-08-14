@@ -1,0 +1,25 @@
+<div class="ac-armed" *ngIf="status?.enabled">
+  @if (status?.triggeredAt) {
+    <mat-icon>bolt</mat-icon>
+    <span>Auto-cashout executed — <strong>{{ formatCurrency(status?.triggerQuote || 0) }}</strong> credited</span>
+  } @else {
+    <mat-icon>bolt</mat-icon>
+    <span>Armed — pays out at <strong>{{ formatCurrency(status?.targetAmount || 0) }}</strong></span>
+    <button class="ac-cancel" (click)="cancel()" [disabled]="saving">Cancel</button>
+  }
+</div>
+
+<button mat-stroked-button class="ac-toggle" *ngIf="!status?.enabled && !stake.isSettled" (click)="togglePanel()" [disabled]="loading">
+  <mat-icon>bolt</mat-icon> Auto-Cashout
+</button>
+
+<div class="ac-panel" *ngIf="panelOpen && !status?.enabled">
+  <div class="ac-live">Live quote: <strong>{{ formatCurrency(quote) }}</strong> · max {{ formatCurrency(maxTarget) }}</div>
+  <div class="ac-controls">
+    <input class="ac-input" type="number" [value]="target" (change)="onTargetChange($event)" placeholder="Target amount" />
+    <button mat-flat-button class="ac-arm" (click)="arm()" [disabled]="saving">Arm</button>
+  </div>
+  @if (error) {
+    <div class="ac-error">{{ error }}</div>
+  }
+</div>

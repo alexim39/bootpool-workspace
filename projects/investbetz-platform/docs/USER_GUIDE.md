@@ -239,6 +239,12 @@ Each row shows: Date, Type (Deposit/Withdrawal), Description, Amount (with +/-),
   - Shows cashout value = remaining stake × (1 - cashout fee).
   - Fee: 10% of stake amount.
   - `GET /stakes/:id/cashout/quote` → `POST /stakes/:id/cashout/confirm`.
+- **Auto-Cashout** (parlays / active accumulators):
+  - "Auto-Cashout" button on the Active-tab parlay cards → enter a target amount (₦100 to the live-quote maximum).
+  - The badge reads "Armed — pays out at ₦X"; Cancel disarms.
+  - Scheduler (`AUTO_CASHOUT_TICK_MS`, default 30s, toggle `AUTO_CASHOUT_SCHEDULER=disabled` to turn off) evaluates armed stakes every tick and executes when the live quote `>=` target: `GET /stakes/:id/auto-cashout` (status+quote), `POST /stakes/:id/auto-cashout` (arm), `DELETE /stakes/:id/auto-cashout` (disarm).
+  - Stage-1 quote: baseline 90% of stake; each won leg locks in its multiplier (quote = 90% × stake × ∏won multipliers); 2+ lost legs → quote 0; exactly 1 lost leg → never below the one-leg insurance payout.
+  - Executed auto-cashouts record a `AUTO_CASHOUT_` transaction (`metadata.autoTriggered: true`) and the stake shows as Cashed Out with an "Auto-cashout" settlement note.
 
 ### 5.3 History Tab
 

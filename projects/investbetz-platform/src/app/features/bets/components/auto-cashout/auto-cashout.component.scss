@@ -1,0 +1,104 @@
+.ac-toggle {
+  border-color: #64B5F6 !important;
+  color: #64B5F6 !important;
+  font-weight: 600;
+}
+
+.ac-toggle mat-icon {
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
+}
+
+.ac-armed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 10px 0 4px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(100, 181, 246, 0.1);
+  border: 1px solid rgba(100, 181, 246, 0.35);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+}
+
+.ac-armed mat-icon {
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
+  color: #64B5F6;
+}
+
+.ac-armed strong {
+  color: #64B5F6;
+}
+
+.ac-cancel {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
+  font-size: 11px;
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.ac-cancel:hover {
+  border-color: #FF6B6B;
+  color: #FF6B6B;
+}
+
+.ac-panel {
+  margin: 10px 0 4px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(100, 181, 246, 0.07);
+  border: 1px solid rgba(100, 181, 246, 0.3);
+}
+
+.ac-live {
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 8px;
+}
+
+.ac-live strong {
+  color: #64B5F6;
+}
+
+.ac-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.ac-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  padding: 8px 10px;
+  outline: none;
+  min-width: 0;
+}
+
+.ac-input:focus {
+  border-color: #64B5F6;
+}
+
+.ac-arm {
+  background: #64B5F6 !important;
+  color: #0B1220 !important;
+  font-weight: 700;
+  min-width: 0;
+}
+
+.ac-error {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #FF6B6B;
+}
