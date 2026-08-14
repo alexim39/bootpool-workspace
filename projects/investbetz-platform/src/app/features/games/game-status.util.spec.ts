@@ -64,6 +64,24 @@ describe('game-status.util', () => {
       expect(pickOutcome({ ...finished, pick: 'Home or Draw', result: 'away_win', homeScore: 0, awayScore: 1 })).toBe('lost');
     });
 
+    it('marks Away or Draw as won on a draw or away win', () => {
+      expect(pickOutcome({ ...finished, pick: 'Away or Draw', result: 'draw' })).toBe('won');
+      expect(pickOutcome({ ...finished, pick: 'Away or Draw', result: 'away_win', homeScore: 1, awayScore: 2 })).toBe('won');
+    });
+
+    it('marks Away or Draw as lost on a home win', () => {
+      expect(pickOutcome({ ...finished, pick: 'Away or Draw', result: 'home_win', homeScore: 2, awayScore: 0 })).toBe('lost');
+    });
+
+    it('marks Home or Away as won when either side wins', () => {
+      expect(pickOutcome({ ...finished, pick: 'Home or Away', result: 'home_win', homeScore: 1, awayScore: 0 })).toBe('won');
+      expect(pickOutcome({ ...finished, pick: 'Home or Away', result: 'away_win', homeScore: 0, awayScore: 1 })).toBe('won');
+    });
+
+    it('marks Home or Away as lost on a draw', () => {
+      expect(pickOutcome({ ...finished, pick: 'Home or Away', result: 'draw', homeScore: 1, awayScore: 1 })).toBe('lost');
+    });
+
     it('skips Draw No Bet on a draw (refund)', () => {
       expect(pickOutcome({ ...finished, pick: 'Home Draw No Bet', result: 'draw' })).toBe('skip');
     });
