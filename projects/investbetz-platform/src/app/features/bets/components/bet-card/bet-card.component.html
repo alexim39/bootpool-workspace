@@ -113,6 +113,10 @@
           </button>
         </div>
 
+        <div class="bet-actions" *ngIf="showActions && !stake.isSettled">
+          <app-auto-cashout [stake]="stake"></app-auto-cashout>
+        </div>
+
         <div class="settled-result" *ngIf="stake.isSettled">
           @if (stake.status === 'won') {
             <div class="result-label">Won</div>

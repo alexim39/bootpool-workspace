@@ -239,6 +239,14 @@ Each row shows: Date, Type (Deposit/Withdrawal), Description, Amount (with +/-),
   - Shows cashout value = remaining stake × (1 - cashout fee).
   - Fee: 10% of stake amount.
   - `GET /stakes/:id/cashout/quote` → `POST /stakes/:id/cashout/confirm`.
+- **Auto-Cashout** (all active bets — singles and parlays):
+  - "Auto-Cashout" button on Active-tab cards → enter a target amount (₦100 to the live-quote maximum).
+  - The badge reads "Armed — pays out at ₦X"; Cancel disarms.
+  - Scheduler (`AUTO_CASHOUT_TICK_MS`, default 30s, toggle `AUTO_CASHOUT_SCHEDULER=disabled` to turn off) evaluates armed stakes every tick and executes when the live quote `>=` target: `GET /stakes/:id/auto-cashout` (status+quote), `POST /stakes/:id/auto-cashout` (arm), `DELETE /stakes/:id/auto-cashout` (disarm).
+  - Stage-1 quote: baseline 90% of stake; each won leg locks in its multiplier (quote = 90% × stake × ∏won multipliers); 2+ lost legs → quote 0; exactly 1 lost leg → never below the one-leg insurance payout.
+  - **Stage-2 liveliness pricing**: while any leg's match is in-play, the quote is scaled by `AUTO_CASHOUT_LIVE_FACTOR` (default 0.75) because the locked-in price no longer reflects real-time odds. Status is read from the match-status watcher cache (`AUTO_CASHOUT_STATUS_TTL_MS`, default 60s); any lookup failure or missing status gracefully falls back to the Stage-1 price.
+  - **Arm caps**: at most `AUTO_CASHOUT_MAX_PER_USER` (default 5) active auto-cashouts per user and `AUTO_CASHOUT_MAX_GLOBAL` (default 200) platform-wide. Rejections read "Maximum of 5 active auto-cashouts reached" / "Platform auto-cashout limit reached, please try again later".
+  - Executed auto-cashouts record a `AUTO_CASHOUT_` transaction (`metadata.autoTriggered: true`) and the stake shows as Cashed Out with an "Auto-cashout" settlement note.
 
 ### 5.3 History Tab
 

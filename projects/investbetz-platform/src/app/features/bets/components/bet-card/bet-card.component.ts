@@ -7,12 +7,13 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatDividerModule } from '@angular/material/divider';
 import { Stake } from '../../../../core/services';
+import { AutoCashoutComponent } from '../auto-cashout/auto-cashout.component';
 import { kickoffCountdown } from '../../../games/game-status.util';
 
 @Component({
   selector: 'app-bet-card',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, MatChipsModule, MatBadgeModule, MatDividerModule],
+  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, MatChipsModule, MatBadgeModule, MatDividerModule, AutoCashoutComponent],
   templateUrl: './bet-card.component.html',
   styleUrls: ['./bet-card.component.scss']
 })

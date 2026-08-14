@@ -1,6 +1,6 @@
-import { Component, inject, DestroyRef } from '@angular/core';
+import { Component, inject, DestroyRef, effect, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AuthStore } from '../stores/auth.store';
 import { interval, Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -8,7 +8,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Component({
   selector: 'app-otp-verify',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, RouterModule],
   templateUrl: './otp-verify.component.html',
   styleUrls: ['./otp-verify.component.scss']
 })
@@ -19,6 +19,10 @@ export class OtpVerifyComponent {
 
   otpDigits: string[] = ['', '', '', '', '', ''];
   private timerSub: Subscription | null = null;
+  private submitGate: ReturnType<typeof setTimeout> | null = null;
+  private resentTimer: ReturnType<typeof setTimeout> | null = null;
+  readonly shake = signal(false);
+  readonly resent = signal(false);
 
   constructor() {
     const nav = this.router.getCurrentNavigation();
@@ -33,7 +37,30 @@ export class OtpVerifyComponent {
     if (!this.store.phone() && history.state?.phone) {
       this.store.phone.set(history.state.phone);
     }
+    effect(() => {
+      if (this.store.error()) {
+        this.shake.set(true);
+        setTimeout(() => this.shake.set(false), 600);
+      }
+    });
     this.startResendTimer();
+    setTimeout(() => {
+      (document.querySelector('app-otp-verify .otp-box') as HTMLInputElement | null)?.focus();
+    }, 80);
+  }
+
+  get codeComplete(): boolean {
+    return this.otpDigits.join('').length === 6;
+  }
+
+  get maskedPhone(): string {
+    const p = this.store.phone();
+    if (!p) return '';
+    return `+234 •••• ${p.slice(-4)}`;
+  }
+
+  get displayEmail(): string {
+    return this.store.email() || 'your inbox';
   }
 
   onInput(event: Event, index: number) {
@@ -44,6 +71,10 @@ export class OtpVerifyComponent {
     if (digit && index < 5) {
       const next = input.parentElement?.querySelectorAll('.otp-box')[index + 1] as HTMLInputElement;
       next?.focus();
+    }
+    if (this.codeComplete && !this.store.loading()) {
+      if (this.submitGate) clearTimeout(this.submitGate);
+      this.submitGate = setTimeout(() => this.verifyOtp(), 250);
     }
   }
 
@@ -56,6 +87,9 @@ export class OtpVerifyComponent {
       } else {
         this.otpDigits[index] = '';
       }
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      this.verifyOtp();
     }
   }
 
@@ -63,9 +97,23 @@ export class OtpVerifyComponent {
     (event.target as HTMLInputElement).select();
   }
 
+  handlePaste(event: ClipboardEvent) {
+    const raw = event.clipboardData?.getData('text') || '';
+    const digits = raw.replace(/\D/g, '').slice(0, 6).split('');
+    if (!digits.length) return;
+    event.preventDefault();
+    digits.forEach((d, i) => { this.otpDigits[i] = d; });
+    const inputs = (event.target as HTMLElement).parentElement?.querySelectorAll('.otp-box');
+    const focusIndex = Math.min(digits.length, 5);
+    (inputs?.[focusIndex] as HTMLInputElement | undefined)?.focus();
+    if (this.codeComplete && !this.store.loading()) {
+      setTimeout(() => this.verifyOtp(), 200);
+    }
+  }
+
   verifyOtp() {
     const code = this.otpDigits.join('');
-    if (code.length < 6) return;
+    if (code.length < 6 || this.store.loading()) return;
     this.store.verifyOtp(
       code,
       () => this.router.navigate(['/home']),
@@ -77,6 +125,12 @@ export class OtpVerifyComponent {
     this.store.resendOtp(() => {
       this.otpDigits = ['', '', '', '', '', ''];
       this.startResendTimer();
+      this.resent.set(true);
+      if (this.resentTimer) clearTimeout(this.resentTimer);
+      this.resentTimer = setTimeout(() => this.resent.set(false), 6000);
+      setTimeout(() => {
+        (document.querySelector('app-otp-verify .otp-box') as HTMLInputElement | null)?.focus();
+      }, 60);
     });
   }
 
