@@ -128,4 +128,8 @@ export class UserDetailComponent implements OnInit {
     const map: Record<string, string> = { pending: '#E8B923', confirmed: '#00E676', active: '#E8B923', won: '#00E676', lost: '#888', void: '#666', cashed_out: '#2196f3', cancelled: '#f44336', refunded: '#888' };
     return map[s] || '#555';
   }
+
+  isAccumulator(s: any): boolean {
+    return !!(s.items && s.items.length > 1);
+  }
 }
