@@ -66,8 +66,15 @@
                 <td mat-cell *matCellDef="let s">{{ s.user?.fullName || s.user?.phone || 'N/A' }}</td>
               </ng-container>
               <ng-container matColumnDef="pod">
-                <th mat-header-cell *matHeaderCellDef>Pod</th>
-                <td mat-cell *matCellDef="let s">{{ s.podId?.title || 'N/A' }}</td>
+                <th mat-header-cell *matHeaderCellDef>Type</th>
+                <td mat-cell *matCellDef="let s">
+                  <div class="stake-type-cell">
+                    <span class="stake-type-chip" [class.accum]="isAccumulator(s)">
+                      {{ isAccumulator(s) ? 'Accumulator' : 'Single' }}
+                    </span>
+                    <span class="stake-pod-title">{{ isAccumulator(s) ? (s.items?.length + ' legs') : (s.pod?.title || 'Single') }}</span>
+                  </div>
+                </td>
               </ng-container>
               <ng-container matColumnDef="amount">
                 <th mat-header-cell *matHeaderCellDef>Amount</th>

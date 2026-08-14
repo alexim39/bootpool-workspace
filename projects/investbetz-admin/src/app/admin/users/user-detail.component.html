@@ -168,7 +168,10 @@
               </div>
               @for (s of data.stakes.items; track s._id) {
                 <div class="st-row">
-                  <span class="st-cell st-pod">{{ s.pod?.title || s.podId }}</span>
+                  <span class="st-cell st-pod">
+                    <span class="stake-type-chip" [class.accum]="isAccumulator(s)">{{ isAccumulator(s) ? 'Accumulator' : 'Single' }}</span>
+                    <span class="stake-pod-title">{{ isAccumulator(s) ? (s.items?.length + ' legs') : (s.pod?.title || 'Single') }}</span>
+                  </span>
                   <span class="st-cell st-amount">₦{{ s.stakeAmount | number }}</span>
                   <span class="st-cell"><span class="chip" [style.background]="statusColor(s.status)">{{ s.status }}</span></span>
                   <span class="st-cell st-date">{{ s.createdAt | date:'shortDate' }}</span>

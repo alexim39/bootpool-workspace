@@ -160,4 +160,8 @@ export class DashboardComponent implements OnInit {
     const map: Record<string, string> = { active: '#E8B923', won: '#00E676', lost: '#f44336', void: '#666', pending: '#E8B923', confirmed: '#00E676', refunded: '#888' };
     return map[s] || '#555';
   }
+
+  isAccumulator(s: any): boolean {
+    return !!(s.items && s.items.length > 1);
+  }
 }
