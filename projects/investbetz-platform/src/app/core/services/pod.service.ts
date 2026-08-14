@@ -157,7 +157,10 @@ export class PodService {
           const { items, total, hasMore, maxAccumulatorLegs, insuranceMinLegs } = res.data;
           const mapped = items.map(p => this.mapPod(p));
           if (isLoadMore) {
-            this.pods.update(existing => [...existing, ...mapped]);
+            this.pods.update(existing => {
+              const seen = new Set(existing.map(p => p.id));
+              return [...existing, ...mapped.filter(p => !seen.has(p.id))];
+            });
           } else {
             this.pods.set(mapped);
           }
@@ -188,7 +191,7 @@ export class PodService {
 
   loadMore(pageSize = 20) {
     if (this.loadingMore() || !this.hasMorePods()) return;
-    this.fetchFeed({ offset: this.pods().length, limit: pageSize });
+    this.fetchFeed({ offset: this.pods().length, limit: pageSize, personalized: this.personalized() });
   }
 
   fetchUpcoming(params?: { sport?: string; limit?: number; hoursAhead?: number }) {

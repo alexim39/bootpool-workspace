@@ -60,10 +60,7 @@ export class HomeStore implements OnDestroy {
   });
 
   readonly displayedPods = computed(() => {
-    const pods = this.activePods();
-    return [...pods].sort((a, b) =>
-      new Date(a.stakingClosesAt).getTime() - new Date(b.stakingClosesAt).getTime()
-    );
+    return [...this.activePods()];
   });
   readonly hasSearchResults = computed(() => this.isSearching() && !this.pods.loading() && this.displayedPods().length > 0);
   readonly noSearchResults = computed(() => this.isSearching() && !this.pods.loading() && this.displayedPods().length === 0);
