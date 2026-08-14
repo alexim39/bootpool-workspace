@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -46,17 +46,33 @@ import { OraPick } from '../../../../core/services';
   templateUrl: './home-desktop.component.html',
   styleUrls: ['./home-desktop.component.scss']
 })
-export class HomeDesktopComponent implements OnInit {
+export class HomeDesktopComponent implements OnInit, AfterViewInit, OnDestroy {
   private _snackBar = inject(MatSnackBar);
   private route = inject(ActivatedRoute);
   readonly store = inject(HomeStore);
   readonly showOraChat = signal(false);
   readonly slipResult = signal<{ success: boolean; message?: string } | null>(null);
 
+  @ViewChild('feedSentinel') feedSentinel?: ElementRef<HTMLDivElement>;
+  private feedObserver?: IntersectionObserver;
+
   ngOnInit() {
     this.store.init();
     const podId = this.route.snapshot.queryParamMap.get('pod');
     if (podId) this.store.openPodById(podId);
+  }
+
+  ngAfterViewInit() {
+    const el = this.feedSentinel?.nativeElement;
+    if (!el) return;
+    this.feedObserver = new IntersectionObserver((entries) => {
+      if (entries.some(e => e.isIntersecting)) this.store.loadMore();
+    }, { rootMargin: '600px 0px' });
+    this.feedObserver.observe(el);
+  }
+
+  ngOnDestroy() {
+    this.feedObserver?.disconnect();
   }
 
   openOraChat() { this.showOraChat.set(true); }

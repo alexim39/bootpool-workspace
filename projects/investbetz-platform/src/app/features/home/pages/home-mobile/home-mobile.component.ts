@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -46,12 +46,15 @@ import { HomeStore } from '../../stores/home.store';
   templateUrl: './home-mobile.component.html',
   styleUrls: ['./home-mobile.component.scss']
 })
-export class HomeMobileComponent implements OnInit {
+export class HomeMobileComponent implements OnInit, AfterViewInit, OnDestroy {
   private _snackBar = inject(MatSnackBar);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   readonly store = inject(HomeStore);
   readonly notifService = inject(NotificationService);
+
+  @ViewChild('feedSentinel') feedSentinel?: ElementRef<HTMLDivElement>;
+  private feedObserver?: IntersectionObserver;
 
   showTopUp = signal(false);
   showOraChat = signal(false);
@@ -112,6 +115,19 @@ export class HomeMobileComponent implements OnInit {
     this.store.init();
     const podId = this.route.snapshot.queryParamMap.get('pod');
     if (podId) this.store.openPodById(podId);
+  }
+
+  ngAfterViewInit() {
+    const el = this.feedSentinel?.nativeElement;
+    if (!el) return;
+    this.feedObserver = new IntersectionObserver((entries) => {
+      if (entries.some(e => e.isIntersecting)) this.store.loadMore();
+    }, { rootMargin: '600px 0px' });
+    this.feedObserver.observe(el);
+  }
+
+  ngOnDestroy() {
+    this.feedObserver?.disconnect();
   }
 
   openStakeModal(pod: Pod) {
