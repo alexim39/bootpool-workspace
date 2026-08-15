@@ -42,6 +42,7 @@ export interface Pod {
   metadata?: Record<string, any>;
   legs: PodLeg[];
   createdBy: string;
+  creatorName?: string | null;
   updatedBy?: string;
   settledBy?: string;
   createdAt: string;
@@ -65,6 +66,7 @@ export interface PaginatedPodFeedResponse {
     hasMore: boolean;
     maxAccumulatorLegs?: number;
     insuranceMinLegs?: number;
+    oraId?: string;
   };
 }
 
@@ -94,6 +96,7 @@ export class PodService {
   personalized = signal(false);
   maxAccumulatorLegs = signal(5);
   insuranceMinLegs = signal(4);
+  oraId = signal<string>('');
 
   activePods = computed(() => 
     this.pods().filter(p => 
@@ -154,7 +157,8 @@ export class PodService {
     this.http.get<PaginatedPodFeedResponse>(`${environment.apiUrl}/pods/feed?${query}`).subscribe({
       next: (res) => {
         if (res.success) {
-          const { items, total, hasMore, maxAccumulatorLegs, insuranceMinLegs } = res.data;
+          const { items, total, hasMore, maxAccumulatorLegs, insuranceMinLegs, oraId } = res.data;
+          if (oraId) this.oraId.set(oraId);
           const mapped = items.map(p => this.mapPod(p));
           if (isLoadMore) {
             this.pods.update(existing => {

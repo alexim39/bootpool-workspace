@@ -227,7 +227,12 @@
     <button class="feed-mode-btn" [class.active]="store.feedMode() === 'following'" (click)="setFeedMode('following')">
       <mat-icon>people</mat-icon> Following
     </button>
+    <button class="feed-mode-btn" [class.active]="store.feedMode() === 'saved'" (click)="setFeedMode('saved')">
+      <mat-icon>bookmark</mat-icon> Saved
+    </button>
   </div>
+
+  <app-who-to-follow />
 
   <div class="sport-chips">
     <button
@@ -279,6 +284,12 @@
             </div>
           }
         </div>
+      </div>
+    } @else if (store.feedMode() === 'saved' && store.feedPods().length === 0 && !store.isSearching()) {
+      <div class="empty-state">
+        <span class="empty-illustration"><mat-icon>bookmark_border</mat-icon></span>
+        <h3>Nothing saved yet</h3>
+        <p>Tap the bookmark icon on any pick to keep it here</p>
       </div>
     } @else if (store.feedPods().length === 0 && !store.isSearching()) {
       <div class="empty-state">

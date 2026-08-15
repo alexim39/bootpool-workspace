@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, computed, input, inject } from '@angular/core';
+import { Component, Output, EventEmitter, computed, input, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,6 +7,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Pod } from '../../../../core/services';
 import { SocialFeedService } from '../../../../core/services';
+import { PodCommentsComponent } from '../pod-comments/pod-comments.component';
 
 @Component({
   selector: 'app-pod-card',
@@ -17,7 +18,8 @@ import { SocialFeedService } from '../../../../core/services';
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    PodCommentsComponent
   ],
   templateUrl: './pod-card.component.html',
   styleUrls: ['./pod-card.component.scss']
@@ -33,12 +35,17 @@ export class PodCardComponent {
   private snackBar = inject(MatSnackBar);
   readonly socialFeed = inject(SocialFeedService);
 
+  readonly showComments = signal(false);
+
   readonly creator = computed(() => this.socialFeed.creatorOf(this.pod()));
-  readonly creatorName = computed(() => this.socialFeed.creatorName(this.creator()));
+  readonly isOra = computed(() => this.socialFeed.isOraCreator(this.creator()));
+  readonly creatorName = computed(() => this.socialFeed.creatorNameFor(this.pod()));
   readonly following = computed(() => this.socialFeed.isFollowing(this.creator()));
   readonly liked = computed(() => this.socialFeed.isLiked(this.pod().id));
   readonly saved = computed(() => this.socialFeed.isSaved(this.pod().id));
   readonly proof = computed(() => this.socialFeed.proofText(this.pod()));
+  readonly likeCount = computed(() => this.socialFeed.likeCount(this.pod()));
+  readonly commentCount = computed(() => this.socialFeed.commentCount(this.pod()));
 
   readonly creatorTime = computed(() => {
     const p = this.pod();
@@ -53,15 +60,23 @@ export class PodCardComponent {
   });
 
   toggleLike() {
-    this.socialFeed.toggleLike(this.pod().id);
+    this.socialFeed.toggleLike(this.pod().id).catch(() => {
+      this.snackBar.open('Could not update like — try again', 'OK', { duration: 2500 });
+    });
   }
 
   toggleSave() {
-    this.socialFeed.toggleSave(this.pod().id);
+    this.socialFeed.toggleSave(this.pod().id).catch(() => {
+      this.snackBar.open('Could not update save — try again', 'OK', { duration: 2500 });
+    });
   }
 
   toggleFollow() {
-    this.socialFeed.toggleFollow(this.creator());
+    this.socialFeed.toggleFollow(this.creator()).then(msg => {
+      if (msg) this.snackBar.open(msg, 'OK', { duration: 2500 });
+    }).catch(() => {
+      this.snackBar.open('Could not update follow — try again', 'OK', { duration: 2500 });
+    });
   }
 
   async share() {

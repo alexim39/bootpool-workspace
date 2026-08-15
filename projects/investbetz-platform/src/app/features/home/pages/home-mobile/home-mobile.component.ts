@@ -18,6 +18,7 @@ import { BetSlipComponent } from '../../components/bet-slip/bet-slip.component';
 import { FeaturedBannerComponent } from '../../components/featured-banner/featured-banner.component';
 import { StoriesRailComponent } from '../../components/stories-rail/stories-rail.component';
 import { SwipeDeckComponent } from '../../components/swipe-deck/swipe-deck.component';
+import { WhoToFollowComponent } from '../../components/who-to-follow/who-to-follow.component';
 import { TopUpModalComponent, OraChatComponent, OraPickBannerComponent } from '../../../../core/components';
 import { MobileNavComponent } from '../../../../core/components';
 import { HomeStore } from '../../stores/home.store';
@@ -42,6 +43,7 @@ import { HomeStore } from '../../stores/home.store';
     FeaturedBannerComponent,
     StoriesRailComponent,
     SwipeDeckComponent,
+    WhoToFollowComponent,
     TopUpModalComponent,
     MobileNavComponent,
     OraChatComponent,
@@ -167,7 +169,7 @@ export class HomeMobileComponent implements OnInit, AfterViewInit, OnDestroy {
     this.openLivePod(pod);
   }
 
-  setFeedMode(mode: 'foryou' | 'following') {
+  setFeedMode(mode: 'foryou' | 'following' | 'saved') {
     this.store.setFeedMode(mode);
   }
 
