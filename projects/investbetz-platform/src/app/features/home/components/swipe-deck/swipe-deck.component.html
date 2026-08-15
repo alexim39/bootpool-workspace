@@ -1,0 +1,132 @@
+<div class="deck" (touchstart)="onTouchStart($event)" (touchmove)="onTouchMove($event)" (touchend)="onTouchEnd()" (keydown)="onKeyDown($event)" tabindex="0" role="feed" aria-label="For You betting picks">
+  <div class="deck-stage" [class.dragging]="dragging()" [style.transform]="'translateY(' + dragOffset() + 'px)'">
+    @for (pod of pods(); track pod.id; let i = $index) {
+      @if (visible(i)) {
+        <article class="deck-card" [class.live]="pod.isLive" [style.top.%]="cardTop(i)">
+          <div class="deck-hero">
+            <div class="hero-orb"></div>
+            <div class="deck-head">
+              <span class="deck-league"><mat-icon>sports_soccer</mat-icon> {{ pod.league || pod.sport }}</span>
+              @if (pod.isLive) {
+                <span class="deck-live"><span class="live-dot"></span> LIVE</span>
+              } @else {
+                <span class="deck-kickoff"><mat-icon>schedule</mat-icon> {{ kickoffLabel(pod) }}</span>
+              }
+            </div>
+            <div class="deck-teams">
+              <span class="deck-team">{{ pod.homeTeam }}</span>
+              <span class="deck-vs">VS</span>
+              <span class="deck-team">{{ pod.awayTeam }}</span>
+            </div>
+            @if (pod.title) {
+              <h3 class="deck-title">{{ pod.title }}</h3>
+            }
+          </div>
+
+          <div class="deck-body">
+            <div class="pick-row">
+              <span class="pick-badge">PICK: {{ pod.selection }}</span>
+              <span class="pick-odds">{{ pod.gainsMultiplier.toFixed(2) }}<em>x</em></span>
+            </div>
+
+            @if (confidence(pod) > 0) {
+              <div class="deck-conf">
+                <div class="conf-head">
+                  <span class="conf-label">Ora confidence</span>
+                  <span class="conf-value">{{ confidence(pod) }}%</span>
+                </div>
+                <div class="conf-track">
+                  <span class="conf-fill" [style.width.%]="confidence(pod)"></span>
+                </div>
+              </div>
+            }
+
+            @if (pod.maxTotalExposure) {
+              <div class="deck-pool">
+                <div class="pool-head">
+                  <span class="pool-label">Pool filled</span>
+                  <span class="pool-value">{{ exposurePct(pod) }}%</span>
+                </div>
+                <div class="pool-track">
+                  <span class="pool-fill" [class.warn]="exposurePct(pod) > 80" [style.width.%]="exposurePct(pod)"></span>
+                </div>
+              </div>
+            }
+
+            @if (pod.currentParticipants > 0 || pod.whyRecommended) {
+              <div class="deck-proof">
+                <span class="proof-dot"></span>
+                <span class="proof-text">{{ pod.currentParticipants > 0 ? pod.currentParticipants.toLocaleString() + (pod.currentParticipants === 1 ? ' person' : ' people') + ' staked' : '' }}{{ pod.currentParticipants > 0 && pod.whyRecommended ? ' · ' : '' }}{{ pod.whyRecommended ? 'Ora AI pick' : '' }}</span>
+              </div>
+            }
+
+            <div class="deck-cta">
+              <div class="deck-meta">
+                <span class="meta-closes"><mat-icon>timer</mat-icon> Closes in {{ closingIn(pod) }}</span>
+                <span class="meta-limits">Min {{ formatMoney(pod.minStake) }} · Max {{ formatMoney(pod.maxStake) }}</span>
+              </div>
+              <div class="cta-row">
+                <button class="slip-btn" [class.selected]="isSelected(pod)" [disabled]="selectionDisabled()" (click)="select(pod)">
+                  <mat-icon>{{ isSelected(pod) ? 'check' : 'add' }}</mat-icon>
+                  {{ isSelected(pod) ? 'In slip' : 'Slip' }}
+                </button>
+                <button class="stake-btn" (click)="stake(pod)">
+                  <mat-icon>bolt</mat-icon> Stake {{ pod.gainsMultiplier.toFixed(2) }}x
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="deck-rail">
+            <button class="rail-btn" [class.active]="socialFeed.isLiked(pod.id)" (click)="toggleLike(pod)" [matTooltip]="'Like'">
+              <mat-icon class="rail-icon" [class.liked]="socialFeed.isLiked(pod.id)">{{ socialFeed.isLiked(pod.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
+              <span class="rail-label">Like</span>
+            </button>
+            <button class="rail-btn" (click)="share(pod)" [matTooltip]="'Share'">
+              <mat-icon class="rail-icon">share</mat-icon>
+              <span class="rail-label">Share</span>
+            </button>
+            <button class="rail-btn" [class.active]="socialFeed.isSaved(pod.id)" (click)="toggleSave(pod)" [matTooltip]="'Save'">
+              <mat-icon class="rail-icon" [class.saved]="socialFeed.isSaved(pod.id)">{{ socialFeed.isSaved(pod.id) ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+              <span class="rail-label">{{ socialFeed.isSaved(pod.id) ? 'Saved' : 'Save' }}</span>
+            </button>
+            <button class="rail-btn follow" [class.following]="isFollowing(pod)" (click)="toggleFollow(pod)" [matTooltip]="'Follow Ora'">
+              <mat-icon>{{ isFollowing(pod) ? 'check' : 'add' }}</mat-icon>
+              <span class="rail-label">{{ isFollowing(pod) ? 'Following' : 'Follow' }}</span>
+            </button>
+          </div>
+
+          <div class="deck-creator">
+            <span class="creator-avatar"><mat-icon>auto_awesome</mat-icon></span>
+            <span class="creator-name">&#64;Ora <mat-icon class="verified">verified</mat-icon> AI Curator</span>
+          </div>
+        </article>
+      }
+    }
+
+    @if (!current()) {
+      <div class="deck-empty">
+        <mat-icon>explore_off</mat-icon>
+        <p>No picks in this feed right now</p>
+      </div>
+    }
+  </div>
+
+  @if (loadingMore()) {
+    <div class="deck-loading">
+      <mat-spinner diameter="16" />
+      <span>Loading more picks…</span>
+    </div>
+  }
+
+  @if (pods().length > 1) {
+    <div class="deck-progress">
+      <span class="progress-num">{{ index() + 1 }} / {{ pods().length }}</span>
+      <div class="progress-dots">
+        @for (p of pods(); track p.id; let i = $index) {
+          <span class="dot" [class.active]="i === index()" [class.past]="i < index()" (click)="goTo(i)"></span>
+        }
+      </div>
+    </div>
+  }
+</div>
