@@ -67,9 +67,9 @@ export class HomeStore implements OnDestroy {
   readonly hasSearchResults = computed(() => this.isSearching() && !this.pods.loading() && this.displayedPods().length > 0);
   readonly noSearchResults = computed(() => this.isSearching() && !this.pods.loading() && this.displayedPods().length === 0);
 
-  readonly feedMode = signal<'foryou' | 'following'>('foryou');
+  readonly feedMode = signal<'foryou' | 'following' | 'saved'>('foryou');
 
-  setFeedMode(mode: 'foryou' | 'following') {
+  setFeedMode(mode: 'foryou' | 'following' | 'saved') {
     this.feedMode.set(mode);
   }
 
@@ -77,8 +77,15 @@ export class HomeStore implements OnDestroy {
     return this.displayedPods().filter(p => this._social.isFollowing(this._social.creatorOf(p)));
   });
 
+  readonly savedPods = computed(() => {
+    return this.displayedPods().filter(p => this._social.isSaved(p.id));
+  });
+
   readonly feedPods = computed(() => {
-    return this.feedMode() === 'following' ? this.followingPods() : this.displayedPods();
+    const mode = this.feedMode();
+    if (mode === 'following') return this.followingPods();
+    if (mode === 'saved') return this.savedPods();
+    return this.displayedPods();
   });
 
   private readonly PAGE_SIZE = 12;
@@ -99,6 +106,11 @@ export class HomeStore implements OnDestroy {
       this.betSlipSelections();
       this.bookingCode.set(null);
       this.bookingCodeError.set(null);
+    });
+
+    effect(() => {
+      const pods = this.activePods();
+      if (pods.length > 0) this._social.hydrateStats(pods);
     });
   }
 

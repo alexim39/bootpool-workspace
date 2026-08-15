@@ -86,6 +86,13 @@
               <mat-icon class="rail-icon">share</mat-icon>
               <span class="rail-label">Share</span>
             </button>
+            <button class="rail-btn" [class.active]="commentPod()?.id === pod.id" (click)="commentPod.set(pod)" [matTooltip]="'View comments'">
+              <mat-icon class="rail-icon">chat_bubble_outline</mat-icon>
+              <span class="rail-label">Comment</span>
+              @if (socialFeed.commentCount(pod) > 0) {
+                <span class="rail-count">{{ socialFeed.commentCount(pod) }}</span>
+              }
+            </button>
             <button class="rail-btn" [class.active]="socialFeed.isSaved(pod.id)" (click)="toggleSave(pod)" [matTooltip]="'Save'">
               <mat-icon class="rail-icon" [class.saved]="socialFeed.isSaved(pod.id)">{{ socialFeed.isSaved(pod.id) ? 'bookmark' : 'bookmark_border' }}</mat-icon>
               <span class="rail-label">{{ socialFeed.isSaved(pod.id) ? 'Saved' : 'Save' }}</span>
@@ -130,3 +137,7 @@
     </div>
   }
 </div>
+
+@if (commentPod()) {
+  <app-pod-comments [pod]="commentPod()!" [open]="true" (close)="commentPod.set(null)" />
+}

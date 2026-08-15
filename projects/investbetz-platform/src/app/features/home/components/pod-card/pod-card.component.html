@@ -142,7 +142,12 @@
         <button class="rail-btn" [class.active]="liked()" (click)="toggleLike()" [matTooltip]="liked() ? 'Unlike this pick' : 'Like this pick'">
           <mat-icon class="rail-icon" [class.liked]="liked()">{{ liked() ? 'favorite' : 'favorite_border' }}</mat-icon>
           <span class="rail-label">Like</span>
-          @if (liked()) { <span class="rail-count">1</span> }
+          @if (likeCount() > 0) { <span class="rail-count">{{ likeCount() }}</span> }
+        </button>
+        <button class="rail-btn" [class.active]="showComments()" (click)="showComments.set(true)" [matTooltip]="'View comments'">
+          <mat-icon class="rail-icon">chat_bubble_outline</mat-icon>
+          <span class="rail-label">Comment</span>
+          @if (commentCount() > 0) { <span class="rail-count">{{ commentCount() }}</span> }
         </button>
         <button class="rail-btn" (click)="share()" matTooltip="Share this pick">
           <mat-icon class="rail-icon">share</mat-icon>
@@ -173,4 +178,8 @@
       }
     </button>
   </mat-card-content>
+
+  @if (social()) {
+    <app-pod-comments [pod]="pod()" [open]="showComments()" (close)="showComments.set(false)" />
+  }
 </mat-card>

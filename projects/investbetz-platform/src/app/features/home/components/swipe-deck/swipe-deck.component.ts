@@ -7,11 +7,12 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Pod } from '../../../../core/services';
 import { SocialFeedService } from '../../../../core/services';
+import { PodCommentsComponent } from '../pod-comments/pod-comments.component';
 
 @Component({
   selector: 'app-swipe-deck',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, MatSnackBarModule, MatProgressSpinnerModule],
+  imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, MatSnackBarModule, MatProgressSpinnerModule, PodCommentsComponent],
   templateUrl: './swipe-deck.component.html',
   styleUrls: ['./swipe-deck.component.scss']
 })
@@ -27,6 +28,8 @@ export class SwipeDeckComponent {
 
   private snackBar = inject(MatSnackBar);
   readonly socialFeed = inject(SocialFeedService);
+
+  readonly commentPod = signal<Pod | null>(null);
 
   readonly index = signal(0);
   readonly dragOffset = signal(0);
@@ -118,11 +121,15 @@ export class SwipeDeckComponent {
 
   // ----- social -----
   toggleLike(pod: Pod) {
-    this.socialFeed.toggleLike(pod.id);
+    this.socialFeed.toggleLike(pod.id).catch(() => {
+      this.snackBar.open('Could not update like — try again', 'OK', { duration: 2500 });
+    });
   }
 
   toggleSave(pod: Pod) {
-    this.socialFeed.toggleSave(pod.id);
+    this.socialFeed.toggleSave(pod.id).catch(() => {
+      this.snackBar.open('Could not update save — try again', 'OK', { duration: 2500 });
+    });
   }
 
   isFollowing(pod: Pod): boolean {
@@ -130,7 +137,9 @@ export class SwipeDeckComponent {
   }
 
   toggleFollow(pod: Pod) {
-    this.socialFeed.toggleFollow(this.socialFeed.creatorOf(pod));
+    this.socialFeed.toggleFollow(this.socialFeed.creatorOf(pod)).then(msg => {
+      if (msg) this.snackBar.open(msg, 'OK', { duration: 2500 });
+    });
   }
 
   async share(pod: Pod) {

@@ -396,21 +396,24 @@
 .deck-rail {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 1.1rem;
+  justify-content: space-between;
+  gap: 0.2rem;
+  padding: 0.35rem 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .rail-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.3rem 0.6rem;
+  justify-content: center;
+  gap: 0.3rem;
+  flex: 1;
+  padding: 0.28rem 0.2rem;
   background: transparent;
   border: none;
   border-radius: $radius-full;
   color: $white-dim;
-  font-size: 0.7rem;
+  font-size: 0.66rem;
   font-weight: 600;
   cursor: pointer;
   transition: all $transition-fast;
@@ -442,6 +445,17 @@
 
 .rail-icon.saved {
   color: $gold;
+}
+
+.rail-count {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: $emerald;
+  background: rgba(100, 255, 218, 0.12);
+  border: 1px solid rgba(100, 255, 218, 0.25);
+  border-radius: 999px;
+  padding: 0 0.4rem;
+  line-height: 1.1rem;
 }
 
 @keyframes like-pop {

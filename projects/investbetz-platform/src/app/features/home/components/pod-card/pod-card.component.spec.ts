@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 import { PodCardComponent } from './pod-card.component';
 import { Pod } from '../../../../core/services';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -45,7 +47,8 @@ describe('PodCardComponent', () => {
   beforeEach(async () => {
     mockPod = createPod();
     await TestBed.configureTestingModule({
-      imports: [PodCardComponent],
+      imports: [PodCardComponent, HttpClientTestingModule],
+      providers: [provideRouter([])],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     fixture = TestBed.createComponent(PodCardComponent);
