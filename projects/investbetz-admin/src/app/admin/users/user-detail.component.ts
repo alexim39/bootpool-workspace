@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, computed, effect } from '@angular/core';
+import { Component, OnInit, inject, computed, effect, signal } from '@angular/core';
 import { DatePipe, DecimalPipe, UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AdminUsersStore } from './stores/admin-users.store';
@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 
@@ -17,7 +18,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
   standalone: true,
   imports: [DatePipe, DecimalPipe, UpperCasePipe, RouterLink, ReactiveFormsModule,
     MatCardModule, MatButtonModule, MatIconModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatSnackBarModule],
+    MatSelectModule, MatSnackBarModule, MatTooltipModule],
   templateUrl: './user-detail.component.html',
   styleUrls: ['./user-detail.component.scss']
 })
@@ -38,6 +39,11 @@ export class UserDetailComponent implements OnInit {
   readonly user = computed(() => this.store.selectedUser()?.user || null);
   readonly wallet = computed(() => this.store.selectedUser()?.wallet || null);
   readonly saving = computed(() => this.store.saving());
+  readonly activeTab = signal<'stakes' | 'referrals'>('stakes');
+
+  setActiveTab(tab: 'stakes' | 'referrals') {
+    this.activeTab.set(tab);
+  }
 
   readonly formValue = toSignal(this.form.valueChanges, { initialValue: null });
 

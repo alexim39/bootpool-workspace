@@ -105,6 +105,10 @@
                 {{ data.user?.phoneVerified ? 'Verified' : 'Unverified' }}
               </span>
             </div>
+            <div class="info-row">
+              <span class="label">Referral Code</span>
+              <span class="value mono">{{ data.user?.referralCode || '—' }}</span>
+            </div>
           </mat-card-content>
         </mat-card>
 
@@ -154,33 +158,90 @@
       </div>
 
       <mat-card class="stakes-card">
-        <mat-card-header>
-          <mat-card-title>Recent Stakes ({{ data.stakes?.total || 0 }})</mat-card-title>
-        </mat-card-header>
         <mat-card-content class="stakes-content">
-          @if (data.stakes?.items?.length) {
-            <div class="stakes-table-wrap">
-              <div class="sth-row">
-                <span class="sth-cell">Pod</span>
-                <span class="sth-cell">Amount</span>
-                <span class="sth-cell">Status</span>
-                <span class="sth-cell">Date</span>
+          <div class="detail-tabs" role="tablist">
+            <button class="detail-tab" role="tab" [class.active]="activeTab() === 'stakes'" [attr.aria-selected]="activeTab() === 'stakes'" (click)="setActiveTab('stakes')">
+              <mat-icon>receipt_long</mat-icon> Recent Stakes
+              <span class="tab-count">{{ data.stakes?.total || 0 }}</span>
+            </button>
+            <button class="detail-tab" role="tab" [class.active]="activeTab() === 'referrals'" [attr.aria-selected]="activeTab() === 'referrals'" (click)="setActiveTab('referrals')">
+              <mat-icon>group</mat-icon> Referred Users
+              <span class="tab-count">{{ data.referrals?.total || 0 }}</span>
+            </button>
+          </div>
+
+          <div role="tabpanel">
+            @if (activeTab() === 'stakes') {
+              <div class="tab-panel">
+                @if (data.stakes?.items?.length) {
+                  <div class="stakes-table-wrap">
+                    <div class="sth-row">
+                      <span class="sth-cell">Pod</span>
+                      <span class="sth-cell">Amount</span>
+                      <span class="sth-cell">Status</span>
+                      <span class="sth-cell">Date</span>
+                    </div>
+                    @for (s of data.stakes.items; track s._id) {
+                      <div class="st-row">
+                        <span class="st-cell st-pod">
+                          <span class="stake-type-chip" [class.accum]="isAccumulator(s)">{{ isAccumulator(s) ? 'Accumulator' : 'Single' }}</span>
+                          <span class="stake-pod-title">{{ isAccumulator(s) ? (s.items?.length + ' legs') : (s.pod?.title || 'Single') }}</span>
+                        </span>
+                        <span class="st-cell st-amount">₦{{ s.stakeAmount | number }}</span>
+                        <span class="st-cell"><span class="chip" [style.background]="statusColor(s.status)">{{ s.status }}</span></span>
+                        <span class="st-cell st-date">{{ s.createdAt | date:'shortDate' }}</span>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="empty-state">No stakes yet</div>
+                }
               </div>
-              @for (s of data.stakes.items; track s._id) {
-                <div class="st-row">
-                  <span class="st-cell st-pod">
-                    <span class="stake-type-chip" [class.accum]="isAccumulator(s)">{{ isAccumulator(s) ? 'Accumulator' : 'Single' }}</span>
-                    <span class="stake-pod-title">{{ isAccumulator(s) ? (s.items?.length + ' legs') : (s.pod?.title || 'Single') }}</span>
-                  </span>
-                  <span class="st-cell st-amount">₦{{ s.stakeAmount | number }}</span>
-                  <span class="st-cell"><span class="chip" [style.background]="statusColor(s.status)">{{ s.status }}</span></span>
-                  <span class="st-cell st-date">{{ s.createdAt | date:'shortDate' }}</span>
-                </div>
-              }
-            </div>
-          } @else {
-            <div class="empty-state">No stakes yet</div>
-          }
+            } @else {
+              <div class="tab-panel">
+                @if (data.referrals?.items?.length) {
+                  <div class="stakes-table-wrap">
+                    <div class="sth-row">
+                      <span class="sth-cell">User</span>
+                      <span class="sth-cell">Status</span>
+                      <span class="sth-cell">KYC</span>
+                      <span class="sth-cell">Earned</span>
+                      <span class="sth-cell">Registered</span>
+                    </div>
+                    @for (r of data.referrals.items; track r._id) {
+                      <div class="st-row">
+                        <span class="st-cell st-ref-user">
+                          <span class="ref-avatar">{{ (r.fullName || r.phone || '?').charAt(0).toUpperCase() }}</span>
+                          <span class="ref-name">
+                            <span class="ref-full">{{ r.fullName || '—' }}</span>
+                            <span class="ref-phone">{{ r.phone }}</span>
+                          </span>
+                        </span>
+                        <span class="st-cell">
+                          <span class="chip chip-safe" [class.chip-danger]="r.isSuspended">
+                            {{ r.isSuspended ? 'Suspended' : 'Active' }}
+                          </span>
+                        </span>
+                        <span class="st-cell">
+                          <span class="chip chip-safe" [class.chip-muted]="!r.kycVerified">
+                            {{ r.kycVerified ? 'Verified' : 'Pending' }}
+                          </span>
+                        </span>
+                        <span class="st-cell">
+                          <span class="chip chip-safe" [class.chip-muted]="!r.referralBonusPaid" matTooltip="{{ r.referralBonusPaid ? 'Referrer earned bonus from this user' : 'Bonus not yet earned — pending qualifying stake settlement' }}">
+                            {{ r.referralBonusPaid ? 'Earned' : 'Not earned' }}
+                          </span>
+                        </span>
+                        <span class="st-cell st-date">{{ r.createdAt | date:'shortDate' }}</span>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="empty-state">No referrals yet</div>
+                }
+              </div>
+            }
+          </div>
         </mat-card-content>
       </mat-card>
     </div>
