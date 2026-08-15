@@ -97,6 +97,21 @@ mat-card-title { color: #fff !important; font-size: 15px !important; font-weight
 .st-date { color: rgba(255,255,255,0.4); font-size: 12px; }
 .empty-state { padding: 32px 16px; text-align: center; color: rgba(255,255,255,0.4); font-size: 13px; }
 
+.detail-tabs { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 12px 16px; background: #162245; border-bottom: 1px solid rgba(255,255,255,0.08); border-radius: 12px 12px 0 0; }
+.detail-tab { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.detail-tab:hover { color: #fff; border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.04); }
+.detail-tab.active { color: #00E676; border-color: #00E676; background: rgba(0,230,118,0.08); }
+.detail-tab mat-icon { font-size: 16px; width: 16px; height: 16px; }
+.tab-count { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 10px; font-variant-numeric: tabular-nums; }
+.detail-tab.active .tab-count { background: rgba(0,230,118,0.15); color: #00E676; }
+.tab-panel { animation: tabIn 0.18s ease; }
+@keyframes tabIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.st-ref-user { display: flex; align-items: center; gap: 10px; }
+.ref-avatar { width: 30px; height: 30px; border-radius: 50%; background: rgba(129, 212, 250, 0.15); color: #81D4FA; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+.ref-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ref-full { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ref-phone { font-size: 11px; color: rgba(255,255,255,0.45); }
+
 .detail-skeleton { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; align-items: start; }
 .skel-side { display: flex; flex-direction: column; gap: 16px; }
 .skel-card { background: #0D1A30; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); padding: 20px; display: flex; flex-direction: column; gap: 14px; }

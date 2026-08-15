@@ -28,9 +28,41 @@ export class AdminUsersStore {
   readonly growth = signal<UserGrowthData | null>(null);
   readonly growthLoading = signal(false);
 
-  readonly columns = ['phone', 'name', 'email', 'wallet', 'status', 'kyc', 'lastActive', 'registered', 'actions'];
+  readonly columns = ['select', 'phone', 'name', 'email', 'wallet', 'status', 'kyc', 'lastActive', 'registered', 'actions'];
 
   readonly rangeEnd = computed(() => Math.min(this.page() * this.limit(), this.total()));
+
+  readonly selectedIds = signal<string[]>([]);
+  readonly selectedCount = computed(() => this.selectedIds().length);
+  readonly pageAllSelected = computed(() => this.items().length > 0 && this.items().every(u => this.selectedIds().includes(u._id || u.id)));
+  readonly pageSomeSelected = computed(() => {
+    const sel = new Set(this.selectedIds());
+    return this.items().some(u => sel.has(u._id || u.id)) && !this.pageAllSelected();
+  });
+
+  isSelected(u: AdminUser): boolean {
+    return this.selectedIds().includes(u._id || u.id);
+  }
+
+  toggleSelect(u: AdminUser) {
+    const id = u._id || u.id;
+    this.selectedIds.update(cur => cur.includes(id) ? cur.filter(x => x !== id) : [...cur, id].slice(0, 500));
+  }
+
+  toggleSelectAll() {
+    if (this.pageAllSelected()) {
+      const ids = new Set(this.items().map(u => u._id || u.id));
+      this.selectedIds.update(cur => cur.filter(x => !ids.has(x)));
+    } else {
+      const ids = new Set(this.selectedIds());
+      this.items().forEach(u => ids.add(u._id || u.id));
+      this.selectedIds.set([...ids].slice(0, 500));
+    }
+  }
+
+  clearSelection() {
+    this.selectedIds.set([]);
+  }
   readonly visiblePages = computed(() => {
     const tp = this.totalPages();
     const cp = this.page();
@@ -43,6 +75,7 @@ export class AdminUsersStore {
   constructor() {
     this.search$.pipe(debounceTime(300), distinctUntilChanged()).subscribe(() => {
       this.page.set(1);
+      this.clearSelection();
       this.load();
     });
   }
@@ -55,6 +88,7 @@ export class AdminUsersStore {
       this.sortOrder.set('desc');
     }
     this.page.set(1);
+    this.clearSelection();
     this.load();
   }
 
@@ -110,6 +144,7 @@ export class AdminUsersStore {
   setLimit(l: number) {
     this.limit.set(l);
     this.page.set(1);
+    this.clearSelection();
     this.load();
   }
 
@@ -120,6 +155,7 @@ export class AdminUsersStore {
   setStatusFilter(s: string) {
     this.statusFilter.set(s);
     this.page.set(1);
+    this.clearSelection();
     this.load();
   }
 
@@ -127,18 +163,21 @@ export class AdminUsersStore {
     this.roleFilter.set(role);
     this.statusFilter.set('all');
     this.page.set(1);
+    this.clearSelection();
     this.load();
   }
 
   setDateFrom(d: string) {
     this.dateFrom.set(d);
     this.page.set(1);
+    this.clearSelection();
     this.load();
   }
 
   setDateTo(d: string) {
     this.dateTo.set(d);
     this.page.set(1);
+    this.clearSelection();
     this.load();
   }
 
@@ -146,6 +185,7 @@ export class AdminUsersStore {
     this.dateFrom.set('');
     this.dateTo.set('');
     this.page.set(1);
+    this.clearSelection();
     this.load();
   }
 
@@ -189,8 +229,36 @@ export class AdminUsersStore {
     this.admin.verifyUserKyc(id).subscribe(() => this.loadUser(id));
   }
 
-  exportCsv() {
-    const rows = this.items();
+  readonly bulkBusy = signal(false);
+
+  bulkAction(action: string, onDone?: (message: string, isError: boolean) => void) {
+    const ids = this.selectedIds();
+    if (!ids.length) return;
+    this.bulkBusy.set(true);
+    this.admin.bulkUserAction(ids, action).subscribe({
+      next: res => {
+        this.bulkBusy.set(false);
+        if (res.success) {
+          const d = res.data;
+          let msg = res.message || 'Bulk action applied';
+          if (d.excluded?.length) msg += ` (${d.excluded.length} excluded — cannot suspend own account)`;
+          this.clearSelection();
+          this.load();
+          onDone?.(msg, false);
+        } else {
+          onDone?.(res.message || 'Bulk action failed', true);
+        }
+      },
+      error: e => {
+        this.bulkBusy.set(false);
+        onDone?.(e.error?.message || 'Bulk action failed', true);
+      },
+    });
+  }
+
+  exportCsv(selectedOnly = false) {
+    const rows = selectedOnly ? this.items().filter(u => this.isSelected(u)) : this.items();
+    if (!rows.length) return;
     const header = 'Phone,Name,Email,Status,KYC,Wallet Balance,Last Login,Registered\n';
     const csv = header + rows.map(u =>
       `"${u.phone}","${u.fullName}","${u.email || ''}","${u.isSuspended ? 'Suspended' : 'Active'}","${u.kycVerified ? 'Verified' : 'Pending'}","${u.walletBalance ?? 0}","${u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleDateString() : ''}","${new Date(u.createdAt).toLocaleDateString()}"`
@@ -199,7 +267,7 @@ export class AdminUsersStore {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `users_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `${selectedOnly ? 'selected_users' : 'users'}_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }

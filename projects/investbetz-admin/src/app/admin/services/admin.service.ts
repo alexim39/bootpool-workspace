@@ -337,6 +337,13 @@ export class AdminService {
     return this.http.post<{ success: boolean; data: AdminUser }>(`${this.baseUrl}/users/${id}/verify-kyc`, {});
   }
 
+  bulkUserAction(ids: string[], action: string): Observable<{ success: boolean; data: { action: string; matched: number; modified: number; excluded: string[] }; message?: string }> {
+    return this.http.post<{ success: boolean; data: { action: string; matched: number; modified: number; excluded: string[] }; message?: string }>(
+      `${this.baseUrl}/users/bulk-action`,
+      { ids, action },
+    );
+  }
+
   rejectUserKyc(id: string, notes: string): Observable<{ success: boolean; message: string }> {
     return this.http.post<{ success: boolean; message: string }>(`${this.baseUrl}/users/${id}/reject-kyc`, { notes });
   }

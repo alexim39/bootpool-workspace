@@ -13,6 +13,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -21,13 +23,14 @@ import { FormsModule } from '@angular/forms';
   imports: [FormsModule, DecimalPipe,
     MatTableModule, MatButtonModule, MatIconModule, MatTooltipModule,
     MatFormFieldModule, MatInputModule, MatCardModule, MatSelectModule,
-    MatDatepickerModule, MatNativeDateModule],
+    MatDatepickerModule, MatNativeDateModule, MatCheckboxModule, MatSnackBarModule],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss']
 })
 export class UsersComponent implements OnInit {
   readonly store = inject(AdminUsersStore);
   private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
   readonly skeletonRows = Array.from({ length: 8 }, (_, i) => i);
 
   ngOnInit() {
@@ -105,5 +108,41 @@ export class UsersComponent implements OnInit {
       this.store.setPage(val);
     }
     input.value = '';
+  }
+
+  readonly allSelectedSuspended = computed(() => {
+    const ids = new Set(this.store.selectedIds());
+    const selected = this.store.items().filter(u => ids.has(u._id || u.id));
+    return selected.length > 0 && selected.every(u => u.isSuspended);
+  });
+
+  readonly allSelectedVerified = computed(() => {
+    const ids = new Set(this.store.selectedIds());
+    const selected = this.store.items().filter(u => ids.has(u._id || u.id));
+    return selected.length > 0 && selected.every(u => u.kycVerified);
+  });
+
+  readonly allSelectedAffiliate = computed(() => {
+    const ids = new Set(this.store.selectedIds());
+    const selected = this.store.items().filter(u => ids.has(u._id || u.id));
+    return selected.length > 0 && selected.every(u => u.isAffiliate);
+  });
+
+  onRowCheck(event: MouseEvent) {
+    event.stopPropagation();
+  }
+
+  onHeaderCheck(event: MouseEvent) {
+    event.stopPropagation();
+  }
+
+  runBulkAction(action: string) {
+    this.store.bulkAction(action, (msg, isError) => {
+      this.snackBar.open(msg, 'Close', { duration: 4000, panelClass: isError ? 'snack-error' : 'snack-success' });
+    });
+  }
+
+  bulkExport() {
+    this.store.exportCsv(true);
   }
 }
