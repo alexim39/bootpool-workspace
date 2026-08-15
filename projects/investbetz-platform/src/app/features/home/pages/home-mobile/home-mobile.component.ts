@@ -167,7 +167,7 @@ export class HomeMobileComponent implements OnInit, AfterViewInit, OnDestroy {
     this.openLivePod(pod);
   }
 
-  setFeedMode(mode: 'foryou' | 'following') {
+  setFeedMode(mode: 'foryou' | 'following' | 'saved') {
     this.store.setFeedMode(mode);
   }
 
