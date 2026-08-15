@@ -112,6 +112,13 @@
     }
   </div>
 
+  @if (loadingMore()) {
+    <div class="deck-loading">
+      <mat-spinner diameter="16" />
+      <span>Loading more picks…</span>
+    </div>
+  }
+
   @if (pods().length > 1) {
     <div class="deck-progress">
       <span class="progress-num">{{ index() + 1 }} / {{ pods().length }}</span>

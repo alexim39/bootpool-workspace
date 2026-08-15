@@ -300,6 +300,7 @@
         [selectedIds]="slipIds()"
         [selectionDisabled]="store.isSelectionDisabled()"
         [hasMore]="store.pods.hasMorePods()"
+        [loadingMore]="store.pods.loadingMore()"
         (placeStake)="openStakeModal($event)"
         (toggleSelect)="toggleSelection($event)"
         (loadMore)="store.loadMore()" />

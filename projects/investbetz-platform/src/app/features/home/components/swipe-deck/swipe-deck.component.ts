@@ -4,13 +4,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Pod } from '../../../../core/services';
 import { SocialFeedService } from '../../../../core/services';
 
 @Component({
   selector: 'app-swipe-deck',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, MatSnackBarModule],
+  imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, MatSnackBarModule, MatProgressSpinnerModule],
   templateUrl: './swipe-deck.component.html',
   styleUrls: ['./swipe-deck.component.scss']
 })
@@ -19,6 +20,7 @@ export class SwipeDeckComponent {
   selectedIds = input<string[]>([]);
   selectionDisabled = input(false);
   hasMore = input(false);
+  loadingMore = input(false);
   @Output() placeStake = new EventEmitter<Pod>();
   @Output() toggleSelect = new EventEmitter<Pod>();
   @Output() loadMore = new EventEmitter<void>();
