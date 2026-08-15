@@ -6,18 +6,20 @@
       <div class="creator-row">
         <div class="creator-left">
           <span class="creator-avatar" [class.avatar-live]="pod().isLive">
-            <mat-icon>auto_awesome</mat-icon>
+            <mat-icon>{{ isOra() ? 'auto_awesome' : 'person' }}</mat-icon>
           </span>
           <div class="creator-meta">
             <span class="creator-handle">
-              &#64;{{ creatorName() }}
-              <mat-icon class="verified-badge" matTooltip="Verified AI curator">verified</mat-icon>
-              <span class="creator-role">AI Curator</span>
+              {{ creatorName() }}
+              @if (isOra()) {
+                <mat-icon class="verified-badge" matTooltip="Verified AI curator">verified</mat-icon>
+              }
+              <span class="creator-role">{{ isOra() ? 'AI Curator' : 'Creator' }}</span>
             </span>
             <span class="creator-time">{{ creatorTime() }}</span>
           </div>
         </div>
-        <button class="follow-btn" [class.following]="following()" (click)="toggleFollow()">
+        <button class="follow-btn" [class.following]="following()" [class.locked]="isOra()" (click)="toggleFollow()">
           <mat-icon>{{ following() ? 'check' : 'add' }}</mat-icon>
           {{ following() ? 'Following' : 'Follow' }}
         </button>

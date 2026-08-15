@@ -97,15 +97,19 @@
               <mat-icon class="rail-icon" [class.saved]="socialFeed.isSaved(pod.id)">{{ socialFeed.isSaved(pod.id) ? 'bookmark' : 'bookmark_border' }}</mat-icon>
               <span class="rail-label">{{ socialFeed.isSaved(pod.id) ? 'Saved' : 'Save' }}</span>
             </button>
-            <button class="rail-btn follow" [class.following]="isFollowing(pod)" (click)="toggleFollow(pod)" [matTooltip]="'Follow Ora'">
+            <button class="rail-btn follow" [class.following]="isFollowing(pod)" (click)="toggleFollow(pod)" [matTooltip]="isOraOf(pod) ? 'Always following Ora' : (isFollowing(pod) ? 'Unfollow' : 'Follow')">
               <mat-icon>{{ isFollowing(pod) ? 'check' : 'add' }}</mat-icon>
               <span class="rail-label">{{ isFollowing(pod) ? 'Following' : 'Follow' }}</span>
             </button>
           </div>
 
           <div class="deck-creator">
-            <span class="creator-avatar"><mat-icon>auto_awesome</mat-icon></span>
-            <span class="creator-name">&#64;Ora <mat-icon class="verified">verified</mat-icon> AI Curator</span>
+            <span class="creator-avatar"><mat-icon>{{ isOraOf(pod) ? 'auto_awesome' : 'person' }}</mat-icon></span>
+            <span class="creator-name">{{ creatorNameOf(pod) }}
+              @if (isOraOf(pod)) {
+                <mat-icon class="verified">verified</mat-icon>
+              }
+              {{ isOraOf(pod) ? 'AI Curator' : 'Creator' }}</span>
           </div>
         </article>
       }

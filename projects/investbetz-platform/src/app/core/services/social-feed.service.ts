@@ -2,7 +2,7 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Pod } from './pod.service';
+import { Pod, PodService } from './pod.service';
 import { AuthService } from './auth.service';
 
 const STORAGE_KEY = 'betpool_social_v1';
@@ -14,6 +14,14 @@ export interface SocialComment {
   authorName: string;
   text: string;
   createdAt: string;
+}
+
+export interface SocialCreator {
+  id: string;
+  fullName: string;
+  podCount: number;
+  isOra: boolean;
+  isFollowing: boolean;
 }
 
 interface SocialState {
@@ -38,6 +46,11 @@ interface ToggleSaveData {
   saved: boolean;
 }
 
+interface ToggleFollowData {
+  following: boolean;
+  followerCount: number;
+}
+
 interface CommentData {
   _id: string;
   pod: string;
@@ -49,15 +62,15 @@ interface CommentData {
 function loadState(): SocialState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { likes: [], saves: [], follows: ['ora'] };
+    if (!raw) return { likes: [], saves: [], follows: [] };
     const parsed = JSON.parse(raw) as SocialState;
     return {
       likes: Array.isArray(parsed.likes) ? parsed.likes : [],
       saves: Array.isArray(parsed.saves) ? parsed.saves : [],
-      follows: Array.isArray(parsed.follows) && parsed.follows.length ? parsed.follows : ['ora'],
+      follows: Array.isArray(parsed.follows) ? parsed.follows : [],
     };
   } catch {
-    return { likes: [], saves: [], follows: ['ora'] };
+    return { likes: [], saves: [], follows: [] };
   }
 }
 
@@ -65,6 +78,7 @@ function loadState(): SocialState {
 export class SocialFeedService {
   private http = inject(HttpClient);
   private auth = inject(AuthService);
+  private podsSvc = inject(PodService);
 
   private readonly API_URL = environment.apiUrl;
   private guest = loadState();
@@ -80,7 +94,12 @@ export class SocialFeedService {
   readonly commentsLoading = signal(false);
   readonly commentPosting = signal(false);
 
+  readonly creators = signal<SocialCreator[]>([]);
+  readonly creatorsLoading = signal(false);
+
   readonly isLoggedIn = computed(() => this.auth.isAuthenticated());
+
+  readonly oraId = computed(() => this.podsSvc.oraId());
 
   private persist() {
     try {
@@ -107,7 +126,26 @@ export class SocialFeedService {
   }
 
   isFollowing(creator: string): boolean {
-    return true;
+    if (!creator) return true;
+    if (this.isOraCreator(creator)) return true;
+    return this.follows().includes(creator);
+  }
+
+  isOraCreator(creator: string): boolean {
+    return !!creator && (creator === this.oraId() || creator === 'ora');
+  }
+
+  creatorOf(pod: Pod): string {
+    return pod.createdBy || 'ora';
+  }
+
+  creatorNameFor(pod: Pod): string {
+    if (this.isOraCreator(pod.createdBy)) return 'Ora';
+    return pod.creatorName || 'Ora';
+  }
+
+  creatorName(creator: string): string {
+    return creator === this.oraId() ? 'Ora' : creator;
   }
 
   likeCount(pod: Pod): number {
@@ -118,10 +156,39 @@ export class SocialFeedService {
     return this.serverCommentCounts()[pod.id] || 0;
   }
 
-  async hydrateStats(pods: Pod[]): Promise<void> {
-    if (!this.isLoggedIn()) return;
+  async hydrateSocial(pods: Pod[]): Promise<void> {
+    const loggedIn = this.isLoggedIn();
+    const oraId = this.oraId();
+    if (oraId) {
+      this.follows.update(cur => cur.includes(oraId) ? cur : [...cur, oraId]);
+      this.persist();
+    }
+    if (!loggedIn) return;
     const ids = pods.map(p => p.id).filter(Boolean);
-    if (ids.length === 0) return;
+    const requests: Promise<void>[] = [];
+    if (ids.length > 0) {
+      requests.push(this.hydrateStats(ids));
+    }
+    await Promise.all(requests);
+    try {
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { ids: string[]; oraId: string } }>(
+        `${this.API_URL}/social/following`,
+        this.headers()
+      ));
+      if (res.success && res.data) {
+        if (res.data.oraId) this.podsSvc.oraId.set(res.data.oraId);
+        const idsSet = new Set(res.data.ids || []);
+        const ora = res.data.oraId;
+        if (ora) idsSet.add(ora);
+        this.follows.set([...idsSet]);
+      }
+    } catch {
+      // keep current follow state
+    }
+    await this.fetchCreators();
+  }
+
+  private async hydrateStats(ids: string[]): Promise<void> {
     try {
       const res = await lastValueFrom(this.http.get<{ success: boolean; data: SocialStatsData }>(
         `${this.API_URL}/social/stats?podIds=${ids.join(',')}`,
@@ -135,6 +202,69 @@ export class SocialFeedService {
     } catch {
       // stats are progressive — keep whatever state exists
     }
+  }
+
+  async fetchCreators(): Promise<void> {
+    if (!this.isLoggedIn()) return;
+    if (this.creatorsLoading()) return;
+    this.creatorsLoading.set(true);
+    try {
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: SocialCreator[] }>(
+        `${this.API_URL}/social/creators?limit=12`,
+        this.headers()
+      ));
+      if (res.success) this.creators.set(res.data || []);
+    } catch {
+      // discovery rail stays hidden on failure
+    } finally {
+      this.creatorsLoading.set(false);
+    }
+  }
+
+  async toggleFollow(creator: string): Promise<string> {
+    if (!creator) return 'You are always following Ora';
+    const oraId = this.oraId();
+    const isOra = creator === oraId || creator === 'ora';
+    if (isOra) {
+      if (!this.isLoggedIn()) return 'You are always following Ora — it cannot be turned off';
+      try {
+        await lastValueFrom(this.http.post<{ success: boolean; data: ToggleFollowData }>(
+          `${this.API_URL}/social/follows/toggle`,
+          { creatorId: oraId || creator },
+          this.headers()
+        ));
+      } catch {
+        // server keeps the lock regardless
+      }
+      return 'You are always following Ora — it cannot be turned off';
+    }
+    const wasFollowing = this.follows().includes(creator);
+    this.follows.update(cur => wasFollowing ? cur.filter(x => x !== creator) : [...cur, creator]);
+    this.updateCreatorFollow(creator, !wasFollowing);
+    if (!this.isLoggedIn()) {
+      this.persist();
+      return '';
+    }
+    try {
+      const res = await lastValueFrom(this.http.post<{ success: boolean; data: ToggleFollowData }>(
+        `${this.API_URL}/social/follows/toggle`,
+        { creatorId: creator },
+        this.headers()
+      ));
+      if (res.success && res.data) {
+        this.follows.update(cur => res.data.following ? (cur.includes(creator) ? cur : [...cur, creator]) : cur.filter(x => x !== creator));
+        this.updateCreatorFollow(creator, res.data.following);
+      }
+      return '';
+    } catch (error) {
+      this.follows.update(cur => wasFollowing ? [...cur, creator] : cur.filter(x => x !== creator));
+      this.updateCreatorFollow(creator, wasFollowing);
+      throw error;
+    }
+  }
+
+  private updateCreatorFollow(creator: string, following: boolean) {
+    this.creators.update(list => list.map(c => c.id === creator ? { ...c, isFollowing: following } : c));
   }
 
   async toggleLike(podId: string): Promise<void> {
@@ -179,19 +309,6 @@ export class SocialFeedService {
       this.saves.update(cur => wasSaved ? [...cur, podId] : cur.filter(x => x !== podId));
       throw error;
     }
-  }
-
-  async toggleFollow(creator: string): Promise<string> {
-    if (!this.isLoggedIn()) return 'Sign in to follow creators';
-    return 'You are always following Ora — it cannot be turned off';
-  }
-
-  creatorOf(pod: Pod): string {
-    return pod.createdBy || 'ora';
-  }
-
-  creatorName(creator: string): string {
-    return 'Ora';
   }
 
   proofText(pod: Pod): string {

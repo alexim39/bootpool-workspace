@@ -238,9 +238,11 @@
       <mat-icon>bookmark</mat-icon> Saved
     </button>
     @if (store.feedMode() === 'following') {
-      <span class="feed-mode-hint">Picks from &#64;Ora — the only curator right now</span>
+      <span class="feed-mode-hint">Picks from people you follow</span>
     }
   </div>
+
+  <app-who-to-follow />
 
   <mat-tab-group class="sports-tabs" (selectedTabChange)="store.onSportChange($event.index)">
     <mat-tab [label]="'All (' + store.pods.totalPods() + ')'"><!-- All ({{ store.pods.totalPods() }}) --></mat-tab>

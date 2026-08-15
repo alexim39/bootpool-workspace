@@ -39,7 +39,7 @@
         @if (socialFeed.isLoggedIn()) {
           <input
             class="comment-input"
-            [placeholder]="'Comment on ' + '@' + socialFeed.creatorName(socialFeed.creatorOf(pod())) + '’s pick…'"
+            [placeholder]="'Comment on ' + socialFeed.creatorNameFor(pod()) + '’s pick…'"
             [(ngModel)]="draft"
             (keydown.enter)="send(pod())"
             maxlength="500" />

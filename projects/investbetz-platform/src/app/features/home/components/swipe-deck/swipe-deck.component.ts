@@ -136,9 +136,19 @@ export class SwipeDeckComponent {
     return this.socialFeed.isFollowing(this.socialFeed.creatorOf(pod));
   }
 
+  isOraOf(pod: Pod): boolean {
+    return this.socialFeed.isOraCreator(this.socialFeed.creatorOf(pod));
+  }
+
+  creatorNameOf(pod: Pod): string {
+    return this.socialFeed.creatorNameFor(pod);
+  }
+
   toggleFollow(pod: Pod) {
     this.socialFeed.toggleFollow(this.socialFeed.creatorOf(pod)).then(msg => {
       if (msg) this.snackBar.open(msg, 'OK', { duration: 2500 });
+    }).catch(() => {
+      this.snackBar.open('Could not update follow — try again', 'OK', { duration: 2500 });
     });
   }
 

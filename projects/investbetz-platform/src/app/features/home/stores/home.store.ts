@@ -110,7 +110,7 @@ export class HomeStore implements OnDestroy {
 
     effect(() => {
       const pods = this.activePods();
-      if (pods.length > 0) this._social.hydrateStats(pods);
+      if (pods.length > 0) this._social.hydrateSocial(pods);
     });
   }
 

@@ -38,7 +38,8 @@ export class PodCardComponent {
   readonly showComments = signal(false);
 
   readonly creator = computed(() => this.socialFeed.creatorOf(this.pod()));
-  readonly creatorName = computed(() => this.socialFeed.creatorName(this.creator()));
+  readonly isOra = computed(() => this.socialFeed.isOraCreator(this.creator()));
+  readonly creatorName = computed(() => this.socialFeed.creatorNameFor(this.pod()));
   readonly following = computed(() => this.socialFeed.isFollowing(this.creator()));
   readonly liked = computed(() => this.socialFeed.isLiked(this.pod().id));
   readonly saved = computed(() => this.socialFeed.isSaved(this.pod().id));
@@ -73,6 +74,8 @@ export class PodCardComponent {
   toggleFollow() {
     this.socialFeed.toggleFollow(this.creator()).then(msg => {
       if (msg) this.snackBar.open(msg, 'OK', { duration: 2500 });
+    }).catch(() => {
+      this.snackBar.open('Could not update follow — try again', 'OK', { duration: 2500 });
     });
   }
 
