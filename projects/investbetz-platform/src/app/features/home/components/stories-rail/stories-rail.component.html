@@ -1,0 +1,37 @@
+<div class="stories-rail">
+  <button class="story-ring" (click)="openTopPick()" [class.disabled]="!topPick()" [attr.aria-label]="'Ora daily pick'">
+    <span class="ring-circle ring-emerald">
+      <span class="ring-inner"><mat-icon>auto_awesome</mat-icon></span>
+    </span>
+    <span class="ring-label">Ora Pick</span>
+    @if (topPick(); as p) {
+      <span class="ring-sub">{{ p.homeTeam }} v {{ p.awayTeam }}</span>
+    }
+  </button>
+
+  @if (livePick(); as live) {
+    <button class="story-ring" (click)="openLivePick()" [attr.aria-label]="'Live game'">
+      <span class="ring-circle ring-live">
+        <span class="ring-inner"><span class="live-pulse-dot"></span></span>
+      </span>
+      <span class="ring-label ring-live-label">Live now</span>
+      <span class="ring-sub">{{ live.homeTeam }} v {{ live.awayTeam }}</span>
+    </button>
+  }
+
+  <a class="story-ring" routerLink="/games" [attr.aria-label]="'Browse all games'">
+    <span class="ring-circle ring-gold">
+      <span class="ring-inner"><mat-icon>sports_soccer</mat-icon></span>
+    </span>
+    <span class="ring-label">Games</span>
+    <span class="ring-sub">View board</span>
+  </a>
+
+  <a class="story-ring" routerLink="/leaderboard" [attr.aria-label]="'Leaderboard'">
+    <span class="ring-circle ring-blue">
+      <span class="ring-inner"><mat-icon>emoji_events</mat-icon></span>
+    </span>
+    <span class="ring-label">Top winners</span>
+    <span class="ring-sub">Leaderboard</span>
+  </a>
+</div>

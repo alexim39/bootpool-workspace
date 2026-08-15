@@ -223,6 +223,57 @@
   height: 18px;
 }
 
+.feed-mode-row {
+  position: sticky;
+  top: 60px;
+  z-index: 199;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #0A1428;
+  padding: 0.6rem 0 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.feed-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1.1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.feed-mode-btn:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.feed-mode-btn.active {
+  color: #00E676;
+  border-color: rgba(0, 230, 118, 0.4);
+  background: rgba(0, 230, 118, 0.08);
+}
+
+.feed-mode-btn mat-icon {
+  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
+}
+
+.feed-mode-hint {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-style: italic;
+}
+
 .sports-tabs {
   position: sticky;
   top: 60px;

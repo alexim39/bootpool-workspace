@@ -93,6 +93,8 @@
     }
   </section>
 
+  <app-stories-rail (openPick)="handleStoriesPick($event)" />
+
   <section class="quick-play" aria-label="Quick play">
     <a class="qp-card qp-arcade" routerLink="/virtual-games">
       <span class="qp-icon"><mat-icon>casino</mat-icon></span>
@@ -218,6 +220,15 @@
     </button>
   </div>
 
+  <div class="feed-mode-row">
+    <button class="feed-mode-btn" [class.active]="store.feedMode() === 'foryou'" (click)="setFeedMode('foryou')">
+      <mat-icon>explore</mat-icon> For You
+    </button>
+    <button class="feed-mode-btn" [class.active]="store.feedMode() === 'following'" (click)="setFeedMode('following')">
+      <mat-icon>people</mat-icon> Following
+    </button>
+  </div>
+
   <div class="sport-chips">
     <button
       class="sport-chip"
@@ -269,7 +280,7 @@
           }
         </div>
       </div>
-    } @else if (store.displayedPods().length === 0 && !store.isSearching()) {
+    } @else if (store.feedPods().length === 0 && !store.isSearching()) {
       <div class="empty-state">
         <span class="empty-illustration"><mat-icon>event_busy</mat-icon></span>
         <h3>No active odds</h3>
@@ -283,9 +294,18 @@
         <p>Try a different search term</p>
         <button class="empty-cta" (click)="store.clearSearch()">Clear search</button>
       </div>
+    } @else if (store.feedMode() === 'foryou' && !store.isSearching() && store.feedPods().length > 0) {
+      <app-swipe-deck
+        [pods]="store.feedPods()"
+        [selectedIds]="slipIds()"
+        [selectionDisabled]="store.isSelectionDisabled()"
+        [hasMore]="store.pods.hasMorePods()"
+        (placeStake)="openStakeModal($event)"
+        (toggleSelect)="toggleSelection($event)"
+        (loadMore)="store.loadMore()" />
     } @else {
       <div class="odds-list">
-        @for (pod of store.displayedPods(); track pod.id) {
+        @for (pod of store.feedPods(); track pod.id) {
           <app-pod-card
             [pod]="pod"
             [selected]="store.isSelected(pod.id)"
@@ -305,7 +325,7 @@
               <mat-spinner diameter="16"/>
               <span>Loading...</span>
             } @else {
-              <span>Load More ({{ store.displayedPods().length }}/{{ store.pods.totalPods() }})</span>
+              <span>Load More ({{ store.feedPods().length }}/{{ store.pods.totalPods() }})</span>
             }
           </button>
         </div>

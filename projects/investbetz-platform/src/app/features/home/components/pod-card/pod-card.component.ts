@@ -1,10 +1,12 @@
-import { Component, Output, EventEmitter, computed, input } from '@angular/core';
+import { Component, Output, EventEmitter, computed, input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Pod } from '../../../../core/services';
+import { SocialFeedService } from '../../../../core/services';
 
 @Component({
   selector: 'app-pod-card',
@@ -14,7 +16,8 @@ import { Pod } from '../../../../core/services';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatSnackBarModule
   ],
   templateUrl: './pod-card.component.html',
   styleUrls: ['./pod-card.component.scss']
@@ -23,8 +26,48 @@ export class PodCardComponent {
   pod = input.required<Pod>();
   selected = input(false);
   selectionDisabled = input(false);
+  social = input(true);
   @Output() placeStake = new EventEmitter<Pod>();
   @Output() toggleSelect = new EventEmitter<Pod>();
+
+  private snackBar = inject(MatSnackBar);
+  readonly socialFeed = inject(SocialFeedService);
+
+  readonly creator = computed(() => this.socialFeed.creatorOf(this.pod()));
+  readonly creatorName = computed(() => this.socialFeed.creatorName(this.creator()));
+  readonly following = computed(() => this.socialFeed.isFollowing(this.creator()));
+  readonly liked = computed(() => this.socialFeed.isLiked(this.pod().id));
+  readonly saved = computed(() => this.socialFeed.isSaved(this.pod().id));
+  readonly proof = computed(() => this.socialFeed.proofText(this.pod()));
+
+  readonly creatorTime = computed(() => {
+    const p = this.pod();
+    if (p.isLive) return 'LIVE';
+    const d = new Date(p.matchDate || p.stakingClosesAt);
+    const now = new Date();
+    const diff = d.getTime() - now.getTime();
+    if (diff < 0) return 'Opens soon';
+    if (diff < 3600000) return `in ${Math.max(1, Math.round(diff / 60000))}m`;
+    if (diff < 86400000) return `in ${Math.round(diff / 3600000)}h`;
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  });
+
+  toggleLike() {
+    this.socialFeed.toggleLike(this.pod().id);
+  }
+
+  toggleSave() {
+    this.socialFeed.toggleSave(this.pod().id);
+  }
+
+  toggleFollow() {
+    this.socialFeed.toggleFollow(this.creator());
+  }
+
+  async share() {
+    const msg = await this.socialFeed.sharePod(this.pod());
+    if (msg) this.snackBar.open(msg, 'OK', { duration: 2500 });
+  }
 
   timeRemaining = computed(() => {
     const now = Date.now();

@@ -42,6 +42,208 @@
   display: none;
 }
 
+.creator-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.creator-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.creator-avatar {
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $emerald 0%, $emerald-light 100%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: $deep-navy;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba($emerald, 0.25);
+}
+
+.creator-avatar mat-icon {
+  font-size: 1.15rem;
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.creator-avatar.avatar-live {
+  background: linear-gradient(135deg, $error 0%, #FF8A80 100%);
+  box-shadow: 0 0 0 2px rgba($error, 0.3);
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+
+.creator-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.creator-handle {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: $white;
+  white-space: nowrap;
+}
+
+.verified-badge {
+  font-size: 0.85rem;
+  width: 0.85rem;
+  height: 0.85rem;
+  color: $info;
+  flex-shrink: 0;
+}
+
+.creator-role {
+  padding: 0.05rem 0.45rem;
+  background: linear-gradient(135deg, rgba($emerald, 0.15), rgba($emerald-light, 0.08));
+  border: 1px solid rgba($emerald, 0.2);
+  color: $emerald-light;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: $radius-full;
+  white-space: nowrap;
+}
+
+.creator-time {
+  font-size: 0.65rem;
+  color: $white-dim;
+}
+
+.follow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.85rem;
+  background: $emerald;
+  border: 1px solid $emerald;
+  border-radius: $radius-full;
+  color: $deep-navy;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all $transition-base;
+  flex-shrink: 0;
+}
+
+.follow-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 10px rgba($emerald, 0.35);
+}
+
+.follow-btn.following {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: $white-muted;
+}
+
+.follow-btn mat-icon {
+  font-size: 0.9rem;
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.proof-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.65rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: $radius-md;
+}
+
+.proof-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: $emerald;
+  box-shadow: 0 0 8px rgba($emerald, 0.6);
+  flex-shrink: 0;
+}
+
+.proof-text {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: $white-dim;
+}
+
+.social-rail {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.rail-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: $radius-full;
+  color: $white-dim;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all $transition-fast;
+}
+
+.rail-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: $white;
+}
+
+.rail-btn.active {
+  color: $emerald;
+}
+
+.rail-icon {
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.rail-icon.liked {
+  color: $error;
+  animation: like-pop 0.3s ease;
+}
+
+.rail-icon.saved {
+  color: $gold;
+}
+
+@keyframes like-pop {
+  0% { transform: scale(0.6); }
+  60% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+.rail-count {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: $error;
+}
+
+.rail-label {
+  white-space: nowrap;
+}
+
 .pod-card:hover .card-glow {
   display: block;
   position: absolute;

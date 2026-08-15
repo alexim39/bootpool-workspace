@@ -6,6 +6,7 @@ import { BookingCodeLeg } from '../../../core/services';
 import { WalletService } from '../../../core/services';
 import { AuthService } from '../../../core/services';
 import { OraRecordService, OraRecord } from '../../../core/services';
+import { SocialFeedService } from '../../../core/services';
 
 @Injectable({ providedIn: 'root' })
 export class HomeStore implements OnDestroy {
@@ -14,6 +15,7 @@ export class HomeStore implements OnDestroy {
   private _stake = inject(StakeService);
   private _wallet = inject(WalletService);
   private _oraRecord = inject(OraRecordService);
+  private _social = inject(SocialFeedService);
 
   readonly selectedPod = signal<Pod | null>(null);
   readonly selectedSport = signal<string | null>(null);
@@ -64,6 +66,20 @@ export class HomeStore implements OnDestroy {
   });
   readonly hasSearchResults = computed(() => this.isSearching() && !this.pods.loading() && this.displayedPods().length > 0);
   readonly noSearchResults = computed(() => this.isSearching() && !this.pods.loading() && this.displayedPods().length === 0);
+
+  readonly feedMode = signal<'foryou' | 'following'>('foryou');
+
+  setFeedMode(mode: 'foryou' | 'following') {
+    this.feedMode.set(mode);
+  }
+
+  readonly followingPods = computed(() => {
+    return this.displayedPods().filter(p => this._social.isFollowing(this._social.creatorOf(p)));
+  });
+
+  readonly feedPods = computed(() => {
+    return this.feedMode() === 'following' ? this.followingPods() : this.displayedPods();
+  });
 
   private readonly PAGE_SIZE = 12;
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, signal, inject, computed, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,6 +16,8 @@ import { PodCardComponent } from '../../components/pod-card/pod-card.component';
 import { StakeModalComponent } from '../../components/stake-modal/stake-modal.component';
 import { BetSlipComponent } from '../../components/bet-slip/bet-slip.component';
 import { FeaturedBannerComponent } from '../../components/featured-banner/featured-banner.component';
+import { StoriesRailComponent } from '../../components/stories-rail/stories-rail.component';
+import { SwipeDeckComponent } from '../../components/swipe-deck/swipe-deck.component';
 import { TopUpModalComponent, OraChatComponent, OraPickBannerComponent } from '../../../../core/components';
 import { MobileNavComponent } from '../../../../core/components';
 import { HomeStore } from '../../stores/home.store';
@@ -38,6 +40,8 @@ import { HomeStore } from '../../stores/home.store';
     StakeModalComponent,
     BetSlipComponent,
     FeaturedBannerComponent,
+    StoriesRailComponent,
+    SwipeDeckComponent,
     TopUpModalComponent,
     MobileNavComponent,
     OraChatComponent,
@@ -60,6 +64,7 @@ export class HomeMobileComponent implements OnInit, AfterViewInit, OnDestroy {
   showOraChat = signal(false);
   showNotifPanel = signal(false);
   readonly slipResult = signal<{ success: boolean; message?: string } | null>(null);
+  readonly slipIds = computed(() => this.store.betSlipSelections().map(p => p.id));
 
   openOraChat() { this.showOraChat.set(true); }
 
@@ -156,6 +161,14 @@ export class HomeMobileComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.store.openPodById(pod.id);
     }
+  }
+
+  handleStoriesPick(pod: Pod) {
+    this.openLivePod(pod);
+  }
+
+  setFeedMode(mode: 'foryou' | 'following') {
+    this.store.setFeedMode(mode);
   }
 
   onStakePlaced() {

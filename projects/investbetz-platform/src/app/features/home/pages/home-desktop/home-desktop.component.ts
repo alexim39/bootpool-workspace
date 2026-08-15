@@ -15,9 +15,11 @@ import { PodCardComponent } from '../../components/pod-card/pod-card.component';
 import { StakeModalComponent } from '../../components/stake-modal/stake-modal.component';
 import { BetSlipComponent } from '../../components/bet-slip/bet-slip.component';
 import { FeaturedBannerComponent } from '../../components/featured-banner/featured-banner.component';
+import { StoriesRailComponent } from '../../components/stories-rail/stories-rail.component';
 import { AppNavComponent, OraChatComponent, OraPickBannerComponent } from '../../../../core/components';
 import { HomeStore } from '../../stores/home.store';
 import { OraPick } from '../../../../core/services';
+import { Pod } from '../../../../core/services';
 
 @Component({
   selector: 'app-home-desktop',
@@ -39,6 +41,7 @@ import { OraPick } from '../../../../core/services';
     StakeModalComponent,
     BetSlipComponent,
     FeaturedBannerComponent,
+    StoriesRailComponent,
     AppNavComponent,
     OraChatComponent,
     OraPickBannerComponent
@@ -97,6 +100,14 @@ export class HomeDesktopComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.store.openPodById(pod.id);
     }
+  }
+
+  handleStoriesPick(pod: Pod) {
+    this.openLivePod(pod);
+  }
+
+  setFeedMode(mode: 'foryou' | 'following') {
+    this.store.setFeedMode(mode);
   }
 
   openStakeModal(pod: any) {

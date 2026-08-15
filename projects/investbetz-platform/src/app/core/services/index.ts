@@ -28,3 +28,4 @@ export { WalletService } from './wallet.service';
 export type { WalletBalance, Transaction, TransactionHistoryResponse, WalletHistoryQuery, DepositInitResponse, WithdrawalInitResponse, Bank, AccountResolution, WithdrawalLimits, SavedBankAccount } from './wallet.service';
 export { VirtualGamesService } from './virtual-games.service';
 export type { VirtualGameId, VirtualGame, PlayResult, PlayHistoryItem, VirtualGameStats, HistoryResultFilter } from './virtual-games.service';
+export { SocialFeedService } from './social-feed.service';
