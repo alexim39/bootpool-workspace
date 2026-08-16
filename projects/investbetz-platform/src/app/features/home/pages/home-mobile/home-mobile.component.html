@@ -230,6 +230,9 @@
     <button class="feed-mode-btn" [class.active]="store.feedMode() === 'saved'" (click)="setFeedMode('saved')">
       <mat-icon>bookmark</mat-icon> Saved
     </button>
+    <button class="create-pick-btn" (click)="openCreatePick()" aria-label="Publish a pick">
+      <mat-icon>add</mat-icon> Create pick
+    </button>
   </div>
 
   <app-who-to-follow />
@@ -252,7 +255,7 @@
   </div>
 
   <main class="feed-area">
-    @if (store.pods.loading()) {
+    @if (store.feedLoading()) {
       <div class="skel-page">
         <div class="skel-grid" style="grid-template-columns:1fr">
           @for (item of [1,2,3]; track item) {
@@ -284,6 +287,13 @@
             </div>
           }
         </div>
+      </div>
+    } @else if (store.feedMode() === 'following' && store.feedPods().length === 0 && !store.isSearching()) {
+      <div class="empty-state">
+        <span class="empty-illustration"><mat-icon>people_outline</mat-icon></span>
+        <h3>No picks from people you follow yet</h3>
+        <p>Follow creators in the rail above to see their picks here</p>
+        <button class="empty-cta" (click)="openCreatePick()">Publish your first pick</button>
       </div>
     } @else if (store.feedMode() === 'saved' && store.feedPods().length === 0 && !store.isSearching()) {
       <div class="empty-state">
@@ -327,17 +337,17 @@
           </app-pod-card>
         }
       </div>
-      @if (store.pods.hasMorePods()) {
+      @if (store.feedHasMore()) {
         <div class="load-more-section">
           <button
             class="load-more-btn"
             (click)="store.loadMore()"
-            [disabled]="store.pods.loadingMore()">
-            @if (store.pods.loadingMore()) {
+            [disabled]="store.feedLoadingMore()">
+            @if (store.feedLoadingMore()) {
               <mat-spinner diameter="16"/>
               <span>Loading...</span>
             } @else {
-              <span>Load More ({{ store.feedPods().length }}/{{ store.pods.totalPods() }})</span>
+              <span>Load More ({{ store.feedPods().length }}/{{ store.feedTotal() }})</span>
             }
           </button>
         </div>
@@ -370,6 +380,12 @@
   }
 
   <app-top-up-modal [visible]="showTopUp()" [disableClose]="true" (close)="showTopUp.set(false)" />
+
+  <app-create-pick-dialog
+    [open]="store.createPickOpen()"
+    (close)="store.closeCreatePick()"
+    (published)="onPickPublished()"
+  />
 
   @if (showNotifPanel()) {
     <div class="mobile-notif-backdrop" (click)="closeNotifPanel()">

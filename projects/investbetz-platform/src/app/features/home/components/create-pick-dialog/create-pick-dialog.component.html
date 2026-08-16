@@ -1,0 +1,101 @@
+@if (open()) {
+  <div class="pick-overlay" (click)="onClose()">
+    <div class="pick-panel" (click)="$event.stopPropagation()">
+      <div class="pick-header">
+        <div class="pick-title-wrap">
+          <span class="pick-icon"><mat-icon>add_circle</mat-icon></span>
+          <div>
+            <h3 class="pick-title">Publish your pick</h3>
+            <span class="pick-sub">Your pick appears in the Following feed of your followers</span>
+          </div>
+        </div>
+        <button class="close-btn" (click)="onClose()" aria-label="Close">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="pick-body">
+        <div class="field">
+          <label class="field-label">Sport</label>
+          <input class="field-input" [(ngModel)]="sport" placeholder="e.g. Football, Basketball" />
+        </div>
+
+        <div class="field">
+          <label class="field-label">League <span class="optional">(optional)</span></label>
+          <input class="field-input" [(ngModel)]="league" placeholder="e.g. Premier League" />
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">Home team</label>
+            <input class="field-input" [(ngModel)]="homeTeam" placeholder="Home team" />
+          </div>
+          <div class="field">
+            <label class="field-label">Away team</label>
+            <input class="field-input" [(ngModel)]="awayTeam" placeholder="Away team" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Your selection</label>
+          <div class="selection-chips">
+            @for (opt of options; track opt) {
+              <button
+                class="selection-chip"
+                [class.active]="selection === opt"
+                (click)="selection = opt">
+                {{ opt }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Odds (multiplier)</label>
+          <input class="field-input" type="number" min="1.01" step="0.01" [(ngModel)]="gainsMultiplier" />
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">Min stake (₦)</label>
+            <input class="field-input" type="number" min="10" step="50" [(ngModel)]="minStake" />
+          </div>
+          <div class="field">
+            <label class="field-label">Max stake (₦)</label>
+            <input class="field-input" type="number" min="100" step="100" [(ngModel)]="maxStake" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Staking closes</label>
+          <input class="field-input" type="datetime-local" [(ngModel)]="closesAt" />
+        </div>
+
+        <div class="field">
+          <label class="field-label">Max total exposure (₦) <span class="optional">(optional)</span></label>
+          <input class="field-input" type="number" min="1000" step="100000" [(ngModel)]="maxTotalExposure" />
+        </div>
+
+        @if (errorMsg()) {
+          <div class="pick-error">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ errorMsg() }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="pick-footer">
+        <button class="cancel-btn" (click)="onClose()" [disabled]="submitting()">Cancel</button>
+        <button class="publish-btn" (click)="submit()" [disabled]="!canSubmit()">
+          @if (submitting()) {
+            <mat-spinner diameter="16" />
+            <span>Publishing...</span>
+          } @else {
+            <mat-icon>rocket_launch</mat-icon>
+            <span>Publish pick</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

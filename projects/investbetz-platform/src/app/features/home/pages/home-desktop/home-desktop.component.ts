@@ -17,6 +17,7 @@ import { BetSlipComponent } from '../../components/bet-slip/bet-slip.component';
 import { FeaturedBannerComponent } from '../../components/featured-banner/featured-banner.component';
 import { StoriesRailComponent } from '../../components/stories-rail/stories-rail.component';
 import { WhoToFollowComponent } from '../../components/who-to-follow/who-to-follow.component';
+import { CreatePickDialogComponent } from '../../components/create-pick-dialog/create-pick-dialog.component';
 import { AppNavComponent, OraChatComponent, OraPickBannerComponent } from '../../../../core/components';
 import { HomeStore } from '../../stores/home.store';
 import { OraPick } from '../../../../core/services';
@@ -44,6 +45,7 @@ import { Pod } from '../../../../core/services';
     FeaturedBannerComponent,
     StoriesRailComponent,
     WhoToFollowComponent,
+    CreatePickDialogComponent,
     AppNavComponent,
     OraChatComponent,
     OraPickBannerComponent
@@ -110,6 +112,19 @@ export class HomeDesktopComponent implements OnInit, AfterViewInit, OnDestroy {
 
   setFeedMode(mode: 'foryou' | 'following' | 'saved') {
     this.store.setFeedMode(mode);
+  }
+
+  openCreatePick() {
+    if (!this.store.auth.isAuthenticated()) {
+      this._snackBar.open('Please log in to publish a pick', 'OK', { duration: 3000 });
+      return;
+    }
+    this.store.openCreatePick();
+  }
+
+  onPickPublished() {
+    this.store.onPickPublished();
+    this._snackBar.open('Pick published! It now shows in your Following feed', 'OK', { duration: 3500 });
   }
 
   openStakeModal(pod: any) {

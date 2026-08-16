@@ -1,6 +1,7 @@
-import { Injectable, signal, computed, effect } from '@angular/core';
+import { Injectable, signal, computed, effect, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { AuthService } from './auth.service';
 
 export interface PodLeg {
   homeTeam: string;
@@ -81,9 +82,32 @@ export interface PodGainsResponse {
   };
 }
 
+export interface CreatePickPayload {
+  sport: string;
+  league?: string;
+  homeTeam: string;
+  awayTeam: string;
+  matchDate?: string;
+  selection: string;
+  gainsMultiplier: number;
+  minStake?: number;
+  maxStake?: number;
+  maxTotalExposure?: number;
+  stakingClosesAt: string;
+}
+
+export interface CreatePickResponse {
+  success: boolean;
+  data: {
+    id: string;
+    pod: Pod;
+  };
+}
+
 @Injectable({ providedIn: 'root' })
 export class PodService {
   private readonly API_URL = environment.apiUrl;
+  private auth = inject(AuthService);
 
   pods = signal<Pod[]>([]);
   upcoming = signal<Pod[]>([]);
@@ -231,6 +255,14 @@ export class PodService {
 
   getGains(id: string) {
     return this.http.get<PodGainsResponse>(`${environment.apiUrl}/pods/${id}/gains`);
+  }
+
+  createPick(data: CreatePickPayload) {
+    return this.http.post<CreatePickResponse>(
+      `${environment.apiUrl}/pods`,
+      data,
+      { headers: { Authorization: `Bearer ${this.auth.token()}` } }
+    );
   }
 
   search(query: string, limit = 10) {

@@ -97,6 +97,13 @@ export class SocialFeedService {
   readonly creators = signal<SocialCreator[]>([]);
   readonly creatorsLoading = signal(false);
 
+  readonly followingPods = signal<Pod[]>([]);
+  readonly followingTotal = signal(0);
+  readonly followingLoading = signal(false);
+  readonly followingHasMore = signal(false);
+  private followingPage = 0;
+  private followingLoaded = false;
+
   readonly isLoggedIn = computed(() => this.auth.isAuthenticated());
 
   readonly oraId = computed(() => this.podsSvc.oraId());
@@ -221,6 +228,81 @@ export class SocialFeedService {
     }
   }
 
+  private mapFeedPod(i: any): Pod {
+    return {
+      ...i,
+      id: i._id || i.id,
+      createdBy: i.createdBy || '',
+      creatorName: i.creatorName ?? null,
+      timeRemaining: Math.max(0, new Date(i.stakingClosesAt).getTime() - Date.now()),
+      isOpen: new Date(i.stakingClosesAt) >= new Date() && i.status === 'active'
+    };
+  }
+
+  async ensureFollowingLoaded(): Promise<void> {
+    if (!this.isLoggedIn()) {
+      this.followingPods.set([]);
+      this.followingTotal.set(0);
+      return;
+    }
+    if (this.followingLoaded) return;
+    await this.fetchFollowingFeed();
+  }
+
+  async fetchFollowingFeed(): Promise<void> {
+    if (!this.isLoggedIn()) return;
+    if (this.followingLoading()) return;
+    this.followingLoading.set(true);
+    try {
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: any[]; total: number } }>(
+        `${this.API_URL}/social/feed?page=1&limit=20`,
+        this.headers()
+      ));
+      if (res.success) {
+        const items = (res.data.items || []).map(i => this.mapFeedPod(i));
+        this.followingPods.set(items);
+        this.followingTotal.set(res.data.total);
+        this.followingPage = 1;
+        this.followingLoaded = true;
+        this.followingHasMore.set(items.length < res.data.total);
+      }
+    } catch {
+      // following feed stays empty on failure
+    } finally {
+      this.followingLoading.set(false);
+    }
+  }
+
+  async loadMoreFollowing(): Promise<void> {
+    if (!this.isLoggedIn() || !this.followingHasMore() || this.followingLoading()) return;
+    this.followingLoading.set(true);
+    try {
+      const page = this.followingPage + 1;
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: any[]; total: number } }>(
+        `${this.API_URL}/social/feed?page=${page}&limit=20`,
+        this.headers()
+      ));
+      if (res.success) {
+        const items = (res.data.items || []).map(i => this.mapFeedPod(i));
+        this.followingPods.update(cur => {
+          const seen = new Set(cur.map(p => p.id));
+          return [...cur, ...items.filter(p => !seen.has(p.id))];
+        });
+        this.followingPage = page;
+        this.followingHasMore.set(this.followingPods().length < res.data.total);
+      }
+    } catch {
+      // keep current following feed on failure
+    } finally {
+      this.followingLoading.set(false);
+    }
+  }
+
+  refreshFollowingFeed(): void {
+    this.followingLoaded = false;
+    if (this.isLoggedIn()) this.fetchFollowingFeed();
+  }
+
   async toggleFollow(creator: string): Promise<string> {
     if (!creator) return 'You are always following Ora';
     const oraId = this.oraId();
@@ -255,6 +337,7 @@ export class SocialFeedService {
         this.follows.update(cur => res.data.following ? (cur.includes(creator) ? cur : [...cur, creator]) : cur.filter(x => x !== creator));
         this.updateCreatorFollow(creator, res.data.following);
       }
+      this.refreshFollowingFeed();
       return '';
     } catch (error) {
       this.follows.update(cur => wasFollowing ? [...cur, creator] : cur.filter(x => x !== creator));

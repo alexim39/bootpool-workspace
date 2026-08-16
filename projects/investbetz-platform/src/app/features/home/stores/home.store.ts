@@ -68,13 +68,31 @@ export class HomeStore implements OnDestroy {
   readonly noSearchResults = computed(() => this.isSearching() && !this.pods.loading() && this.displayedPods().length === 0);
 
   readonly feedMode = signal<'foryou' | 'following' | 'saved'>('foryou');
+  readonly createPickOpen = signal(false);
 
   setFeedMode(mode: 'foryou' | 'following' | 'saved') {
     this.feedMode.set(mode);
+    if (mode === 'following') {
+      this._social.ensureFollowingLoaded();
+    }
+  }
+
+  openCreatePick() {
+    this.createPickOpen.set(true);
+  }
+
+  closeCreatePick() {
+    this.createPickOpen.set(false);
+  }
+
+  onPickPublished() {
+    this.createPickOpen.set(false);
+    this.feedMode.set('following');
+    this._social.refreshFollowingFeed();
   }
 
   readonly followingPods = computed(() => {
-    return this.displayedPods().filter(p => this._social.isFollowing(this._social.creatorOf(p)));
+    return this._social.followingPods();
   });
 
   readonly savedPods = computed(() => {
@@ -83,9 +101,29 @@ export class HomeStore implements OnDestroy {
 
   readonly feedPods = computed(() => {
     const mode = this.feedMode();
-    if (mode === 'following') return this.followingPods();
+    if (mode === 'following') return this._social.followingPods();
     if (mode === 'saved') return this.savedPods();
     return this.displayedPods();
+  });
+
+  readonly feedLoading = computed(() => {
+    if (this.feedMode() === 'following') return this._social.followingLoading();
+    return this.pods.loading();
+  });
+
+  readonly feedHasMore = computed(() => {
+    if (this.feedMode() === 'following') return this._social.followingHasMore();
+    return this.pods.hasMorePods();
+  });
+
+  readonly feedLoadingMore = computed(() => {
+    if (this.feedMode() === 'following') return this._social.followingLoading();
+    return this.pods.loadingMore();
+  });
+
+  readonly feedTotal = computed(() => {
+    if (this.feedMode() === 'following') return this._social.followingTotal();
+    return this.pods.totalPods();
   });
 
   private readonly PAGE_SIZE = 12;
@@ -200,6 +238,10 @@ export class HomeStore implements OnDestroy {
   }
 
   loadMore() {
+    if (this.feedMode() === 'following') {
+      this._social.loadMoreFollowing();
+      return;
+    }
     this.pods.loadMore(this.PAGE_SIZE);
   }
 
