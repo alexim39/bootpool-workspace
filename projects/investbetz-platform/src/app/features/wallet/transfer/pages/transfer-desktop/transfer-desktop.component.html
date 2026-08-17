@@ -1,0 +1,364 @@
+<app-nav />
+<div class="transfer-page">
+  <div class="page-header">
+    <a class="back-link" routerLink="/wallet"><mat-icon>arrow_back</mat-icon> Wallet</a>
+    <h1>Transfer Funds</h1>
+    <p class="page-subtitle">Send money instantly to any BetPool wallet. Every transfer is recorded in your ledger.</p>
+  </div>
+
+  <div class="page-body">
+    <div class="main-panel">
+      <div class="steps">
+        @for (step of [1, 2, 3]; track step) {
+          <div class="step-pill" [class.on]="store.flowStep() === step" [class.done]="store.flowStep() > step">
+            <span class="step-num">{{ step }}</span>
+            <span class="step-label">{{ step === 1 ? 'Recipient' : (step === 2 ? 'Amount' : 'Confirm') }}</span>
+          </div>
+        }
+      </div>
+
+      <mat-card class="form-card">
+        <mat-card-content>
+          <div class="balance-banner">
+            <div class="banner-glow"></div>
+            <span class="bb-label">Available Balance</span>
+            <span class="bb-value">{{ store.formatAmount(store.walletBalance().available) }}</span>
+            @if (store.walletBalance().locked > 0) {
+              <span class="bb-locked">Locked: {{ store.formatAmount(store.walletBalance().locked) }}</span>
+            }
+          </div>
+
+          <form [formGroup]="store.transferForm" class="transfer-form">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Search recipient</mat-label>
+              <input matInput [matAutocomplete]="recipientAuto" [formControl]="store.recipientSearchCtrl"
+                placeholder="Phone number or email" autocomplete="off">
+              @if (store.recipientSearching()) {
+                <mat-spinner matSuffix diameter="16"></mat-spinner>
+              }
+              <mat-autocomplete #recipientAuto="matAutocomplete" [displayWith]="displayRecipient" (optionSelected)="onOptionSelected($event)">
+                @for (r of store.recipientResults(); track r.id) {
+                  <mat-option [value]="r">
+                    <div class="recipient-option">
+                      <span class="ro-avatar">{{ r.fullName.charAt(0).toUpperCase() }}</span>
+                      <span class="ro-details">
+                        <span class="ro-name">{{ r.fullName }}</span>
+                        <span class="ro-phone">{{ r.phone }}</span>
+                      </span>
+                    </div>
+                  </mat-option>
+                }
+                @if (!store.recipientResults().length && !store.recipientSearching()) {
+                  <mat-option disabled>
+                    <span class="no-results">No BetPool users match "{{ store.recipientSearchCtrl.value }}"</span>
+                  </mat-option>
+                }
+              </mat-autocomplete>
+            </mat-form-field>
+
+            @if (store.recipientId()) {
+              <div class="recipient-card">
+                <span class="rc-avatar">{{ store.recipientName().charAt(0).toUpperCase() }}</span>
+                <div class="rc-details">
+                  <span class="rc-name">{{ store.recipientName() }}</span>
+                  <span class="rc-phone">{{ store.recipientPhone() }}</span>
+                </div>
+                <mat-icon class="rc-check">verified</mat-icon>
+                <button type="button" class="rc-clear" (click)="store.clearRecipient()"><mat-icon>close</mat-icon></button>
+              </div>
+            }
+            @if (store.recipientError()) {
+              <div class="account-status error"><mat-icon>error</mat-icon><span>{{ store.recipientError() }}</span></div>
+            }
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Amount</mat-label>
+              <span matTextPrefix class="amount-prefix">₦&nbsp;</span>
+              <input matInput type="number" formControlName="amount" placeholder="0" min="500" step="100" inputmode="numeric">
+              @if (store.transferForm.get('amount')?.hasError('required')) { <mat-error>Amount required</mat-error> }
+              @if (store.transferForm.get('amount')?.hasError('min')) { <mat-error>Min ₦{{ store.transferMin.toLocaleString() }}</mat-error> }
+              @if (store.transferForm.get('amount')?.errors?.['insufficient']) { <mat-error>Insufficient balance</mat-error> }
+            </mat-form-field>
+
+            <div class="quick-amounts">
+              @for (amt of [5000, 10000, 20000, 50000, 100000]; track amt) {
+                <button type="button" class="quick-chip" [class.active]="store.transferForm.get('amount')?.value === amt" (click)="store.setAmount(amt)">₦{{ amt.toLocaleString() }}</button>
+              }
+            </div>
+
+            <div class="limits-hint">
+              <mat-icon>info</mat-icon>
+              <span>Min ₦{{ store.transferMin.toLocaleString() }} · Max ₦{{ store.transferMax.toLocaleString() }} · Daily ₦{{ store.transferDaily.toLocaleString() }}</span>
+            </div>
+
+            @if (store.recipientId() && !store.amountValid()) {
+              <div class="account-status error">
+                <mat-icon>error</mat-icon>
+                <span>Enter an amount between ₦{{ store.transferMin.toLocaleString() }} and ₦{{ store.transferMax.toLocaleString() }}{{ store.amountInsufficient() ? ' — amount exceeds your available balance' : '' }} to continue</span>
+              </div>
+            }
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Note (optional)</mat-label>
+              <input matInput formControlName="narration" placeholder="e.g. Lunch money" maxlength="140">
+              <mat-icon matSuffix>edit_note</mat-icon>
+            </mat-form-field>
+
+            @if (store.amountValid()) {
+              <div class="fee-summary">
+                <div class="fee-row"><span>Amount</span><span>{{ store.formatAmount(store.calculatedAmount()) }}</span></div>
+                <div class="fee-row"><span>Fee</span><span class="fee-free">No fees</span></div>
+                <div class="fee-row total"><span>Recipient receives</span><span>{{ store.formatAmount(store.calculatedAmount()) }}</span></div>
+              </div>
+            }
+
+            @if (store.recipientId()) {
+              <div class="pin-section">
+                <div class="pin-label">Enter your 6-digit PIN to confirm</div>
+                <div class="pin-input-row">
+                  @for (i of [0,1,2,3,4,5]; track i) {
+                    <input
+                      class="pin-digit"
+                      type="password"
+                      maxlength="1"
+                      inputmode="numeric"
+                      [value]="store.pinDigits()[i] || ''"
+                      (input)="store.onPinInput($event, i)"
+                      (keydown)="store.onPinKeydown($event, i)"
+                      [id]="'tpin-' + i"
+                      [disabled]="store.submitting()"
+                    >
+                  }
+                </div>
+                @if (store.pinError()) {
+                  <div class="pin-error"><mat-icon>error</mat-icon>{{ store.pinError() }}</div>
+                }
+              </div>
+            }
+
+            <button class="btn-submit" [disabled]="!store.canSubmit() || store.submitting()" (click)="submitTransfer()">
+              @if (store.submitting()) {
+                <mat-spinner diameter="18"></mat-spinner>
+              } @else {
+                <ng-container><mat-icon>send</mat-icon> Send {{ store.formatAmount(store.calculatedAmount()) }}</ng-container>
+              }
+            </button>
+            <div class="submit-note">
+              <mat-icon>lock</mat-icon>
+              <span>Protected by your 6-digit PIN · Instant delivery</span>
+            </div>
+          </form>
+
+          @if (store.lastTransfer()) {
+            <div class="success-card">
+              <mat-icon class="sc-icon">check_circle</mat-icon>
+              <div>
+                <div class="sc-title">Transfer successful!</div>
+                <div class="sc-amount">{{ store.formatAmount(store.lastTransfer()!.amount) }}</div>
+                <div class="sc-recipient">to {{ store.lastTransfer()!.recipientName }}</div>
+                <div class="sc-ref">Ref: {{ store.lastTransfer()!.reference }}</div>
+              </div>
+              <button mat-stroked-button class="btn-gold" routerLink="/wallet"><mat-icon>account_balance_wallet</mat-icon> Back to Wallet</button>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="sidebar">
+      <mat-card class="info-card">
+        <mat-card-content>
+          <h3>Transfer Limits</h3>
+          <div class="info-row"><span>Minimum</span><span class="info-value">₦{{ store.transferMin.toLocaleString() }}</span></div>
+          <div class="info-row"><span>Maximum</span><span class="info-value">₦{{ store.transferMax.toLocaleString() }}</span></div>
+          <div class="info-row"><span>Daily limit</span><span class="info-value">₦{{ store.transferDaily.toLocaleString() }}</span></div>
+          <div class="info-row"><span>Fee</span><span class="info-value fee-free">No fees</span></div>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="security-card">
+        <mat-card-content>
+          <h3><mat-icon>shield</mat-icon> Secure Transfers</h3>
+          <ul>
+            <li>Every transfer is protected by your 6-digit PIN.</li>
+            <li>Instant, fee-free delivery to the recipient's wallet.</li>
+            <li>Double-entry ledger records both sides of every transfer.</li>
+            <li>Daily caps prevent abuse and suspicious activity.</li>
+          </ul>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <mat-card class="history-card">
+    <mat-card-content>
+      <div class="history-header">
+        <div class="hh-text">
+          <h2>Transfer History</h2>
+          <span class="hh-count">{{ store.total() }} record{{ store.total() === 1 ? '' : 's' }}</span>
+        </div>
+        <div class="hh-actions">
+          @if (store.hasActiveFilters()) {
+            <button type="button" class="clear-filters" (click)="store.clearFilters()">Clear filters ({{ store.activeFilterCount() }})</button>
+          }
+          <button type="button" class="export-btn" [disabled]="!store.hasSelection()" (click)="exportSelected()">
+            <mat-icon>file_download</mat-icon> Export selected{{ store.hasSelection() ? ' (' + store.selectedCount() + ')' : '' }}
+          </button>
+          <button type="button" class="export-btn" [disabled]="store.historyLoading()" (click)="exportAll()">
+            <mat-icon>download</mat-icon> Export all matching
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-deck">
+        <mat-form-field appearance="outline" class="f-search">
+          <mat-label>Search transfers</mat-label>
+          <input matInput [value]="store.search()" (input)="store.onSearchChange($any($event.target).value)" placeholder="Reference, name, phone or amount">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="f-select">
+          <mat-select [value]="store.direction()" (selectionChange)="store.setFilters({ direction: $any($event.value) })">
+            <mat-option value="">All directions</mat-option>
+            <mat-option value="sent">Sent</mat-option>
+            <mat-option value="received">Received</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="f-select">
+          <mat-select [value]="store.status()" (selectionChange)="store.setFilters({ status: $any($event.value) })">
+            <mat-option value="">All statuses</mat-option>
+            <mat-option value="completed">Completed</mat-option>
+            <mat-option value="pending">Pending</mat-option>
+            <mat-option value="failed">Failed</mat-option>
+            <mat-option value="reversed">Reversed</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="f-date">
+          <mat-label>From</mat-label>
+          <input matInput type="date" [value]="store.from()" (input)="store.setFilters({ from: $any($event.target).value })">
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="f-date">
+          <mat-label>To</mat-label>
+          <input matInput type="date" [value]="store.to()" (input)="store.setFilters({ to: $any($event.target).value })">
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="f-select">
+          <mat-select [value]="store.sortField() + ':' + store.sortOrder()" (selectionChange)="store.setFilters({ sort: $any($event.value) })">
+            @for (opt of sortOptions; track opt.value) {
+              <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="f-select f-size">
+          <mat-select [value]="store.limit()" (selectionChange)="store.setFilters({ limit: $any($event.value) })">
+            @for (size of pageSizes; track size) {
+              <mat-option [value]="size">{{ size }} / page</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="select-bar" [class.active]="store.hasSelection()">
+        <label class="master-check">
+          <input type="checkbox" [checked]="store.allSelected()" [indeterminate]="store.someSelected()" (change)="store.toggleSelectAll()">
+          <span>Select all on this page</span>
+        </label>
+        @if (store.hasSelection()) {
+          <div class="bulk-actions">
+            <span class="bulk-count">{{ store.selectedCount() }} selected</span>
+            <button type="button" class="bulk-btn" (click)="exportSelected()"><mat-icon>file_download</mat-icon> Export</button>
+            <button type="button" class="bulk-btn" (click)="store.clearSelection()"><mat-icon>close</mat-icon> Clear</button>
+          </div>
+        }
+      </div>
+
+      @if (store.historyLoading()) {
+        <div class="skel-table">
+          @for (i of [1,2,3,4,5,6]; track i) {
+            <div class="skel-row-lg">
+              <div class="skel-icon-circle"></div>
+              <div class="skel-line-group">
+                <div class="skel-text"></div>
+                <div class="skel-text-sm"></div>
+              </div>
+              <div class="skel-badge"></div>
+            </div>
+          }
+        </div>
+      } @else if (store.historyError() && !store.transfers().length) {
+        <div class="empty-state">
+          <mat-icon class="empty-icon err">cloud_off</mat-icon>
+          <h3>Couldn't load transfers</h3>
+          <p>{{ store.historyError() }}</p>
+          <button type="button" class="retry-btn" (click)="store.loadHistory()">Retry</button>
+        </div>
+      } @else if (!store.transfers().length) {
+        <div class="empty-state">
+          <mat-icon class="empty-icon">swap_horiz</mat-icon>
+          <h3>No transfers found</h3>
+          <p>Transfers you send or receive will appear here.</p>
+          @if (store.hasActiveFilters()) {
+            <button type="button" class="retry-btn" (click)="store.clearFilters()">Clear all filters</button>
+          }
+        </div>
+      } @else {
+        <div class="table-wrap">
+          <table class="transfer-table">
+            <thead>
+              <tr>
+                <th class="col-check">
+                  <input type="checkbox" [checked]="store.allSelected()" [indeterminate]="store.someSelected()" (change)="store.toggleSelectAll()">
+                </th>
+                <th>Direction</th>
+                <th>Counterparty</th>
+                <th>Reference</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of store.transfers(); track t.id) {
+                <tr [class.selected]="store.selectedIds().has(t.id)">
+                  <td class="col-check">
+                    <input type="checkbox" class="row-checkbox" [checked]="store.selectedIds().has(t.id)" (change)="store.toggleSelect(t.id)">
+                  </td>
+                  <td>
+                    <span class="dir-badge" [class.sent]="t.direction === 'sent'" [class.received]="t.direction === 'received'">
+                      <mat-icon>{{ t.direction === 'sent' ? 'north_east' : 'south_west' }}</mat-icon>
+                      {{ t.direction === 'sent' ? 'Sent' : 'Received' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="cp-cell">
+                      <span class="cp-name">{{ t.counterpartyName || t.counterpartyPhone || 'BetPool user' }}</span>
+                      <span class="cp-phone">{{ t.counterpartyPhone }}</span>
+                      @if (t.narration) {
+                        <span class="cp-note">{{ t.narration }}</span>
+                      }
+                    </div>
+                  </td>
+                  <td><span class="ref-cell">{{ t.reference }}</span></td>
+                  <td>
+                    <span class="amount-cell" [class.sent]="t.direction === 'sent'" [class.received]="t.direction === 'received'">
+                      {{ t.direction === 'sent' ? '−' : '+' }}{{ store.formatAmount(t.amount) }}
+                    </span>
+                  </td>
+                  <td><span class="chip-badge {{ store.statusClass(t.status) }}">{{ store.formatStatus(t.status) }}</span></td>
+                  <td><span class="date-cell">{{ store.formatDate(t.createdAt) }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pager">
+          <span class="pager-info">Page {{ store.page() }} of {{ store.totalPages() }} · showing {{ store.transfers().length }} of {{ store.total() }}</span>
+          <div class="pager-btns">
+            <button type="button" class="page-btn" [disabled]="store.page() <= 1" (click)="store.goToPage(1)">First</button>
+            <button type="button" class="page-btn" [disabled]="store.page() <= 1" (click)="store.goToPage(store.page() - 1)">← Prev</button>
+            <button type="button" class="page-btn" [disabled]="!store.hasMore()" (click)="store.goToPage(store.page() + 1)">Next →</button>
+            <button type="button" class="page-btn" [disabled]="!store.hasMore()" (click)="store.goToPage(store.totalPages())">Last</button>
+          </div>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

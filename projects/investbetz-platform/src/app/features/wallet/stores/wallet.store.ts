@@ -185,6 +185,10 @@ export class WalletStore {
     this._router.navigate(['/wallet/withdraw']);
   }
 
+  openTransfer() {
+    this._router.navigate(['/wallet/transfer']);
+  }
+
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat('en-NG', {
       style: 'currency', currency: 'NGN', minimumFractionDigits: 0, maximumFractionDigits: 0

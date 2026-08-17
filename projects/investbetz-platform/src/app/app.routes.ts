@@ -34,6 +34,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'wallet/transfer',
+    loadComponent: () => import('./features/wallet/transfer/transfer.component').then(m => m.TransferComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'wallet/deposit/callback',
     loadComponent: () => import('./features/wallet/pages/deposit-callback/deposit-callback.component').then(m => m.DepositCallbackComponent)
   },
