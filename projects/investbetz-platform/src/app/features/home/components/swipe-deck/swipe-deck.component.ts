@@ -40,10 +40,10 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
   readonly dragging = signal(false);
 
   readonly deckMinHeight = signal(360);
-  private readonly NAV_RESERVE = 84;
   private rafPending = false;
   private lastIndex = -1;
   private lastFirstId = '';
+  private lastPodsLength = -1;
   private readonly destroyFns: (() => void)[] = [];
 
   constructor() {
@@ -64,16 +64,31 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
         this.measure();
       }
     });
+
+    effect(() => {
+      const pods = this.pods();
+      if (pods.length !== this.lastPodsLength) {
+        this.lastPodsLength = pods.length;
+        this.measureThrottled();
+      }
+    });
   }
 
   ngAfterViewInit() {
     this.measure();
+    setTimeout(() => this.measure(), 400);
+    if (typeof document !== 'undefined' && 'fonts' in document) {
+      document.fonts.ready.then(() => this.measure());
+    }
     const onViewportChange = () => this.measureThrottled();
+    const onLoad = () => this.measure();
     window.addEventListener('scroll', onViewportChange, { passive: true });
     window.addEventListener('resize', onViewportChange);
+    window.addEventListener('load', onLoad);
     this.destroyFns.push(() => {
       window.removeEventListener('scroll', onViewportChange);
       window.removeEventListener('resize', onViewportChange);
+      window.removeEventListener('load', onLoad);
     });
   }
 
@@ -92,35 +107,37 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
 
   private measure() {
     const host = this.el.nativeElement as HTMLElement;
-    const rect = host.getBoundingClientRect();
-    const vh = window.innerHeight;
-    let avail = 360;
-    if (rect.top < vh) {
-      avail = Math.max(360, Math.floor(vh - Math.max(rect.top, 0) - this.NAV_RESERVE));
-    }
+    // Measure every rendered card (not just the current one) so the deck is
+    // always tall enough for the tallest card — no overflow, no overlap.
     const cards = host.querySelectorAll('.deck-card');
-    let current: Element | null = null;
+    let content = 0;
     for (let i = 0; i < cards.length; i++) {
       const c = cards.item(i);
       if (!c) continue;
-      const style = c.getAttribute('style') || '';
-      if (style.indexOf('top: 0') !== -1) {
-        current = c;
-        break;
-      }
+      let h = 0;
+      const hero = c.querySelector('.deck-hero');
+      const body = c.querySelector('.deck-body');
+      const rail = c.querySelector('.deck-rail');
+      const creator = c.querySelector('.deck-creator');
+      if (hero) h += hero.getBoundingClientRect().height;
+      if (body) h += body.scrollHeight;
+      if (rail) h += rail.getBoundingClientRect().height;
+      if (creator) h += creator.getBoundingClientRect().height;
+      content = Math.max(content, h);
     }
-    let content = 0;
-    if (current) {
-      const hero = current.querySelector('.deck-hero');
-      const body = current.querySelector('.deck-body');
-      const rail = current.querySelector('.deck-rail');
-      const creator = current.querySelector('.deck-creator');
-      if (hero) content += hero.getBoundingClientRect().height;
-      if (body) content += body.scrollHeight;
-      if (rail) content += rail.getBoundingClientRect().height;
-      if (creator) content += creator.getBoundingClientRect().height;
+    // The stage is (deck height − progress row), so the deck must be at least
+    // content + progress tall for the tallest card to fit without clipping.
+    // The deck is always sized to its full content — never capped by the
+    // viewport — so the centre content and counters are complete on load and
+    // the page scrolls to reveal the whole card.
+    let progress = 0;
+    const progressEl = host.querySelector('.deck-progress');
+    if (progressEl) {
+      const pr = progressEl.getBoundingClientRect().height;
+      if (pr > 0) progress = pr;
     }
-    this.deckMinHeight.set(Math.max(avail, content));
+    const needed = Math.ceil(content + progress);
+    this.deckMinHeight.set(Math.max(360, needed));
   }
 
   readonly current = computed(() => this.pods()[this.index()] ?? null);
@@ -145,12 +162,6 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
   prev() {
     if (this.index() <= 0) return;
     this.index.update(i => i - 1);
-    this.dragOffset.set(0);
-  }
-
-  goTo(i: number) {
-    if (i < 0 || i >= this.pods().length) return;
-    this.index.set(i);
     this.dragOffset.set(0);
   }
 

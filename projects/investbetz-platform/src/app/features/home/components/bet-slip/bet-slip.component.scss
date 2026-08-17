@@ -129,5 +129,7 @@
       .bet-slip:not(.open) .place-bet-btn { display: none; }
       /* Keep header content away from the Ora FAB on the right */
       .bet-slip:not(.open) .slip-header { padding-right: 70px; }
+      /* Slide the collapsed bar away while the swipe deck is on screen */
+      :host(.immersive-nav) .bet-slip:not(.open) { transform: translateY(calc(100% + 60px)); }
     }
   

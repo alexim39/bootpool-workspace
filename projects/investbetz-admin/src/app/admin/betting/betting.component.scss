@@ -140,6 +140,7 @@
     .detail-actions { display: flex; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; }
     .action-settle { color: #4caf50 !important; border-color: rgba(76,175,80,0.3) !important; }
     .action-ai-settle { color: #CE93D8 !important; border-color: rgba(206,147,216,0.3) !important; }
+    .action-unsettle { color: #FFB74D !important; border-color: rgba(255,183,77,0.4) !important; }
     .ai-settle-panel { margin-top: 12px; background: rgba(206,147,216,0.06); border: 1px solid rgba(206,147,216,0.15); border-radius: 8px; overflow: hidden; }
     .ai-settle-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(206,147,216,0.08); font-size: 13px; font-weight: 600; color: #CE93D8; }
     .ai-settle-header button { margin-left: auto; color: rgba(255,255,255,0.4); }

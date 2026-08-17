@@ -136,17 +136,6 @@
       <span>Loading more picks…</span>
     </div>
   }
-
-  @if (pods().length > 1) {
-    <div class="deck-progress">
-      <span class="progress-num">{{ index() + 1 }} / {{ pods().length }}</span>
-      <div class="progress-dots">
-        @for (p of pods(); track p.id; let i = $index) {
-          <span class="dot" [class.active]="i === index()" [class.past]="i < index()" (click)="goTo(i)"></span>
-        }
-      </div>
-    </div>
-  }
 </div>
 
 @if (commentPod()) {

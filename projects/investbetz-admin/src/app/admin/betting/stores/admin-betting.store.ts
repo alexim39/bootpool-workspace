@@ -313,6 +313,20 @@ export class AdminBettingStore {
     this.settleTarget.set(null);
   }
 
+  unsettlePod(pod: AdminPod) {
+    const id = pod._id || pod.id;
+    this.admin.unsettlePod(id, 'Incorrect AI settlement — reopened for re-settlement').subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.detailPod.set(null);
+          this.settleCheck.set(null);
+          this.loadPods();
+        }
+      },
+      error: (err) => console.error('Unsettle request error:', err)
+    });
+  }
+
   loadDisputed() {
     this.showDisputedPanel.set(true);
     this.selectedDisputedIds.set(new Set());

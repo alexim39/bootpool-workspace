@@ -1,4 +1,4 @@
-<div class="mobile-container">
+<div class="mobile-container" [class.immersive]="immersive()">
   <header class="mobile-header">
     <h1 class="app-title">
       <img src="img/logo/logo.png" alt="BetPool Logo" class="logo-image">
@@ -231,7 +231,7 @@
       <mat-icon>bookmark</mat-icon> Saved
     </button>
     <button class="create-pick-btn" (click)="openCreatePick()" aria-label="Publish a pick">
-      <mat-icon>add</mat-icon> Create pick
+      <mat-icon>add</mat-icon> <!-- Create pick -->
     </button>
   </div>
 
@@ -325,7 +325,8 @@
         (placeStake)="openStakeModal($event)"
         (toggleSelect)="toggleSelection($event)"
         (loadMore)="store.loadMore()"
-        (manage)="store.openManagePod($event)" />
+        (manage)="store.openManagePod($event)" 
+      />
     } @else {
       <div class="odds-list">
         @for (pod of store.feedPods(); track pod.id) {
@@ -335,8 +336,8 @@
             [selectionDisabled]="store.isSelectionDisabled()"
             (placeStake)="openStakeModal($event)"
             (toggleSelect)="toggleSelection($event)"
-            (manage)="store.openManagePod($event)">
-          </app-pod-card>
+            (manage)="store.openManagePod($event)"
+          />
         }
       </div>
       @if (store.feedHasMore()) {
@@ -442,6 +443,7 @@
   }
 
   <app-bet-slip
+    [class.immersive-nav]="immersive()"
     [selections]="store.betSlipSelections()"
     [open]="store.betSlipOpen()"
     [placeBetResult]="slipResult()"
@@ -452,5 +454,5 @@
     (placeBetRequest)="onPlaceAccumulator($event)"
   />
 
-  <app-mobile-nav />
+  <app-mobile-nav [class.immersive-nav]="immersive()" />
 </div>

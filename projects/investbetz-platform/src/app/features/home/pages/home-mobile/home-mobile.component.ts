@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, computed, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, signal, inject, computed, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -60,11 +60,39 @@ export class HomeMobileComponent implements OnInit, AfterViewInit, OnDestroy {
   private _snackBar = inject(MatSnackBar);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private ngZone = inject(NgZone);
   readonly store = inject(HomeStore);
   readonly notifService = inject(NotificationService);
 
   @ViewChild('feedSentinel') feedSentinel?: ElementRef<HTMLDivElement>;
+  @ViewChild(SwipeDeckComponent, { read: ElementRef }) deckEl?: ElementRef<HTMLElement>;
   private feedObserver?: IntersectionObserver;
+  private immersiveRaf = false;
+  private readonly immersiveFns: (() => void)[] = [];
+
+  readonly immersive = signal(false);
+
+  private onDeckScroll = () => {
+    if (this.immersiveRaf) return;
+    this.immersiveRaf = true;
+    requestAnimationFrame(() => {
+      this.immersiveRaf = false;
+      const deck = this.deckEl?.nativeElement;
+      if (!deck || !deck.isConnected) {
+        if (this.immersive()) this.ngZone.run(() => this.immersive.set(false));
+        return;
+      }
+      const rect = deck.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const visible = Math.min(rect.bottom, vh) - Math.max(rect.top, 0);
+      const fraction = rect.height > 0 ? visible / rect.height : 0;
+      if (this.immersive()) {
+        if (fraction <= 0.15) this.ngZone.run(() => this.immersive.set(false));
+      } else if (fraction >= 0.4) {
+        this.ngZone.run(() => this.immersive.set(true));
+      }
+    });
+  };
 
   showTopUp = signal(false);
   showOraChat = signal(false);
@@ -130,15 +158,24 @@ export class HomeMobileComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     const el = this.feedSentinel?.nativeElement;
-    if (!el) return;
-    this.feedObserver = new IntersectionObserver((entries) => {
-      if (entries.some(e => e.isIntersecting)) this.store.loadMore();
-    }, { rootMargin: '600px 0px' });
-    this.feedObserver.observe(el);
+    if (el) {
+      this.feedObserver = new IntersectionObserver((entries) => {
+        if (entries.some(e => e.isIntersecting)) this.store.loadMore();
+      }, { rootMargin: '600px 0px' });
+      this.feedObserver.observe(el);
+    }
+    const onScroll = this.onDeckScroll;
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    this.immersiveFns.push(() => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    });
   }
 
   ngOnDestroy() {
     this.feedObserver?.disconnect();
+    this.immersiveFns.forEach(fn => fn());
   }
 
   openStakeModal(pod: Pod) {

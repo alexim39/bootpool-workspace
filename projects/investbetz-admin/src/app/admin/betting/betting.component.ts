@@ -66,6 +66,6 @@ export class BettingComponent implements OnInit {
   }
 
   canManage(pod: AdminPod): boolean {
-    return ['draft', 'published', 'active'].includes(pod.status);
+    return ['draft', 'published', 'active'].includes(pod.status) || (pod.status === 'settled' && pod.result === 'loss');
   }
 }
