@@ -330,7 +330,8 @@
               [selected]="store.isSelected(pod.id)"
               [selectionDisabled]="store.isSelectionDisabled()"
               (placeStake)="openStakeModal($event)"
-              (toggleSelect)="toggleSelection($event)">
+              (toggleSelect)="toggleSelection($event)"
+              (manage)="store.openManagePod($event)">
             </app-pod-card>
           }
         </div>
@@ -397,5 +398,11 @@
     [open]="store.createPickOpen()"
     (close)="store.closeCreatePick()"
     (published)="onPickPublished()"
+  />
+
+  <app-manage-pick-dialog
+    [pod]="store.managePod()"
+    (close)="store.closeManagePod()"
+    (updated)="onPickManaged()"
   />
 </div>

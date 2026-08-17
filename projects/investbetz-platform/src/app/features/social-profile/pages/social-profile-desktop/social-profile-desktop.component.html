@@ -1,0 +1,233 @@
+<app-nav />
+<div class="social-profile">
+  <header class="page-head">
+    <a routerLink="/home" class="back-link">
+      <mat-icon>arrow_back</mat-icon>
+      <span>Home</span>
+    </a>
+    <h1>Community Profile</h1>
+  </header>
+
+  @if (store.profile(); as p) {
+    <div class="layout">
+      <aside class="side">
+        <section class="cover-card">
+          <div class="cover-banner">
+            <div class="orb orb-a"></div>
+            <div class="orb orb-b"></div>
+            <div class="avatar" [class.ora]="p.user.isOra">
+              @if (p.user.isOra) {
+                <mat-icon class="ora-bolt">auto_awesome</mat-icon>
+              } @else {
+                <span>{{ initials(p.user.fullName) }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="cover-body">
+            <div class="name-row">
+              <h2>{{ p.user.fullName }}</h2>
+              @if (p.user.isOra) {
+                <mat-icon class="verified">verified</mat-icon>
+              }
+            </div>
+            <div class="role-row">
+              <span class="role-chip">{{ roleLabel() }}</span>
+              @if (p.isSelf) {
+                <span class="role-chip self-chip">Viewing your public profile</span>
+              }
+            </div>
+
+            <div class="action-row">
+              @if (!p.isSelf && !p.user.isOra) {
+                <button mat-flat-button class="follow-btn" [class.following]="p.isFollowing" (click)="store.toggleFollow()">
+                  <mat-icon>{{ p.isFollowing ? 'check' : 'person_add' }}</mat-icon>
+                  {{ p.isFollowing ? 'Following' : 'Follow' }}
+                </button>
+              }
+              <button mat-stroked-button class="share-btn" (click)="store.shareProfile()">
+                <mat-icon>share</mat-icon>
+                Share profile
+              </button>
+            </div>
+
+            <div class="stats-row">
+              <button class="stat" (click)="store.loadTab('picks')">
+                <span class="stat-val">{{ p.stats.picks }}</span>
+                <span class="stat-lbl">Picks</span>
+              </button>
+              <button class="stat" (click)="store.loadTab('followers')">
+                <span class="stat-val">{{ p.stats.followers }}</span>
+                <span class="stat-lbl">Followers</span>
+              </button>
+              <button class="stat" (click)="store.loadTab('following')">
+                <span class="stat-val">{{ p.stats.following }}</span>
+                <span class="stat-lbl">Following</span>
+              </button>
+              <div class="stat">
+                <span class="stat-val">{{ p.stats.likesReceived }}</span>
+                <span class="stat-lbl">Likes</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="achievements">
+          <div class="section-head">
+            <mat-icon>workspace_premium</mat-icon>
+            <h3>Achievements</h3>
+            <span class="count-pill">{{ p.achievements.length }}/{{ achievements.length }}</span>
+          </div>
+          <div class="badge-grid">
+            @for (a of achievements; track a.id) {
+              <div class="badge" [class.locked]="!isUnlocked(a.id)">
+                <div class="badge-ring" [style.border-color]="isUnlocked(a.id) ? a.color : undefined">
+                  <mat-icon [style.color]="isUnlocked(a.id) ? a.color : undefined">{{ a.icon }}</mat-icon>
+                  @if (!isUnlocked(a.id)) {
+                    <span class="lock"><mat-icon>lock</mat-icon></span>
+                  }
+                </div>
+                <div class="badge-text">
+                  <span class="badge-name">{{ a.label }}</span>
+                  <span class="badge-desc">{{ a.desc }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      </aside>
+
+      <main class="content">
+        <div class="tabs">
+          <button class="tab" [class.active]="store.tab() === 'picks'" (click)="store.loadTab('picks')">
+            Picks <span class="tab-count">{{ store.picksTotal() }}</span>
+          </button>
+          <button class="tab" [class.active]="store.tab() === 'followers'" (click)="store.loadTab('followers')">
+            Followers <span class="tab-count">{{ store.followersTotal() }}</span>
+          </button>
+          <button class="tab" [class.active]="store.tab() === 'following'" (click)="store.loadTab('following')">
+            Following <span class="tab-count">{{ store.followingTotal() }}</span>
+          </button>
+        </div>
+
+        <div class="tab-body">
+          @switch (store.tab()) {
+            @case ('picks') {
+              @if (store.picksLoading() && store.picks().length === 0) {
+                <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading picks…</span></div>
+              } @else if (store.picks().length === 0) {
+                <div class="empty-state">
+                  <mat-icon>flag</mat-icon>
+                  <span>{{ p.isSelf ? 'You have not published any picks yet.' : p.user.fullName + ' has no picks yet.' }}</span>
+                </div>
+              } @else {
+                <div class="pick-list">
+                  @for (pod of store.picks(); track pod.id) {
+                    <app-pod-card
+                      [pod]="pod"
+                      [manageable]="false"
+                      (placeStake)="store.openPod($event)"
+                      (toggleSelect)="store.openPod($event)"
+                    />
+                  }
+                </div>
+                @if (store.picksHasMore()) {
+                  <button mat-stroked-button class="load-more" (click)="store.loadMorePicks()" [disabled]="store.picksLoading()">
+                    @if (store.picksLoading()) { <mat-spinner diameter="16"></mat-spinner> } @else { Load more picks }
+                  </button>
+                }
+              }
+            }
+            @case ('followers') {
+              @if (store.followersLoading() && store.followers().length === 0) {
+                <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading followers…</span></div>
+              } @else if (store.followers().length === 0) {
+                <div class="empty-state">
+                  <mat-icon>person_search</mat-icon>
+                  <span>No followers yet.</span>
+                </div>
+              } @else {
+                <div class="user-list">
+                  @for (row of store.followers(); track row.id) {
+                    <div class="user-row" [class.self]="row.isSelf" (click)="onUserRow(row)">
+                      <div class="user-avatar" [class.ora]="row.isOra">
+                        @if (row.isOra) {
+                          <mat-icon>auto_awesome</mat-icon>
+                        } @else {
+                          <span>{{ initials(row.fullName) }}</span>
+                        }
+                      </div>
+                      <div class="user-meta">
+                        <div class="user-name">
+                          {{ row.fullName }}
+                          @if (row.isOra) { <mat-icon class="verified">verified</mat-icon> }
+                          @if (row.isSelf) { <span class="you-chip">You</span> }
+                        </div>
+                      </div>
+                      @if (!row.isSelf && !row.isOra) {
+                        <button mat-flat-button class="mini-follow" [class.following]="row.isFollowing"
+                          (click)="$event.stopPropagation(); store.followRow(row)">
+                          <mat-icon>{{ row.isFollowing ? 'check' : 'person_add' }}</mat-icon>
+                          {{ row.isFollowing ? 'Following' : 'Follow' }}
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            }
+            @case ('following') {
+              @if (store.followingLoading() && store.following().length === 0) {
+                <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading following…</span></div>
+              } @else if (store.following().length === 0) {
+                <div class="empty-state">
+                  <mat-icon>person_search</mat-icon>
+                  <span>Not following anyone yet.</span>
+                </div>
+              } @else {
+                <div class="user-list">
+                  @for (row of store.following(); track row.id) {
+                    <div class="user-row" [class.self]="row.isSelf" (click)="onUserRow(row)">
+                      <div class="user-avatar" [class.ora]="row.isOra">
+                        @if (row.isOra) {
+                          <mat-icon>auto_awesome</mat-icon>
+                        } @else {
+                          <span>{{ initials(row.fullName) }}</span>
+                        }
+                      </div>
+                      <div class="user-meta">
+                        <div class="user-name">
+                          {{ row.fullName }}
+                          @if (row.isOra) { <mat-icon class="verified">verified</mat-icon> }
+                          @if (row.isSelf) { <span class="you-chip">You</span> }
+                        </div>
+                      </div>
+                      @if (!row.isSelf && !row.isOra) {
+                        <button mat-flat-button class="mini-follow" [class.following]="row.isFollowing"
+                          (click)="$event.stopPropagation(); store.followRow(row)">
+                          <mat-icon>{{ row.isFollowing ? 'check' : 'person_add' }}</mat-icon>
+                          {{ row.isFollowing ? 'Following' : 'Follow' }}
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            }
+          }
+        </div>
+      </main>
+    </div>
+  } @else if (store.loading()) {
+    <div class="page-loading">
+      <mat-spinner diameter="28"></mat-spinner>
+      <span>Loading profile…</span>
+    </div>
+  } @else {
+    <div class="page-error">
+      <mat-icon>person_off</mat-icon>
+      <span>{{ store.error() }}</span>
+      <button mat-stroked-button (click)="store.retry()">Try again</button>
+    </div>
+  }
+</div>

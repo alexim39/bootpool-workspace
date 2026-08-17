@@ -1,5 +1,6 @@
 import { Component, Output, EventEmitter, computed, input, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -29,16 +30,20 @@ export class PodCardComponent {
   selected = input(false);
   selectionDisabled = input(false);
   social = input(true);
+  manageable = input(true);
   @Output() placeStake = new EventEmitter<Pod>();
   @Output() toggleSelect = new EventEmitter<Pod>();
+  @Output() manage = new EventEmitter<Pod>();
 
   private snackBar = inject(MatSnackBar);
+  private router = inject(Router);
   readonly socialFeed = inject(SocialFeedService);
 
   readonly showComments = signal(false);
 
   readonly creator = computed(() => this.socialFeed.creatorOf(this.pod()));
   readonly isOra = computed(() => this.socialFeed.isOraCreator(this.creator()));
+  readonly isMyPod = computed(() => this.socialFeed.isMyPod(this.pod()));
   readonly creatorName = computed(() => this.socialFeed.creatorNameFor(this.pod()));
   readonly following = computed(() => this.socialFeed.isFollowing(this.creator()));
   readonly liked = computed(() => this.socialFeed.isLiked(this.pod().id));
@@ -77,6 +82,10 @@ export class PodCardComponent {
     }).catch(() => {
       this.snackBar.open('Could not update follow — try again', 'OK', { duration: 2500 });
     });
+  }
+
+  openCreatorProfile() {
+    this.router.navigate(['/social', this.creator()]);
   }
 
   async share() {

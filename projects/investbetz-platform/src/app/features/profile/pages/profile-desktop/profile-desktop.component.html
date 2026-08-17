@@ -57,6 +57,13 @@
             <div class="stat-label">See how you rank <mat-icon class="chev">chevron_right</mat-icon></div>
           </mat-card-content>
         </mat-card>
+        <mat-card class="stat-card stat-card-link" [routerLink]="['/social', store.user()?.id]">
+          <mat-card-content>
+            <div class="stat-icon board"><mat-icon>people</mat-icon></div>
+            <div class="stat-value">Community</div>
+            <div class="stat-label">Followers &amp; achievements <mat-icon class="chev">chevron_right</mat-icon></div>
+          </mat-card-content>
+        </mat-card>
       </div>
 
       @if (loyalty.snapshot() || loyalty.loading()) {

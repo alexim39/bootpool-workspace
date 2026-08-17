@@ -20,7 +20,24 @@ export interface SocialCreator {
   id: string;
   fullName: string;
   podCount: number;
+  followerCount: number;
   isOra: boolean;
+  isFollowing: boolean;
+}
+
+export interface SocialProfile {
+  user: { id: string; fullName: string; isOra: boolean };
+  stats: { picks: number; followers: number; following: number; likesReceived: number; stakers: number };
+  achievements: string[];
+  isSelf: boolean;
+  isFollowing: boolean;
+}
+
+export interface SocialUserRow {
+  id: string;
+  fullName: string;
+  isOra: boolean;
+  isSelf: boolean;
   isFollowing: boolean;
 }
 
@@ -104,7 +121,16 @@ export class SocialFeedService {
   private followingPage = 0;
   private followingLoaded = false;
 
+  readonly savedPods = signal<Pod[]>([]);
+  readonly savedTotal = signal(0);
+  readonly savedLoading = signal(false);
+  readonly savedHasMore = signal(false);
+  private savedPage = 0;
+  private savedLoaded = false;
+
   readonly isLoggedIn = computed(() => this.auth.isAuthenticated());
+
+  readonly myId = computed(() => this.auth.user()?.id ?? '');
 
   readonly oraId = computed(() => this.podsSvc.oraId());
 
@@ -146,8 +172,14 @@ export class SocialFeedService {
     return pod.createdBy || 'ora';
   }
 
+  isMyPod(pod: Pod): boolean {
+    const me = this.myId();
+    return !!me && !!pod.createdBy && pod.createdBy === me;
+  }
+
   creatorNameFor(pod: Pod): string {
     if (this.isOraCreator(pod.createdBy)) return 'Ora';
+    if (this.isMyPod(pod)) return 'You';
     return pod.creatorName || 'Ora';
   }
 
@@ -196,18 +228,39 @@ export class SocialFeedService {
   }
 
   private async hydrateStats(ids: string[]): Promise<void> {
-    try {
-      const res = await lastValueFrom(this.http.get<{ success: boolean; data: SocialStatsData }>(
-        `${this.API_URL}/social/stats?podIds=${ids.join(',')}`,
-        this.headers()
-      ));
-      if (!res.success) return;
-      this.serverLikeCounts.set(res.data.likes || {});
-      this.serverCommentCounts.set(res.data.comments || {});
-      this.likes.set(res.data.liked || []);
-      this.saves.set(res.data.saved || []);
-    } catch {
-      // stats are progressive — keep whatever state exists
+    const unique = [...new Set(ids)].filter(Boolean);
+    const BATCH = 30;
+    for (let i = 0; i < unique.length; i += BATCH) {
+      const chunk = unique.slice(i, i + BATCH);
+      try {
+        const res = await lastValueFrom(this.http.get<{ success: boolean; data: SocialStatsData }>(
+          `${this.API_URL}/social/stats?podIds=${chunk.join(',')}`,
+          this.headers()
+        ));
+        if (!res.success) continue;
+        this.serverLikeCounts.update(cur => ({ ...cur, ...(res.data.likes || {}) }));
+        this.serverCommentCounts.update(cur => ({ ...cur, ...(res.data.comments || {}) }));
+        if (res.data.liked?.length) {
+          this.likes.update(cur => {
+            const merged = [...cur];
+            for (const id of res.data.liked) {
+              if (!merged.includes(id)) merged.push(id);
+            }
+            return merged;
+          });
+        }
+        if (res.data.saved?.length) {
+          this.saves.update(cur => {
+            const merged = [...cur];
+            for (const id of res.data.saved) {
+              if (!merged.includes(id)) merged.push(id);
+            }
+            return merged;
+          });
+        }
+      } catch {
+        // stats are progressive — keep whatever state exists
+      }
     }
   }
 
@@ -265,6 +318,7 @@ export class SocialFeedService {
         this.followingPage = 1;
         this.followingLoaded = true;
         this.followingHasMore.set(items.length < res.data.total);
+        this.hydrateStats(items.map(p => p.id));
       }
     } catch {
       // following feed stays empty on failure
@@ -290,6 +344,7 @@ export class SocialFeedService {
         });
         this.followingPage = page;
         this.followingHasMore.set(this.followingPods().length < res.data.total);
+        this.hydrateStats(items.map(p => p.id));
       }
     } catch {
       // keep current following feed on failure
@@ -301,6 +356,125 @@ export class SocialFeedService {
   refreshFollowingFeed(): void {
     this.followingLoaded = false;
     if (this.isLoggedIn()) this.fetchFollowingFeed();
+  }
+
+  async ensureSavedLoaded(): Promise<void> {
+    if (!this.isLoggedIn()) {
+      this.savedPods.set([]);
+      this.savedTotal.set(0);
+      return;
+    }
+    if (this.savedLoaded) return;
+    await this.fetchSavedPods();
+  }
+
+  async fetchSavedPods(): Promise<void> {
+    if (!this.isLoggedIn()) return;
+    if (this.savedLoading()) return;
+    this.savedLoading.set(true);
+    try {
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: any[]; total: number } }>(
+        `${this.API_URL}/social/saved?page=1&limit=20`,
+        this.headers()
+      ));
+      if (res.success) {
+        const items = (res.data.items || []).map(i => this.mapFeedPod(i));
+        this.savedPods.set(items);
+        this.savedTotal.set(res.data.total);
+        this.savedPage = 1;
+        this.savedLoaded = true;
+        this.savedHasMore.set(items.length < res.data.total);
+        this.hydrateStats(items.map(p => p.id));
+      }
+    } catch {
+      // saved list stays empty on failure
+    } finally {
+      this.savedLoading.set(false);
+    }
+  }
+
+  async loadMoreSaved(): Promise<void> {
+    if (!this.isLoggedIn() || !this.savedHasMore() || this.savedLoading()) return;
+    this.savedLoading.set(true);
+    try {
+      const page = this.savedPage + 1;
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: any[]; total: number } }>(
+        `${this.API_URL}/social/saved?page=${page}&limit=20`,
+        this.headers()
+      ));
+      if (res.success) {
+        const items = (res.data.items || []).map(i => this.mapFeedPod(i));
+        this.savedPods.update(cur => {
+          const seen = new Set(cur.map(p => p.id));
+          return [...cur, ...items.filter(p => !seen.has(p.id))];
+        });
+        this.savedPage = page;
+        this.savedHasMore.set(this.savedPods().length < res.data.total);
+        this.hydrateStats(items.map(p => p.id));
+      }
+    } catch {
+      // keep current saved list on failure
+    } finally {
+      this.savedLoading.set(false);
+    }
+  }
+
+  refreshSaved(): void {
+    this.savedLoaded = false;
+    if (this.isLoggedIn()) this.fetchSavedPods();
+  }
+
+  async fetchProfile(userId: string): Promise<SocialProfile | null> {
+    if (!this.isLoggedIn()) return null;
+    try {
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: SocialProfile }>(
+        `${this.API_URL}/social/profile/${userId}`,
+        this.headers()
+      ));
+      return res.success ? res.data : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async fetchFollowers(userId: string, page = 1, limit = 20): Promise<{ items: SocialUserRow[]; total: number }> {
+    if (!this.isLoggedIn()) return { items: [], total: 0 };
+    try {
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: SocialUserRow[]; total: number } }>(
+        `${this.API_URL}/social/followers?userId=${userId}&page=${page}&limit=${limit}`,
+        this.headers()
+      ));
+      return res.success ? res.data : { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  }
+
+  async fetchFollowingUsers(userId: string, page = 1, limit = 20): Promise<{ items: SocialUserRow[]; total: number }> {
+    if (!this.isLoggedIn()) return { items: [], total: 0 };
+    try {
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: SocialUserRow[]; total: number } }>(
+        `${this.API_URL}/social/following-list?userId=${userId}&page=${page}&limit=${limit}`,
+        this.headers()
+      ));
+      return res.success ? res.data : { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  }
+
+  async fetchCreatorPicks(userId: string, page = 1, limit = 12): Promise<{ items: Pod[]; total: number }> {
+    if (!this.isLoggedIn()) return { items: [], total: 0 };
+    try {
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: any[]; total: number } }>(
+        `${this.API_URL}/social/creator-picks?userId=${userId}&page=${page}&limit=${limit}`,
+        this.headers()
+      ));
+      if (!res.success) return { items: [], total: 0 };
+      return { items: (res.data.items || []).map(i => this.mapFeedPod(i)), total: res.data.total };
+    } catch {
+      return { items: [], total: 0 };
+    }
   }
 
   async toggleFollow(creator: string): Promise<string> {
@@ -388,6 +562,7 @@ export class SocialFeedService {
       if (res.success && res.data) {
         this.saves.update(cur => res.data.saved ? (cur.includes(podId) ? cur : [...cur, podId]) : cur.filter(x => x !== podId));
       }
+      this.refreshSaved();
     } catch (error) {
       this.saves.update(cur => wasSaved ? [...cur, podId] : cur.filter(x => x !== podId));
       throw error;

@@ -1,5 +1,6 @@
-import { Component, Output, EventEmitter, input, signal, computed, inject, effect } from '@angular/core';
+import { Component, Output, EventEmitter, input, signal, computed, inject, effect, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -16,7 +17,7 @@ import { PodCommentsComponent } from '../pod-comments/pod-comments.component';
   templateUrl: './swipe-deck.component.html',
   styleUrls: ['./swipe-deck.component.scss']
 })
-export class SwipeDeckComponent {
+export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
   pods = input.required<Pod[]>();
   selectedIds = input<string[]>([]);
   selectionDisabled = input(false);
@@ -25,8 +26,11 @@ export class SwipeDeckComponent {
   @Output() placeStake = new EventEmitter<Pod>();
   @Output() toggleSelect = new EventEmitter<Pod>();
   @Output() loadMore = new EventEmitter<void>();
+  @Output() manage = new EventEmitter<Pod>();
 
   private snackBar = inject(MatSnackBar);
+  private el = inject(ElementRef);
+  private router = inject(Router);
   readonly socialFeed = inject(SocialFeedService);
 
   readonly commentPod = signal<Pod | null>(null);
@@ -35,7 +39,12 @@ export class SwipeDeckComponent {
   readonly dragOffset = signal(0);
   readonly dragging = signal(false);
 
+  readonly deckMinHeight = signal(360);
+  private readonly NAV_RESERVE = 84;
+  private rafPending = false;
+  private lastIndex = -1;
   private lastFirstId = '';
+  private readonly destroyFns: (() => void)[] = [];
 
   constructor() {
     effect(() => {
@@ -47,6 +56,71 @@ export class SwipeDeckComponent {
         this.dragOffset.set(0);
       }
     });
+
+    effect(() => {
+      const i = this.index();
+      if (i !== this.lastIndex && this.el.nativeElement.isConnected) {
+        this.lastIndex = i;
+        this.measure();
+      }
+    });
+  }
+
+  ngAfterViewInit() {
+    this.measure();
+    const onViewportChange = () => this.measureThrottled();
+    window.addEventListener('scroll', onViewportChange, { passive: true });
+    window.addEventListener('resize', onViewportChange);
+    this.destroyFns.push(() => {
+      window.removeEventListener('scroll', onViewportChange);
+      window.removeEventListener('resize', onViewportChange);
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroyFns.forEach(fn => fn());
+  }
+
+  private measureThrottled() {
+    if (this.rafPending) return;
+    this.rafPending = true;
+    requestAnimationFrame(() => {
+      this.rafPending = false;
+      this.measure();
+    });
+  }
+
+  private measure() {
+    const host = this.el.nativeElement as HTMLElement;
+    const rect = host.getBoundingClientRect();
+    const vh = window.innerHeight;
+    let avail = 360;
+    if (rect.top < vh) {
+      avail = Math.max(360, Math.floor(vh - Math.max(rect.top, 0) - this.NAV_RESERVE));
+    }
+    const cards = host.querySelectorAll('.deck-card');
+    let current: Element | null = null;
+    for (let i = 0; i < cards.length; i++) {
+      const c = cards.item(i);
+      if (!c) continue;
+      const style = c.getAttribute('style') || '';
+      if (style.indexOf('top: 0') !== -1) {
+        current = c;
+        break;
+      }
+    }
+    let content = 0;
+    if (current) {
+      const hero = current.querySelector('.deck-hero');
+      const body = current.querySelector('.deck-body');
+      const rail = current.querySelector('.deck-rail');
+      const creator = current.querySelector('.deck-creator');
+      if (hero) content += hero.getBoundingClientRect().height;
+      if (body) content += body.scrollHeight;
+      if (rail) content += rail.getBoundingClientRect().height;
+      if (creator) content += creator.getBoundingClientRect().height;
+    }
+    this.deckMinHeight.set(Math.max(avail, content));
   }
 
   readonly current = computed(() => this.pods()[this.index()] ?? null);
@@ -81,7 +155,7 @@ export class SwipeDeckComponent {
   }
 
   cardTop(i: number): number {
-    return (i - this.index()) * 100;
+    return (i - this.index()) * this.deckMinHeight();
   }
 
   visible(i: number): boolean {
@@ -132,12 +206,20 @@ export class SwipeDeckComponent {
     });
   }
 
+  openCreator(pod: Pod) {
+    this.router.navigate(['/social', this.socialFeed.creatorOf(pod)]);
+  }
+
   isFollowing(pod: Pod): boolean {
     return this.socialFeed.isFollowing(this.socialFeed.creatorOf(pod));
   }
 
   isOraOf(pod: Pod): boolean {
     return this.socialFeed.isOraCreator(this.socialFeed.creatorOf(pod));
+  }
+
+  isMyPodOf(pod: Pod): boolean {
+    return this.socialFeed.isMyPod(pod);
   }
 
   creatorNameOf(pod: Pod): string {

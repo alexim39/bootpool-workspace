@@ -1,8 +1,8 @@
-<div class="deck" (touchstart)="onTouchStart($event)" (touchmove)="onTouchMove($event)" (touchend)="onTouchEnd()" (keydown)="onKeyDown($event)" tabindex="0" role="feed" aria-label="For You betting picks">
+<div class="deck" [style.min-height.px]="deckMinHeight()" (touchstart)="onTouchStart($event)" (touchmove)="onTouchMove($event)" (touchend)="onTouchEnd()" (keydown)="onKeyDown($event)" tabindex="0" role="feed" aria-label="For You betting picks">
   <div class="deck-stage" [class.dragging]="dragging()" [style.transform]="'translateY(' + dragOffset() + 'px)'">
     @for (pod of pods(); track pod.id; let i = $index) {
       @if (visible(i)) {
-        <article class="deck-card" [class.live]="pod.isLive" [style.top.%]="cardTop(i)">
+        <article class="deck-card" [class.live]="pod.isLive" [style.top.px]="cardTop(i)">
           <div class="deck-hero">
             <div class="hero-orb"></div>
             <div class="deck-head">
@@ -97,13 +97,20 @@
               <mat-icon class="rail-icon" [class.saved]="socialFeed.isSaved(pod.id)">{{ socialFeed.isSaved(pod.id) ? 'bookmark' : 'bookmark_border' }}</mat-icon>
               <span class="rail-label">{{ socialFeed.isSaved(pod.id) ? 'Saved' : 'Save' }}</span>
             </button>
-            <button class="rail-btn follow" [class.following]="isFollowing(pod)" (click)="toggleFollow(pod)" [matTooltip]="isOraOf(pod) ? 'Always following Ora' : (isFollowing(pod) ? 'Unfollow' : 'Follow')">
-              <mat-icon>{{ isFollowing(pod) ? 'check' : 'add' }}</mat-icon>
-              <span class="rail-label">{{ isFollowing(pod) ? 'Following' : 'Follow' }}</span>
-            </button>
+            @if (isMyPodOf(pod)) {
+              <button class="rail-btn follow" (click)="manage.emit(pod)" [matTooltip]="'Manage your pick'">
+                <mat-icon>edit</mat-icon>
+                <span class="rail-label">Manage</span>
+              </button>
+            } @else {
+              <button class="rail-btn follow" [class.following]="isFollowing(pod)" (click)="toggleFollow(pod)" [matTooltip]="isOraOf(pod) ? 'Always following Ora' : (isFollowing(pod) ? 'Unfollow' : 'Follow')">
+                <mat-icon>{{ isFollowing(pod) ? 'check' : 'add' }}</mat-icon>
+                <span class="rail-label">{{ isFollowing(pod) ? 'Following' : 'Follow' }}</span>
+              </button>
+            }
           </div>
 
-          <div class="deck-creator">
+          <div class="deck-creator" (click)="openCreator(pod)">
             <span class="creator-avatar"><mat-icon>{{ isOraOf(pod) ? 'auto_awesome' : 'person' }}</mat-icon></span>
             <span class="creator-name">{{ creatorNameOf(pod) }}
               @if (isOraOf(pod)) {

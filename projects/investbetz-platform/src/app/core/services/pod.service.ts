@@ -265,6 +265,14 @@ export class PodService {
     );
   }
 
+  managePick(id: string, action: 'extend' | 'cancel', stakingClosesAt?: string) {
+    return this.http.post<{ success: boolean; data: Pod }>(
+      `${environment.apiUrl}/pods/${id}/manage`,
+      { action, stakingClosesAt },
+      { headers: { Authorization: `Bearer ${this.auth.token()}` } }
+    );
+  }
+
   search(query: string, limit = 10) {
     return this.http.get<PodFeedResponse>(`${environment.apiUrl}/pods/search?q=${encodeURIComponent(query)}&limit=${limit}`);
   }

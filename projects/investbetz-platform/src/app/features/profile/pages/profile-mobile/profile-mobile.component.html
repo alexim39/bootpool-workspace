@@ -88,6 +88,15 @@
           <mat-icon class="chevron">chevron_right</mat-icon>
         </a>
 
+        <a class="menu-item" [routerLink]="['/social', store.user()?.id]">
+          <mat-icon class="menu-icon emerald">people</mat-icon>
+          <div class="menu-text">
+            <span class="menu-title">My Community Profile</span>
+            <span class="menu-desc">Followers, following &amp; achievements</span>
+          </div>
+          <mat-icon class="chevron">chevron_right</mat-icon>
+        </a>
+
         <a class="menu-item" routerLink="/ora-record">
           <mat-icon class="menu-icon emerald">verified</mat-icon>
           <div class="menu-text">

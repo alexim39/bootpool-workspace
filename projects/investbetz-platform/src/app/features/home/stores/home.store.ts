@@ -69,6 +69,7 @@ export class HomeStore implements OnDestroy {
 
   readonly feedMode = signal<'foryou' | 'following' | 'saved'>('foryou');
   readonly createPickOpen = signal(false);
+  readonly managePod = signal<Pod | null>(null);
 
   setFeedMode(mode: 'foryou' | 'following' | 'saved') {
     this.feedMode.set(mode);
@@ -91,38 +92,72 @@ export class HomeStore implements OnDestroy {
     this._social.refreshFollowingFeed();
   }
 
+  openManagePod(pod: Pod) {
+    this.managePod.set(pod);
+  }
+
+  closeManagePod() {
+    this.managePod.set(null);
+  }
+
+  onPickManaged() {
+    this.managePod.set(null);
+    this._social.refreshFollowingFeed();
+    this.pods.fetchFeed({ limit: this.PAGE_SIZE, sport: this.selectedSport() ?? undefined, personalized: this.isLoggedIn() });
+  }
+
   readonly followingPods = computed(() => {
     return this._social.followingPods();
   });
 
   readonly savedPods = computed(() => {
+    if (this.isLoggedIn()) return this._social.savedPods();
     return this.displayedPods().filter(p => this._social.isSaved(p.id));
+  });
+
+  readonly ownPods = computed(() => {
+    return this._social.followingPods().filter(p => this._social.isMyPod(p));
   });
 
   readonly feedPods = computed(() => {
     const mode = this.feedMode();
     if (mode === 'following') return this._social.followingPods();
     if (mode === 'saved') return this.savedPods();
-    return this.displayedPods();
+    const main = this.displayedPods();
+    const own = this.ownPods();
+    if (own.length === 0) return main;
+    const seen = new Set(main.map(p => p.id));
+    const merged = [...main, ...own.filter(p => !seen.has(p.id))];
+    return merged.sort((a, b) =>
+      new Date(a.stakingClosesAt).getTime() - new Date(b.stakingClosesAt).getTime()
+    );
   });
 
   readonly feedLoading = computed(() => {
-    if (this.feedMode() === 'following') return this._social.followingLoading();
+    const mode = this.feedMode();
+    if (mode === 'following') return this._social.followingLoading();
+    if (mode === 'saved') return this._social.savedLoading();
     return this.pods.loading();
   });
 
   readonly feedHasMore = computed(() => {
-    if (this.feedMode() === 'following') return this._social.followingHasMore();
+    const mode = this.feedMode();
+    if (mode === 'following') return this._social.followingHasMore();
+    if (mode === 'saved') return this._social.savedHasMore();
     return this.pods.hasMorePods();
   });
 
   readonly feedLoadingMore = computed(() => {
-    if (this.feedMode() === 'following') return this._social.followingLoading();
+    const mode = this.feedMode();
+    if (mode === 'following') return this._social.followingLoading();
+    if (mode === 'saved') return this._social.savedLoading();
     return this.pods.loadingMore();
   });
 
   readonly feedTotal = computed(() => {
-    if (this.feedMode() === 'following') return this._social.followingTotal();
+    const mode = this.feedMode();
+    if (mode === 'following') return this._social.followingTotal();
+    if (mode === 'saved') return this._social.savedTotal();
     return this.pods.totalPods();
   });
 
@@ -165,6 +200,8 @@ export class HomeStore implements OnDestroy {
     this._wallet.fetchBalance();
     this._stake.fetchActiveStakes();
     this.fetchOraRecord();
+    this._social.ensureFollowingLoaded();
+    this._social.ensureSavedLoaded();
   }
 
   fetchOraRecord() {
@@ -238,8 +275,13 @@ export class HomeStore implements OnDestroy {
   }
 
   loadMore() {
-    if (this.feedMode() === 'following') {
+    const mode = this.feedMode();
+    if (mode === 'following') {
       this._social.loadMoreFollowing();
+      return;
+    }
+    if (mode === 'saved') {
+      this._social.loadMoreSaved();
       return;
     }
     this.pods.loadMore(this.PAGE_SIZE);

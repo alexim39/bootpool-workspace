@@ -18,6 +18,7 @@ import { FeaturedBannerComponent } from '../../components/featured-banner/featur
 import { StoriesRailComponent } from '../../components/stories-rail/stories-rail.component';
 import { WhoToFollowComponent } from '../../components/who-to-follow/who-to-follow.component';
 import { CreatePickDialogComponent } from '../../components/create-pick-dialog/create-pick-dialog.component';
+import { ManagePickDialogComponent } from '../../components/manage-pick-dialog/manage-pick-dialog.component';
 import { AppNavComponent, OraChatComponent, OraPickBannerComponent } from '../../../../core/components';
 import { HomeStore } from '../../stores/home.store';
 import { OraPick } from '../../../../core/services';
@@ -46,6 +47,7 @@ import { Pod } from '../../../../core/services';
     StoriesRailComponent,
     WhoToFollowComponent,
     CreatePickDialogComponent,
+    ManagePickDialogComponent,
     AppNavComponent,
     OraChatComponent,
     OraPickBannerComponent
@@ -125,6 +127,11 @@ export class HomeDesktopComponent implements OnInit, AfterViewInit, OnDestroy {
   onPickPublished() {
     this.store.onPickPublished();
     this._snackBar.open('Pick published! It now shows in your Following feed', 'OK', { duration: 3500 });
+  }
+
+  onPickManaged() {
+    this.store.onPickManaged();
+    this._snackBar.open('Pick updated', 'OK', { duration: 2500 });
   }
 
   openStakeModal(pod: any) {

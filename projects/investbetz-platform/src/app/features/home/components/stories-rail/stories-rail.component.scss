@@ -2,9 +2,10 @@
 
 .stories-rail {
   display: flex;
-  gap: 1.25rem;
+  justify-content: center;
+  gap: 1.1rem;
   overflow-x: auto;
-  padding: 0.25rem 0.25rem 0.5rem;
+  padding: 1rem 0.25rem 1.1rem;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }

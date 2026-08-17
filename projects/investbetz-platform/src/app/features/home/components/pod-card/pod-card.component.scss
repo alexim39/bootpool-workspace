@@ -54,6 +54,12 @@
   align-items: center;
   gap: 0.6rem;
   min-width: 0;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
 }
 
 .creator-avatar {
@@ -151,6 +157,32 @@
 }
 
 .follow-btn mat-icon {
+  font-size: 0.9rem;
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.manage-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.85rem;
+  background: rgba(100, 255, 218, 0.1);
+  border: 1px solid rgba(100, 255, 218, 0.35);
+  border-radius: $radius-full;
+  color: $emerald;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all $transition-base;
+  flex-shrink: 0;
+}
+
+.manage-btn:hover {
+  background: rgba(100, 255, 218, 0.18);
+}
+
+.manage-btn mat-icon {
   font-size: 0.9rem;
   width: 0.9rem;
   height: 0.9rem;

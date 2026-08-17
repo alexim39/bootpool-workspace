@@ -1,101 +1,155 @@
+@use '../../../../core/styles/brand' as *;
+
 .w2f-section {
-  padding: 0.6rem 1rem 0.4rem;
+  padding: 0.85rem 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  text-align: left;
 }
 
 .w2f-head {
   display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.w2f-head-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.w2f-eyebrow {
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: 0.3rem;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: $emerald;
+}
+
+.w2f-eyebrow mat-icon {
+  font-size: 0.8rem;
+  width: 0.8rem;
+  height: 0.8rem;
 }
 
 .w2f-title {
-  font-size: 0.78rem;
+  margin: 0;
+  font-size: 0.98rem;
   font-weight: 800;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.01em;
+  color: $white;
 }
 
 .w2f-count {
-  font-size: 0.7rem;
+  flex-shrink: 0;
+  font-size: 0.68rem;
   font-weight: 700;
-  color: #00e676;
-  background: rgba(0, 230, 118, 0.1);
-  border: 1px solid rgba(0, 230, 118, 0.3);
+  color: $emerald;
+  background: rgba($emerald, 0.1);
+  border: 1px solid rgba($emerald, 0.3);
   border-radius: 999px;
-  padding: 0 0.5rem;
-  line-height: 1.2rem;
+  padding: 0.15rem 0.6rem;
+  white-space: nowrap;
 }
 
 .w2f-row {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.6rem;
   overflow-x: auto;
   scrollbar-width: none;
-  padding-bottom: 0.25rem;
+  padding: 0.15rem 0.1rem 0.35rem;
 }
 
 .w2f-row::-webkit-scrollbar {
   display: none;
 }
 
-.w2f-chip {
+.w2f-card {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.55rem 0.7rem;
-  background: rgba(255, 255, 255, 0.04);
+  padding: 0.6rem 0.7rem;
+  background: linear-gradient(160deg, rgba($emerald, 0.07) 0%, rgba(255, 255, 255, 0.035) 60%);
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 14px;
   min-width: 0;
+  cursor: pointer;
+  transition: all $transition-base;
+}
+
+.w2f-card:hover {
+  background: linear-gradient(160deg, rgba($emerald, 0.12) 0%, rgba(255, 255, 255, 0.06) 60%);
+  border-color: rgba($emerald, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
 }
 
 .w2f-avatar {
   flex-shrink: 0;
-  width: 2rem;
-  height: 2rem;
+  width: 2.35rem;
+  height: 2.35rem;
   border-radius: 50%;
   background: linear-gradient(135deg, #0f86ff, #16c79a);
   color: #04121a;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
   text-transform: uppercase;
+  box-shadow: 0 0 0 2px rgba($emerald, 0.25);
 }
 
 .w2f-avatar.ora {
   background: linear-gradient(135deg, #16c79a, #00e676);
+  box-shadow: 0 0 0 2px rgba($emerald, 0.5), 0 0 14px rgba($emerald, 0.35);
 }
 
 .w2f-avatar mat-icon {
-  font-size: 1.1rem;
-  width: 1.1rem;
-  height: 1.1rem;
+  font-size: 1.15rem;
+  width: 1.15rem;
+  height: 1.15rem;
 }
 
 .w2f-meta {
   min-width: 0;
   display: flex;
   flex-direction: column;
+  gap: 0.1rem;
 }
 
 .w2f-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #eaf6ff;
+  color: $white;
   white-space: nowrap;
-  max-width: 120px;
+  max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.w2f-pods {
-  font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.5);
+.w2f-verified {
+  font-size: 0.85rem;
+  width: 0.85rem;
+  height: 0.85rem;
+  color: $info;
+  flex-shrink: 0;
+}
+
+.w2f-sub {
+  font-size: 0.66rem;
+  color: $white-dim;
   white-space: nowrap;
 }
 
@@ -104,29 +158,60 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.35rem 0.75rem;
+  padding: 0.4rem 0.85rem;
   border-radius: 999px;
-  border: 1px solid rgba(0, 230, 118, 0.45);
-  background: rgba(0, 230, 118, 0.12);
-  color: #00e676;
+  border: 1px solid rgba($emerald, 0.5);
+  background: rgba($emerald, 0.14);
+  color: $emerald;
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .w2f-follow:hover {
-  background: rgba(0, 230, 118, 0.22);
+  background: $emerald;
+  color: $deep-navy;
+}
+
+.w2f-follow:disabled {
+  opacity: 0.75;
+  cursor: default;
 }
 
 .w2f-follow.following {
   background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.65);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: $white-muted;
+}
+
+.w2f-follow.following:hover {
+  background: rgba($error, 0.12);
+  border-color: rgba($error, 0.4);
+  color: $error;
 }
 
 .w2f-follow mat-icon {
   font-size: 0.9rem;
   width: 0.9rem;
   height: 0.9rem;
+}
+
+@media (min-width: 640px) {
+  .w2f-section {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 1rem 0.25rem 0.5rem;
+  }
+
+  .w2f-row {
+    flex-direction: column;
+    gap: 0.55rem;
+    overflow: visible;
+  }
+
+  .w2f-card {
+    width: 100%;
+    padding: 0.7rem 0.85rem;
+  }
 }
