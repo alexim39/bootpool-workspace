@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, input, signal, computed, inject, effect, ElementRef, AfterViewInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, Output, EventEmitter, input, signal, computed, inject, effect, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -32,10 +32,7 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
   private el = inject(ElementRef);
   private router = inject(Router);
   readonly socialFeed = inject(SocialFeedService);
-  private cdr = inject(ChangeDetectorRef);
-  private ngZone = inject(NgZone);
 
-  private readonly now = signal(Date.now());
   private nowTimer: ReturnType<typeof setInterval> | undefined;
 
   readonly commentPod = signal<Pod | null>(null);
@@ -80,13 +77,20 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    this.nowTimer = this.ngZone.run(() => setInterval(() => {
-      this.ngZone.run(() => {
-        this.now.set(Date.now());
-        this.cdr.markForCheck();
-        this.cdr.detectChanges();
-      });
-    }, 1000));
+    this.nowTimer = setInterval(() => {
+      const host = this.el.nativeElement as HTMLElement;
+      const ticks = host.querySelectorAll<HTMLElement>('.closes-tick');
+      if (ticks.length === 0) return;
+      const pods = this.pods();
+      const now = Date.now();
+      for (let i = 0; i < ticks.length; i++) {
+        const id = ticks[i].getAttribute('data-pod');
+        const pod = id ? pods.find(p => p.id === id) : null;
+        if (pod) {
+          ticks[i].textContent = ' ' + this.countdown(Math.max(0, new Date(pod.stakingClosesAt).getTime() - now));
+        }
+      }
+    }, 1000);
     this.measure();
     setTimeout(() => this.measure(), 400);
     if (typeof document !== 'undefined' && 'fonts' in document) {
@@ -287,21 +291,17 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
 
   countdown(ms: number): string {
     if (ms <= 0) return 'Closed';
-    const hours = Math.floor(ms / 3600000);
+    const days = Math.floor(ms / 86400000);
+    const hours = Math.floor((ms % 86400000) / 3600000);
     const mins = Math.floor((ms % 3600000) / 60000);
     const secs = Math.floor((ms % 60000) / 1000);
-    if (hours > 0) return `${hours}h ${mins.toString().padStart(2, '0')}m`;
-    return `${mins}m ${secs.toString().padStart(2, '0')}s`;
+    const parts = [];
+    if (days > 0) parts.push(`${days}d`);
+    if (hours > 0 || days > 0) parts.push(`${hours}h`);
+    if (mins > 0 || hours > 0 || days > 0) parts.push(`${mins.toString().padStart(2, '0')}m`);
+    parts.push(`${secs.toString().padStart(2, '0')}s`);
+    return parts.join(' ');
   }
-
-  readonly closingLabels = computed(() => {
-    const now = this.now();
-    const map = new Map<string, string>();
-    for (const p of this.pods()) {
-      map.set(p.id, this.countdown(Math.max(0, new Date(p.stakingClosesAt).getTime() - now)));
-    }
-    return map;
-  });
 
   confidence(pod: Pod): number {
     const ora = Number(pod.metadata?.['oraConfidence'] ?? 0);

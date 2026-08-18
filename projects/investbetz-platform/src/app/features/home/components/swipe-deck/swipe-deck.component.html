@@ -62,7 +62,7 @@
 
             <div class="deck-cta">
               <div class="deck-meta">
-                <span class="meta-closes"><mat-icon>timer</mat-icon>Staking Closes in {{ closingLabels().get(pod.id) }}</span>
+                <span class="meta-closes"><mat-icon>timer</mat-icon>Staking Closes in <span class="closes-tick" [attr.data-pod]="pod.id">--</span></span>
                 <span class="meta-limits">Min {{ formatMoney(pod.minStake) }} · Max {{ formatMoney(pod.maxStake) }}</span>
               </div>
               <div class="cta-row">
