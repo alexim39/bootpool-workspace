@@ -230,8 +230,8 @@
     <button class="feed-mode-btn" [class.active]="store.feedMode() === 'saved'" (click)="setFeedMode('saved')">
       <mat-icon>bookmark</mat-icon> Saved
     </button>
-    <button class="create-pick-btn" (click)="openCreatePick()" aria-label="Publish a pick">
-      <mat-icon>add</mat-icon> <!-- Create pick -->
+    <button class="create-pick-btn" (click)="openBuildCode()" aria-label="Create a booking code">
+      <mat-icon>qr_code_2</mat-icon> <!-- Booking code -->
     </button>
   </div>
 
@@ -288,12 +288,12 @@
           }
         </div>
       </div>
-    } @else if (store.feedMode() === 'following' && store.feedPods().length === 0 && !store.isSearching()) {
+    } @else if (store.feedMode() === 'following' && store.followingPosts().length === 0 && !store.isSearching()) {
       <div class="empty-state">
         <span class="empty-illustration"><mat-icon>people_outline</mat-icon></span>
-        <h3>No picks from people you follow yet</h3>
-        <p>Follow creators in the rail above to see their picks here</p>
-        <button class="empty-cta" (click)="openCreatePick()">Publish your first pick</button>
+        <h3>No booking codes from people you follow yet</h3>
+        <p>Follow creators in the rail above — their codes appear here</p>
+        <button class="empty-cta" (click)="openBuildCode()">Create your first booking code</button>
       </div>
     } @else if (store.feedMode() === 'saved' && store.feedPods().length === 0 && !store.isSearching()) {
       <div class="empty-state">
@@ -325,8 +325,29 @@
         (placeStake)="openStakeModal($event)"
         (toggleSelect)="toggleSelection($event)"
         (loadMore)="store.loadMore()"
-        (manage)="store.openManagePod($event)" 
       />
+    } @else if (store.feedMode() === 'following' && !store.isSearching()) {
+      <div class="odds-list code-feed">
+        @for (post of store.followingPosts(); track post.id) {
+          <app-code-post-card [post]="post" />
+        }
+      </div>
+      @if (store.feedHasMore()) {
+        <div class="load-more-section">
+          <button
+            class="load-more-btn"
+            (click)="store.loadMore()"
+            [disabled]="store.feedLoadingMore()">
+            @if (store.feedLoadingMore()) {
+              <mat-spinner diameter="16"/>
+              <span>Loading...</span>
+            } @else {
+              <span>Load More ({{ store.followingPosts().length }}/{{ store.feedTotal() }})</span>
+            }
+          </button>
+        </div>
+      }
+      <div class="feed-sentinel" #feedSentinel aria-hidden="true"></div>
     } @else {
       <div class="odds-list">
         @for (pod of store.feedPods(); track pod.id) {
@@ -336,7 +357,6 @@
             [selectionDisabled]="store.isSelectionDisabled()"
             (placeStake)="openStakeModal($event)"
             (toggleSelect)="toggleSelection($event)"
-            (manage)="store.openManagePod($event)"
           />
         }
       </div>
@@ -384,16 +404,10 @@
 
   <app-top-up-modal [visible]="showTopUp()" [disableClose]="true" (close)="showTopUp.set(false)" />
 
-  <app-create-pick-dialog
-    [open]="store.createPickOpen()"
-    (close)="store.closeCreatePick()"
-    (published)="onPickPublished()"
-  />
-
-  <app-manage-pick-dialog
-    [pod]="store.managePod()"
-    (close)="store.closeManagePod()"
-    (updated)="onPickManaged()"
+  <app-build-code-dialog
+    [open]="store.buildCodeOpen()"
+    (close)="store.closeBuildCode()"
+    (shared)="onCodeShared()"
   />
 
   @if (showNotifPanel()) {

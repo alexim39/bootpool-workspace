@@ -16,6 +16,16 @@
         <p class="hero-sub">Live rankings by staking volume</p>
       </section>
 
+      <div class="view-tabs">
+        <button class="view-tab" [class.active]="view() === 'stakers'" (click)="setView('stakers')">
+          <mat-icon>emoji_events</mat-icon> Top Stakers
+        </button>
+        <button class="view-tab" [class.active]="view() === 'creators'" (click)="setView('creators')">
+          <mat-icon>qr_code_2</mat-icon> Top Creators
+        </button>
+      </div>
+
+      @if (view() === 'stakers') {
       <div class="stats-grid">
         <div class="stat-card">
           <mat-icon class="stat-icon stat-icon--gold">military_tech</mat-icon>
@@ -166,6 +176,9 @@
           </button>
         </div>
       }
+      } @else {
+        <app-creators-board />
+      }
     </div>
 
     <app-mobile-nav />
@@ -185,6 +198,16 @@
       <p class="hero-sub">Top stakers by volume, wins and momentum — updated live every 60 seconds.</p>
     </section>
 
+    <div class="view-tabs">
+      <button class="view-tab" [class.active]="view() === 'stakers'" (click)="setView('stakers')">
+        <mat-icon>emoji_events</mat-icon> Top Stakers
+      </button>
+      <button class="view-tab" [class.active]="view() === 'creators'" (click)="setView('creators')">
+        <mat-icon>qr_code_2</mat-icon> Top Creators
+      </button>
+    </div>
+
+    @if (view() === 'stakers') {
     <div class="stats-grid">
       <div class="stat-card">
         <mat-icon class="stat-icon stat-icon--gold">military_tech</mat-icon>
@@ -345,6 +368,9 @@
           <mat-icon>chevron_right</mat-icon>
         </button>
       </div>
+    }
+    } @else {
+      <app-creators-board />
     }
   </div>
 }

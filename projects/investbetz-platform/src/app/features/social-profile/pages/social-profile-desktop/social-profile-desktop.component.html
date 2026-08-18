@@ -30,9 +30,15 @@
               @if (p.user.isOra) {
                 <mat-icon class="verified">verified</mat-icon>
               }
+              @if (p.virality && p.virality.badge && p.virality.badge !== 'Rookie') {
+                <span class="creator-badge" [title]="'Creator score ₦' + (p.virality.score | number)">{{ p.virality.badge }}</span>
+              }
             </div>
             <div class="role-row">
               <span class="role-chip">{{ roleLabel() }}</span>
+              @if (p.virality && p.virality.rank != null) {
+                <span class="role-chip creator-rank-chip">#{{ p.virality.rank }} creator</span>
+              }
               @if (p.isSelf) {
                 <span class="role-chip self-chip">Viewing your public profile</span>
               }

@@ -1,0 +1,117 @@
+@if (open()) {
+  <div class="pick-overlay" (click)="onClose()">
+    <div class="pick-panel" (click)="$event.stopPropagation()">
+      <div class="pick-header">
+        <div class="pick-title-wrap">
+          <span class="pick-icon"><mat-icon>qr_code_2</mat-icon></span>
+          <div>
+            <h3 class="pick-title">Create a booking code</h3>
+            <span class="pick-sub">Pick 2–30 open odds. Followers enter your code to stake.</span>
+          </div>
+        </div>
+        <button class="close-btn" (click)="onClose()" aria-label="Close">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      @if (store.bookingCode(); as code) {
+        <div class="code-success">
+          <div class="success-icon"><mat-icon>check_circle</mat-icon></div>
+          <h4 class="success-title">Booking code ready</h4>
+          <div class="code-big">{{ code }}</div>
+          <div class="code-meta">
+            {{ store.myLatestCode()?.legCount || selectedCount() }} legs
+            • {{ (store.myLatestCode()?.combinedMultiplier || combinedMultiplier()).toFixed(2) }}x
+            • expires {{ formatExpiry(store.bookingCodeExpiry()) }}
+          </div>
+          <p class="code-hint">
+            Your code is live in the Following feed of your followers. Anyone who wins on it
+            boosts your creator score.
+          </p>
+          <div class="success-actions">
+            <button class="btn-primary" (click)="copyCode()" type="button">
+              <mat-icon>{{ copied() ? 'check' : 'content_copy' }}</mat-icon>
+              {{ copied() ? 'Copied' : 'Copy code' }}
+            </button>
+            <button class="btn-ghost" (click)="onShared()" type="button">View in feed</button>
+          </div>
+        </div>
+      } @else {
+        <div class="pick-body">
+          <div class="field">
+            <label class="field-label">Your selections</label>
+            <div class="selection-summary">
+              <span>
+                {{ selectedCount() }} / {{ store.maxBookingCodeLegs }} selected
+              </span>
+              <span class="summary-odds">Combined odds: {{ combinedMultiplier().toFixed(2) }}x</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <input
+              class="field-input"
+              [(ngModel)]="search"
+              placeholder="Search teams or leagues…"
+              (keydown.enter)="$event.preventDefault()"
+            />
+          </div>
+
+          <div class="pod-picker">
+            @for (pod of availablePods(); track pod.id) {
+              <button
+                class="pod-option"
+                [class.selected]="isSelected(pod)"
+                [disabled]="!isSelected(pod) && isFull()"
+                (click)="toggle(pod)"
+                type="button">
+                <span class="pod-check">
+                  @if (isSelected(pod)) {
+                    <mat-icon>check_circle</mat-icon>
+                  } @else {
+                    <mat-icon>radio_button_unchecked</mat-icon>
+                  }
+                </span>
+                <span class="pod-info">
+                  <span class="pod-teams">{{ pod.homeTeam }} vs {{ pod.awayTeam }}</span>
+                  <span class="pod-meta">{{ pod.league }} • {{ pod.selection }}</span>
+                </span>
+                <span class="pod-odds">{{ pod.gainsMultiplier }}x</span>
+              </button>
+            } @empty {
+              <div class="pod-empty">
+                <mat-icon>sports_soccer</mat-icon>
+                <span>{{ search.trim() ? 'No open odds match that search.' : 'No open odds right now — check back soon.' }}</span>
+              </div>
+            }
+          </div>
+
+          @if (store.bookingCodeError(); as err) {
+            <div class="pick-error">
+              <mat-icon>error_outline</mat-icon>
+              <span>{{ err }}</span>
+            </div>
+          }
+
+          @if (selectedCount() > 0 && selectedCount() < 2) {
+            <div class="pick-hint">Booking codes need at least 2 selections.</div>
+          }
+          @if (selectedCount() >= store.maxBookingCodeLegs) {
+            <div class="pick-hint">Maximum of {{ store.maxBookingCodeLegs }} selections reached.</div>
+          }
+
+          <div class="footer-actions">
+            <button class="btn-primary" (click)="create()" [disabled]="!canCreate()" type="button">
+              @if (submitting() || store.bookingCodeLoading()) {
+                <mat-spinner diameter="16" />
+                Creating…
+              } @else {
+                Create booking code
+              }
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

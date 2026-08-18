@@ -17,8 +17,8 @@ import { BetSlipComponent } from '../../components/bet-slip/bet-slip.component';
 import { FeaturedBannerComponent } from '../../components/featured-banner/featured-banner.component';
 import { StoriesRailComponent } from '../../components/stories-rail/stories-rail.component';
 import { WhoToFollowComponent } from '../../components/who-to-follow/who-to-follow.component';
-import { CreatePickDialogComponent } from '../../components/create-pick-dialog/create-pick-dialog.component';
-import { ManagePickDialogComponent } from '../../components/manage-pick-dialog/manage-pick-dialog.component';
+import { CodePostCardComponent } from '../../components/code-post-card/code-post-card.component';
+import { BuildCodeDialogComponent } from '../../components/build-code-dialog/build-code-dialog.component';
 import { AppNavComponent, OraChatComponent, OraPickBannerComponent } from '../../../../core/components';
 import { HomeStore } from '../../stores/home.store';
 import { OraPick } from '../../../../core/services';
@@ -46,8 +46,8 @@ import { Pod } from '../../../../core/services';
     FeaturedBannerComponent,
     StoriesRailComponent,
     WhoToFollowComponent,
-    CreatePickDialogComponent,
-    ManagePickDialogComponent,
+    CodePostCardComponent,
+    BuildCodeDialogComponent,
     AppNavComponent,
     OraChatComponent,
     OraPickBannerComponent
@@ -69,6 +69,10 @@ export class HomeDesktopComponent implements OnInit, AfterViewInit, OnDestroy {
     this.store.init();
     const podId = this.route.snapshot.queryParamMap.get('pod');
     if (podId) this.store.openPodById(podId);
+    const code = this.route.snapshot.queryParamMap.get('code');
+    if (code && this.store.auth.isAuthenticated()) {
+      this.store.redeemBookingCode(code).subscribe({ error: () => {} });
+    }
   }
 
   ngAfterViewInit() {
@@ -116,22 +120,17 @@ export class HomeDesktopComponent implements OnInit, AfterViewInit, OnDestroy {
     this.store.setFeedMode(mode);
   }
 
-  openCreatePick() {
+  openBuildCode() {
     if (!this.store.auth.isAuthenticated()) {
-      this._snackBar.open('Please log in to publish a pick', 'OK', { duration: 3000 });
+      this._snackBar.open('Please log in to create a booking code', 'OK', { duration: 3000 });
       return;
     }
-    this.store.openCreatePick();
+    this.store.openBuildCode();
   }
 
-  onPickPublished() {
-    this.store.onPickPublished();
-    this._snackBar.open('Pick published! It now shows in your Following feed', 'OK', { duration: 3500 });
-  }
-
-  onPickManaged() {
-    this.store.onPickManaged();
-    this._snackBar.open('Pick updated', 'OK', { duration: 2500 });
+  onCodeShared() {
+    this.store.onCodeShared();
+    this._snackBar.open('Booking code shared! It now shows in your Following feed', 'OK', { duration: 3500 });
   }
 
   openStakeModal(pod: any) {

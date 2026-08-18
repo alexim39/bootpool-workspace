@@ -68,8 +68,7 @@ export class HomeStore implements OnDestroy {
   readonly noSearchResults = computed(() => this.isSearching() && !this.pods.loading() && this.displayedPods().length === 0);
 
   readonly feedMode = signal<'foryou' | 'following' | 'saved'>('foryou');
-  readonly createPickOpen = signal(false);
-  readonly managePod = signal<Pod | null>(null);
+  readonly buildCodeOpen = signal(false);
 
   setFeedMode(mode: 'foryou' | 'following' | 'saved') {
     this.feedMode.set(mode);
@@ -78,36 +77,22 @@ export class HomeStore implements OnDestroy {
     }
   }
 
-  openCreatePick() {
-    this.createPickOpen.set(true);
+  openBuildCode() {
+    this.buildCodeOpen.set(true);
   }
 
-  closeCreatePick() {
-    this.createPickOpen.set(false);
+  closeBuildCode() {
+    this.buildCodeOpen.set(false);
   }
 
-  onPickPublished() {
-    this.createPickOpen.set(false);
+  onCodeShared() {
+    this.buildCodeOpen.set(false);
     this.feedMode.set('following');
     this._social.refreshFollowingFeed();
   }
 
-  openManagePod(pod: Pod) {
-    this.managePod.set(pod);
-  }
-
-  closeManagePod() {
-    this.managePod.set(null);
-  }
-
-  onPickManaged() {
-    this.managePod.set(null);
-    this._social.refreshFollowingFeed();
-    this.pods.fetchFeed({ limit: this.PAGE_SIZE, sport: this.selectedSport() ?? undefined, personalized: this.isLoggedIn() });
-  }
-
-  readonly followingPods = computed(() => {
-    return this._social.followingPods();
+  readonly followingPosts = computed(() => {
+    return this._social.followingPosts();
   });
 
   readonly savedPods = computed(() => {
@@ -115,22 +100,10 @@ export class HomeStore implements OnDestroy {
     return this.displayedPods().filter(p => this._social.isSaved(p.id));
   });
 
-  readonly ownPods = computed(() => {
-    return this._social.followingPods().filter(p => this._social.isMyPod(p));
-  });
-
   readonly feedPods = computed(() => {
     const mode = this.feedMode();
-    if (mode === 'following') return this._social.followingPods();
     if (mode === 'saved') return this.savedPods();
-    const main = this.displayedPods();
-    const own = this.ownPods();
-    if (own.length === 0) return main;
-    const seen = new Set(main.map(p => p.id));
-    const merged = [...main, ...own.filter(p => !seen.has(p.id))];
-    return merged.sort((a, b) =>
-      new Date(a.stakingClosesAt).getTime() - new Date(b.stakingClosesAt).getTime()
-    );
+    return this.displayedPods();
   });
 
   readonly feedLoading = computed(() => {
@@ -309,6 +282,7 @@ export class HomeStore implements OnDestroy {
 
   readonly maxAccumulatorLegs = computed(() => this.pods.maxAccumulatorLegs());
   readonly insuranceMinLegs = computed(() => this.pods.insuranceMinLegs());
+  readonly maxBookingCodeLegs = 30;
 
   toggleSelection(pod: Pod) {
     if (!this.auth.isAuthenticated()) return;
@@ -349,16 +323,19 @@ export class HomeStore implements OnDestroy {
   clearSelections() {
     this.betSlipSelections.set([]);
     this.betSlipOpen.set(false);
+    this.clearBookingCode();
   }
 
   placeAccumulator(data: PlaceAccumulatorRequest) {
-    return this._stake.placeAccumulator(data);
+    const bookingCode = this.activeBookingCode();
+    return this._stake.placeAccumulator(bookingCode ? { ...data, bookingCode } : data);
   }
 
   onStakePlaced() {
     this.selectedPod.set(null);
     this._wallet.fetchBalance();
     this._stake.fetchActiveStakes();
+    this.clearBookingCode();
   }
 
   readonly bookingCode = signal<string | null>(null);
@@ -366,24 +343,36 @@ export class HomeStore implements OnDestroy {
   readonly bookingCodeLoading = signal(false);
   readonly redeemLoading = signal(false);
   readonly bookingCodeError = signal<string | null>(null);
+  readonly myLatestCode = signal<{ code: string; expiresAt: string; combinedMultiplier: number; legCount: number } | null>(null);
+
+  private activeBookingCode = signal<string | null>(null);
 
   clearBookingCode() {
     this.bookingCode.set(null);
     this.bookingCodeExpiry.set(null);
     this.bookingCodeError.set(null);
+    this.activeBookingCode.set(null);
+    this.myLatestCode.set(null);
   }
 
-  createBookingCode() {
-    const podIds = this.betSlipSelections().map(s => s.id);
-    if (podIds.length < 2 || this.bookingCodeLoading()) return;
+  createBookingCode(podIds: string[]) {
+    const ids = Array.isArray(podIds) ? podIds : [];
+    if (ids.length < 2 || this.bookingCodeLoading()) return;
 
     this.bookingCodeLoading.set(true);
     this.bookingCodeError.set(null);
-    this._stake.createBookingCode(podIds).subscribe({
+    this._stake.createBookingCode(ids).subscribe({
       next: (res) => {
         if (res.success && res.data?.code) {
           this.bookingCode.set(res.data.code);
           this.bookingCodeExpiry.set(res.data.expiresAt);
+          this.myLatestCode.set({
+            code: res.data.code,
+            expiresAt: res.data.expiresAt,
+            combinedMultiplier: res.data.combinedMultiplier || this.betSlipSelections().reduce((acc, p) => acc * p.gainsMultiplier, 1),
+            legCount: res.data.legCount || ids.length
+          });
+          this._social.refreshFollowingFeed();
         } else {
           this.bookingCodeError.set(res.message || 'Could not generate booking code');
         }
@@ -410,6 +399,7 @@ export class HomeStore implements OnDestroy {
           this.betSlipSelections.set(available.map(l => this.mapBookingLegToPod(l)));
           this.betSlipOpen.set(true);
           this.bookingCode.set(null);
+          this.activeBookingCode.set(trimmed.toUpperCase());
           if (available.length < legs.length) {
             this.bookingCodeError.set(
               `${legs.length - available.length} selection(s) already closed — ${available.length} added to slip`
@@ -425,6 +415,13 @@ export class HomeStore implements OnDestroy {
         return false;
       })
     );
+  }
+
+  readonly creatorLeaderboard = computed(() => this._social.creatorLeaderboard());
+  readonly creatorLeaderboardLoading = computed(() => this._social.creatorLeaderboardLoading());
+
+  fetchCreatorLeaderboard() {
+    this._social.fetchCreatorLeaderboard();
   }
 
   private mapBookingLegToPod(leg: BookingCodeLeg): Pod {

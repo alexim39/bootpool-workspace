@@ -83,6 +83,7 @@ export interface PodGainsResponse {
 }
 
 export interface CreatePickPayload {
+  fixtureId: number;
   sport: string;
   league?: string;
   homeTeam: string;

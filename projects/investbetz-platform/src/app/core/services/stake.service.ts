@@ -141,6 +141,7 @@ export interface PlaceStakeRequest {
 export interface PlaceAccumulatorRequest {
   podIds: string[];
   stakeAmount: number;
+  bookingCode?: string;
 }
 
 export interface BookingCodeLeg {
@@ -160,8 +161,12 @@ export interface BookingCodeResponse {
   message?: string;
   data?: {
     code: string;
+    codeId?: string;
     expiresAt: string;
     legs?: BookingCodeLeg[];
+    combinedMultiplier?: number;
+    legCount?: number;
+    creator?: { id: string; name: string } | null;
   };
 }
 

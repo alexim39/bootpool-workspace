@@ -20,15 +20,62 @@ export interface SocialCreator {
   id: string;
   fullName: string;
   podCount: number;
+  codeCount?: number;
   followerCount: number;
   isOra: boolean;
   isFollowing: boolean;
+}
+
+export interface CodePostLeg {
+  podId: string;
+  homeTeam: string;
+  awayTeam: string;
+  selection: string;
+  multiplier: number;
+}
+
+export interface CodePost {
+  id: string;
+  codeId: string;
+  code: string;
+  creatorId: string;
+  creatorName: string;
+  boosted: boolean;
+  createdAt: number;
+  expiresAt: string | null;
+  combinedMultiplier: number;
+  legCount: number;
+  legs: CodePostLeg[];
+  totalLegs: number;
+  stakeAmount: number | null;
+}
+
+export interface CreatorViralityProfile {
+  score: number;
+  codesShared: number;
+  stakesPlaced: number;
+  wins: number;
+  badge: string;
+  isTopCreator: boolean;
+  rank: number | null;
+}
+
+export interface CreatorLeaderboardEntry {
+  id: string;
+  fullName: string;
+  score: number;
+  codesShared: number;
+  stakesPlaced: number;
+  wins: number;
+  badge: string;
+  isTopCreator: boolean;
 }
 
 export interface SocialProfile {
   user: { id: string; fullName: string; isOra: boolean };
   stats: { picks: number; followers: number; following: number; likesReceived: number; stakers: number };
   achievements: string[];
+  virality?: CreatorViralityProfile;
   isSelf: boolean;
   isFollowing: boolean;
 }
@@ -114,12 +161,15 @@ export class SocialFeedService {
   readonly creators = signal<SocialCreator[]>([]);
   readonly creatorsLoading = signal(false);
 
-  readonly followingPods = signal<Pod[]>([]);
+  readonly followingPosts = signal<CodePost[]>([]);
   readonly followingTotal = signal(0);
   readonly followingLoading = signal(false);
   readonly followingHasMore = signal(false);
   private followingPage = 0;
   private followingLoaded = false;
+
+  readonly creatorLeaderboard = signal<CreatorLeaderboardEntry[]>([]);
+  readonly creatorLeaderboardLoading = signal(false);
 
   readonly savedPods = signal<Pod[]>([]);
   readonly savedTotal = signal(0);
@@ -193,6 +243,30 @@ export class SocialFeedService {
 
   commentCount(pod: Pod): number {
     return this.serverCommentCounts()[pod.id] || 0;
+  }
+
+  likeCountFor(id: string): number {
+    return this.serverLikeCounts()[id] || (this.isLiked(id) ? 1 : 0);
+  }
+
+  commentCountFor(id: string): number {
+    return this.serverCommentCounts()[id] || 0;
+  }
+
+  async fetchCreatorLeaderboard(): Promise<void> {
+    if (this.creatorLeaderboardLoading()) return;
+    this.creatorLeaderboardLoading.set(true);
+    try {
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: CreatorLeaderboardEntry[] } }>(
+        `${this.API_URL}/social/leaderboard?limit=20`,
+        this.headers()
+      ));
+      if (res.success) this.creatorLeaderboard.set(res.data?.items || []);
+    } catch {
+      // leaderboard stays empty on failure
+    } finally {
+      this.creatorLeaderboardLoading.set(false);
+    }
   }
 
   async hydrateSocial(pods: Pod[]): Promise<void> {
@@ -292,9 +366,33 @@ export class SocialFeedService {
     };
   }
 
+  private mapCodePost(i: any): CodePost {
+    return {
+      id: i._id || i.id || '',
+      codeId: i.codeId || '',
+      code: i.code || '',
+      creatorId: i.creatorId || '',
+      creatorName: i.creatorName || 'BetPool user',
+      boosted: !!i.boosted,
+      createdAt: typeof i.createdAt === 'number' ? i.createdAt : new Date(i.createdAt).getTime(),
+      expiresAt: i.expiresAt || null,
+      combinedMultiplier: Number(i.combinedMultiplier) || 1,
+      legCount: Number(i.legCount) || 0,
+      legs: Array.isArray(i.legs) ? i.legs.map((l: any) => ({
+        podId: String(l.podId || ''),
+        homeTeam: l.homeTeam,
+        awayTeam: l.awayTeam,
+        selection: l.selection,
+        multiplier: Number(l.multiplier) || 1
+      })) : [],
+      totalLegs: Number(i.totalLegs) || Number(i.legCount) || 0,
+      stakeAmount: i.stakeAmount != null ? Number(i.stakeAmount) : null
+    };
+  }
+
   async ensureFollowingLoaded(): Promise<void> {
     if (!this.isLoggedIn()) {
-      this.followingPods.set([]);
+      this.followingPosts.set([]);
       this.followingTotal.set(0);
       return;
     }
@@ -312,13 +410,13 @@ export class SocialFeedService {
         this.headers()
       ));
       if (res.success) {
-        const items = (res.data.items || []).map(i => this.mapFeedPod(i));
-        this.followingPods.set(items);
+        const items = (res.data.items || []).map(i => this.mapCodePost(i));
+        this.followingPosts.set(items);
         this.followingTotal.set(res.data.total);
         this.followingPage = 1;
         this.followingLoaded = true;
         this.followingHasMore.set(items.length < res.data.total);
-        this.hydrateStats(items.map(p => p.id));
+        this.hydrateStats(items.map(p => p.codeId));
       }
     } catch {
       // following feed stays empty on failure
@@ -337,14 +435,14 @@ export class SocialFeedService {
         this.headers()
       ));
       if (res.success) {
-        const items = (res.data.items || []).map(i => this.mapFeedPod(i));
-        this.followingPods.update(cur => {
+        const items = (res.data.items || []).map(i => this.mapCodePost(i));
+        this.followingPosts.update(cur => {
           const seen = new Set(cur.map(p => p.id));
           return [...cur, ...items.filter(p => !seen.has(p.id))];
         });
         this.followingPage = page;
-        this.followingHasMore.set(this.followingPods().length < res.data.total);
-        this.hydrateStats(items.map(p => p.id));
+        this.followingHasMore.set(this.followingPosts().length < res.data.total);
+        this.hydrateStats(items.map(p => p.codeId));
       }
     } catch {
       // keep current following feed on failure
