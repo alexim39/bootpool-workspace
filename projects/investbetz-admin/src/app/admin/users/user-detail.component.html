@@ -153,6 +153,10 @@
               <mat-icon>campaign</mat-icon>
               {{ data.user?.isAffiliate ? 'Unmark Affiliate' : 'Mark Affiliate' }}
             </button>
+            <button mat-stroked-button class="action-btn btn-danger-action" (click)="deleteUser()" [disabled]="data.user?.role === 'admin' || store.deletingUser()">
+              <mat-icon>{{ store.deletingUser() ? 'hourglass_empty' : 'delete_forever' }}</mat-icon>
+              {{ store.deletingUser() ? 'Deleting...' : 'Delete Account' }}
+            </button>
           </mat-card-content>
         </mat-card>
       </div>

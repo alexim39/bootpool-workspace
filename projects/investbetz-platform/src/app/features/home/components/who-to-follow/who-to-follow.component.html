@@ -10,7 +10,7 @@
 
     <div class="w2f-row">
       @for (c of socialFeed.creators(); track c.id) {
-        <div class="w2f-card" (click)="openProfile(c.id)">
+        <div class="w2f-card" [class.w2f-card-ora]="c.isOra" (click)="openProfile(c.id)">
           <span class="w2f-avatar" [class.ora]="c.isOra">
             @if (c.isOra) {
               <mat-icon>auto_awesome</mat-icon>
@@ -29,14 +29,19 @@
               {{ c.followerCount.toLocaleString() }} {{ c.followerCount === 1 ? 'follower' : 'followers' }} · {{ c.podCount }} {{ c.podCount === 1 ? 'pick' : 'picks' }}
             </span>
           </div>
-          <button
-            class="w2f-follow"
-            [class.following]="c.isFollowing"
-            (click)="follow($event, c)"
-            [disabled]="c.isOra">
-            <mat-icon>{{ c.isFollowing ? 'check' : 'add' }}</mat-icon>
-            {{ c.isOra ? 'Curator' : (c.isFollowing ? 'Following' : 'Follow') }}
-          </button>
+          <span
+            [attr.title]="c.isOra ? 'Ora is the AI curator — you are always following' : ''"
+            class="w2f-follow-wrap"
+            [class.w2f-follow-locked]="c.isOra">
+            <button
+              class="w2f-follow"
+              [class.following]="c.isFollowing"
+              (click)="follow($event, c)"
+              [disabled]="c.isOra">
+              <mat-icon>{{ c.isFollowing ? 'check' : 'add' }}</mat-icon>
+              {{ c.isOra ? 'Curator' : (c.isFollowing ? 'Following' : 'Follow') }}
+            </button>
+          </span>
         </div>
       }
     </div>

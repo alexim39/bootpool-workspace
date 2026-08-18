@@ -16,6 +16,8 @@ export class ProfileStore {
   readonly savingProfile = signal(false);
   readonly changingPin = signal(false);
   readonly showPinChange = signal(false);
+  readonly showDeleteAccount = signal(false);
+  readonly deletingAccount = signal(false);
   readonly showOraChat = signal(false);
   readonly showFaq = signal(false);
   readonly kycType = signal<'bvn' | 'nin'>('bvn');
@@ -27,6 +29,7 @@ export class ProfileStore {
 
   readonly kycNumberCtrl = new FormControl('', [Validators.required, Validators.pattern(/^\d{11}$/)]);
   readonly phoneOtpCode = new FormControl('', [Validators.required, Validators.pattern(/^\d{6}$/)]);
+  readonly deleteAccountPin = new FormControl('', [Validators.required, Validators.pattern(/^\d{6}$/)]);
 
   readonly profileForm: FormGroup;
   readonly pinForm: FormGroup;
@@ -99,6 +102,28 @@ export class ProfileStore {
       error: () => {
         this.changingPin.set(false);
         afterSubmit('Failed to change PIN');
+      }
+    });
+  }
+
+  deleteAccount(afterSubmit: (message: string) => void) {
+    if (this.deleteAccountPin.invalid) return;
+    this.deletingAccount.set(true);
+    this._auth.deleteAccount(this.deleteAccountPin.value!).subscribe({
+      next: (res) => {
+        this.deletingAccount.set(false);
+        if (res.success) {
+          this.showDeleteAccount.set(false);
+          this.deleteAccountPin.reset();
+          this._auth.logout();
+          afterSubmit('Account deleted. You have been logged out.');
+        } else {
+          afterSubmit(res.message || 'Failed to delete account');
+        }
+      },
+      error: (err) => {
+        this.deletingAccount.set(false);
+        afterSubmit(err.error?.message || 'Failed to delete account');
       }
     });
   }

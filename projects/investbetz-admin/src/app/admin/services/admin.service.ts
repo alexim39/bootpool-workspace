@@ -337,6 +337,10 @@ export class AdminService {
     return this.http.post<{ success: boolean; data: AdminUser }>(`${this.baseUrl}/users/${id}/toggle-status`, {});
   }
 
+  deleteUser(id: string): Observable<{ success: boolean; message: string }> {
+    return this.http.delete<{ success: boolean; message: string }>(`${this.baseUrl}/users/${id}`);
+  }
+
   verifyUserKyc(id: string): Observable<{ success: boolean; data: AdminUser }> {
     return this.http.post<{ success: boolean; data: AdminUser }>(`${this.baseUrl}/users/${id}/verify-kyc`, {});
   }

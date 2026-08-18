@@ -47,6 +47,10 @@ export class ProfileMobileComponent implements OnInit, AfterViewInit {
     this.store.changePin((msg) => this._snackBar.open(msg, 'OK', { duration: 3000 }));
   }
 
+  deleteAccount() {
+    this.store.deleteAccount((msg) => this._snackBar.open(msg, 'OK', { duration: 5000 }));
+  }
+
   requestPhoneVerification() {
     this.store.requestPhoneVerification((msg) => this._snackBar.open(msg, 'OK', { duration: 3000 }));
   }

@@ -1,10 +1,12 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AdminService, AdminUser, UserGrowthData } from '../../services';
 import { Subject, debounceTime, distinctUntilChanged, finalize, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AdminUsersStore {
   private admin = inject(AdminService);
+  private snackBar = inject(MatSnackBar);
   private search$ = new Subject<string>();
 
   readonly items = signal<AdminUser[]>([]);
@@ -219,6 +221,24 @@ export class AdminUsersStore {
 
   toggleUserById(id: string) {
     this.admin.toggleUserStatus(id).subscribe(() => this.loadUser(id));
+  }
+
+  readonly deletingUser = signal(false);
+
+  deleteUserById(id: string) {
+    this.deletingUser.set(true);
+    this.admin.deleteUser(id).subscribe({
+      next: (res) => {
+        this.deletingUser.set(false);
+        this.loadUser(id);
+        this.load();
+        this.snackBar.open(res.message || 'User deleted', 'OK', { duration: 4000, panelClass: 'snack-success' });
+      },
+      error: (err) => {
+        this.deletingUser.set(false);
+        this.snackBar.open(err?.error?.message || 'Failed to delete user', 'OK', { duration: 4000, panelClass: 'snack-error' });
+      },
+    });
   }
 
   verifyKyc(u: AdminUser) {

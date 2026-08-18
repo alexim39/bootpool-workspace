@@ -266,6 +266,32 @@
                   </div>
                 }
               </div>
+              <div class="sec-section danger-zone">
+                <h4>Danger Zone</h4>
+                <p>Permanently delete your account and anonymize your data. This cannot be undone.</p>
+                <button class="btn-danger-zone btn-lg full-width" (click)="store.showDeleteAccount.set(true)">
+                  <mat-icon>delete_forever</mat-icon> Delete My Account
+                </button>
+              </div>
+              @if (store.showDeleteAccount()) {
+                <div class="delete-confirm-card">
+                  <h4>Delete Account?</h4>
+                  <p>This permanently deletes your account, anonymizes your personal data and revokes all sessions. Your wallet balance and history cannot be recovered.</p>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Enter your 6-digit PIN to confirm</mat-label>
+                    <input matInput [formControl]="store.deleteAccountPin" type="password" maxlength="6" autocomplete="off">
+                    @if (store.deleteAccountPin.hasError('required')) { <mat-error>PIN required</mat-error> }
+                    @if (store.deleteAccountPin.hasError('pattern')) { <mat-error>PIN must be 6 digits</mat-error> }
+                  </mat-form-field>
+                  <div class="delete-confirm-actions">
+                    <button class="btn-cancel-otp-mobile" (click)="store.showDeleteAccount.set(false); store.deleteAccountPin.reset()">Cancel</button>
+                    <button class="btn-danger-zone btn-lg" (click)="deleteAccount()" [disabled]="store.deleteAccountPin.invalid || store.deletingAccount()">
+                      @if (store.deletingAccount()) { <mat-spinner diameter="20"></mat-spinner> }
+                      @else { <mat-icon>delete_forever</mat-icon> Delete }
+                    </button>
+                  </div>
+                </div>
+              }
             </div>
           </div>
         </div>

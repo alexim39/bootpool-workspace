@@ -131,4 +131,14 @@
     .m-nudges li::before { content: ''; position: absolute; left: 0; top: 6px; width: 5px; height: 5px; border-radius: 50%; background: #00E676; }
     .m-tip { display: flex; gap: 8px; align-items: flex-start; background: rgba(245,179,1,0.08); border: 1px solid rgba(245,179,1,0.2); border-radius: 8px; padding: 9px 11px; font-size: 12px; color: rgba(255,255,255,0.8); }
     .m-tip mat-icon { color: #F5B301; font-size: 15px; width: 15px; height: 15px; margin-top: 1px; }
+    .danger-zone { border-top: 1px solid rgba(244,67,54,0.25); padding-top: 16px; margin-top: 4px; }
+    .danger-zone p { color: rgba(255,255,255,0.55); }
+    .btn-danger-zone { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: rgba(244,67,54,0.14); color: #f44336; border: 1px solid rgba(244,67,54,0.5); border-radius: 10px; padding: 12px 16px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+    .btn-danger-zone:hover:not(:disabled) { background: #f44336; color: #FFFFFF; }
+    .btn-danger-zone:disabled { opacity: 0.6; cursor: default; }
+    .btn-danger-zone mat-icon { font-size: 18px; width: 18px; height: 18px; }
+    .delete-confirm-card { margin-top: 12px; padding: 14px; background: rgba(244,67,54,0.06); border: 1px solid rgba(244,67,54,0.35); border-radius: 12px; }
+    .delete-confirm-card h4 { margin: 0 0 6px; font-size: 14px; font-weight: 700; color: #f44336; }
+    .delete-confirm-card p { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.5; margin: 0 0 10px; }
+    .delete-confirm-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
   

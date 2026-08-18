@@ -169,6 +169,15 @@
   transition: all 0.15s;
 }
 
+.w2f-follow-wrap {
+  flex-shrink: 0;
+  display: inline-flex;
+}
+
+.w2f-follow-wrap.w2f-follow-locked {
+  cursor: not-allowed;
+}
+
 .w2f-follow:hover {
   background: $emerald;
   color: $deep-navy;
@@ -176,7 +185,7 @@
 
 .w2f-follow:disabled {
   opacity: 0.75;
-  cursor: default;
+  cursor: not-allowed;
 }
 
 .w2f-follow.following {
@@ -199,19 +208,100 @@
 
 @media (min-width: 640px) {
   .w2f-section {
-    max-width: 560px;
-    margin: 0 auto;
     padding: 1rem 0.25rem 0.5rem;
   }
 
+  .w2f-head {
+    padding: 0 0.75rem;
+  }
+
+  .w2f-title {
+    font-size: 1.08rem;
+  }
+
   .w2f-row {
-    flex-direction: column;
-    gap: 0.55rem;
-    overflow: visible;
+    gap: 0.8rem;
+    overflow-x: auto;
+    padding: 0.3rem 0.75rem 0.55rem;
+    scroll-snap-type: x proximity;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14px, #000 calc(100% - 34px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 14px, #000 calc(100% - 34px), transparent 100%);
   }
 
   .w2f-card {
-    width: 100%;
-    padding: 0.7rem 0.85rem;
+    scroll-snap-align: start;
+    min-width: 264px;
+    gap: 0.75rem;
+    padding: 0.85rem 0.95rem;
+    border-radius: 16px;
+    background: linear-gradient(160deg, rgba($emerald, 0.08) 0%, rgba(255, 255, 255, 0.045) 55%, rgba(232, 185, 35, 0.05) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .w2f-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(120% 90% at 100% 0%, rgba($emerald, 0.12) 0%, transparent 55%);
+    opacity: 0;
+    transition: opacity $transition-base;
+    pointer-events: none;
+  }
+
+  .w2f-card:hover::after {
+    opacity: 1;
+  }
+
+  .w2f-card:hover {
+    border-color: rgba($emerald, 0.45);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35), 0 0 18px rgba($emerald, 0.12);
+  }
+
+  .w2f-card:not(.w2f-card-ora) {
+    flex: 1 0 264px;
+    max-width: 300px;
+  }
+
+  .w2f-card-ora {
+    border-color: rgba($emerald, 0.4);
+    background: linear-gradient(160deg, rgba($emerald, 0.14) 0%, rgba(255, 255, 255, 0.05) 55%, rgba(232, 185, 35, 0.08) 100%);
+    box-shadow: 0 0 22px rgba($emerald, 0.14);
+  }
+
+  .w2f-avatar {
+    width: 2.9rem;
+    height: 2.9rem;
+    font-size: 1rem;
+  }
+
+  .w2f-avatar.ora {
+    animation: w2f-ora-pulse 3s ease-in-out infinite;
+  }
+
+  .w2f-name {
+    font-size: 0.92rem;
+    max-width: 170px;
+  }
+
+  .w2f-sub {
+    font-size: 0.72rem;
+  }
+
+  .w2f-follow {
+    padding: 0.45rem 1rem;
+    font-size: 0.76rem;
+  }
+}
+
+@keyframes w2f-ora-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgba($emerald, 0.5), 0 0 14px rgba($emerald, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba($emerald, 0.75), 0 0 22px rgba($emerald, 0.55);
   }
 }
