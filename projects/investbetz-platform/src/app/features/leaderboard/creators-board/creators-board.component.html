@@ -1,0 +1,45 @@
+@if (loading() && entries().length === 0) {
+  <div class="skel-page">
+    @for (item of skeletonRows(); track item) {
+      <div class="skel-creator-row"></div>
+    }
+  </div>
+} @else if (entries().length === 0) {
+  <div class="empty-state">
+    <mat-icon>qr_code_2</mat-icon>
+    <h3>No creators yet</h3>
+    <p>Share a booking code with your followers and claim the top spot.</p>
+  </div>
+} @else {
+  <section class="creator-board">
+    <div class="creator-row creator-head">
+      <span>#</span>
+      <span>Creator</span>
+      <span class="num-col">Codes</span>
+      <span class="num-col">Staked</span>
+      <span class="num-col">Wins</span>
+      <span class="num-col">Followers won</span>
+    </div>
+    @for (entry of entries(); track entry.id; let i = $index) {
+      <a class="creator-row" [class.self-row]="isMe(entry)" [routerLink]="'/social/' + entry.id">
+        <span class="rank-cell">
+          <span class="rank-emblem" [class]="rankClass(i + 1)">{{ rankEmblem(i + 1) }}</span>
+          <span class="rank-no" [class]="rankClass(i + 1)">{{ i + 1 }}</span>
+        </span>
+        <span class="creator-name">
+          {{ entry.fullName }}
+          @if (entry.badge && entry.badge !== 'Rookie') {
+            <span class="badge-chip">{{ entry.badge }}</span>
+          }
+          @if (isMe(entry)) {
+            <span class="me-pill">You</span>
+          }
+        </span>
+        <span class="num-col">{{ entry.codesShared }}</span>
+        <span class="num-col">{{ entry.stakesPlaced }}</span>
+        <span class="num-col">{{ entry.wins }}</span>
+        <span class="num-col strong">{{ formatMoney(entry.score) }}</span>
+      </a>
+    }
+  </section>
+}

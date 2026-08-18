@@ -194,6 +194,15 @@ export class AuthService {
     );
   }
 
+  deleteAccount(pin: string): Observable<{ success: boolean; message?: string }> {
+    this.loading.set(true);
+    this.error.set(null);
+    return this.http.post<{ success: boolean; message?: string }>(`${this.API_URL}/auth/delete-account`,
+      { pin },
+      { headers: { Authorization: `Bearer ${this.token()}` } }
+    );
+  }
+
   getProfile(): Observable<{ success: boolean; data: User }> {
     return this.http.get<{ success: boolean; data: User }>(`${this.API_URL}/auth/profile`, {
       headers: { Authorization: `Bearer ${this.token()}` }

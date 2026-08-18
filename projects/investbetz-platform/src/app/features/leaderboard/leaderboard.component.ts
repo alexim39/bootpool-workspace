@@ -9,13 +9,14 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { DeviceService, LeaderboardService, LeaderboardPeriod, LeaderboardPage, LeaderboardEntry } from '../../core/services';
 import { AppNavComponent, MobileNavComponent } from '../../core/components';
+import { CreatorsBoardComponent } from './creators-board/creators-board.component';
 
 export type LeaderboardSortField = 'totalStaked' | 'stakeCount' | 'totalWon' | 'lastWinAt';
 
 @Component({
   selector: 'app-leaderboard',
   standalone: true,
-  imports: [RouterModule, CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule, MatTooltipModule, MatSnackBarModule, AppNavComponent, MobileNavComponent],
+  imports: [RouterModule, CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule, MatTooltipModule, MatSnackBarModule, AppNavComponent, MobileNavComponent, CreatorsBoardComponent],
   templateUrl: './leaderboard.component.html',
   styleUrls: ['./leaderboard.component.scss']
 })
@@ -27,6 +28,7 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private search$ = new Subject<string>();
 
+  view = signal<'stakers' | 'creators'>('stakers');
   period = signal<LeaderboardPeriod>('month');
   page = signal(1);
   pageSize = signal(25);
@@ -95,6 +97,11 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
   clearSearch() {
     this.searchTerm.set('');
     this.search$.next('');
+  }
+
+  setView(v: 'stakers' | 'creators') {
+    this.view.set(v);
+    if (v === 'stakers' && !this.board()) this.load();
   }
 
   setPeriod(p: LeaderboardPeriod) {

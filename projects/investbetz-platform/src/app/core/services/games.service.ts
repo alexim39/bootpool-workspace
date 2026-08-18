@@ -77,6 +77,10 @@ export class GamesService {
   pageSize = signal(25);
   leagues = signal<string[]>([]);
 
+  fixtureResults = signal<TodayGame[]>([]);
+  fixtureSearching = signal(false);
+  fixtureSearchError = signal<string | null>(null);
+
   analytics = computed(() => {
     const all = this.games();
     const stakable = all.filter(g => g.stakable).length;
@@ -108,6 +112,36 @@ export class GamesService {
       error: (err) => {
         this.error.set(err.error?.message || 'Failed to load games');
         this.loading.set(false);
+      }
+    });
+  }
+
+  searchFixtures(search: string, limit = 10) {
+    const term = (search || '').trim();
+    this.fixtureSearching.set(true);
+    this.fixtureSearchError.set(null);
+    if (!term) {
+      this.fixtureResults.set([]);
+      this.fixtureSearching.set(false);
+      return;
+    }
+    const params = new HttpParams()
+      .set('search', term)
+      .set('status', 'upcoming')
+      .set('limit', String(limit))
+      .set('sortField', 'matchDate')
+      .set('sortOrder', 'asc');
+    this.http.get<GamesListResponse>(`${environment.apiUrl}/games`, { params }).subscribe({
+      next: (res) => {
+        this.fixtureResults.set(res.success
+          ? res.data.items.map(g => ({ ...g, matchDate: new Date(g.matchDate).toISOString() }))
+          : []);
+        if (!res.success) this.fixtureSearchError.set('Could not search games');
+        this.fixtureSearching.set(false);
+      },
+      error: (err) => {
+        this.fixtureSearchError.set(err.error?.message || 'Could not search games');
+        this.fixtureSearching.set(false);
       }
     });
   }

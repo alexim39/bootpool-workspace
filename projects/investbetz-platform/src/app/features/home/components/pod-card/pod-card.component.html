@@ -4,7 +4,7 @@
   <mat-card-content>
     @if (social()) {
       <div class="creator-row">
-        <div class="creator-left">
+        <div class="creator-left" (click)="openCreatorProfile()">
           <span class="creator-avatar" [class.avatar-live]="pod().isLive">
             <mat-icon>{{ isOra() ? 'auto_awesome' : 'person' }}</mat-icon>
           </span>
@@ -19,10 +19,17 @@
             <span class="creator-time">{{ creatorTime() }}</span>
           </div>
         </div>
-        <button class="follow-btn" [class.following]="following()" [class.locked]="isOra()" (click)="toggleFollow()">
-          <mat-icon>{{ following() ? 'check' : 'add' }}</mat-icon>
-          {{ following() ? 'Following' : 'Follow' }}
-        </button>
+        @if (isMyPod() && manageable()) {
+          <button class="manage-btn" (click)="manage.emit(pod())">
+            <mat-icon>edit</mat-icon>
+            Manage
+          </button>
+        } @else if (!isMyPod()) {
+          <button class="follow-btn" [class.following]="following()" [class.locked]="isOra()" (click)="toggleFollow()">
+            <mat-icon>{{ following() ? 'check' : 'add' }}</mat-icon>
+            {{ following() ? 'Following' : 'Follow' }}
+          </button>
+        }
       </div>
     }
 

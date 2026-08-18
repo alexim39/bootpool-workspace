@@ -57,6 +57,13 @@
             <div class="stat-label">See how you rank <mat-icon class="chev">chevron_right</mat-icon></div>
           </mat-card-content>
         </mat-card>
+        <mat-card class="stat-card stat-card-link" [routerLink]="['/social', store.user()?.id]">
+          <mat-card-content>
+            <div class="stat-icon board"><mat-icon>people</mat-icon></div>
+            <div class="stat-value">Community</div>
+            <div class="stat-label">Followers &amp; achievements <mat-icon class="chev">chevron_right</mat-icon></div>
+          </mat-card-content>
+        </mat-card>
       </div>
 
       @if (loyalty.snapshot() || loyalty.loading()) {
@@ -330,6 +337,16 @@
                 </div>
               </div>
             </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="security-section danger-zone">
+              <h3>Danger Zone</h3>
+              <p class="section-desc">Permanently delete your account, anonymize your data, and revoke all sessions. This cannot be undone.</p>
+              <button mat-stroked-button class="btn-danger-zone" (click)="store.showDeleteAccount.set(true)">
+                <mat-icon>delete_forever</mat-icon> Delete My Account
+              </button>
+            </div>
           </div>
         </mat-tab>
 
@@ -534,6 +551,49 @@
                     <mat-spinner diameter="20"></mat-spinner>
                   } @else {
                     Change PIN
+                  }
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      }
+
+      @if (store.showDeleteAccount()) {
+        <div class="modal-overlay" (click)="store.showDeleteAccount.set(false)">
+          <div class="modal-container modal-danger" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h3>Delete Account</h3>
+              <button mat-icon-button (click)="store.showDeleteAccount.set(false)">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+            <p class="delete-warning">
+              This permanently deletes your account and anonymizes your personal data.
+              Your wallet balance, history and all sessions will be lost and cannot be recovered.
+            </p>
+            <form (ngSubmit)="deleteAccount()" class="modal-form">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Enter your 6-digit PIN to confirm</mat-label>
+                <input matInput [formControl]="store.deleteAccountPin" type="password" maxlength="6" autocomplete="off">
+                <mat-icon matPrefix>lock</mat-icon>
+                @if (store.deleteAccountPin.hasError('required')) {
+                  <mat-error>PIN required</mat-error>
+                }
+                @if (store.deleteAccountPin.hasError('pattern')) {
+                  <mat-error>PIN must be 6 digits</mat-error>
+                }
+              </mat-form-field>
+              <div class="modal-actions">
+                <button mat-button type="button" (click)="store.showDeleteAccount.set(false)">Cancel</button>
+                <button mat-raised-button class="btn-danger-zone" type="submit" [disabled]="store.deleteAccountPin.invalid || store.deletingAccount()">
+                  @if (store.deletingAccount()) {
+                    <mat-spinner diameter="20"></mat-spinner>
+                  } @else {
+                    <span>
+                      <mat-icon>delete_forever</mat-icon>
+                    </span>
+                    Delete My Account
                   }
                 </button>
               </div>

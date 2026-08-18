@@ -1,0 +1,100 @@
+<article class="code-post" [class.boosted]="post().boosted">
+  <div class="post-head">
+    <div class="creator-info">
+      <span class="creator-avatar">
+        @if (isMine()) {
+          <mat-icon>person</mat-icon>
+        } @else {
+          {{ creatorName().charAt(0).toUpperCase() }}
+        }
+      </span>
+      <div class="creator-meta">
+        <a class="creator-name" [routerLink]="'/social/' + post().creatorId">{{ creatorName() }}</a>
+        <span class="post-time">{{ post().createdAt | date: 'MMM d • h:mm a' }}</span>
+      </div>
+    </div>
+    @if (post().boosted) {
+      <span class="boost-chip" title="Top 10 creator — boosted in feeds">
+        <mat-icon>trending_up</mat-icon>
+        Hot
+      </span>
+    }
+  </div>
+
+  <div class="code-row">
+    <span class="code-text">{{ post().code }}</span>
+    <button class="copy-btn" (click)="copyCode()" aria-label="Copy code">
+      <mat-icon>content_copy</mat-icon>
+    </button>
+  </div>
+  <div class="code-sub">
+    {{ post().totalLegs }} legs • {{ post().combinedMultiplier.toFixed(2) }}x
+    @if (expiresLabel()) {
+      <span class="expiry">• {{ expiresLabel() }}</span>
+    }
+  </div>
+  @if (post().stakeAmount) {
+    <div class="code-sub">Followers have staked {{ formatMoney(post().stakeAmount!) }} on this code</div>
+  }
+
+  <div class="legs-list">
+    @for (leg of legsPreview(); track leg.podId) {
+      <div class="leg-row">
+        <span class="leg-teams">{{ leg.homeTeam }} vs {{ leg.awayTeam }}</span>
+        <span class="leg-pick">{{ leg.selection }} &#64; {{ leg.multiplier }}x</span>
+      </div>
+    }
+    @if (extraLegs() > 0) {
+      <div class="leg-more">+{{ extraLegs() }} more selections</div>
+    }
+  </div>
+
+  <button class="stake-now" (click)="stakeNow()" [disabled]="staking()">
+    @if (staking()) {
+      <mat-spinner diameter="16" />
+      Applying…
+    } @else {
+      Stake now
+    }
+  </button>
+
+  <div class="social-row">
+    <button class="social-btn" [class.active]="liked()" (click)="toggleLike()">
+      <mat-icon>{{ liked() ? 'favorite' : 'favorite_border' }}</mat-icon>
+      <span>{{ likeCount() }}</span>
+    </button>
+    <button class="social-btn" [class.active]="commentsOpen()" (click)="toggleComments()">
+      <mat-icon>chat_bubble_outline</mat-icon>
+      <span>{{ commentCount() }}</span>
+    </button>
+    <button class="social-btn" [class.active]="saved()" (click)="toggleSave()">
+      <mat-icon>{{ saved() ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+    </button>
+  </div>
+
+  @if (commentsOpen()) {
+    <div class="comments">
+      <div class="comments-list">
+        @for (c of social.commentsFor(post().codeId); track c.id) {
+          <div class="comment-row">
+            <span class="comment-author">{{ c.authorName }}</span>
+            <span class="comment-text">{{ c.text }}</span>
+          </div>
+        } @empty {
+          <div class="comments-empty">No comments yet — say something about this code.</div>
+        }
+      </div>
+      <div class="comment-input-row">
+        <input
+          class="comment-input"
+          [(ngModel)]="commentText"
+          placeholder="Add a comment…"
+          (keydown.enter)="postComment()"
+        />
+        <button class="comment-send" (click)="postComment()" [disabled]="social.commentPosting() || !commentText().trim()">
+          <mat-icon>send</mat-icon>
+        </button>
+      </div>
+    </div>
+  }
+</article>

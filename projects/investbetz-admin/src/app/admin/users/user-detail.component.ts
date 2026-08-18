@@ -130,6 +130,20 @@ export class UserDetailComponent implements OnInit {
     if (id) this.store.verifyUserKycById(id);
   }
 
+  deleteUser() {
+    const id = this.route.snapshot.paramMap.get('id');
+    const u = this.user();
+    if (!id || !u) return;
+    if (u.role === 'admin') {
+      this.snackBar.open('Admin accounts cannot be deleted', 'OK', { duration: 4000, panelClass: 'snack-error' });
+      return;
+    }
+    const confirmed = window.confirm(
+      `Permanently delete ${u.fullName || u.phone}?\n\nThis deactivates the account, anonymizes all personal data and revokes every session. This cannot be undone.`
+    );
+    if (confirmed) this.store.deleteUserById(id);
+  }
+
   statusColor(s: string): string {
     const map: Record<string, string> = { pending: '#E8B923', confirmed: '#00E676', active: '#E8B923', won: '#00E676', lost: '#888', void: '#666', cashed_out: '#2196f3', cancelled: '#f44336', refunded: '#888' };
     return map[s] || '#555';

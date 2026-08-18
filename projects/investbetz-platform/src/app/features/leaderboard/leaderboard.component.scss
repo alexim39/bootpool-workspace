@@ -206,6 +206,44 @@
   margin-bottom: 18px;
 }
 
+.view-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.view-tab {
+  padding: 9px 18px;
+  border-radius: $radius-full;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  mat-icon {
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: $white;
+  }
+
+  &.active {
+    background: rgba($emerald, 0.14);
+    border-color: rgba($emerald, 0.4);
+    color: $emerald;
+  }
+}
+
 .period-tab {
   padding: 7px 16px;
   border-radius: $radius-full;

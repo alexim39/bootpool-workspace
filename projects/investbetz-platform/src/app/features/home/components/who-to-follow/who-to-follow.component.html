@@ -1,12 +1,16 @@
 @if (socialFeed.isLoggedIn() && socialFeed.creators().length > 0) {
-  <div class="w2f-section">
+  <section class="w2f-section">
     <div class="w2f-head">
-      <span class="w2f-title">People to follow</span>
-      <span class="w2f-count">{{ socialFeed.creators().length }}</span>
+      <div class="w2f-head-text">
+        <span class="w2f-eyebrow"><mat-icon>group_add</mat-icon> Creator discovery</span>
+        <h3 class="w2f-title">People to follow</h3>
+      </div>
+      <span class="w2f-count">{{ socialFeed.creators().length }} creators</span>
     </div>
+
     <div class="w2f-row">
       @for (c of socialFeed.creators(); track c.id) {
-        <div class="w2f-chip">
+        <div class="w2f-card" [class.w2f-card-ora]="c.isOra" (click)="openProfile(c.id)">
           <span class="w2f-avatar" [class.ora]="c.isOra">
             @if (c.isOra) {
               <mat-icon>auto_awesome</mat-icon>
@@ -15,15 +19,31 @@
             }
           </span>
           <div class="w2f-meta">
-            <span class="w2f-name">{{ c.fullName }}</span>
-            <span class="w2f-pods">{{ c.podCount }} {{ c.podCount === 1 ? 'pick' : 'picks' }}</span>
+            <span class="w2f-name">
+              {{ c.fullName }}
+              @if (c.isOra) {
+                <mat-icon class="w2f-verified">verified</mat-icon>
+              }
+            </span>
+            <span class="w2f-sub">
+              {{ c.followerCount.toLocaleString() }} {{ c.followerCount === 1 ? 'follower' : 'followers' }} · {{ c.podCount }} {{ c.podCount === 1 ? 'pick' : 'picks' }}
+            </span>
           </div>
-          <button class="w2f-follow" [class.following]="c.isFollowing" (click)="follow(c)">
-            <mat-icon>{{ c.isFollowing ? 'check' : 'add' }}</mat-icon>
-            {{ c.isFollowing ? 'Following' : 'Follow' }}
-          </button>
+          <span
+            [attr.title]="c.isOra ? 'Ora is the AI curator — you are always following' : ''"
+            class="w2f-follow-wrap"
+            [class.w2f-follow-locked]="c.isOra">
+            <button
+              class="w2f-follow"
+              [class.following]="c.isFollowing"
+              (click)="follow($event, c)"
+              [disabled]="c.isOra">
+              <mat-icon>{{ c.isFollowing ? 'check' : 'add' }}</mat-icon>
+              {{ c.isOra ? 'Curator' : (c.isFollowing ? 'Following' : 'Follow') }}
+            </button>
+          </span>
         </div>
       }
     </div>
-  </div>
+  </section>
 }

@@ -1,5 +1,6 @@
-import { Component, Output, EventEmitter, input, signal, computed, inject, effect } from '@angular/core';
+import { Component, Output, EventEmitter, input, signal, computed, inject, effect, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -16,7 +17,7 @@ import { PodCommentsComponent } from '../pod-comments/pod-comments.component';
   templateUrl: './swipe-deck.component.html',
   styleUrls: ['./swipe-deck.component.scss']
 })
-export class SwipeDeckComponent {
+export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
   pods = input.required<Pod[]>();
   selectedIds = input<string[]>([]);
   selectionDisabled = input(false);
@@ -25,9 +26,14 @@ export class SwipeDeckComponent {
   @Output() placeStake = new EventEmitter<Pod>();
   @Output() toggleSelect = new EventEmitter<Pod>();
   @Output() loadMore = new EventEmitter<void>();
+  @Output() manage = new EventEmitter<Pod>();
 
   private snackBar = inject(MatSnackBar);
+  private el = inject(ElementRef);
+  private router = inject(Router);
   readonly socialFeed = inject(SocialFeedService);
+
+  private nowTimer: ReturnType<typeof setInterval> | undefined;
 
   readonly commentPod = signal<Pod | null>(null);
 
@@ -35,7 +41,12 @@ export class SwipeDeckComponent {
   readonly dragOffset = signal(0);
   readonly dragging = signal(false);
 
+  readonly deckMinHeight = signal(360);
+  private rafPending = false;
+  private lastIndex = -1;
   private lastFirstId = '';
+  private lastPodsLength = -1;
+  private readonly destroyFns: (() => void)[] = [];
 
   constructor() {
     effect(() => {
@@ -47,6 +58,103 @@ export class SwipeDeckComponent {
         this.dragOffset.set(0);
       }
     });
+
+    effect(() => {
+      const i = this.index();
+      if (i !== this.lastIndex && this.el.nativeElement.isConnected) {
+        this.lastIndex = i;
+        this.measure();
+      }
+    });
+
+    effect(() => {
+      const pods = this.pods();
+      if (pods.length !== this.lastPodsLength) {
+        this.lastPodsLength = pods.length;
+        this.measureThrottled();
+      }
+    });
+  }
+
+  ngAfterViewInit() {
+    this.nowTimer = setInterval(() => {
+      const host = this.el.nativeElement as HTMLElement;
+      const ticks = host.querySelectorAll<HTMLElement>('.closes-tick');
+      if (ticks.length === 0) return;
+      const pods = this.pods();
+      const now = Date.now();
+      for (let i = 0; i < ticks.length; i++) {
+        const id = ticks[i].getAttribute('data-pod');
+        const pod = id ? pods.find(p => p.id === id) : null;
+        if (pod) {
+          ticks[i].textContent = ' ' + this.countdown(Math.max(0, new Date(pod.stakingClosesAt).getTime() - now));
+        }
+      }
+    }, 1000);
+    this.measure();
+    setTimeout(() => this.measure(), 400);
+    if (typeof document !== 'undefined' && 'fonts' in document) {
+      document.fonts.ready.then(() => this.measure());
+    }
+    const onViewportChange = () => this.measureThrottled();
+    const onLoad = () => this.measure();
+    window.addEventListener('scroll', onViewportChange, { passive: true });
+    window.addEventListener('resize', onViewportChange);
+    window.addEventListener('load', onLoad);
+    this.destroyFns.push(() => {
+      window.removeEventListener('scroll', onViewportChange);
+      window.removeEventListener('resize', onViewportChange);
+      window.removeEventListener('load', onLoad);
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.nowTimer) clearInterval(this.nowTimer);
+    this.destroyFns.forEach(fn => fn());
+  }
+
+  private measureThrottled() {
+    if (this.rafPending) return;
+    this.rafPending = true;
+    requestAnimationFrame(() => {
+      this.rafPending = false;
+      this.measure();
+    });
+  }
+
+  private measure() {
+    const host = this.el.nativeElement as HTMLElement;
+    // Measure every rendered card (not just the current one) so the deck is
+    // always tall enough for the tallest card — no overflow, no overlap.
+    const cards = host.querySelectorAll('.deck-card');
+    let content = 0;
+    for (let i = 0; i < cards.length; i++) {
+      const c = cards.item(i);
+      if (!c) continue;
+      let h = 0;
+      const hero = c.querySelector('.deck-hero');
+      const body = c.querySelector('.deck-body');
+      const rail = c.querySelector('.deck-rail');
+      const creator = c.querySelector('.deck-creator');
+      if (hero) h += hero.getBoundingClientRect().height;
+      if (body) h += body.scrollHeight;
+      if (rail) h += rail.getBoundingClientRect().height;
+      if (creator) h += creator.getBoundingClientRect().height;
+      content = Math.max(content, h);
+    }
+    // The stage is (deck height − progress row), so the deck must be at least
+    // content + progress tall for the tallest card to fit without clipping.
+    // The deck is always sized to its full content — never capped by the
+    // viewport — so the centre content and counters are complete on load and
+    // the page scrolls to reveal the whole card.
+    let progress = 0;
+    const progressEl = host.querySelector('.deck-progress');
+    if (progressEl) {
+      const pr = progressEl.getBoundingClientRect().height;
+      if (pr > 0) progress = pr;
+    }
+    const needed = Math.ceil(content + progress);
+    this.deckMinHeight.set(Math.max(360, needed));
   }
 
   readonly current = computed(() => this.pods()[this.index()] ?? null);
@@ -74,14 +182,8 @@ export class SwipeDeckComponent {
     this.dragOffset.set(0);
   }
 
-  goTo(i: number) {
-    if (i < 0 || i >= this.pods().length) return;
-    this.index.set(i);
-    this.dragOffset.set(0);
-  }
-
   cardTop(i: number): number {
-    return (i - this.index()) * 100;
+    return (i - this.index()) * this.deckMinHeight();
   }
 
   visible(i: number): boolean {
@@ -132,12 +234,20 @@ export class SwipeDeckComponent {
     });
   }
 
+  openCreator(pod: Pod) {
+    this.router.navigate(['/social', this.socialFeed.creatorOf(pod)]);
+  }
+
   isFollowing(pod: Pod): boolean {
     return this.socialFeed.isFollowing(this.socialFeed.creatorOf(pod));
   }
 
   isOraOf(pod: Pod): boolean {
     return this.socialFeed.isOraCreator(this.socialFeed.creatorOf(pod));
+  }
+
+  isMyPodOf(pod: Pod): boolean {
+    return this.socialFeed.isMyPod(pod);
   }
 
   creatorNameOf(pod: Pod): string {
@@ -174,23 +284,23 @@ export class SwipeDeckComponent {
     const now = Date.now();
     const diff = d.getTime() - now;
     if (diff < 0) return 'Opens soon';
-    if (diff < 3600000) return `in ${Math.max(1, Math.round(diff / 60000))}m`;
-    if (diff < 86400000) return `in ${Math.round(diff / 3600000)}h`;
+    if (diff < 3600000) return `Starts in ${Math.max(1, Math.round(diff / 60000))}m`;
+    if (diff < 86400000) return `Starts in ${Math.round(diff / 3600000)}h`;
     return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
   }
 
   countdown(ms: number): string {
     if (ms <= 0) return 'Closed';
-    const hours = Math.floor(ms / 3600000);
+    const days = Math.floor(ms / 86400000);
+    const hours = Math.floor((ms % 86400000) / 3600000);
     const mins = Math.floor((ms % 3600000) / 60000);
     const secs = Math.floor((ms % 60000) / 1000);
-    if (hours > 0) return `${hours}h ${mins.toString().padStart(2, '0')}m`;
-    return `${mins}m ${secs.toString().padStart(2, '0')}s`;
-  }
-
-  closingIn(pod: Pod): string {
-    const ms = new Date(pod.stakingClosesAt).getTime() - Date.now();
-    return this.countdown(Math.max(0, ms));
+    const parts = [];
+    if (days > 0) parts.push(`${days}d`);
+    if (hours > 0 || days > 0) parts.push(`${hours}h`);
+    if (mins > 0 || hours > 0 || days > 0) parts.push(`${mins.toString().padStart(2, '0')}m`);
+    parts.push(`${secs.toString().padStart(2, '0')}s`);
+    return parts.join(' ');
   }
 
   confidence(pod: Pod): number {

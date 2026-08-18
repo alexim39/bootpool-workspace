@@ -1,5 +1,6 @@
-import { Component, Output, EventEmitter, computed, input, inject, signal } from '@angular/core';
+import { Component, Output, EventEmitter, computed, input, inject, signal, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -24,21 +25,44 @@ import { PodCommentsComponent } from '../pod-comments/pod-comments.component';
   templateUrl: './pod-card.component.html',
   styleUrls: ['./pod-card.component.scss']
 })
-export class PodCardComponent {
+export class PodCardComponent implements OnDestroy {
   pod = input.required<Pod>();
   selected = input(false);
   selectionDisabled = input(false);
   social = input(true);
+  manageable = input(true);
   @Output() placeStake = new EventEmitter<Pod>();
   @Output() toggleSelect = new EventEmitter<Pod>();
+  @Output() manage = new EventEmitter<Pod>();
 
   private snackBar = inject(MatSnackBar);
+  private router = inject(Router);
   readonly socialFeed = inject(SocialFeedService);
+  private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
+
+  private readonly now = signal(Date.now());
+  private nowTimer: ReturnType<typeof setInterval> | undefined;
+
+  constructor() {
+    this.nowTimer = this.ngZone.run(() => setInterval(() => {
+      this.ngZone.run(() => {
+        this.now.set(Date.now());
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+      });
+    }, 1000));
+  }
+
+  ngOnDestroy() {
+    if (this.nowTimer) clearInterval(this.nowTimer);
+  }
 
   readonly showComments = signal(false);
 
   readonly creator = computed(() => this.socialFeed.creatorOf(this.pod()));
   readonly isOra = computed(() => this.socialFeed.isOraCreator(this.creator()));
+  readonly isMyPod = computed(() => this.socialFeed.isMyPod(this.pod()));
   readonly creatorName = computed(() => this.socialFeed.creatorNameFor(this.pod()));
   readonly following = computed(() => this.socialFeed.isFollowing(this.creator()));
   readonly liked = computed(() => this.socialFeed.isLiked(this.pod().id));
@@ -54,8 +78,8 @@ export class PodCardComponent {
     const now = new Date();
     const diff = d.getTime() - now.getTime();
     if (diff < 0) return 'Opens soon';
-    if (diff < 3600000) return `in ${Math.max(1, Math.round(diff / 60000))}m`;
-    if (diff < 86400000) return `in ${Math.round(diff / 3600000)}h`;
+    if (diff < 3600000) return `Starts in ${Math.max(1, Math.round(diff / 60000))}m`;
+    if (diff < 86400000) return `Starts in ${Math.round(diff / 3600000)}h`;
     return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   });
 
@@ -79,14 +103,17 @@ export class PodCardComponent {
     });
   }
 
+  openCreatorProfile() {
+    this.router.navigate(['/social', this.creator()]);
+  }
+
   async share() {
     const msg = await this.socialFeed.sharePod(this.pod());
     if (msg) this.snackBar.open(msg, 'OK', { duration: 2500 });
   }
 
   timeRemaining = computed(() => {
-    const now = Date.now();
-    return Math.max(0, new Date(this.pod().stakingClosesAt).getTime() - now);
+    return Math.max(0, new Date(this.pod().stakingClosesAt).getTime() - this.now());
   });
 
   exposurePercent = computed(() => {

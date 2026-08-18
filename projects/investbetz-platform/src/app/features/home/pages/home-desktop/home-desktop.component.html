@@ -238,8 +238,11 @@
       <mat-icon>bookmark</mat-icon> Saved
     </button>
     @if (store.feedMode() === 'following') {
-      <span class="feed-mode-hint">Picks from people you follow</span>
+      <span class="feed-mode-hint">Booking codes from people you follow</span>
     }
+    <button class="create-pick-btn" (click)="openBuildCode()" aria-label="Create a booking code">
+      <mat-icon>qr_code_2</mat-icon> Create code
+    </button>
   </div>
 
   <app-who-to-follow />
@@ -253,7 +256,7 @@
 
   <div class="feed-layout">
     <main class="odds-feed">
-      @if (store.pods.loading()) {
+      @if (store.feedLoading()) {
         <div class="skel-page">
           <div class="skel-tabs">
             <div class="skel skel-tab"></div>
@@ -292,6 +295,13 @@
             }
           </div>
         </div>
+      } @else if (store.feedMode() === 'following' && store.followingPosts().length === 0 && !store.isSearching()) {
+        <div class="empty-state">
+          <span class="empty-illustration"><mat-icon>people_outline</mat-icon></span>
+          <h3>No booking codes from people you follow yet</h3>
+          <p>Follow creators in the rail above — their codes appear here</p>
+          <button class="empty-cta" (click)="openBuildCode()">Create your first booking code</button>
+        </div>
       } @else if (store.feedMode() === 'saved' && store.feedPods().length === 0 && !store.isSearching()) {
         <div class="empty-state">
           <span class="empty-illustration"><mat-icon>bookmark_border</mat-icon></span>
@@ -312,6 +322,29 @@
           <p>Try a different search term</p>
           <button class="empty-cta" (click)="store.clearSearch()">Clear search</button>
         </div>
+      } @else if (store.feedMode() === 'following' && !store.isSearching()) {
+        <div class="odds-list code-feed">
+          @for (post of store.followingPosts(); track post.id) {
+            <app-code-post-card [post]="post" />
+          }
+        </div>
+        @if (store.feedHasMore()) {
+          <div class="load-more-section">
+            <span class="pod-count">{{ store.followingPosts().length }} of {{ store.feedTotal() }} codes</span>
+            <button
+              class="load-more-btn"
+              (click)="store.loadMore()"
+              [disabled]="store.feedLoadingMore()">
+              @if (store.feedLoadingMore()) {
+                <mat-spinner diameter="18"></mat-spinner>
+                <span>Loading...</span>
+              } @else {
+                <span>Load More</span>
+              }
+            </button>
+          </div>
+        }
+        <div class="feed-sentinel" #feedSentinel aria-hidden="true"></div>
       } @else {
         <div class="odds-list">
           @for (pod of store.feedPods(); track pod.id) {
@@ -324,14 +357,14 @@
             </app-pod-card>
           }
         </div>
-        @if (store.pods.hasMorePods()) {
+        @if (store.feedHasMore()) {
           <div class="load-more-section">
-            <span class="pod-count">{{ store.feedPods().length }} of {{ store.pods.totalPods() }} pods</span>
+            <span class="pod-count">{{ store.feedPods().length }} of {{ store.feedTotal() }} pods</span>
             <button
               class="load-more-btn"
               (click)="store.loadMore()"
-              [disabled]="store.pods.loadingMore()">
-              @if (store.pods.loadingMore()) {
+              [disabled]="store.feedLoadingMore()">
+              @if (store.feedLoadingMore()) {
                 <mat-spinner diameter="18"></mat-spinner>
                 <span>Loading...</span>
               } @else {
@@ -382,4 +415,10 @@
       <app-ora-chat (close)="closeOraChat()" />
     </div>
   }
+
+  <app-build-code-dialog
+    [open]="store.buildCodeOpen()"
+    (close)="store.closeBuildCode()"
+    (shared)="onCodeShared()"
+  />
 </div>

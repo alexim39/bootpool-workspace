@@ -135,7 +135,7 @@ export class BetSlipComponent {
 
   shareBookingCode() {
     if (this.store.bookingCode()) return;
-    this.store.createBookingCode();
+    this.store.createBookingCode(this.selections().map(s => s.id));
   }
 
   clearBookingCode() {

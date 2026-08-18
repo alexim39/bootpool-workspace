@@ -20,7 +20,71 @@ export interface SocialCreator {
   id: string;
   fullName: string;
   podCount: number;
+  codeCount?: number;
+  followerCount: number;
   isOra: boolean;
+  isFollowing: boolean;
+}
+
+export interface CodePostLeg {
+  podId: string;
+  homeTeam: string;
+  awayTeam: string;
+  selection: string;
+  multiplier: number;
+}
+
+export interface CodePost {
+  id: string;
+  codeId: string;
+  code: string;
+  creatorId: string;
+  creatorName: string;
+  boosted: boolean;
+  createdAt: number;
+  expiresAt: string | null;
+  combinedMultiplier: number;
+  legCount: number;
+  legs: CodePostLeg[];
+  totalLegs: number;
+  stakeAmount: number | null;
+}
+
+export interface CreatorViralityProfile {
+  score: number;
+  codesShared: number;
+  stakesPlaced: number;
+  wins: number;
+  badge: string;
+  isTopCreator: boolean;
+  rank: number | null;
+}
+
+export interface CreatorLeaderboardEntry {
+  id: string;
+  fullName: string;
+  score: number;
+  codesShared: number;
+  stakesPlaced: number;
+  wins: number;
+  badge: string;
+  isTopCreator: boolean;
+}
+
+export interface SocialProfile {
+  user: { id: string; fullName: string; isOra: boolean };
+  stats: { picks: number; followers: number; following: number; likesReceived: number; stakers: number };
+  achievements: string[];
+  virality?: CreatorViralityProfile;
+  isSelf: boolean;
+  isFollowing: boolean;
+}
+
+export interface SocialUserRow {
+  id: string;
+  fullName: string;
+  isOra: boolean;
+  isSelf: boolean;
   isFollowing: boolean;
 }
 
@@ -97,7 +161,26 @@ export class SocialFeedService {
   readonly creators = signal<SocialCreator[]>([]);
   readonly creatorsLoading = signal(false);
 
+  readonly followingPosts = signal<CodePost[]>([]);
+  readonly followingTotal = signal(0);
+  readonly followingLoading = signal(false);
+  readonly followingHasMore = signal(false);
+  private followingPage = 0;
+  private followingLoaded = false;
+
+  readonly creatorLeaderboard = signal<CreatorLeaderboardEntry[]>([]);
+  readonly creatorLeaderboardLoading = signal(false);
+
+  readonly savedPods = signal<Pod[]>([]);
+  readonly savedTotal = signal(0);
+  readonly savedLoading = signal(false);
+  readonly savedHasMore = signal(false);
+  private savedPage = 0;
+  private savedLoaded = false;
+
   readonly isLoggedIn = computed(() => this.auth.isAuthenticated());
+
+  readonly myId = computed(() => this.auth.user()?.id ?? '');
 
   readonly oraId = computed(() => this.podsSvc.oraId());
 
@@ -139,8 +222,14 @@ export class SocialFeedService {
     return pod.createdBy || 'ora';
   }
 
+  isMyPod(pod: Pod): boolean {
+    const me = this.myId();
+    return !!me && !!pod.createdBy && pod.createdBy === me;
+  }
+
   creatorNameFor(pod: Pod): string {
     if (this.isOraCreator(pod.createdBy)) return 'Ora';
+    if (this.isMyPod(pod)) return 'You';
     return pod.creatorName || 'Ora';
   }
 
@@ -154,6 +243,30 @@ export class SocialFeedService {
 
   commentCount(pod: Pod): number {
     return this.serverCommentCounts()[pod.id] || 0;
+  }
+
+  likeCountFor(id: string): number {
+    return this.serverLikeCounts()[id] || (this.isLiked(id) ? 1 : 0);
+  }
+
+  commentCountFor(id: string): number {
+    return this.serverCommentCounts()[id] || 0;
+  }
+
+  async fetchCreatorLeaderboard(): Promise<void> {
+    if (this.creatorLeaderboardLoading()) return;
+    this.creatorLeaderboardLoading.set(true);
+    try {
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: CreatorLeaderboardEntry[] } }>(
+        `${this.API_URL}/social/leaderboard?limit=20`,
+        this.headers()
+      ));
+      if (res.success) this.creatorLeaderboard.set(res.data?.items || []);
+    } catch {
+      // leaderboard stays empty on failure
+    } finally {
+      this.creatorLeaderboardLoading.set(false);
+    }
   }
 
   async hydrateSocial(pods: Pod[]): Promise<void> {
@@ -189,18 +302,39 @@ export class SocialFeedService {
   }
 
   private async hydrateStats(ids: string[]): Promise<void> {
-    try {
-      const res = await lastValueFrom(this.http.get<{ success: boolean; data: SocialStatsData }>(
-        `${this.API_URL}/social/stats?podIds=${ids.join(',')}`,
-        this.headers()
-      ));
-      if (!res.success) return;
-      this.serverLikeCounts.set(res.data.likes || {});
-      this.serverCommentCounts.set(res.data.comments || {});
-      this.likes.set(res.data.liked || []);
-      this.saves.set(res.data.saved || []);
-    } catch {
-      // stats are progressive — keep whatever state exists
+    const unique = [...new Set(ids)].filter(Boolean);
+    const BATCH = 30;
+    for (let i = 0; i < unique.length; i += BATCH) {
+      const chunk = unique.slice(i, i + BATCH);
+      try {
+        const res = await lastValueFrom(this.http.get<{ success: boolean; data: SocialStatsData }>(
+          `${this.API_URL}/social/stats?podIds=${chunk.join(',')}`,
+          this.headers()
+        ));
+        if (!res.success) continue;
+        this.serverLikeCounts.update(cur => ({ ...cur, ...(res.data.likes || {}) }));
+        this.serverCommentCounts.update(cur => ({ ...cur, ...(res.data.comments || {}) }));
+        if (res.data.liked?.length) {
+          this.likes.update(cur => {
+            const merged = [...cur];
+            for (const id of res.data.liked) {
+              if (!merged.includes(id)) merged.push(id);
+            }
+            return merged;
+          });
+        }
+        if (res.data.saved?.length) {
+          this.saves.update(cur => {
+            const merged = [...cur];
+            for (const id of res.data.saved) {
+              if (!merged.includes(id)) merged.push(id);
+            }
+            return merged;
+          });
+        }
+      } catch {
+        // stats are progressive — keep whatever state exists
+      }
     }
   }
 
@@ -218,6 +352,226 @@ export class SocialFeedService {
       // discovery rail stays hidden on failure
     } finally {
       this.creatorsLoading.set(false);
+    }
+  }
+
+  private mapFeedPod(i: any): Pod {
+    return {
+      ...i,
+      id: i._id || i.id,
+      createdBy: i.createdBy || '',
+      creatorName: i.creatorName ?? null,
+      timeRemaining: Math.max(0, new Date(i.stakingClosesAt).getTime() - Date.now()),
+      isOpen: new Date(i.stakingClosesAt) >= new Date() && i.status === 'active'
+    };
+  }
+
+  private mapCodePost(i: any): CodePost {
+    return {
+      id: i._id || i.id || '',
+      codeId: i.codeId || '',
+      code: i.code || '',
+      creatorId: i.creatorId || '',
+      creatorName: i.creatorName || 'BetPool user',
+      boosted: !!i.boosted,
+      createdAt: typeof i.createdAt === 'number' ? i.createdAt : new Date(i.createdAt).getTime(),
+      expiresAt: i.expiresAt || null,
+      combinedMultiplier: Number(i.combinedMultiplier) || 1,
+      legCount: Number(i.legCount) || 0,
+      legs: Array.isArray(i.legs) ? i.legs.map((l: any) => ({
+        podId: String(l.podId || ''),
+        homeTeam: l.homeTeam,
+        awayTeam: l.awayTeam,
+        selection: l.selection,
+        multiplier: Number(l.multiplier) || 1
+      })) : [],
+      totalLegs: Number(i.totalLegs) || Number(i.legCount) || 0,
+      stakeAmount: i.stakeAmount != null ? Number(i.stakeAmount) : null
+    };
+  }
+
+  async ensureFollowingLoaded(): Promise<void> {
+    if (!this.isLoggedIn()) {
+      this.followingPosts.set([]);
+      this.followingTotal.set(0);
+      return;
+    }
+    if (this.followingLoaded) return;
+    await this.fetchFollowingFeed();
+  }
+
+  async fetchFollowingFeed(): Promise<void> {
+    if (!this.isLoggedIn()) return;
+    if (this.followingLoading()) return;
+    this.followingLoading.set(true);
+    try {
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: any[]; total: number } }>(
+        `${this.API_URL}/social/feed?page=1&limit=20`,
+        this.headers()
+      ));
+      if (res.success) {
+        const items = (res.data.items || []).map(i => this.mapCodePost(i));
+        this.followingPosts.set(items);
+        this.followingTotal.set(res.data.total);
+        this.followingPage = 1;
+        this.followingLoaded = true;
+        this.followingHasMore.set(items.length < res.data.total);
+        this.hydrateStats(items.map(p => p.codeId));
+      }
+    } catch {
+      // following feed stays empty on failure
+    } finally {
+      this.followingLoading.set(false);
+    }
+  }
+
+  async loadMoreFollowing(): Promise<void> {
+    if (!this.isLoggedIn() || !this.followingHasMore() || this.followingLoading()) return;
+    this.followingLoading.set(true);
+    try {
+      const page = this.followingPage + 1;
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: any[]; total: number } }>(
+        `${this.API_URL}/social/feed?page=${page}&limit=20`,
+        this.headers()
+      ));
+      if (res.success) {
+        const items = (res.data.items || []).map(i => this.mapCodePost(i));
+        this.followingPosts.update(cur => {
+          const seen = new Set(cur.map(p => p.id));
+          return [...cur, ...items.filter(p => !seen.has(p.id))];
+        });
+        this.followingPage = page;
+        this.followingHasMore.set(this.followingPosts().length < res.data.total);
+        this.hydrateStats(items.map(p => p.codeId));
+      }
+    } catch {
+      // keep current following feed on failure
+    } finally {
+      this.followingLoading.set(false);
+    }
+  }
+
+  refreshFollowingFeed(): void {
+    this.followingLoaded = false;
+    if (this.isLoggedIn()) this.fetchFollowingFeed();
+  }
+
+  async ensureSavedLoaded(): Promise<void> {
+    if (!this.isLoggedIn()) {
+      this.savedPods.set([]);
+      this.savedTotal.set(0);
+      return;
+    }
+    if (this.savedLoaded) return;
+    await this.fetchSavedPods();
+  }
+
+  async fetchSavedPods(): Promise<void> {
+    if (!this.isLoggedIn()) return;
+    if (this.savedLoading()) return;
+    this.savedLoading.set(true);
+    try {
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: any[]; total: number } }>(
+        `${this.API_URL}/social/saved?page=1&limit=20`,
+        this.headers()
+      ));
+      if (res.success) {
+        const items = (res.data.items || []).map(i => this.mapFeedPod(i));
+        this.savedPods.set(items);
+        this.savedTotal.set(res.data.total);
+        this.savedPage = 1;
+        this.savedLoaded = true;
+        this.savedHasMore.set(items.length < res.data.total);
+        this.hydrateStats(items.map(p => p.id));
+      }
+    } catch {
+      // saved list stays empty on failure
+    } finally {
+      this.savedLoading.set(false);
+    }
+  }
+
+  async loadMoreSaved(): Promise<void> {
+    if (!this.isLoggedIn() || !this.savedHasMore() || this.savedLoading()) return;
+    this.savedLoading.set(true);
+    try {
+      const page = this.savedPage + 1;
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: any[]; total: number } }>(
+        `${this.API_URL}/social/saved?page=${page}&limit=20`,
+        this.headers()
+      ));
+      if (res.success) {
+        const items = (res.data.items || []).map(i => this.mapFeedPod(i));
+        this.savedPods.update(cur => {
+          const seen = new Set(cur.map(p => p.id));
+          return [...cur, ...items.filter(p => !seen.has(p.id))];
+        });
+        this.savedPage = page;
+        this.savedHasMore.set(this.savedPods().length < res.data.total);
+        this.hydrateStats(items.map(p => p.id));
+      }
+    } catch {
+      // keep current saved list on failure
+    } finally {
+      this.savedLoading.set(false);
+    }
+  }
+
+  refreshSaved(): void {
+    this.savedLoaded = false;
+    if (this.isLoggedIn()) this.fetchSavedPods();
+  }
+
+  async fetchProfile(userId: string): Promise<SocialProfile | null> {
+    if (!this.isLoggedIn()) return null;
+    try {
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: SocialProfile }>(
+        `${this.API_URL}/social/profile/${userId}`,
+        this.headers()
+      ));
+      return res.success ? res.data : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async fetchFollowers(userId: string, page = 1, limit = 20): Promise<{ items: SocialUserRow[]; total: number }> {
+    if (!this.isLoggedIn()) return { items: [], total: 0 };
+    try {
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: SocialUserRow[]; total: number } }>(
+        `${this.API_URL}/social/followers?userId=${userId}&page=${page}&limit=${limit}`,
+        this.headers()
+      ));
+      return res.success ? res.data : { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  }
+
+  async fetchFollowingUsers(userId: string, page = 1, limit = 20): Promise<{ items: SocialUserRow[]; total: number }> {
+    if (!this.isLoggedIn()) return { items: [], total: 0 };
+    try {
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: SocialUserRow[]; total: number } }>(
+        `${this.API_URL}/social/following-list?userId=${userId}&page=${page}&limit=${limit}`,
+        this.headers()
+      ));
+      return res.success ? res.data : { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  }
+
+  async fetchCreatorPicks(userId: string, page = 1, limit = 12): Promise<{ items: Pod[]; total: number }> {
+    if (!this.isLoggedIn()) return { items: [], total: 0 };
+    try {
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: any[]; total: number } }>(
+        `${this.API_URL}/social/creator-picks?userId=${userId}&page=${page}&limit=${limit}`,
+        this.headers()
+      ));
+      if (!res.success) return { items: [], total: 0 };
+      return { items: (res.data.items || []).map(i => this.mapFeedPod(i)), total: res.data.total };
+    } catch {
+      return { items: [], total: 0 };
     }
   }
 
@@ -255,6 +609,7 @@ export class SocialFeedService {
         this.follows.update(cur => res.data.following ? (cur.includes(creator) ? cur : [...cur, creator]) : cur.filter(x => x !== creator));
         this.updateCreatorFollow(creator, res.data.following);
       }
+      this.refreshFollowingFeed();
       return '';
     } catch (error) {
       this.follows.update(cur => wasFollowing ? [...cur, creator] : cur.filter(x => x !== creator));
@@ -305,6 +660,7 @@ export class SocialFeedService {
       if (res.success && res.data) {
         this.saves.update(cur => res.data.saved ? (cur.includes(podId) ? cur : [...cur, podId]) : cur.filter(x => x !== podId));
       }
+      this.refreshSaved();
     } catch (error) {
       this.saves.update(cur => wasSaved ? [...cur, podId] : cur.filter(x => x !== podId));
       throw error;

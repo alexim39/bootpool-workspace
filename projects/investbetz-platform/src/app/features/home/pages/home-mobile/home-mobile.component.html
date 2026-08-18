@@ -1,4 +1,4 @@
-<div class="mobile-container">
+<div class="mobile-container" [class.immersive]="immersive()">
   <header class="mobile-header">
     <h1 class="app-title">
       <img src="img/logo/logo.png" alt="BetPool Logo" class="logo-image">
@@ -230,6 +230,9 @@
     <button class="feed-mode-btn" [class.active]="store.feedMode() === 'saved'" (click)="setFeedMode('saved')">
       <mat-icon>bookmark</mat-icon> Saved
     </button>
+    <button class="create-pick-btn" (click)="openBuildCode()" aria-label="Create a booking code">
+      <mat-icon>qr_code_2</mat-icon> <!-- Booking code -->
+    </button>
   </div>
 
   <app-who-to-follow />
@@ -252,7 +255,7 @@
   </div>
 
   <main class="feed-area">
-    @if (store.pods.loading()) {
+    @if (store.feedLoading()) {
       <div class="skel-page">
         <div class="skel-grid" style="grid-template-columns:1fr">
           @for (item of [1,2,3]; track item) {
@@ -285,6 +288,13 @@
           }
         </div>
       </div>
+    } @else if (store.feedMode() === 'following' && store.followingPosts().length === 0 && !store.isSearching()) {
+      <div class="empty-state">
+        <span class="empty-illustration"><mat-icon>people_outline</mat-icon></span>
+        <h3>No booking codes from people you follow yet</h3>
+        <p>Follow creators in the rail above — their codes appear here</p>
+        <button class="empty-cta" (click)="openBuildCode()">Create your first booking code</button>
+      </div>
     } @else if (store.feedMode() === 'saved' && store.feedPods().length === 0 && !store.isSearching()) {
       <div class="empty-state">
         <span class="empty-illustration"><mat-icon>bookmark_border</mat-icon></span>
@@ -314,7 +324,30 @@
         [loadingMore]="store.pods.loadingMore()"
         (placeStake)="openStakeModal($event)"
         (toggleSelect)="toggleSelection($event)"
-        (loadMore)="store.loadMore()" />
+        (loadMore)="store.loadMore()"
+      />
+    } @else if (store.feedMode() === 'following' && !store.isSearching()) {
+      <div class="odds-list code-feed">
+        @for (post of store.followingPosts(); track post.id) {
+          <app-code-post-card [post]="post" />
+        }
+      </div>
+      @if (store.feedHasMore()) {
+        <div class="load-more-section">
+          <button
+            class="load-more-btn"
+            (click)="store.loadMore()"
+            [disabled]="store.feedLoadingMore()">
+            @if (store.feedLoadingMore()) {
+              <mat-spinner diameter="16"/>
+              <span>Loading...</span>
+            } @else {
+              <span>Load More ({{ store.followingPosts().length }}/{{ store.feedTotal() }})</span>
+            }
+          </button>
+        </div>
+      }
+      <div class="feed-sentinel" #feedSentinel aria-hidden="true"></div>
     } @else {
       <div class="odds-list">
         @for (pod of store.feedPods(); track pod.id) {
@@ -323,21 +356,21 @@
             [selected]="store.isSelected(pod.id)"
             [selectionDisabled]="store.isSelectionDisabled()"
             (placeStake)="openStakeModal($event)"
-            (toggleSelect)="toggleSelection($event)">
-          </app-pod-card>
+            (toggleSelect)="toggleSelection($event)"
+          />
         }
       </div>
-      @if (store.pods.hasMorePods()) {
+      @if (store.feedHasMore()) {
         <div class="load-more-section">
           <button
             class="load-more-btn"
             (click)="store.loadMore()"
-            [disabled]="store.pods.loadingMore()">
-            @if (store.pods.loadingMore()) {
+            [disabled]="store.feedLoadingMore()">
+            @if (store.feedLoadingMore()) {
               <mat-spinner diameter="16"/>
               <span>Loading...</span>
             } @else {
-              <span>Load More ({{ store.feedPods().length }}/{{ store.pods.totalPods() }})</span>
+              <span>Load More ({{ store.feedPods().length }}/{{ store.feedTotal() }})</span>
             }
           </button>
         </div>
@@ -370,6 +403,12 @@
   }
 
   <app-top-up-modal [visible]="showTopUp()" [disableClose]="true" (close)="showTopUp.set(false)" />
+
+  <app-build-code-dialog
+    [open]="store.buildCodeOpen()"
+    (close)="store.closeBuildCode()"
+    (shared)="onCodeShared()"
+  />
 
   @if (showNotifPanel()) {
     <div class="mobile-notif-backdrop" (click)="closeNotifPanel()">
@@ -418,6 +457,7 @@
   }
 
   <app-bet-slip
+    [class.immersive-nav]="immersive()"
     [selections]="store.betSlipSelections()"
     [open]="store.betSlipOpen()"
     [placeBetResult]="slipResult()"
@@ -428,5 +468,5 @@
     (placeBetRequest)="onPlaceAccumulator($event)"
   />
 
-  <app-mobile-nav />
+  <app-mobile-nav [class.immersive-nav]="immersive()" />
 </div>

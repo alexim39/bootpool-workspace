@@ -25,7 +25,7 @@ export { PollingService } from './polling.service';
 export { StakeService } from './stake.service';
 export type { PodRef, StakeItem, Stake, StakesResponse, ActiveStakesResponse, PlaceStakeRequest, PlaceAccumulatorRequest, PlaceStakeResponse, CalculatePayoutResponse, BookingCodeLeg, BookingCodeResponse, AutoCashoutStatus, BetSummary, BetDayStat, BetSummaryResponse } from './stake.service';
 export { WalletService } from './wallet.service';
-export type { WalletBalance, Transaction, TransactionHistoryResponse, WalletHistoryQuery, DepositInitResponse, WithdrawalInitResponse, Bank, AccountResolution, WithdrawalLimits, SavedBankAccount } from './wallet.service';
+export type { WalletBalance, Transaction, TransactionHistoryResponse, WalletHistoryQuery, DepositInitResponse, WithdrawalInitResponse, Bank, AccountResolution, WithdrawalLimits, SavedBankAccount, RecipientMatch, TransferDirection, TransferRecord, TransferHistoryResponse, TransferQuery, TransferInitResponse } from './wallet.service';
 export { VirtualGamesService } from './virtual-games.service';
 export type { VirtualGameId, VirtualGame, PlayResult, PlayHistoryItem, VirtualGameStats, HistoryResultFilter } from './virtual-games.service';
 export { SocialFeedService } from './social-feed.service';
