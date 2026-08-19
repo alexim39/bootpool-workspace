@@ -92,8 +92,8 @@
               <span class="value">{{ data.user?.registrationDate || data.user?.createdAt | date:'mediumDate' }}</span>
             </div>
             <div class="info-row">
-              <span class="label">Last Login</span>
-              <span class="value">{{ data.user?.lastLoginAt ? (data.user?.lastLoginAt | date:'medium') : 'Never' }}</span>
+              <span class="label">Last Active</span>
+              <span class="value">{{ (data.user?.lastActiveAt || data.user?.lastLoginAt) ? ((data.user?.lastActiveAt || data.user?.lastLoginAt) | date:'medium') : 'Never' }}</span>
             </div>
             <div class="info-row">
               <span class="label">KYC Type</span>

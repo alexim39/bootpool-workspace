@@ -60,6 +60,7 @@ export interface Stake {
   isActive: boolean;
   isSettled: boolean;
   isParlay: boolean;
+  canCashOut: boolean;
   refundAmount?: number;
   insuranceApplied?: boolean;
   cashoutAmount?: number;
@@ -213,7 +214,14 @@ export class StakeService {
 
   private mapStake(s: any): Stake {
     const id = (s as any)._id || s.id;
-    const items = s.items && s.items.length > 0 ? s.items : undefined;
+    const items: StakeItem[] | undefined = s.items && s.items.length > 0 ? s.items : undefined;
+    const lostCount = (items || []).filter(i => i.status === 'lost').length;
+    const activeLegs = (items || []).filter(i => i.status !== 'void').length;
+    const canCashOut =
+      !['won', 'lost', 'void', 'refunded', 'cashed_out', 'cancelled'].includes(s.status) &&
+      (Array.isArray(items) && items.length > 1
+        ? activeLegs > 0 && lostCount < 2
+        : true);
     return {
       ...s,
       id,
@@ -221,6 +229,7 @@ export class StakeService {
       isParlay: Array.isArray(items) && items.length > 1,
       isSettled: ['won', 'lost', 'void', 'refunded', 'cashed_out'].includes(s.status),
       isActive: ['pending', 'confirmed'].includes(s.status),
+      canCashOut,
       profit: s.status === 'won' ? (s.netPayout || 0) - (s.stakeAmount || 0) : s.status === 'lost' ? (s.refundAmount || 0) - (s.stakeAmount || 0) : 0
     };
   }

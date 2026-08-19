@@ -7,7 +7,7 @@
               <mat-icon matChipAvatar>{{ getStatusIcon(stake.status) }}</mat-icon>
               {{ formatStatus(stake.status) }}
             </mat-chip>
-            @if (stake.status === 'confirmed' && !stake.isSettled) {
+            @if (stake.status === 'confirmed' && !stake.isSettled && stake.canCashOut) {
               <mat-chip class="chip-cashout" selected>
                 <mat-icon matChipAvatar>autorenew</mat-icon>
                 Cashout Available
@@ -28,7 +28,15 @@
               <div class="parlay-leg-row" [class.leg-won]="item.status === 'won'" [class.leg-lost]="item.status === 'lost'" [class.leg-void]="item.status === 'void'">
                 <div class="parlay-leg-index">{{ i + 1 }}</div>
                 <div class="parlay-leg-info">
-                  <div class="parlay-leg-match">{{ item.homeTeam }} vs {{ item.awayTeam }}</div>
+                  <div class="parlay-leg-match">
+                    <span class="parlay-leg-match-text">{{ item.homeTeam }} vs {{ item.awayTeam }}</span>
+                    @if (hasScore(item)) {
+                      <span class="parlay-leg-score" [class.score-draw]="item.homeScore === item.awayScore">
+                        <span class="score-ft">FT</span>
+                        <span class="score-value">{{ item.homeScore }} : {{ item.awayScore }}</span>
+                      </span>
+                    }
+                  </div>
                   <div class="parlay-leg-pick">{{ item.selection }}</div>
                   <div class="parlay-leg-meta">
                     <span class="parlay-leg-time">{{ matchTime(item.matchDate) }} · {{ matchDay(item.matchDate) }}</span>
@@ -59,34 +67,41 @@
         } @else {
           <div class="bet-match">
             <div class="match-teams">
-              <span class="team home">{{ stake.pod.homeTeam }}</span>
-              <mat-icon>sports_soccer</mat-icon>
-              <span class="team away">{{ stake.pod.awayTeam }}</span>
+              <span class="team home">{{ stake.pod?.homeTeam }}</span>
+              @if (hasScore(stake.pod)) {
+                <span class="match-score" [class.score-draw]="stake.pod?.homeScore === stake.pod?.awayScore">
+                  <span class="score-ft">FT</span>
+                  <span class="score-value">{{ stake.pod?.homeScore }} : {{ stake.pod?.awayScore }}</span>
+                </span>
+              } @else {
+                <mat-icon>sports_soccer</mat-icon>
+              }
+              <span class="team away">{{ stake.pod?.awayTeam }}</span>
             </div>
             <div class="match-info">
-              @if (stake.pod.league) {
-                <span class="league">{{ stake.pod.league }}</span>
+              @if (stake.pod?.league) {
+                <span class="league">{{ stake.pod?.league }}</span>
               }
-              @if (stake.pod.marketType) {
-                <span class="market-type">{{ stake.pod.marketType }}</span>
+              @if (stake.pod?.marketType) {
+                <span class="market-type">{{ stake.pod?.marketType }}</span>
               }
-              @if (stake.pod.refundPercent) {
-                <span class="refund-chip">{{ stake.pod.refundPercent }}% cash back</span>
+              @if (stake.pod?.refundPercent) {
+                <span class="refund-chip">{{ stake.pod?.refundPercent }}% cash back</span>
               }
             </div>
-            @if (stake.pod.matchDate) {
+            @if (stake.pod?.matchDate) {
               <div class="match-time-row">
                 <mat-icon>schedule</mat-icon>
-                <span class="match-time">{{ matchTime(stake.pod.matchDate) }} · {{ matchDay(stake.pod.matchDate) }}</span>
-                @if (isUpcomingMatchDate(stake.pod.matchDate) && matchCountdown(stake.pod.matchDate)) {
-                  <span class="match-countdown">{{ matchCountdown(stake.pod.matchDate) }}</span>
+                <span class="match-time">{{ matchTime(stake.pod?.matchDate) }} · {{ matchDay(stake.pod?.matchDate) }}</span>
+                @if (isUpcomingMatchDate(stake.pod?.matchDate) && matchCountdown(stake.pod?.matchDate)) {
+                  <span class="match-countdown">{{ matchCountdown(stake.pod?.matchDate) }}</span>
                 }
               </div>
             }
           </div>
           <div class="bet-selection">
-            <span class="selection">{{ stake.pod.selection }}</span>
-            <span class="odds">{{ stake.pod.gainsMultiplier.toFixed(2) }}x</span>
+            <span class="selection">{{ stake.pod?.selection }}</span>
+            <span class="odds">{{ stake.pod?.gainsMultiplier?.toFixed(2) }}x</span>
           </div>
         }
 
@@ -107,13 +122,13 @@
           </div>
         </div>
 
-        <div class="bet-actions" *ngIf="showActions && !stake.isSettled && !stake.isParlay">
+        <div class="bet-actions" *ngIf="showActions && !stake.isSettled && !stake.isParlay && stake.canCashOut">
           <button mat-stroked-button class="btn-cashout-action" (click)="onCashout(stake.id)">
             <mat-icon>autorenew</mat-icon> Request Cashout
           </button>
         </div>
 
-        <div class="bet-actions" *ngIf="showActions && !stake.isSettled">
+        <div class="bet-actions" *ngIf="showActions && !stake.isSettled && stake.canCashOut">
           <app-auto-cashout [stake]="stake"></app-auto-cashout>
         </div>
 

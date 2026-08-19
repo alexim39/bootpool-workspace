@@ -11,6 +11,10 @@
     .bet-match { margin-bottom: 8px; }
     .match-teams { display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 14px; margin-bottom: 4px; color: #FFFFFF; }
     .match-teams mat-icon { font-size: 16px; width: 16px; height: 16px; color: rgba(255,255,255,0.3); }
+    .match-score { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 8px; background: rgba(232,185,35,0.12); border: 1px solid rgba(232,185,35,0.25); font-size: 15px; font-weight: 800; letter-spacing: 0.5px; color: #FFFFFF; }
+    .match-score .score-ft { font-size: 8.5px; font-weight: 700; letter-spacing: 0.8px; color: #E8B923; }
+    .match-score.score-draw { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.14); }
+    .match-score.score-draw .score-ft { color: rgba(255,255,255,0.45); }
     .match-info { display: flex; justify-content: center; gap: 12px; font-size: 11px; color: rgba(255,255,255,0.5); }
     .league { background: rgba(0,230,118,0.1); color: #00E676; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
     .market-type { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); padding: 2px 6px; border-radius: 4px; font-weight: 500; }
@@ -62,7 +66,12 @@
     .parlay-leg-row.leg-won .parlay-leg-index { background: rgba(0,230,118,0.15); color: #00E676; }
     .parlay-leg-row.leg-lost .parlay-leg-index { background: rgba(244,67,54,0.15); color: #f44336; }
     .parlay-leg-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-    .parlay-leg-match { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .parlay-leg-match { display: flex; align-items: center; gap: 2px; min-width: 0; font-size: 13px; font-weight: 600; color: #fff; }
+    .parlay-leg-match-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .parlay-leg-score { display: inline-flex; align-items: center; gap: 5px; margin-left: 8px; padding: 2px 8px; border-radius: 6px; background: rgba(232,185,35,0.12); border: 1px solid rgba(232,185,35,0.25); font-size: 12px; font-weight: 800; letter-spacing: 0.4px; color: #FFFFFF; vertical-align: middle; }
+    .parlay-leg-score .score-ft { font-size: 8px; font-weight: 700; letter-spacing: 0.7px; color: #E8B923; }
+    .parlay-leg-score.score-draw { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.14); }
+    .parlay-leg-score.score-draw .score-ft { color: rgba(255,255,255,0.45); }
     .parlay-leg-pick { font-size: 11px; color: rgba(255,255,255,0.4); display: flex; align-items: center; gap: 4px; }
     .parlay-leg-pick::before { content: 'Pick:'; color: rgba(255,255,255,0.25); font-weight: 500; }
     .parlay-leg-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 2px; }
