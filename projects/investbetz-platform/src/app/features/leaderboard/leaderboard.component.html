@@ -155,6 +155,17 @@
                 @if (isMe(entry)) {
                   <span class="me-pill">You</span>
                 }
+                @if (!isMe(entry)) {
+                  <button
+                    class="follow-btn"
+                    [class.following]="isFollowingEntry(entry)"
+                    [class.follow-locked]="isOraEntry(entry)"
+                    (click)="onToggleFollow($event, entry)"
+                    [attr.title]="isOraEntry(entry) ? 'Ora is the AI curator — you are always following' : ''">
+                    <mat-icon>{{ isOraEntry(entry) ? 'auto_awesome' : (isFollowingEntry(entry) ? 'check' : 'add') }}</mat-icon>
+                    {{ isOraEntry(entry) ? 'Curator' : (isFollowingEntry(entry) ? 'Following' : 'Follow') }}
+                  </button>
+                }
               </div>
             </div>
           }
@@ -327,6 +338,7 @@
           <span class="num-col">Volume</span>
           <span class="num-col">Total Won</span>
           <span class="num-col">Last Win</span>
+          <span class="num-col">Follow</span>
         </div>
         @for (entry of board()!.items; track entry.userId) {
           <div class="board-row" [class.self-row]="isMe(entry)">
@@ -349,6 +361,19 @@
             </span>
             <span class="num-col won">{{ formatMoney(entry.totalWon) }}</span>
             <span class="num-col">{{ formatDate(entry.lastWinAt) }}</span>
+            <span class="num-col follow-cell">
+              @if (!isMe(entry)) {
+                <button
+                  class="follow-btn"
+                  [class.following]="isFollowingEntry(entry)"
+                  [class.follow-locked]="isOraEntry(entry)"
+                  (click)="onToggleFollow($event, entry)"
+                  [attr.title]="isOraEntry(entry) ? 'Ora is the AI curator — you are always following' : ''">
+                  <mat-icon>{{ isOraEntry(entry) ? 'auto_awesome' : (isFollowingEntry(entry) ? 'check' : 'add') }}</mat-icon>
+                  {{ isOraEntry(entry) ? 'Curator' : (isFollowingEntry(entry) ? 'Following' : 'Follow') }}
+                </button>
+              }
+            </span>
           </div>
         }
       </section>

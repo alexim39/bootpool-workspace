@@ -8,6 +8,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { DeviceService, LeaderboardService, LeaderboardPeriod, LeaderboardPage, LeaderboardEntry } from '../../core/services';
+import { SocialFeedService } from '../../core/services/social-feed.service';
 import { AppNavComponent, MobileNavComponent } from '../../core/components';
 import { CreatorsBoardComponent } from './creators-board/creators-board.component';
 
@@ -25,6 +26,7 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
   isMobileView = computed(() => this.device.isMobile() || this.device.isTablet());
   private service = inject(LeaderboardService);
   private snackBar = inject(MatSnackBar);
+  private social = inject(SocialFeedService);
   private destroy$ = new Subject<void>();
   private search$ = new Subject<string>();
 
@@ -74,6 +76,7 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.setPeriod('month');
+    this.social.syncFollows();
     this.search$.pipe(
       debounceTime(350),
       distinctUntilChanged(),
@@ -160,6 +163,24 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
   isMe(entry: LeaderboardEntry): boolean {
     const me = this.myRank();
     return !!me && me.userId === entry.userId;
+  }
+
+  isOraEntry(entry: LeaderboardEntry): boolean {
+    return this.social.isOraCreator(entry.userId);
+  }
+
+  isFollowingEntry(entry: LeaderboardEntry): boolean {
+    return this.social.isFollowing(entry.userId);
+  }
+
+  async onToggleFollow(event: Event, entry: LeaderboardEntry) {
+    event.stopPropagation();
+    try {
+      const msg = await this.social.toggleFollow(entry.userId);
+      if (msg) this.snackBar.open(msg, 'OK', { duration: 2500 });
+    } catch {
+      this.snackBar.open('Could not update follow — try again', 'OK', { duration: 2500 });
+    }
   }
 
   loadLastWin() {

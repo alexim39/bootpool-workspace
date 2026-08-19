@@ -19,6 +19,7 @@
       <span class="num-col">Staked</span>
       <span class="num-col">Wins</span>
       <span class="num-col">Followers won</span>
+      <span class="num-col">Follow</span>
     </div>
     @for (entry of entries(); track entry.id; let i = $index) {
       <a class="creator-row" [class.self-row]="isMe(entry)" [routerLink]="'/social/' + entry.id">
@@ -39,6 +40,19 @@
         <span class="num-col">{{ entry.stakesPlaced }}</span>
         <span class="num-col">{{ entry.wins }}</span>
         <span class="num-col strong">{{ formatMoney(entry.score) }}</span>
+        <span class="num-col follow-cell">
+          @if (!isMe(entry)) {
+            <button
+              class="follow-btn"
+              [class.following]="isFollowingEntry(entry)"
+              [class.follow-locked]="isOraEntry(entry)"
+              (click)="onToggleFollow($event, entry)"
+              [attr.title]="isOraEntry(entry) ? 'Ora is the AI curator — you are always following' : ''">
+              <mat-icon>{{ isOraEntry(entry) ? 'auto_awesome' : (isFollowingEntry(entry) ? 'check' : 'add') }}</mat-icon>
+              {{ isOraEntry(entry) ? 'Curator' : (isFollowingEntry(entry) ? 'Following' : 'Follow') }}
+            </button>
+          }
+        </span>
       </a>
     }
   </section>

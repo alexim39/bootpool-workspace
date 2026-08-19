@@ -288,6 +288,12 @@ export class SocialFeedService {
       requests.push(this.hydrateStats(ids));
     }
     await Promise.all(requests);
+    await this.syncFollows();
+    await this.fetchCreators();
+  }
+
+  async syncFollows(): Promise<void> {
+    if (!this.isLoggedIn()) return;
     try {
       const res = await lastValueFrom(this.http.get<{ success: boolean; data: { ids: string[]; oraId: string } }>(
         `${this.API_URL}/social/following`,
@@ -299,11 +305,11 @@ export class SocialFeedService {
         const ora = res.data.oraId;
         if (ora) idsSet.add(ora);
         this.follows.set([...idsSet]);
+        this.persist();
       }
     } catch {
       // keep current follow state
     }
-    await this.fetchCreators();
   }
 
   private async hydrateStats(ids: string[]): Promise<void> {
