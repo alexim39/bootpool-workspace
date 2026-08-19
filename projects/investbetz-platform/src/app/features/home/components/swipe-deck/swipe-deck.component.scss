@@ -425,6 +425,24 @@
   color: $white;
 }
 
+.you-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  flex: 1;
+  padding: 0.22rem 0.2rem;
+  color: $emerald;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.you-label mat-icon {
+  font-size: 0.85rem;
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
 .rail-btn.active {
   color: $emerald;
 }

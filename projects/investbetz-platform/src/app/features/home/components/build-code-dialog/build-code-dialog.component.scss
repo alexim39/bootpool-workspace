@@ -176,6 +176,11 @@
   cursor: not-allowed;
 }
 
+.pod-option.match-taken:disabled {
+  border-color: rgba(248, 113, 113, 0.25);
+  opacity: 0.45;
+}
+
 .pod-check {
   color: #22c55e;
   display: flex;
@@ -221,6 +226,23 @@
   color: #8ea3c8;
   font-size: 13px;
   text-align: center;
+}
+
+.pod-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 8px;
+  color: #8ea3c8;
+  font-size: 13px;
+}
+
+.pod-count-line {
+  font-size: 11px;
+  color: #8ea3c8;
+  letter-spacing: 0.02em;
+  padding: 0 2px;
 }
 
 .pick-error {

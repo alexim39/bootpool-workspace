@@ -25,8 +25,11 @@
                 <mat-icon class="w2f-verified">verified</mat-icon>
               }
             </span>
+            @if (c.username) {
+              <span class="w2f-handle">{{ '@' + c.username }}</span>
+            }
             <span class="w2f-sub">
-              {{ c.followerCount.toLocaleString() }} {{ c.followerCount === 1 ? 'follower' : 'followers' }} · {{ c.podCount }} {{ c.podCount === 1 ? 'pick' : 'picks' }}
+              {{ c.followerCount.toLocaleString() }} {{ c.followerCount === 1 ? 'follower' : 'followers' }} · {{ c.codeCount ?? 0 }} {{ (c.codeCount ?? 0) === 1 ? 'code' : 'codes' }}
             </span>
           </div>
           <span

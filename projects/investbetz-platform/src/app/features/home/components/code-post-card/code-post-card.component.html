@@ -10,6 +10,9 @@
       </span>
       <div class="creator-meta">
         <a class="creator-name" [routerLink]="'/social/' + post().creatorId">{{ creatorName() }}</a>
+        @if (post().creatorUsername) {
+          <span class="creator-username">{{ '@' + post().creatorUsername }}</span>
+        }
         <span class="post-time">{{ post().createdAt | date: 'MMM d • h:mm a' }}</span>
       </div>
     </div>
@@ -77,7 +80,10 @@
       <div class="comments-list">
         @for (c of social.commentsFor(post().codeId); track c.id) {
           <div class="comment-row">
-            <span class="comment-author">{{ c.authorName }}</span>
+            <span class="comment-author">
+              {{ c.authorName }}
+              @if (c.authorUsername) { <span class="comment-user">{{ '@' + c.authorUsername }}</span> }
+            </span>
             <span class="comment-text">{{ c.text }}</span>
           </div>
         } @empty {

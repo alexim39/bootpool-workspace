@@ -58,31 +58,41 @@
           </div>
 
           <div class="pod-picker">
-            @for (pod of availablePods(); track pod.id) {
-              <button
-                class="pod-option"
-                [class.selected]="isSelected(pod)"
-                [disabled]="!isSelected(pod) && isFull()"
-                (click)="toggle(pod)"
-                type="button">
-                <span class="pod-check">
-                  @if (isSelected(pod)) {
-                    <mat-icon>check_circle</mat-icon>
-                  } @else {
-                    <mat-icon>radio_button_unchecked</mat-icon>
-                  }
-                </span>
-                <span class="pod-info">
-                  <span class="pod-teams">{{ pod.homeTeam }} vs {{ pod.awayTeam }}</span>
-                  <span class="pod-meta">{{ pod.league }} • {{ pod.selection }}</span>
-                </span>
-                <span class="pod-odds">{{ pod.gainsMultiplier }}x</span>
-              </button>
-            } @empty {
-              <div class="pod-empty">
-                <mat-icon>sports_soccer</mat-icon>
-                <span>{{ search.trim() ? 'No open odds match that search.' : 'No open odds right now — check back soon.' }}</span>
+            @if (store.bookingCodePodsLoading() && store.bookingCodePods().length === 0) {
+              <div class="pod-loading">
+                <mat-spinner diameter="22"></mat-spinner>
+                <span>Loading open odds…</span>
               </div>
+            } @else {
+              <div class="pod-count-line">{{ availablePods().length }} open odds available</div>
+              @for (pod of availablePods(); track pod.id) {
+                <button
+                  class="pod-option"
+                  [class.selected]="isSelected(pod)"
+                  [class.match-taken]="isMatchTaken(pod)"
+                  [disabled]="!isSelected(pod) && (isFull() || isMatchTaken(pod))"
+                  [attr.title]="isMatchTaken(pod) ? 'A selection from this match is already in your code' : null"
+                  (click)="toggle(pod)"
+                  type="button">
+                  <span class="pod-check">
+                    @if (isSelected(pod)) {
+                      <mat-icon>check_circle</mat-icon>
+                    } @else {
+                      <mat-icon>radio_button_unchecked</mat-icon>
+                    }
+                  </span>
+                  <span class="pod-info">
+                    <span class="pod-teams">{{ pod.homeTeam }} vs {{ pod.awayTeam }}</span>
+                    <span class="pod-meta">{{ pod.league }} • {{ pod.selection }} • {{ formatKickoff(pod) }}</span>
+                  </span>
+                  <span class="pod-odds">{{ pod.gainsMultiplier }}x</span>
+                </button>
+              } @empty {
+                <div class="pod-empty">
+                  <mat-icon>sports_soccer</mat-icon>
+                  <span>{{ search.trim() ? 'No open odds match that search.' : 'No open odds right now — check back soon.' }}</span>
+                </div>
+              }
             }
           </div>
 
@@ -98,6 +108,9 @@
           }
           @if (selectedCount() >= store.maxBookingCodeLegs) {
             <div class="pick-hint">Maximum of {{ store.maxBookingCodeLegs }} selections reached.</div>
+          }
+          @if (hasTakenMatch()) {
+            <div class="pick-hint">Only one selection per match is allowed in a booking code.</div>
           }
 
           <div class="footer-actions">

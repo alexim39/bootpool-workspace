@@ -30,10 +30,8 @@ export class PodCardComponent implements OnDestroy {
   selected = input(false);
   selectionDisabled = input(false);
   social = input(true);
-  manageable = input(true);
   @Output() placeStake = new EventEmitter<Pod>();
   @Output() toggleSelect = new EventEmitter<Pod>();
-  @Output() manage = new EventEmitter<Pod>();
 
   private snackBar = inject(MatSnackBar);
   private router = inject(Router);

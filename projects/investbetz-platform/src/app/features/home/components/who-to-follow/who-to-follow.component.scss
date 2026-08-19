@@ -147,6 +147,16 @@
   flex-shrink: 0;
 }
 
+.w2f-handle {
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: $info;
+  white-space: nowrap;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .w2f-sub {
   font-size: 0.66rem;
   color: $white-dim;

@@ -7,6 +7,7 @@
     .avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #00E676, #00C853); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
     .avatar mat-icon { font-size: 36px; width: 36px; height: 36px; color: #0A1428; }
     .info h2 { margin: 0 0 4px; font-size: 20px; font-weight: 700; }
+    .username { display: block; margin-bottom: 4px; font-size: 14px; font-weight: 500; color: #00E676; }
     .phone { font-size: 14px; color: rgba(255,255,255,0.5); }
     .badges { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; justify-content: center; }
     .badge { display: flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }

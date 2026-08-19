@@ -1,10 +1,9 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { SocialFeedService, SocialProfile, SocialUserRow } from '../../core/services/social-feed.service';
-import { Pod } from '../../core/services';
+import { SocialFeedService, SocialProfile, SocialUserRow, CodePost } from '../../core/services/social-feed.service';
 
-export type SocialProfileTab = 'picks' | 'followers' | 'following';
+export type SocialProfileTab = 'codes' | 'followers' | 'following';
 
 @Injectable({ providedIn: 'root' })
 export class SocialProfileStore {
@@ -16,7 +15,7 @@ export class SocialProfileStore {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
 
-  readonly tab = signal<SocialProfileTab>('picks');
+  readonly tab = signal<SocialProfileTab>('codes');
 
   readonly followers = signal<SocialUserRow[]>([]);
   readonly followersTotal = signal(0);
@@ -30,11 +29,11 @@ export class SocialProfileStore {
   private followingLoaded = false;
   private followingPage = 0;
 
-  readonly picks = signal<Pod[]>([]);
-  readonly picksTotal = signal(0);
-  readonly picksLoading = signal(false);
-  readonly picksHasMore = signal(false);
-  private picksPage = 0;
+  readonly codes = signal<CodePost[]>([]);
+  readonly codesTotal = signal(0);
+  readonly codesLoading = signal(false);
+  readonly codesHasMore = signal(false);
+  private codesPage = 0;
 
   private currentId = '';
 
@@ -47,13 +46,13 @@ export class SocialProfileStore {
     this.loading.set(true);
     this.error.set(null);
     this.profile.set(null);
-    this.tab.set('picks');
-    this.picks.set([]);
+    this.tab.set('codes');
+    this.codes.set([]);
     this.followers.set([]);
     this.following.set([]);
     this.followersLoaded = false;
     this.followingLoaded = false;
-    this.picksPage = 0;
+    this.codesPage = 0;
     this.followersPage = 0;
     this.followingPage = 0;
     try {
@@ -63,7 +62,7 @@ export class SocialProfileStore {
         return;
       }
       this.profile.set(p);
-      await Promise.all([this.loadPicks(), this.loadFollowers(), this.loadFollowing()]);
+      await Promise.all([this.loadCodes(), this.loadFollowers(), this.loadFollowing()]);
     } catch {
       this.error.set('Profile could not be loaded.');
     } finally {
@@ -71,24 +70,24 @@ export class SocialProfileStore {
     }
   }
 
-  async loadPicks(): Promise<void> {
+  async loadCodes(): Promise<void> {
     const userId = this.currentId;
-    if (!userId || this.picksLoading()) return;
-    this.picksLoading.set(true);
+    if (!userId || this.codesLoading()) return;
+    this.codesLoading.set(true);
     try {
-      const page = this.picksPage + 1;
-      const res = await this._social.fetchCreatorPicks(userId, page, 12);
-      this.picksPage = page;
-      this.picks.update(prev => (page === 1 ? res.items : [...prev, ...res.items]));
-      this.picksTotal.set(res.total);
-      this.picksHasMore.set(this.picks().length < res.total);
+      const page = this.codesPage + 1;
+      const res = await this._social.fetchCreatorCodes(userId, page, 12);
+      this.codesPage = page;
+      this.codes.update(prev => (page === 1 ? res.items : [...prev, ...res.items]));
+      this.codesTotal.set(res.total);
+      this.codesHasMore.set(this.codes().length < res.total);
     } finally {
-      this.picksLoading.set(false);
+      this.codesLoading.set(false);
     }
   }
 
-  async loadMorePicks(): Promise<void> {
-    await this.loadPicks();
+  async loadMoreCodes(): Promise<void> {
+    await this.loadCodes();
   }
 
   async loadFollowers(): Promise<void> {
@@ -125,7 +124,7 @@ export class SocialProfileStore {
 
   async loadTab(tab: SocialProfileTab): Promise<void> {
     this.tab.set(tab);
-    if (tab === 'picks' && this.picks().length === 0) await this.loadPicks();
+    if (tab === 'codes' && this.codes().length === 0) await this.loadCodes();
     if (tab === 'followers' && this.followers().length === 0) await this.loadFollowers();
     if (tab === 'following' && this.following().length === 0) await this.loadFollowing();
   }
@@ -177,8 +176,8 @@ export class SocialProfileStore {
     }
   }
 
-  openPod(pod: Pod): void {
-    this.router.navigate(['/home'], { queryParams: { pod: pod.id } });
+  openCode(post: CodePost): void {
+    this.router.navigate(['/home'], { queryParams: { code: post.code } });
   }
 
   openUser(id: string): void {

@@ -1,5 +1,6 @@
 import { Injectable, signal, computed, effect, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 
@@ -12,6 +13,7 @@ export interface PodLeg {
 
 export interface Pod {
   id: string;
+  kind?: 'pod';
   title: string;
   description?: string;
   sport: string;
@@ -221,6 +223,28 @@ export class PodService {
   loadMore(pageSize = 20) {
     if (this.loadingMore() || !this.hasMorePods()) return;
     this.fetchFeed({ offset: this.pods().length, limit: pageSize, personalized: this.personalized() });
+  }
+
+  fetchFeedPage(params?: { limit?: number; offset?: number; sport?: string; personalized?: boolean }) {
+    const query = new URLSearchParams();
+    if (params?.sport) query.set('sport', params.sport);
+    if (params?.limit) query.set('limit', String(params.limit));
+    if (params?.offset) query.set('offset', String(params.offset));
+    if (params?.personalized) query.set('personalized', 'true');
+
+    return this.http.get<PaginatedPodFeedResponse>(`${environment.apiUrl}/pods/feed?${query}`).pipe(
+      map(res => {
+        if (!res.success) return { items: [] as Pod[], total: 0, hasMore: false };
+        return {
+          items: res.data.items.map(p => this.mapPod(p)),
+          total: res.data.total,
+          hasMore: res.data.hasMore,
+          maxAccumulatorLegs: res.data.maxAccumulatorLegs,
+          insuranceMinLegs: res.data.insuranceMinLegs,
+          oraId: res.data.oraId
+        };
+      })
+    );
   }
 
   fetchUpcoming(params?: { sport?: string; limit?: number; hoursAhead?: number }) {

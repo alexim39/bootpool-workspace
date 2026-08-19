@@ -19,12 +19,7 @@
             <span class="creator-time">{{ creatorTime() }}</span>
           </div>
         </div>
-        @if (isMyPod() && manageable()) {
-          <button class="manage-btn" (click)="manage.emit(pod())">
-            <mat-icon>edit</mat-icon>
-            Manage
-          </button>
-        } @else if (!isMyPod()) {
+        @if (!isMyPod()) {
           <button class="follow-btn" [class.following]="following()" [class.locked]="isOra()" (click)="toggleFollow()">
             <mat-icon>{{ following() ? 'check' : 'add' }}</mat-icon>
             {{ following() ? 'Following' : 'Follow' }}

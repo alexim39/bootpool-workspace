@@ -26,7 +26,10 @@ export class BuildCodeDialogComponent {
 
   constructor() {
     effect(() => {
-      if (this.open()) this.reset();
+      if (this.open()) {
+        this.reset();
+        this.store.loadBookingCodePods();
+      }
     });
     effect(() => {
       if (this.open() && this.store.bookingCode() && this.submitting()) {
@@ -40,21 +43,22 @@ export class BuildCodeDialogComponent {
     this.search = '';
     this.copied.set(false);
     this.store.clearBookingCode();
+    this.store.clearBookingCodeSelections();
   }
 
   availablePods = computed(() => {
     const q = this.search.trim().toLowerCase();
-    return this.store.displayedPods().filter(p => {
+    return this.store.bookingCodePods().filter(p => {
       if (!this.store.isStakable(p)) return false;
       if (!q) return true;
       return `${p.homeTeam} ${p.awayTeam} ${p.league} ${p.title || ''}`.toLowerCase().includes(q);
     });
   });
 
-  selectedCount = computed(() => this.store.betSlipSelections().length);
+  selectedCount = computed(() => this.store.bookingCodeSelections().length);
 
   combinedMultiplier = computed(() => {
-    return this.store.betSlipSelections().reduce((acc, p) => acc * p.gainsMultiplier, 1);
+    return this.store.bookingCodeSelections().reduce((acc, p) => acc * p.gainsMultiplier, 1);
   });
 
   canCreate = computed(() => {
@@ -64,16 +68,29 @@ export class BuildCodeDialogComponent {
   });
 
   toggle(pod: Pod) {
-    this.store.toggleSelection(pod);
+    this.store.toggleBookingCodeSelection(pod);
   }
 
   isSelected(pod: Pod): boolean {
-    return this.store.isSelected(pod.id);
+    return this.store.isBookingCodeSelected(pod.id);
   }
 
   isFull(): boolean {
     return this.selectedCount() >= this.store.maxBookingCodeLegs;
   }
+
+  private matchKey(pod: Pod): string {
+    return `${pod.homeTeam}|${pod.awayTeam}|${pod.matchDate || ''}`;
+  }
+
+  isMatchTaken(pod: Pod): boolean {
+    const key = this.matchKey(pod);
+    return this.store.bookingCodeSelections().some(s => s.id !== pod.id && this.matchKey(s) === key);
+  }
+
+  hasTakenMatch = computed(() => {
+    return this.availablePods().some(p => !this.isSelected(p) && this.isMatchTaken(p));
+  });
 
   onClose() {
     if (this.submitting()) return;
@@ -83,7 +100,7 @@ export class BuildCodeDialogComponent {
   create() {
     if (!this.canCreate()) return;
     this.submitting.set(true);
-    const ids = this.store.betSlipSelections().map(s => s.id);
+    const ids = this.store.bookingCodeSelections().map(s => s.id);
     this.store.createBookingCode(ids);
   }
 
@@ -117,6 +134,10 @@ export class BuildCodeDialogComponent {
     const d = new Date(iso);
     if (isNaN(d.getTime())) return '';
     return d.toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  }
+
+  formatKickoff(pod: Pod): string {
+    return this.store.kickoffLabel(pod);
   }
 
   onShared() {

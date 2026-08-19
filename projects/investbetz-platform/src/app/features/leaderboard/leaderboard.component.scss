@@ -434,7 +434,7 @@
 
 .board-row {
   display: grid;
-  grid-template-columns: 0.7fr 2fr 0.8fr 1.1fr 1.1fr 0.9fr;
+  grid-template-columns: 0.7fr 2fr 0.8fr 1.1fr 1.1fr 0.9fr 0.9fr;
   align-items: center;
   gap: 12px;
   padding: 11px 16px;
@@ -625,6 +625,63 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.follow-cell {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.follow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba($emerald, 0.5);
+  background: rgba($emerald, 0.14);
+  color: $emerald;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.follow-btn:hover {
+  background: $emerald;
+  color: $deep-navy;
+}
+
+.follow-btn.following {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.follow-btn.following:hover {
+  background: rgba($error, 0.12);
+  border-color: rgba($error, 0.4);
+  color: $error;
+}
+
+.follow-btn.follow-locked {
+  background: rgba($gold, 0.12);
+  border-color: rgba($gold, 0.4);
+  color: $gold-light;
+  cursor: not-allowed;
+}
+
+.follow-btn.follow-locked:hover {
+  background: rgba($gold, 0.12);
+  color: $gold-light;
+}
+
+.follow-btn mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
 }
 
 .won-pill {

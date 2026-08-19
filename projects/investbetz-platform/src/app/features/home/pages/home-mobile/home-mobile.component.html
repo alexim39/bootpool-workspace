@@ -295,11 +295,11 @@
         <p>Follow creators in the rail above — their codes appear here</p>
         <button class="empty-cta" (click)="openBuildCode()">Create your first booking code</button>
       </div>
-    } @else if (store.feedMode() === 'saved' && store.feedPods().length === 0 && !store.isSearching()) {
+    } @else if (store.feedMode() === 'saved' && store.savedPods().length === 0 && !store.isSearching()) {
       <div class="empty-state">
         <span class="empty-illustration"><mat-icon>bookmark_border</mat-icon></span>
         <h3>Nothing saved yet</h3>
-        <p>Tap the bookmark icon on any pick to keep it here</p>
+        <p>Tap the bookmark icon on any pick or booking code to keep it here</p>
       </div>
     } @else if (store.feedPods().length === 0 && !store.isSearching()) {
       <div class="empty-state">
@@ -343,6 +343,38 @@
               <span>Loading...</span>
             } @else {
               <span>Load More ({{ store.followingPosts().length }}/{{ store.feedTotal() }})</span>
+            }
+          </button>
+        </div>
+      }
+      <div class="feed-sentinel" #feedSentinel aria-hidden="true"></div>
+    } @else if (store.feedMode() === 'saved' && !store.isSearching()) {
+      <div class="odds-list">
+        @for (item of store.savedPods(); track item.id) {
+          @if (item.kind === 'code') {
+            <app-code-post-card [post]="item" />
+          } @else {
+            <app-pod-card
+              [pod]="item"
+              [selected]="store.isSelected(item.id)"
+              [selectionDisabled]="store.isSelectionDisabled()"
+              (placeStake)="openStakeModal($event)"
+              (toggleSelect)="toggleSelection($event)"
+            />
+          }
+        }
+      </div>
+      @if (store.feedHasMore()) {
+        <div class="load-more-section">
+          <button
+            class="load-more-btn"
+            (click)="store.loadMore()"
+            [disabled]="store.feedLoadingMore()">
+            @if (store.feedLoadingMore()) {
+              <mat-spinner diameter="16"/>
+              <span>Loading...</span>
+            } @else {
+              <span>Load More ({{ store.savedPods().length }}/{{ store.feedTotal() }})</span>
             }
           </button>
         </div>

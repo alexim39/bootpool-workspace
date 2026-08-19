@@ -12,6 +12,7 @@ export interface SocialComment {
   podId: string;
   authorId: string;
   authorName: string;
+  authorUsername?: string | null;
   text: string;
   createdAt: string;
 }
@@ -19,6 +20,7 @@ export interface SocialComment {
 export interface SocialCreator {
   id: string;
   fullName: string;
+  username?: string | null;
   podCount: number;
   codeCount?: number;
   followerCount: number;
@@ -35,11 +37,13 @@ export interface CodePostLeg {
 }
 
 export interface CodePost {
+  kind: 'code';
   id: string;
   codeId: string;
   code: string;
   creatorId: string;
   creatorName: string;
+  creatorUsername?: string | null;
   boosted: boolean;
   createdAt: number;
   expiresAt: string | null;
@@ -72,8 +76,8 @@ export interface CreatorLeaderboardEntry {
 }
 
 export interface SocialProfile {
-  user: { id: string; fullName: string; isOra: boolean };
-  stats: { picks: number; followers: number; following: number; likesReceived: number; stakers: number };
+  user: { id: string; fullName: string; username?: string | null; isOra: boolean };
+  stats: { codes: number; followers: number; following: number; likesReceived: number; stakers: number };
   achievements: string[];
   virality?: CreatorViralityProfile;
   isSelf: boolean;
@@ -83,6 +87,7 @@ export interface SocialProfile {
 export interface SocialUserRow {
   id: string;
   fullName: string;
+  username?: string | null;
   isOra: boolean;
   isSelf: boolean;
   isFollowing: boolean;
@@ -118,7 +123,7 @@ interface ToggleFollowData {
 interface CommentData {
   _id: string;
   pod: string;
-  user: { _id: string; fullName: string };
+  user: { _id: string; fullName: string; username?: string };
   text: string;
   createdAt: string;
 }
@@ -171,7 +176,7 @@ export class SocialFeedService {
   readonly creatorLeaderboard = signal<CreatorLeaderboardEntry[]>([]);
   readonly creatorLeaderboardLoading = signal(false);
 
-  readonly savedPods = signal<Pod[]>([]);
+  readonly savedPods = signal<(Pod | CodePost)[]>([]);
   readonly savedTotal = signal(0);
   readonly savedLoading = signal(false);
   readonly savedHasMore = signal(false);
@@ -283,6 +288,12 @@ export class SocialFeedService {
       requests.push(this.hydrateStats(ids));
     }
     await Promise.all(requests);
+    await this.syncFollows();
+    await this.fetchCreators();
+  }
+
+  async syncFollows(): Promise<void> {
+    if (!this.isLoggedIn()) return;
     try {
       const res = await lastValueFrom(this.http.get<{ success: boolean; data: { ids: string[]; oraId: string } }>(
         `${this.API_URL}/social/following`,
@@ -294,11 +305,11 @@ export class SocialFeedService {
         const ora = res.data.oraId;
         if (ora) idsSet.add(ora);
         this.follows.set([...idsSet]);
+        this.persist();
       }
     } catch {
       // keep current follow state
     }
-    await this.fetchCreators();
   }
 
   private async hydrateStats(ids: string[]): Promise<void> {
@@ -359,6 +370,7 @@ export class SocialFeedService {
     return {
       ...i,
       id: i._id || i.id,
+      kind: (i.kind || 'pod') as 'pod',
       createdBy: i.createdBy || '',
       creatorName: i.creatorName ?? null,
       timeRemaining: Math.max(0, new Date(i.stakingClosesAt).getTime() - Date.now()),
@@ -368,11 +380,13 @@ export class SocialFeedService {
 
   private mapCodePost(i: any): CodePost {
     return {
+      kind: 'code',
       id: i._id || i.id || '',
       codeId: i.codeId || '',
       code: i.code || '',
       creatorId: i.creatorId || '',
       creatorName: i.creatorName || 'BetPool user',
+      creatorUsername: i.creatorUsername || null,
       boosted: !!i.boosted,
       createdAt: typeof i.createdAt === 'number' ? i.createdAt : new Date(i.createdAt).getTime(),
       expiresAt: i.expiresAt || null,
@@ -476,7 +490,7 @@ export class SocialFeedService {
         this.headers()
       ));
       if (res.success) {
-        const items = (res.data.items || []).map(i => this.mapFeedPod(i));
+        const items = (res.data.items || []).map(i => i.kind === 'code' ? this.mapCodePost(i) : this.mapFeedPod(i));
         this.savedPods.set(items);
         this.savedTotal.set(res.data.total);
         this.savedPage = 1;
@@ -501,7 +515,7 @@ export class SocialFeedService {
         this.headers()
       ));
       if (res.success) {
-        const items = (res.data.items || []).map(i => this.mapFeedPod(i));
+        const items = (res.data.items || []).map(i => i.kind === 'code' ? this.mapCodePost(i) : this.mapFeedPod(i));
         this.savedPods.update(cur => {
           const seen = new Set(cur.map(p => p.id));
           return [...cur, ...items.filter(p => !seen.has(p.id))];
@@ -561,15 +575,15 @@ export class SocialFeedService {
     }
   }
 
-  async fetchCreatorPicks(userId: string, page = 1, limit = 12): Promise<{ items: Pod[]; total: number }> {
+  async fetchCreatorCodes(userId: string, page = 1, limit = 12): Promise<{ items: CodePost[]; total: number }> {
     if (!this.isLoggedIn()) return { items: [], total: 0 };
     try {
-      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: any[]; total: number } }>(
-        `${this.API_URL}/social/creator-picks?userId=${userId}&page=${page}&limit=${limit}`,
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: CodePost[]; total: number } }>(
+        `${this.API_URL}/social/creator-codes?userId=${userId}&page=${page}&limit=${limit}`,
         this.headers()
       ));
       if (!res.success) return { items: [], total: 0 };
-      return { items: (res.data.items || []).map(i => this.mapFeedPod(i)), total: res.data.total };
+      return { items: res.data.items || [], total: res.data.total || 0 };
     } catch {
       return { items: [], total: 0 };
     }
@@ -718,6 +732,7 @@ export class SocialFeedService {
           podId: String(c.pod),
           authorId: String(c.user?._id ?? ''),
           authorName: c.user?.fullName || 'BetPool user',
+          authorUsername: c.user?.username || null,
           text: c.text,
           createdAt: c.createdAt
         }));
@@ -740,6 +755,7 @@ export class SocialFeedService {
       podId,
       authorId: me?.id || '',
       authorName: me?.fullName || 'You',
+      authorUsername: me?.username || null,
       text: trimmed,
       createdAt: new Date().toISOString()
     };
@@ -758,6 +774,7 @@ export class SocialFeedService {
           podId: String(res.data.pod),
           authorId: String(res.data.user?._id ?? ''),
           authorName: res.data.user?.fullName || me?.fullName || 'You',
+          authorUsername: res.data.user?.username || me?.username || null,
           text: res.data.text,
           createdAt: res.data.createdAt
         };
