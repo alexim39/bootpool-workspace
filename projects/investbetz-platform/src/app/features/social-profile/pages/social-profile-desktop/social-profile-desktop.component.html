@@ -123,7 +123,7 @@
           @switch (store.tab()) {
             @case ('codes') {
               @if (store.codesLoading() && store.codes().length === 0) {
-                <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading codesâ€¦</span></div>
+                <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading codes…</span></div>
               } @else if (store.codes().length === 0) {
                 <div class="empty-state">
                   <mat-icon>qr_code_2</mat-icon>
@@ -144,7 +144,7 @@
             }
             @case ('followers') {
               @if (store.followersLoading() && store.followers().length === 0) {
-                <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading followersâ€¦</span></div>
+                <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading followers…</span></div>
               } @else if (store.followers().length === 0) {
                 <div class="empty-state">
                   <mat-icon>person_search</mat-icon>
@@ -185,7 +185,7 @@
             }
             @case ('following') {
               @if (store.followingLoading() && store.following().length === 0) {
-                <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading followingâ€¦</span></div>
+                <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading following…</span></div>
               } @else if (store.following().length === 0) {
                 <div class="empty-state">
                   <mat-icon>person_search</mat-icon>
@@ -231,7 +231,7 @@
   } @else if (store.loading()) {
     <div class="page-loading">
       <mat-spinner diameter="28"></mat-spinner>
-      <span>Loading profileâ€¦</span>
+      <span>Loading profile…</span>
     </div>
   } @else {
     <div class="page-error">

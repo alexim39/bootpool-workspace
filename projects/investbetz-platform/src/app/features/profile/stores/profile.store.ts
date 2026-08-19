@@ -37,7 +37,13 @@ export class ProfileStore {
   constructor() {
     this.profileForm = this._fb.group({
       fullName: [this.user()?.fullName || '', Validators.required],
-      email: [this.user()?.email || '', [Validators.email]]
+      email: [this.user()?.email || '', [Validators.email]],
+      username: [this.user()?.username || '', [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(24),
+        Validators.pattern(/^[a-z0-9._-]+$/i)
+      ]]
     });
 
     this.pinForm = this._fb.group({
@@ -66,12 +72,20 @@ export class ProfileStore {
   updateProfile(afterSubmit: (message: string) => void) {
     if (this.profileForm.invalid || this.profileForm.pristine) return;
     this.savingProfile.set(true);
-    this._auth.updateProfile(this.profileForm.value).subscribe({
+    const value = { ...this.profileForm.value };
+    if (typeof value.username === 'string') value.username = value.username.trim().toLowerCase();
+    this._auth.updateProfile(value).subscribe({
       next: (res) => {
         this.savingProfile.set(false);
         if (res.success && res.data) {
           this._auth.user.set(res.data);
           localStorage.setItem('ib_user', JSON.stringify(res.data));
+          this.profileForm.patchValue({
+            fullName: res.data.fullName,
+            email: res.data.email || '',
+            username: res.data.username || ''
+          });
+          this.profileForm.markAsPristine();
           afterSubmit('Profile updated');
         } else {
           afterSubmit(res.message || 'Failed to update profile');

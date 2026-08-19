@@ -10,6 +10,9 @@
         </div>
         <div class="info">
           <h2>{{ store.user()?.fullName || 'User' }}</h2>
+          @if (store.user()?.username) {
+            <span class="username">{{ '@' + store.user()?.username }}</span>
+          }
           <span class="phone">{{ store.formatPhone(store.user()?.phone) }}</span>
         </div>
         <div class="badges">
@@ -47,7 +50,7 @@
           <mat-icon class="menu-icon emerald">person</mat-icon>
           <div class="menu-text">
             <span class="menu-title">Personal Info</span>
-            <span class="menu-desc">Name, email, phone</span>
+            <span class="menu-desc">Name, username, email, phone</span>
           </div>
           <mat-icon class="chevron">chevron_right</mat-icon>
         </button>
@@ -193,6 +196,15 @@
                 <mat-label>Email Address</mat-label>
                 <input matInput formControlName="email" type="email" autocomplete="email">
                 <mat-icon matPrefix>email</mat-icon>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Username</mat-label>
+                <input matInput formControlName="username" autocomplete="username">
+                <span matPrefix>&#64;</span>
+                @if (store.profileForm.get('username')?.hasError('required')) { <mat-error>Username required</mat-error> }
+                @if (store.profileForm.get('username')?.hasError('pattern') || store.profileForm.get('username')?.hasError('minlength') || store.profileForm.get('username')?.hasError('maxlength')) {
+                  <mat-error>3-24 characters (letters, numbers, . _ -)</mat-error>
+                }
               </mat-form-field>
               <div class="readonly-phone">
                 <label>Phone Number</label>

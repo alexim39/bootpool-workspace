@@ -10,6 +10,9 @@
           </div>
           <div class="profile-info">
             <h2>{{ store.user()?.fullName || 'User' }}</h2>
+            @if (store.user()?.username) {
+              <p class="profile-username">{{ '@' + store.user()?.username }}</p>
+            }
             <p class="profile-phone">{{ store.formatPhone(store.user()?.phone) }}</p>
             <div class="verification-badges">
               <mat-chip class="chip-phone-v" selected>
@@ -203,6 +206,19 @@
                 @if (store.profileForm.get('email')?.hasError('email')) {
                   <mat-error>Enter a valid email</mat-error>
                 }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Username</mat-label>
+                <input matInput formControlName="username" autocomplete="username">
+                <span matPrefix>&#64;</span>
+                @if (store.profileForm.get('username')?.hasError('required')) {
+                  <mat-error>Username is required</mat-error>
+                }
+                @if (store.profileForm.get('username')?.hasError('pattern') || store.profileForm.get('username')?.hasError('minlength') || store.profileForm.get('username')?.hasError('maxlength')) {
+                  <mat-error>3-24 characters (letters, numbers, . _ -)</mat-error>
+                }
+                <mat-hint>Your public handle shown across the app</mat-hint>
               </mat-form-field>
 
               <div class="readonly-field">

@@ -210,7 +210,7 @@ export class AuthService {
     });
   }
 
-  updateProfile(data: { fullName?: string; email?: string }): Observable<{ success: boolean; data?: User; message?: string }> {
+  updateProfile(data: { fullName?: string; email?: string; username?: string }): Observable<{ success: boolean; data?: User; message?: string }> {
     return this.http.put<{ success: boolean; data: User }>(`${this.API_URL}/auth/profile`, data, {
       headers: { Authorization: `Bearer ${this.token()}` }
     });

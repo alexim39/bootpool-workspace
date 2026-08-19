@@ -1,4 +1,4 @@
-﻿@if (socialFeed.isLoggedIn() && socialFeed.creators().length > 0) {
+@if (socialFeed.isLoggedIn() && socialFeed.creators().length > 0) {
   <section class="w2f-section">
     <div class="w2f-head">
       <div class="w2f-head-text">
@@ -29,11 +29,11 @@
               <span class="w2f-handle">{{ '@' + c.username }}</span>
             }
             <span class="w2f-sub">
-              {{ c.followerCount.toLocaleString() }} {{ c.followerCount === 1 ? 'follower' : 'followers' }} Â· {{ c.codeCount ?? 0 }} {{ (c.codeCount ?? 0) === 1 ? 'code' : 'codes' }}
+              {{ c.followerCount.toLocaleString() }} {{ c.followerCount === 1 ? 'follower' : 'followers' }} · {{ c.codeCount ?? 0 }} {{ (c.codeCount ?? 0) === 1 ? 'code' : 'codes' }}
             </span>
           </div>
           <span
-            [attr.title]="c.isOra ? 'Ora is the AI curator â€” you are always following' : ''"
+            [attr.title]="c.isOra ? 'Ora is the AI curator — you are always following' : ''"
             class="w2f-follow-wrap"
             [class.w2f-follow-locked]="c.isOra">
             <button
