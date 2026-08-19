@@ -13,6 +13,7 @@ export interface PodLeg {
 
 export interface Pod {
   id: string;
+  kind?: 'pod';
   title: string;
   description?: string;
   sport: string;

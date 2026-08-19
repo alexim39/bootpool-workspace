@@ -31,9 +31,12 @@
                 <mat-icon class="verified">verified</mat-icon>
               }
               @if (p.virality && p.virality.badge && p.virality.badge !== 'Rookie') {
-                <span class="creator-badge" [title]="'Creator score ₦' + (p.virality.score | number)">{{ p.virality.badge }}</span>
+                <span class="creator-badge" [title]="'Creator score â‚¦' + (p.virality.score | number)">{{ p.virality.badge }}</span>
               }
             </div>
+            @if (p.user.username) {
+              <div class="username-row">{{ '@' + p.user.username }}</div>
+            }
             <div class="role-row">
               <span class="role-chip">{{ roleLabel() }}</span>
               @if (p.virality && p.virality.rank != null) {
@@ -120,7 +123,7 @@
           @switch (store.tab()) {
             @case ('codes') {
               @if (store.codesLoading() && store.codes().length === 0) {
-                <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading codes…</span></div>
+                <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading codesâ€¦</span></div>
               } @else if (store.codes().length === 0) {
                 <div class="empty-state">
                   <mat-icon>qr_code_2</mat-icon>
@@ -141,7 +144,7 @@
             }
             @case ('followers') {
               @if (store.followersLoading() && store.followers().length === 0) {
-                <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading followers…</span></div>
+                <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading followersâ€¦</span></div>
               } @else if (store.followers().length === 0) {
                 <div class="empty-state">
                   <mat-icon>person_search</mat-icon>
@@ -164,6 +167,9 @@
                           @if (row.isOra) { <mat-icon class="verified">verified</mat-icon> }
                           @if (row.isSelf) { <span class="you-chip">You</span> }
                         </div>
+                        @if (row.username) {
+                          <div class="user-handle">{{ '@' + row.username }}</div>
+                        }
                       </div>
                       @if (!row.isSelf && !row.isOra) {
                         <button mat-flat-button class="mini-follow" [class.following]="row.isFollowing"
@@ -179,7 +185,7 @@
             }
             @case ('following') {
               @if (store.followingLoading() && store.following().length === 0) {
-                <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading following…</span></div>
+                <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading followingâ€¦</span></div>
               } @else if (store.following().length === 0) {
                 <div class="empty-state">
                   <mat-icon>person_search</mat-icon>
@@ -202,6 +208,9 @@
                           @if (row.isOra) { <mat-icon class="verified">verified</mat-icon> }
                           @if (row.isSelf) { <span class="you-chip">You</span> }
                         </div>
+                        @if (row.username) {
+                          <div class="user-handle">{{ '@' + row.username }}</div>
+                        }
                       </div>
                       @if (!row.isSelf && !row.isOra) {
                         <button mat-flat-button class="mini-follow" [class.following]="row.isFollowing"
@@ -222,7 +231,7 @@
   } @else if (store.loading()) {
     <div class="page-loading">
       <mat-spinner diameter="28"></mat-spinner>
-      <span>Loading profile…</span>
+      <span>Loading profileâ€¦</span>
     </div>
   } @else {
     <div class="page-error">

@@ -1,4 +1,4 @@
-<article class="code-post" [class.boosted]="post().boosted">
+﻿<article class="code-post" [class.boosted]="post().boosted">
   <div class="post-head">
     <div class="creator-info">
       <span class="creator-avatar">
@@ -10,11 +10,14 @@
       </span>
       <div class="creator-meta">
         <a class="creator-name" [routerLink]="'/social/' + post().creatorId">{{ creatorName() }}</a>
-        <span class="post-time">{{ post().createdAt | date: 'MMM d • h:mm a' }}</span>
+        @if (post().creatorUsername) {
+          <span class="creator-username">{{ '@' + post().creatorUsername }}</span>
+        }
+        <span class="post-time">{{ post().createdAt | date: 'MMM d â€¢ h:mm a' }}</span>
       </div>
     </div>
     @if (post().boosted) {
-      <span class="boost-chip" title="Top 10 creator — boosted in feeds">
+      <span class="boost-chip" title="Top 10 creator â€” boosted in feeds">
         <mat-icon>trending_up</mat-icon>
         Hot
       </span>
@@ -28,9 +31,9 @@
     </button>
   </div>
   <div class="code-sub">
-    {{ post().totalLegs }} legs • {{ post().combinedMultiplier.toFixed(2) }}x
+    {{ post().totalLegs }} legs â€¢ {{ post().combinedMultiplier.toFixed(2) }}x
     @if (expiresLabel()) {
-      <span class="expiry">• {{ expiresLabel() }}</span>
+      <span class="expiry">â€¢ {{ expiresLabel() }}</span>
     }
   </div>
   @if (post().stakeAmount) {
@@ -52,7 +55,7 @@
   <button class="stake-now" (click)="stakeNow()" [disabled]="staking()">
     @if (staking()) {
       <mat-spinner diameter="16" />
-      Applying…
+      Applyingâ€¦
     } @else {
       Stake now
     }
@@ -77,18 +80,21 @@
       <div class="comments-list">
         @for (c of social.commentsFor(post().codeId); track c.id) {
           <div class="comment-row">
-            <span class="comment-author">{{ c.authorName }}</span>
+            <span class="comment-author">
+              {{ c.authorName }}
+              @if (c.authorUsername) { <span class="comment-user">{{ '@' + c.authorUsername }}</span> }
+            </span>
             <span class="comment-text">{{ c.text }}</span>
           </div>
         } @empty {
-          <div class="comments-empty">No comments yet — say something about this code.</div>
+          <div class="comments-empty">No comments yet â€” say something about this code.</div>
         }
       </div>
       <div class="comment-input-row">
         <input
           class="comment-input"
           [(ngModel)]="commentText"
-          placeholder="Add a comment…"
+          placeholder="Add a commentâ€¦"
           (keydown.enter)="postComment()"
         />
         <button class="comment-send" (click)="postComment()" [disabled]="social.commentPosting() || !commentText().trim()">

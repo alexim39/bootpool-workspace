@@ -49,6 +49,7 @@ export interface User {
   id: string;
   phone: string;
   fullName: string;
+  username?: string;
   email?: string;
   phoneVerified: boolean;
   kycVerified: boolean;

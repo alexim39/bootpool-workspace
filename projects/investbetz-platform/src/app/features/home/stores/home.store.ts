@@ -6,7 +6,7 @@ import { BookingCodeLeg } from '../../../core/services';
 import { WalletService } from '../../../core/services';
 import { AuthService } from '../../../core/services';
 import { OraRecordService, OraRecord } from '../../../core/services';
-import { SocialFeedService } from '../../../core/services';
+import { SocialFeedService, CodePost } from '../../../core/services';
 
 @Injectable({ providedIn: 'root' })
 export class HomeStore implements OnDestroy {
@@ -79,6 +79,9 @@ export class HomeStore implements OnDestroy {
     if (mode === 'following') {
       this._social.ensureFollowingLoaded();
     }
+    if (mode === 'saved') {
+      this._social.ensureSavedLoaded();
+    }
   }
 
   openBuildCode() {
@@ -99,14 +102,12 @@ export class HomeStore implements OnDestroy {
     return this._social.followingPosts();
   });
 
-  readonly savedPods = computed(() => {
+  readonly savedPods = computed<(Pod | CodePost)[]>(() => {
     if (this.isLoggedIn()) return this._social.savedPods();
     return this.displayedPods().filter(p => this._social.isSaved(p.id));
   });
 
   readonly feedPods = computed(() => {
-    const mode = this.feedMode();
-    if (mode === 'saved') return this.savedPods();
     return this.displayedPods();
   });
 

@@ -61,6 +61,14 @@
   color: #4ade80;
 }
 
+.creator-username {
+  font-size: 11.5px;
+  color: #4ade80;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .post-time {
   font-size: 11.5px;
   color: #8ea3c8;
@@ -241,7 +249,14 @@
 .comment-author {
   font-size: 12px;
   font-weight: 700;
-  color: #4ade80;
+  color: #f5f8ff;
+
+  .comment-user {
+    margin-left: 0.35rem;
+    font-size: 11px;
+    font-weight: 500;
+    color: #4ade80;
+  }
 }
 
 .comment-text {

@@ -144,6 +144,13 @@
     .cover-body {
       padding: 3rem 1.5rem 1.4rem;
 
+      .username-row {
+        margin-top: 0.15rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #16c79a;
+      }
+
       .name-row {
         display: flex;
         align-items: center;
@@ -554,6 +561,16 @@
                 padding: 0.1rem 0.4rem;
                 flex-shrink: 0;
               }
+            }
+
+            .user-handle {
+              margin-top: 0.1rem;
+              font-size: 0.76rem;
+              font-weight: 500;
+              color: rgba(255, 255, 255, 0.45);
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
             }
           }
 

@@ -29,3 +29,4 @@ export type { WalletBalance, Transaction, TransactionHistoryResponse, WalletHist
 export { VirtualGamesService } from './virtual-games.service';
 export type { VirtualGameId, VirtualGame, PlayResult, PlayHistoryItem, VirtualGameStats, HistoryResultFilter } from './virtual-games.service';
 export { SocialFeedService } from './social-feed.service';
+export type { SocialComment, SocialCreator, CodePostLeg, CodePost, CreatorViralityProfile, CreatorLeaderboardEntry, SocialProfile, SocialUserRow } from './social-feed.service';
