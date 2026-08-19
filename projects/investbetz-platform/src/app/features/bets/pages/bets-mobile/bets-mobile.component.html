@@ -120,6 +120,9 @@
                           </span>
                           <span class="parlay-mobile-leg-pick">{{ item.selection }}</span>
                         </div>
+                        @if (item.homeScore != null && item.awayScore != null) {
+                          <span class="score-pill">Ended {{ item.homeScore }} - {{ item.awayScore }}</span>
+                        }
                         <div class="parlay-mobile-leg-odds-block">
                           <span class="parlay-mobile-leg-odds">{{ item.gainsMultiplier.toFixed(2) }}x</span>
                           @if (item.status !== 'pending') {
@@ -139,7 +142,11 @@
                 } @else {
                   <div class="bet-teams">
                     <span>{{ stake.pod.homeTeam }}</span>
-                    <mat-icon>sports_soccer</mat-icon>
+                    @if (stake.pod.homeScore != null && stake.pod.awayScore != null) {
+                      <span class="score-pill">Ended {{ stake.pod.homeScore }} - {{ stake.pod.awayScore }}</span>
+                    } @else {
+                      <mat-icon>sports_soccer</mat-icon>
+                    }
                     <span>{{ stake.pod.awayTeam }}</span>
                   </div>
                 }
@@ -168,13 +175,13 @@
                     <span>Stake: <strong>{{ store.formatCurrency(stake.stakeAmount) }}</strong></span>
                     <span>Payout: <strong class="emerald">{{ store.formatCurrency(stake.netPayout) }}</strong></span>
                   </div>
-                  @if (!stake.isSettled && !stake.isParlay) {
+                  @if (!stake.isSettled && !stake.isParlay && stake.canCashOut) {
                     <button class="btn-cashout" (click)="store.requestCashout(stake.id)" aria-label="Cash out">
                       <mat-icon>autorenew</mat-icon>
                     </button>
                   }
                 </div>
-                @if (!stake.isSettled) {
+                @if (!stake.isSettled && stake.canCashOut) {
                   <app-auto-cashout [stake]="stake"></app-auto-cashout>
                 }
                 @if (stake.isSettled) {
