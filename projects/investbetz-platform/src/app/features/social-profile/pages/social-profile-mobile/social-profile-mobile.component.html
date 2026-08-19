@@ -55,9 +55,9 @@
         </div>
 
         <div class="stats-row">
-          <button class="stat" (click)="store.loadTab('picks')">
-            <span class="stat-val">{{ p.stats.picks }}</span>
-            <span class="stat-lbl">Picks</span>
+          <button class="stat" (click)="store.loadTab('codes')">
+            <span class="stat-val">{{ p.stats.codes }}</span>
+            <span class="stat-lbl">Codes</span>
           </button>
           <button class="stat" (click)="store.loadTab('followers')">
             <span class="stat-val">{{ p.stats.followers }}</span>
@@ -99,8 +99,8 @@
 
     <section class="tab-section">
       <div class="tabs">
-        <button class="tab" [class.active]="store.tab() === 'picks'" (click)="store.loadTab('picks')">
-          Picks <span class="tab-count">{{ store.picksTotal() }}</span>
+        <button class="tab" [class.active]="store.tab() === 'codes'" (click)="store.loadTab('codes')">
+          Codes <span class="tab-count">{{ store.codesTotal() }}</span>
         </button>
         <button class="tab" [class.active]="store.tab() === 'followers'" (click)="store.loadTab('followers')">
           Followers <span class="tab-count">{{ store.followersTotal() }}</span>
@@ -112,28 +112,23 @@
 
       <div class="tab-body">
         @switch (store.tab()) {
-          @case ('picks') {
-            @if (store.picksLoading() && store.picks().length === 0) {
-              <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading picks…</span></div>
-            } @else if (store.picks().length === 0) {
+          @case ('codes') {
+            @if (store.codesLoading() && store.codes().length === 0) {
+              <div class="tab-loading"><mat-spinner diameter="24"></mat-spinner><span>Loading codes…</span></div>
+            } @else if (store.codes().length === 0) {
               <div class="empty-state">
-                <mat-icon>flag</mat-icon>
-                <span>{{ p.isSelf ? 'You have not published any picks yet.' : p.user.fullName + ' has no picks yet.' }}</span>
+                <mat-icon>qr_code_2</mat-icon>
+                <span>{{ p.isSelf ? 'You have not shared any booking codes yet.' : p.user.fullName + ' has not shared any booking codes yet.' }}</span>
               </div>
             } @else {
               <div class="pick-list">
-                @for (pod of store.picks(); track pod.id) {
-                  <app-pod-card
-                    [pod]="pod"
-                    [manageable]="false"
-                    (placeStake)="store.openPod($event)"
-                    (toggleSelect)="store.openPod($event)"
-                  />
+                @for (post of store.codes(); track post.id) {
+                  <app-code-post-card [post]="post" />
                 }
               </div>
-              @if (store.picksHasMore()) {
-                <button mat-stroked-button class="load-more" (click)="store.loadMorePicks()" [disabled]="store.picksLoading()">
-                  @if (store.picksLoading()) { <mat-spinner diameter="16"></mat-spinner> } @else { Load more picks }
+              @if (store.codesHasMore()) {
+                <button mat-stroked-button class="load-more" (click)="store.loadMoreCodes()" [disabled]="store.codesLoading()">
+                  @if (store.codesLoading()) { <mat-spinner diameter="16"></mat-spinner> } @else { Load more codes }
                 </button>
               }
             }

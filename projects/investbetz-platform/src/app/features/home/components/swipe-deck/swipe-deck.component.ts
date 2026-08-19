@@ -26,7 +26,6 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
   @Output() placeStake = new EventEmitter<Pod>();
   @Output() toggleSelect = new EventEmitter<Pod>();
   @Output() loadMore = new EventEmitter<void>();
-  @Output() manage = new EventEmitter<Pod>();
 
   private snackBar = inject(MatSnackBar);
   private el = inject(ElementRef);

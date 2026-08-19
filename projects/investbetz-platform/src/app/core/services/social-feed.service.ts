@@ -73,7 +73,7 @@ export interface CreatorLeaderboardEntry {
 
 export interface SocialProfile {
   user: { id: string; fullName: string; isOra: boolean };
-  stats: { picks: number; followers: number; following: number; likesReceived: number; stakers: number };
+  stats: { codes: number; followers: number; following: number; likesReceived: number; stakers: number };
   achievements: string[];
   virality?: CreatorViralityProfile;
   isSelf: boolean;
@@ -561,15 +561,15 @@ export class SocialFeedService {
     }
   }
 
-  async fetchCreatorPicks(userId: string, page = 1, limit = 12): Promise<{ items: Pod[]; total: number }> {
+  async fetchCreatorCodes(userId: string, page = 1, limit = 12): Promise<{ items: CodePost[]; total: number }> {
     if (!this.isLoggedIn()) return { items: [], total: 0 };
     try {
-      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: any[]; total: number } }>(
-        `${this.API_URL}/social/creator-picks?userId=${userId}&page=${page}&limit=${limit}`,
+      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: CodePost[]; total: number } }>(
+        `${this.API_URL}/social/creator-codes?userId=${userId}&page=${page}&limit=${limit}`,
         this.headers()
       ));
       if (!res.success) return { items: [], total: 0 };
-      return { items: (res.data.items || []).map(i => this.mapFeedPod(i)), total: res.data.total };
+      return { items: res.data.items || [], total: res.data.total || 0 };
     } catch {
       return { items: [], total: 0 };
     }

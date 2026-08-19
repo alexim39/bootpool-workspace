@@ -20,6 +20,10 @@ export class HomeStore implements OnDestroy {
   readonly selectedPod = signal<Pod | null>(null);
   readonly selectedSport = signal<string | null>(null);
   readonly betSlipSelections = signal<Pod[]>([]);
+  readonly bookingCodeSelections = signal<Pod[]>([]);
+  readonly bookingCodePods = signal<Pod[]>([]);
+  readonly bookingCodePodsLoading = signal(false);
+  private bookingCodePodsLoaded = false;
   readonly betSlipOpen = signal(false);
   readonly searchQuery = signal('');
 
@@ -303,6 +307,58 @@ export class HomeStore implements OnDestroy {
     }
   }
 
+  toggleBookingCodeSelection(pod: Pod) {
+    if (!this.auth.isAuthenticated()) return;
+
+    this.bookingCodeSelections.update(selected => {
+      const exists = selected.find(s => s.id === pod.id);
+      if (exists) {
+        return selected.filter(s => s.id !== pod.id);
+      }
+      if (selected.length >= this.maxBookingCodeLegs) {
+        return selected;
+      }
+      return [...selected, pod];
+    });
+  }
+
+  isBookingCodeSelected(podId: string): boolean {
+    return this.bookingCodeSelections().some(s => s.id === podId);
+  }
+
+  clearBookingCodeSelections() {
+    this.bookingCodeSelections.set([]);
+  }
+
+  loadBookingCodePods() {
+    if (this.bookingCodePodsLoaded || this.bookingCodePodsLoading()) return;
+    this.bookingCodePodsLoading.set(true);
+    const pageSize = 100;
+    let offset = 0;
+    const collect = (): void => {
+      this.pods.fetchFeedPage({ limit: pageSize, offset }).subscribe({
+        next: (page) => {
+          const items = page.items ?? [];
+          this.bookingCodePods.update(existing => {
+            const seen = new Set(existing.map(p => p.id));
+            return [...existing, ...items.filter(p => !seen.has(p.id))];
+          });
+          offset += items.length;
+          if (items.length > 0 && offset < (page.total ?? 0)) {
+            collect();
+          } else {
+            this.bookingCodePodsLoaded = true;
+            this.bookingCodePodsLoading.set(false);
+          }
+        },
+        error: () => {
+          this.bookingCodePodsLoading.set(false);
+        }
+      });
+    };
+    collect();
+  }
+
   toggleSlip() { this.betSlipOpen.update(v => !v); }
 
   removeFromSlip(podId: string) {
@@ -324,6 +380,7 @@ export class HomeStore implements OnDestroy {
     this.betSlipSelections.set([]);
     this.betSlipOpen.set(false);
     this.clearBookingCode();
+    this.clearBookingCodeSelections();
   }
 
   placeAccumulator(data: PlaceAccumulatorRequest) {
@@ -369,7 +426,7 @@ export class HomeStore implements OnDestroy {
           this.myLatestCode.set({
             code: res.data.code,
             expiresAt: res.data.expiresAt,
-            combinedMultiplier: res.data.combinedMultiplier || this.betSlipSelections().reduce((acc, p) => acc * p.gainsMultiplier, 1),
+            combinedMultiplier: res.data.combinedMultiplier || this.bookingCodeSelections().reduce((acc, p) => acc * p.gainsMultiplier, 1),
             legCount: res.data.legCount || ids.length
           });
           this._social.refreshFollowingFeed();

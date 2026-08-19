@@ -98,10 +98,7 @@
               <span class="rail-label">{{ socialFeed.isSaved(pod.id) ? 'Saved' : 'Save' }}</span>
             </button>
             @if (isMyPodOf(pod)) {
-              <button class="rail-btn follow" (click)="manage.emit(pod)" [matTooltip]="'Manage your pick'">
-                <mat-icon>edit</mat-icon>
-                <span class="rail-label">Manage</span>
-              </button>
+              <span class="rail-label you-label"><mat-icon>person</mat-icon> You</span>
             } @else {
               <button class="rail-btn follow" [class.following]="isFollowing(pod)" (click)="toggleFollow(pod)" [matTooltip]="isOraOf(pod) ? 'Always following Ora' : (isFollowing(pod) ? 'Unfollow' : 'Follow')">
                 <mat-icon>{{ isFollowing(pod) ? 'check' : 'add' }}</mat-icon>
