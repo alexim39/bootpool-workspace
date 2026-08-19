@@ -63,11 +63,13 @@ export class BetCardComponent {
     return new Date(dateStr).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' });
   }
 
-  matchTime(matchDate: string): string {
+  matchTime(matchDate: string | undefined | null): string {
+    if (!matchDate) return '';
     return new Date(matchDate).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' });
   }
 
-  matchDay(matchDate: string): string {
+  matchDay(matchDate: string | undefined | null): string {
+    if (!matchDate) return '';
     const d = new Date(matchDate);
     const today = new Date();
     const tomorrow = new Date(today.getTime() + 86400000);
@@ -77,12 +79,13 @@ export class BetCardComponent {
     return day;
   }
 
-  matchCountdown(matchDate: string): string {
+  matchCountdown(matchDate: string | undefined | null): string {
+    if (!matchDate) return '';
     return kickoffCountdown(matchDate);
   }
 
-  isUpcomingMatchDate(matchDate: string): boolean {
-    return new Date(matchDate).getTime() > Date.now();
+  isUpcomingMatchDate(matchDate: string | undefined | null): boolean {
+    return !!matchDate && new Date(matchDate).getTime() > Date.now();
   }
 
   getStatusClass(status: Stake['status']): string {

@@ -67,41 +67,41 @@
         } @else {
           <div class="bet-match">
             <div class="match-teams">
-              <span class="team home">{{ stake.pod.homeTeam }}</span>
+              <span class="team home">{{ stake.pod?.homeTeam }}</span>
               @if (hasScore(stake.pod)) {
-                <span class="match-score" [class.score-draw]="stake.pod.homeScore === stake.pod.awayScore">
+                <span class="match-score" [class.score-draw]="stake.pod?.homeScore === stake.pod?.awayScore">
                   <span class="score-ft">FT</span>
-                  <span class="score-value">{{ stake.pod.homeScore }} : {{ stake.pod.awayScore }}</span>
+                  <span class="score-value">{{ stake.pod?.homeScore }} : {{ stake.pod?.awayScore }}</span>
                 </span>
               } @else {
                 <mat-icon>sports_soccer</mat-icon>
               }
-              <span class="team away">{{ stake.pod.awayTeam }}</span>
+              <span class="team away">{{ stake.pod?.awayTeam }}</span>
             </div>
             <div class="match-info">
-              @if (stake.pod.league) {
-                <span class="league">{{ stake.pod.league }}</span>
+              @if (stake.pod?.league) {
+                <span class="league">{{ stake.pod?.league }}</span>
               }
-              @if (stake.pod.marketType) {
-                <span class="market-type">{{ stake.pod.marketType }}</span>
+              @if (stake.pod?.marketType) {
+                <span class="market-type">{{ stake.pod?.marketType }}</span>
               }
-              @if (stake.pod.refundPercent) {
-                <span class="refund-chip">{{ stake.pod.refundPercent }}% cash back</span>
+              @if (stake.pod?.refundPercent) {
+                <span class="refund-chip">{{ stake.pod?.refundPercent }}% cash back</span>
               }
             </div>
-            @if (stake.pod.matchDate) {
+            @if (stake.pod?.matchDate) {
               <div class="match-time-row">
                 <mat-icon>schedule</mat-icon>
-                <span class="match-time">{{ matchTime(stake.pod.matchDate) }} · {{ matchDay(stake.pod.matchDate) }}</span>
-                @if (isUpcomingMatchDate(stake.pod.matchDate) && matchCountdown(stake.pod.matchDate)) {
-                  <span class="match-countdown">{{ matchCountdown(stake.pod.matchDate) }}</span>
+                <span class="match-time">{{ matchTime(stake.pod?.matchDate) }} · {{ matchDay(stake.pod?.matchDate) }}</span>
+                @if (isUpcomingMatchDate(stake.pod?.matchDate) && matchCountdown(stake.pod?.matchDate)) {
+                  <span class="match-countdown">{{ matchCountdown(stake.pod?.matchDate) }}</span>
                 }
               </div>
             }
           </div>
           <div class="bet-selection">
-            <span class="selection">{{ stake.pod.selection }}</span>
-            <span class="odds">{{ stake.pod.gainsMultiplier.toFixed(2) }}x</span>
+            <span class="selection">{{ stake.pod?.selection }}</span>
+            <span class="odds">{{ stake.pod?.gainsMultiplier?.toFixed(2) }}x</span>
           </div>
         }
 

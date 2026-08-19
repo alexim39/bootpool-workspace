@@ -141,33 +141,33 @@
                   </div>
                 } @else {
                   <div class="bet-teams">
-                    <span>{{ stake.pod.homeTeam }}</span>
-                    @if (stake.pod.homeScore != null && stake.pod.awayScore != null) {
-                      <span class="score-pill">Ended {{ stake.pod.homeScore }} - {{ stake.pod.awayScore }}</span>
+                    <span>{{ stake.pod?.homeTeam }}</span>
+                    @if (stake.pod?.homeScore != null && stake.pod?.awayScore != null) {
+                      <span class="score-pill">Ended {{ stake.pod?.homeScore }} - {{ stake.pod?.awayScore }}</span>
                     } @else {
                       <mat-icon>sports_soccer</mat-icon>
                     }
-                    <span>{{ stake.pod.awayTeam }}</span>
+                    <span>{{ stake.pod?.awayTeam }}</span>
                   </div>
                 }
                 @if (!stake.isParlay) {
                   <div class="bet-meta">
-                    <span class="bet-league" *ngIf="stake.pod.league">{{ stake.pod.league }}</span>
-                    <span class="bet-market" *ngIf="stake.pod.marketType">{{ stake.pod.marketType }}</span>
-                    <span class="bet-refund" *ngIf="stake.pod.refundPercent">{{ stake.pod.refundPercent }}% cash back</span>
+                    <span class="bet-league" *ngIf="stake.pod?.league">{{ stake.pod?.league }}</span>
+                    <span class="bet-market" *ngIf="stake.pod?.marketType">{{ stake.pod?.marketType }}</span>
+                    <span class="bet-refund" *ngIf="stake.pod?.refundPercent">{{ stake.pod?.refundPercent }}% cash back</span>
                   </div>
-                  @if (stake.pod.matchDate) {
+                  @if (stake.pod?.matchDate) {
                     <div class="bet-time-row">
-                      <span class="bet-time">{{ matchTime(stake.pod.matchDate) }} · {{ matchDay(stake.pod.matchDate) }}</span>
-                      @if (isUpcomingMatchDate(stake.pod.matchDate) && matchCountdown(stake.pod.matchDate)) {
-                        <span class="bet-countdown">{{ matchCountdown(stake.pod.matchDate) }}</span>
+                      <span class="bet-time">{{ matchTime(stake.pod?.matchDate) }} · {{ matchDay(stake.pod?.matchDate) }}</span>
+                      @if (isUpcomingMatchDate(stake.pod?.matchDate) && matchCountdown(stake.pod?.matchDate)) {
+                        <span class="bet-countdown">{{ matchCountdown(stake.pod?.matchDate) }}</span>
                       }
                     </div>
                   }
                   <div class="bet-pick">
                     <span class="pick-label">Pick:</span>
-                    <span class="pick-value">{{ stake.pod.selection }}</span>
-                    <span class="pick-odds">{{ stake.pod.gainsMultiplier.toFixed(2) }}x</span>
+                    <span class="pick-value">{{ stake.pod?.selection }}</span>
+                    <span class="pick-odds">{{ stake.pod?.gainsMultiplier?.toFixed(2) }}x</span>
                   </div>
                 }
                 <div class="bet-card-footer">
@@ -342,32 +342,32 @@
                   </div>
                 } @else {
                   <div class="bet-teams">
-                    <span>{{ stake.pod.homeTeam }}</span>
+                    <span>{{ stake.pod?.homeTeam }}</span>
                     <mat-icon>sports_soccer</mat-icon>
-                    <span>{{ stake.pod.awayTeam }}</span>
+                    <span>{{ stake.pod?.awayTeam }}</span>
                   </div>
-                  @if (stake.pod.homeScore != null && stake.pod.awayScore != null) {
-                    <div class="score-pill">Ended {{ stake.pod.homeScore }} - {{ stake.pod.awayScore }}</div>
+                  @if (stake.pod?.homeScore != null && stake.pod?.awayScore != null) {
+                    <div class="score-pill">Ended {{ stake.pod?.homeScore }} - {{ stake.pod?.awayScore }}</div>
                   }
                 }
                 @if (!stake.isParlay) {
                   <div class="bet-meta">
-                    <span class="bet-league" *ngIf="stake.pod.league">{{ stake.pod.league }}</span>
-                    <span class="bet-market" *ngIf="stake.pod.marketType">{{ stake.pod.marketType }}</span>
-                    <span class="bet-refund" *ngIf="stake.pod.refundPercent">{{ stake.pod.refundPercent }}% cash back</span>
+                    <span class="bet-league" *ngIf="stake.pod?.league">{{ stake.pod?.league }}</span>
+                    <span class="bet-market" *ngIf="stake.pod?.marketType">{{ stake.pod?.marketType }}</span>
+                    <span class="bet-refund" *ngIf="stake.pod?.refundPercent">{{ stake.pod?.refundPercent }}% cash back</span>
                   </div>
-                  @if (stake.pod.matchDate) {
+                  @if (stake.pod?.matchDate) {
                     <div class="bet-time-row">
-                      <span class="bet-time">{{ matchTime(stake.pod.matchDate) }} · {{ matchDay(stake.pod.matchDate) }}</span>
-                      @if (isUpcomingMatchDate(stake.pod.matchDate) && matchCountdown(stake.pod.matchDate)) {
-                        <span class="bet-countdown">{{ matchCountdown(stake.pod.matchDate) }}</span>
+                      <span class="bet-time">{{ matchTime(stake.pod?.matchDate) }} · {{ matchDay(stake.pod?.matchDate) }}</span>
+                      @if (isUpcomingMatchDate(stake.pod?.matchDate) && matchCountdown(stake.pod?.matchDate)) {
+                        <span class="bet-countdown">{{ matchCountdown(stake.pod?.matchDate) }}</span>
                       }
                     </div>
                   }
                   <div class="bet-pick">
                     <span class="pick-label">Pick:</span>
-                    <span class="pick-value">{{ stake.pod.selection }}</span>
-                    <span class="pick-odds">{{ stake.pod.gainsMultiplier.toFixed(2) }}x</span>
+                    <span class="pick-value">{{ stake.pod?.selection }}</span>
+                    <span class="pick-odds">{{ stake.pod?.gainsMultiplier?.toFixed(2) }}x</span>
                   </div>
                 }
                 <div class="bet-card-footer">
