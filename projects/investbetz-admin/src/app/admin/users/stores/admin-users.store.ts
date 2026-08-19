@@ -281,7 +281,7 @@ export class AdminUsersStore {
     if (!rows.length) return;
     const header = 'Phone,Name,Email,Status,KYC,Wallet Balance,Last Login,Registered\n';
     const csv = header + rows.map(u =>
-      `"${u.phone}","${u.fullName}","${u.email || ''}","${u.isSuspended ? 'Suspended' : 'Active'}","${u.kycVerified ? 'Verified' : 'Pending'}","${u.walletBalance ?? 0}","${u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleDateString() : ''}","${new Date(u.createdAt).toLocaleDateString()}"`
+      `"${u.phone}","${u.fullName}","${u.email || ''}","${u.isSuspended ? 'Suspended' : 'Active'}","${u.kycVerified ? 'Verified' : 'Pending'}","${u.walletBalance ?? 0}","${(u.lastActiveAt || u.lastLoginAt) ? new Date(u.lastActiveAt || u.lastLoginAt!).toLocaleDateString() : ''}","${new Date(u.createdAt).toLocaleDateString()}"`
     ).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);

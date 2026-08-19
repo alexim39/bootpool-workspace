@@ -46,6 +46,10 @@ export class BetCardComponent {
     return !stake.isParlay && (stake.refundAmount || 0) > 0;
   }
 
+  hasScore(target: { homeScore?: number | null; awayScore?: number | null } | undefined | null): boolean {
+    return !!target && target.homeScore != null && target.awayScore != null;
+  }
+
   formatDay(dateStr: string): string {
     const date = new Date(dateStr);
     const today = new Date();

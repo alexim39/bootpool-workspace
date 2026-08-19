@@ -103,6 +103,7 @@ export interface AdminUser {
   createdAt: string;
   registrationDate?: string;
   lastLoginAt?: string;
+  lastActiveAt?: string;
   walletBalance?: number;
   totalStakes?: number;
   kycType?: string;

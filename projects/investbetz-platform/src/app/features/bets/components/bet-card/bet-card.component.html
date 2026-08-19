@@ -28,7 +28,15 @@
               <div class="parlay-leg-row" [class.leg-won]="item.status === 'won'" [class.leg-lost]="item.status === 'lost'" [class.leg-void]="item.status === 'void'">
                 <div class="parlay-leg-index">{{ i + 1 }}</div>
                 <div class="parlay-leg-info">
-                  <div class="parlay-leg-match">{{ item.homeTeam }} vs {{ item.awayTeam }}</div>
+                  <div class="parlay-leg-match">
+                    <span class="parlay-leg-match-text">{{ item.homeTeam }} vs {{ item.awayTeam }}</span>
+                    @if (hasScore(item)) {
+                      <span class="parlay-leg-score" [class.score-draw]="item.homeScore === item.awayScore">
+                        <span class="score-ft">FT</span>
+                        <span class="score-value">{{ item.homeScore }} : {{ item.awayScore }}</span>
+                      </span>
+                    }
+                  </div>
                   <div class="parlay-leg-pick">{{ item.selection }}</div>
                   <div class="parlay-leg-meta">
                     <span class="parlay-leg-time">{{ matchTime(item.matchDate) }} · {{ matchDay(item.matchDate) }}</span>
@@ -60,7 +68,14 @@
           <div class="bet-match">
             <div class="match-teams">
               <span class="team home">{{ stake.pod.homeTeam }}</span>
-              <mat-icon>sports_soccer</mat-icon>
+              @if (hasScore(stake.pod)) {
+                <span class="match-score" [class.score-draw]="stake.pod.homeScore === stake.pod.awayScore">
+                  <span class="score-ft">FT</span>
+                  <span class="score-value">{{ stake.pod.homeScore }} : {{ stake.pod.awayScore }}</span>
+                </span>
+              } @else {
+                <mat-icon>sports_soccer</mat-icon>
+              }
               <span class="team away">{{ stake.pod.awayTeam }}</span>
             </div>
             <div class="match-info">

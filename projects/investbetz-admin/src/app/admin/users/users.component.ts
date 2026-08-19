@@ -82,11 +82,12 @@ export class UsersComponent implements OnInit {
     if (!d) return '-';
     const date = new Date(d);
     const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    if (diff < 86400000 && date.getDate() === now.getDate()) {
+    const dayDiff = Math.floor((new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
+      - new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()) / 86400000);
+    if (dayDiff === 0) {
       return `Today ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     }
-    if (diff < 172800000 && date.getDate() === now.getDate() - 1) {
+    if (dayDiff === 1) {
       return `Yesterday ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     }
     return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
