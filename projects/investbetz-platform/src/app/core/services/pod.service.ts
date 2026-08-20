@@ -149,11 +149,12 @@ export class PodService {
   }
 
   private updateCountdowns(): void {
-    this.pods.update(pods => pods.map(p => ({
-      ...p,
-      timeRemaining: Math.max(0, new Date(p.stakingClosesAt).getTime() - Date.now()),
-      isOpen: new Date(p.stakingClosesAt) >= new Date() && p.status === 'active'
-    })));
+    const now = Date.now();
+    const pods = this.pods();
+    for (const p of pods) {
+      p.timeRemaining = Math.max(0, new Date(p.stakingClosesAt).getTime() - now);
+      p.isOpen = now <= new Date(p.stakingClosesAt).getTime() && p.status === 'active';
+    }
   }
 
   private mapPod(p: any): Pod {

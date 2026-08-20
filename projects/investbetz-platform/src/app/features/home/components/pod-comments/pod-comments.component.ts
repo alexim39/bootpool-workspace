@@ -24,11 +24,19 @@ export class PodCommentsComponent {
   readonly socialFeed = inject(SocialFeedService);
 
   draft = '';
+  private loadedPodId = '';
 
   constructor() {
     effect(() => {
-      if (this.open() && this.pod()) {
-        this.socialFeed.loadComments(this.pod().id);
+      const open = this.open();
+      const pod = this.pod();
+      if (!open) {
+        this.loadedPodId = '';
+        return;
+      }
+      if (pod && this.loadedPodId !== pod.id) {
+        this.loadedPodId = pod.id;
+        this.socialFeed.loadComments(pod.id);
       }
     });
   }
