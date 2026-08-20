@@ -21,6 +21,7 @@ import { SwipeDeckComponent } from '../../components/swipe-deck/swipe-deck.compo
 import { WhoToFollowComponent } from '../../components/who-to-follow/who-to-follow.component';
 import { CodePostCardComponent } from '../../components/code-post-card/code-post-card.component';
 import { BuildCodeDialogComponent } from '../../components/build-code-dialog/build-code-dialog.component';
+import { CommentsSheetComponent } from '../../components/comments-sheet/comments-sheet.component';
 import { TopUpModalComponent, OraChatComponent, OraPickBannerComponent } from '../../../../core/components';
 import { MobileNavComponent } from '../../../../core/components';
 import { HomeStore } from '../../stores/home.store';
@@ -48,6 +49,7 @@ import { HomeStore } from '../../stores/home.store';
     WhoToFollowComponent,
     CodePostCardComponent,
     BuildCodeDialogComponent,
+    CommentsSheetComponent,
     TopUpModalComponent,
     MobileNavComponent,
     OraChatComponent,

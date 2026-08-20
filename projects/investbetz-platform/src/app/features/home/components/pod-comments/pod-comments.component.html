@@ -1,59 +1,49 @@
-@if (open()) {
-  <div class="comments-overlay" (click)="onClose()">
-    <div class="comments-panel" (click)="$event.stopPropagation()">
-      <div class="comments-header">
-        <span class="comments-title">Comments</span>
-        <span class="comments-count">{{ count(pod()) }}</span>
-        <button class="close-btn" (click)="onClose()" aria-label="Close comments">
-          <mat-icon>close</mat-icon>
-        </button>
+<div class="comments">
+  <div class="comments-list">
+    @if (socialFeed.commentsLoading() && commentsFor(pod()).length === 0) {
+      <div class="comments-loading">
+        <mat-spinner diameter="16" />
       </div>
-
-      <div class="comments-body">
-        @if (socialFeed.commentsLoading()) {
-          <div class="comments-empty">
-            <mat-spinner diameter="22" />
-          </div>
-        } @else if (commentsFor(pod()).length === 0) {
-          <div class="comments-empty">
-            <mat-icon>chat_bubble_outline</mat-icon>
-            <p>No comments yet — be the first to drop one.</p>
-          </div>
-        } @else {
-          @for (c of commentsFor(pod()); track c.id) {
-            <div class="comment-row" [class.temp]="c.id.startsWith('temp-')">
-              <span class="comment-avatar">{{ initialOf(c.authorName) }}</span>
-              <div class="comment-main">
-                <div class="comment-head">
-                  <span class="comment-name">{{ c.authorName }}</span>
-                  <span class="comment-time">{{ timeAgo(c.createdAt) }}</span>
-                </div>
-                <p class="comment-text">{{ c.text }}</p>
-              </div>
-            </div>
-          }
-        }
-      </div>
-
-      <div class="comments-footer">
-        @if (socialFeed.isLoggedIn()) {
-          <input
-            class="comment-input"
-            [placeholder]="'Comment on ' + socialFeed.creatorNameFor(pod()) + '’s pick…'"
-            [(ngModel)]="draft"
-            (keydown.enter)="send(pod())"
-            maxlength="500" />
-          <button class="send-btn" [disabled]="!draft.trim() || socialFeed.commentPosting()" (click)="send(pod())">
-            @if (socialFeed.commentPosting()) {
-              <mat-spinner diameter="16" />
-            } @else {
-              <mat-icon>send</mat-icon>
+    } @else {
+      @for (c of preview(pod()); track c.id) {
+        <div class="comment-row" [class.temp]="c.id.startsWith('temp-')">
+          <span class="comment-author">
+            {{ c.authorName }}
+            @if (c.authorUsername) {
+              <span class="comment-user">{{ '@' + c.authorUsername }}</span>
             }
-          </button>
-        } @else {
-          <button class="signin-btn" (click)="onClose()">Sign in to join the conversation</button>
-        }
-      </div>
-    </div>
+          </span>
+          <span class="comment-text">{{ c.text }}</span>
+        </div>
+      } @empty {
+        <div class="comments-empty">No comments yet — say something about this pick.</div>
+      }
+      @if (count(pod()) > preview(pod()).length) {
+        <button class="view-all-btn" (click)="openFullThread(pod())">
+          <mat-icon>forum</mat-icon>
+          View all {{ count(pod()) }} comments
+        </button>
+      }
+    }
   </div>
-}
+
+  <div class="comment-input-row">
+    @if (socialFeed.isLoggedIn()) {
+      <input
+        class="comment-input"
+        [placeholder]="'Comment on ' + socialFeed.creatorNameFor(pod()) + '’s pick…'"
+        [(ngModel)]="draft"
+        (keydown.enter)="send(pod())"
+        maxlength="500" />
+      <button class="comment-send" (click)="send(pod())" [disabled]="socialFeed.commentPosting() || !draft.trim()">
+        @if (socialFeed.commentPosting()) {
+          <mat-spinner diameter="16" />
+        } @else {
+          <mat-icon>send</mat-icon>
+        }
+      </button>
+    } @else {
+      <span class="comments-signin">Sign in to join the conversation</span>
+    }
+  </div>
+</div>

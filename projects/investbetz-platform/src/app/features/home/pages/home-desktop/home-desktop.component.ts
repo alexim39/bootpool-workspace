@@ -19,6 +19,7 @@ import { StoriesRailComponent } from '../../components/stories-rail/stories-rail
 import { WhoToFollowComponent } from '../../components/who-to-follow/who-to-follow.component';
 import { CodePostCardComponent } from '../../components/code-post-card/code-post-card.component';
 import { BuildCodeDialogComponent } from '../../components/build-code-dialog/build-code-dialog.component';
+import { CommentsSheetComponent } from '../../components/comments-sheet/comments-sheet.component';
 import { AppNavComponent, OraChatComponent, OraPickBannerComponent } from '../../../../core/components';
 import { HomeStore } from '../../stores/home.store';
 import { OraPick } from '../../../../core/services';
@@ -48,6 +49,7 @@ import { Pod } from '../../../../core/services';
     WhoToFollowComponent,
     CodePostCardComponent,
     BuildCodeDialogComponent,
+    CommentsSheetComponent,
     AppNavComponent,
     OraChatComponent,
     OraPickBannerComponent

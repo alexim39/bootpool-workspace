@@ -8,12 +8,11 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Pod } from '../../../../core/services';
 import { SocialFeedService } from '../../../../core/services';
-import { PodCommentsComponent } from '../pod-comments/pod-comments.component';
 
 @Component({
   selector: 'app-swipe-deck',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, MatSnackBarModule, MatProgressSpinnerModule, PodCommentsComponent],
+  imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, MatSnackBarModule, MatProgressSpinnerModule],
   templateUrl: './swipe-deck.component.html',
   styleUrls: ['./swipe-deck.component.scss']
 })
@@ -33,8 +32,6 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
   readonly socialFeed = inject(SocialFeedService);
 
   private nowTimer: ReturnType<typeof setInterval> | undefined;
-
-  readonly commentPod = signal<Pod | null>(null);
 
   readonly index = signal(0);
   readonly dragOffset = signal(0);

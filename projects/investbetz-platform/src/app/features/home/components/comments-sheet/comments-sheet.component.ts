@@ -1,59 +1,65 @@
-import { Component, input, inject, effect } from '@angular/core';
+import { Component, computed, inject, effect, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Pod } from '../../../../core/services';
 import { SocialFeedService, SocialComment } from '../../../../core/services/social-feed.service';
 
 @Component({
-  selector: 'app-pod-comments',
+  selector: 'app-comments-sheet',
   standalone: true,
   imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule, MatSnackBarModule],
-  templateUrl: './pod-comments.component.html',
-  styleUrls: ['./pod-comments.component.scss']
+  templateUrl: './comments-sheet.component.html',
+  styleUrls: ['./comments-sheet.component.scss']
 })
-export class PodCommentsComponent {
-  pod = input.required<Pod>();
-
-  private snackBar = inject(MatSnackBar);
+export class CommentsSheetComponent implements OnDestroy {
   readonly socialFeed = inject(SocialFeedService);
+  private snackBar = inject(MatSnackBar);
 
-  readonly previewCount = 3;
+  readonly pod = computed(() => this.socialFeed.commentsSheet());
 
   draft = '';
-  private loadedPodId = '';
 
   constructor() {
     effect(() => {
-      const pod = this.pod();
-      if (!pod) return;
-      if (this.loadedPodId !== pod.id) {
-        this.loadedPodId = pod.id;
-        this.socialFeed.loadComments(pod.id);
+      const p = this.pod();
+      if (p) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+        this.draft = '';
       }
     });
   }
 
-  commentsFor(pod: Pod): SocialComment[] {
-    return this.socialFeed.commentsFor(pod.id);
+  ngOnDestroy() {
+    document.body.style.overflow = '';
   }
 
-  preview(pod: Pod): SocialComment[] {
-    return this.commentsFor(pod).slice(0, this.previewCount);
+  commentsFor(): SocialComment[] {
+    const p = this.pod();
+    return p ? this.socialFeed.commentsFor(p.id) : [];
   }
 
-  count(pod: Pod): number {
-    return this.socialFeed.commentCount(pod);
+  count(): number {
+    const p = this.pod();
+    return p ? this.socialFeed.commentCount(p) : 0;
   }
 
-  openFullThread(pod: Pod) {
-    this.socialFeed.openCommentsSheet(pod);
+  close() {
+    this.socialFeed.closeCommentsSheet();
   }
 
-  async send(pod: Pod) {
+  @HostListener('document:keydown.escape')
+  onEsc() {
+    if (this.pod()) this.close();
+  }
+
+  async send() {
+    const p = this.pod();
+    if (!p) return;
     const text = this.draft.trim();
     if (!text) return;
     if (!this.socialFeed.isLoggedIn()) {
@@ -62,7 +68,7 @@ export class PodCommentsComponent {
     }
     this.draft = '';
     try {
-      await this.socialFeed.postComment(pod.id, text);
+      await this.socialFeed.postComment(p.id, text);
     } catch {
       this.snackBar.open('Could not post comment — try again', 'OK', { duration: 2500 });
       this.draft = text;

@@ -102,7 +102,7 @@
               <mat-icon class="rail-icon">share</mat-icon>
               <span class="rail-label">Share</span>
             </button>
-            <button class="rail-btn" [class.active]="commentPod()?.id === pod.id" (click)="commentPod.set(pod)" [matTooltip]="'View comments'">
+            <button class="rail-btn" [class.active]="socialFeed.commentsSheet()?.id === pod.id" (click)="socialFeed.openCommentsSheet(pod)" [matTooltip]="'View comments'">
               <mat-icon class="rail-icon">chat_bubble_outline</mat-icon>
               <span class="rail-label">Comment</span>
               @if (socialFeed.commentCount(pod) > 0) {
@@ -150,7 +150,3 @@
     </div>
   }
 </div>
-
-@if (commentPod()) {
-  <app-pod-comments [pod]="commentPod()!" [open]="true" (close)="commentPod.set(null)" />
-}
