@@ -19,8 +19,8 @@
             <span class="creator-time">{{ creatorTime() }}</span>
           </div>
         </div>
-        @if (!isMyPod()) {
-          <button class="follow-btn" [class.following]="following()" [class.locked]="isOra()" (click)="toggleFollow()">
+        @if (!isMyPod() && !isOra()) {
+          <button class="follow-btn" [class.following]="following()" (click)="toggleFollow()">
             <mat-icon>{{ following() ? 'check' : 'add' }}</mat-icon>
             {{ following() ? 'Following' : 'Follow' }}
           </button>

@@ -19,32 +19,40 @@
             }
           </span>
           <div class="w2f-meta">
+            <div class="w2f-name-row">
             <span class="w2f-name">
               {{ c.fullName }}
               @if (c.isOra) {
                 <mat-icon class="w2f-verified">verified</mat-icon>
               }
             </span>
+            @if (c.isOra) {
+              <span class="w2f-curator-badge"><mat-icon>auto_awesome</mat-icon> AI Curator</span>
+            }
+          </div>
             @if (c.username) {
               <span class="w2f-handle">{{ '@' + c.username }}</span>
             }
             <span class="w2f-sub">
-              {{ c.followerCount.toLocaleString() }} {{ c.followerCount === 1 ? 'follower' : 'followers' }} · {{ c.codeCount ?? 0 }} {{ (c.codeCount ?? 0) === 1 ? 'code' : 'codes' }}
+              @if (c.isOra) {
+                {{ c.codeCount ?? 0 }} {{ (c.codeCount ?? 0) === 1 ? 'code' : 'codes' }}
+              } @else {
+                {{ c.followerCount.toLocaleString() }} {{ c.followerCount === 1 ? 'follower' : 'followers' }} · {{ c.codeCount ?? 0 }} {{ (c.codeCount ?? 0) === 1 ? 'code' : 'codes' }}
+              }
             </span>
           </div>
-          <span
-            [attr.title]="c.isOra ? 'Ora is the AI curator — you are always following' : ''"
-            class="w2f-follow-wrap"
-            [class.w2f-follow-locked]="c.isOra">
-            <button
-              class="w2f-follow"
-              [class.following]="c.isFollowing"
-              (click)="follow($event, c)"
-              [disabled]="c.isOra">
-              <mat-icon>{{ c.isFollowing ? 'check' : 'add' }}</mat-icon>
-              {{ c.isOra ? 'Curator' : (c.isFollowing ? 'Following' : 'Follow') }}
-            </button>
-          </span>
+          @if (!c.isOra) {
+            <span
+              class="w2f-follow-wrap">
+              <button
+                class="w2f-follow"
+                [class.following]="c.isFollowing"
+                (click)="follow($event, c)">
+                <mat-icon>{{ c.isFollowing ? 'check' : 'add' }}</mat-icon>
+                {{ c.isFollowing ? 'Following' : 'Follow' }}
+              </button>
+            </span>
+          }
         </div>
       }
     </div>

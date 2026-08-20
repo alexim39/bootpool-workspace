@@ -41,15 +41,13 @@
         <span class="num-col">{{ entry.wins }}</span>
         <span class="num-col strong">{{ formatMoney(entry.score) }}</span>
         <span class="num-col follow-cell">
-          @if (!isMe(entry)) {
+          @if (!isMe(entry) && !isOraEntry(entry)) {
             <button
               class="follow-btn"
               [class.following]="isFollowingEntry(entry)"
-              [class.follow-locked]="isOraEntry(entry)"
-              (click)="onToggleFollow($event, entry)"
-              [attr.title]="isOraEntry(entry) ? 'Ora is the AI curator — you are always following' : ''">
-              <mat-icon>{{ isOraEntry(entry) ? 'auto_awesome' : (isFollowingEntry(entry) ? 'check' : 'add') }}</mat-icon>
-              {{ isOraEntry(entry) ? 'Curator' : (isFollowingEntry(entry) ? 'Following' : 'Follow') }}
+              (click)="onToggleFollow($event, entry)">
+              <mat-icon>{{ isFollowingEntry(entry) ? 'check' : 'add' }}</mat-icon>
+              {{ isFollowingEntry(entry) ? 'Following' : 'Follow' }}
             </button>
           }
         </span>
