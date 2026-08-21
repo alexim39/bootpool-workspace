@@ -7,6 +7,7 @@
             <div class="hero-orb"></div>
             <div class="deck-head">
               <span class="deck-league"><mat-icon>sports_soccer</mat-icon> {{ pod.league || pod.sport }}</span>
+              <span class="deck-ora-badge">Ora AI</span>
               @if (pod.isLive) {
                 <span class="deck-live"><span class="live-dot"></span> LIVE</span>
               } @else {
@@ -25,7 +26,22 @@
 
           <div class="deck-body">
             <div class="pick-row">
-              <span class="pick-badge">PICK: {{ pod.selection }}</span>
+              <div class="pick-left">
+                <span class="pick-badge">PICK: {{ pod.selection }}</span>
+                @if (pod.refundPercent) {
+                  <span class="pick-refund">{{ pod.refundPercent }}% cash back</span>
+                }
+                @if (pod.whyRecommended) {
+                  <button
+                    class="pick-why"
+                    [matTooltip]="pod.whyRecommended"
+                    matTooltipPosition="after"
+                    (click)="$event.preventDefault()">
+                    <mat-icon>info_outline</mat-icon>
+                    <span>Why?</span>
+                  </button>
+                }
+              </div>
               <span class="pick-odds">{{ pod.gainsMultiplier.toFixed(2) }}<em>x</em></span>
             </div>
 
@@ -86,7 +102,7 @@
               <mat-icon class="rail-icon">share</mat-icon>
               <span class="rail-label">Share</span>
             </button>
-            <button class="rail-btn" [class.active]="commentPod()?.id === pod.id" (click)="commentPod.set(pod)" [matTooltip]="'View comments'">
+            <button class="rail-btn" [class.active]="socialFeed.commentsSheet()?.id === pod.id" (click)="socialFeed.openCommentsSheet(pod)" [matTooltip]="'View comments'">
               <mat-icon class="rail-icon">chat_bubble_outline</mat-icon>
               <span class="rail-label">Comment</span>
               @if (socialFeed.commentCount(pod) > 0) {
@@ -99,8 +115,8 @@
             </button>
             @if (isMyPodOf(pod)) {
               <span class="rail-label you-label"><mat-icon>person</mat-icon> You</span>
-            } @else {
-              <button class="rail-btn follow" [class.following]="isFollowing(pod)" (click)="toggleFollow(pod)" [matTooltip]="isOraOf(pod) ? 'Always following Ora' : (isFollowing(pod) ? 'Unfollow' : 'Follow')">
+            } @else if (!isOraOf(pod)) {
+              <button class="rail-btn follow" [class.following]="isFollowing(pod)" (click)="toggleFollow(pod)" [matTooltip]="isFollowing(pod) ? 'Unfollow' : 'Follow'">
                 <mat-icon>{{ isFollowing(pod) ? 'check' : 'add' }}</mat-icon>
                 <span class="rail-label">{{ isFollowing(pod) ? 'Following' : 'Follow' }}</span>
               </button>
@@ -134,7 +150,3 @@
     </div>
   }
 </div>
-
-@if (commentPod()) {
-  <app-pod-comments [pod]="commentPod()!" [open]="true" (close)="commentPod.set(null)" />
-}

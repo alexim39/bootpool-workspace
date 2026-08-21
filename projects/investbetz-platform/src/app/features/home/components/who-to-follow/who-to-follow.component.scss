@@ -126,6 +126,12 @@
   gap: 0.1rem;
 }
 
+.w2f-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 .w2f-name {
   display: inline-flex;
   align-items: center;
@@ -137,6 +143,28 @@
   max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.w2f-curator-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #04131f;
+  background: linear-gradient(135deg, #22c55e, #0ea5e9);
+  border-radius: 999px;
+  padding: 0.16rem 0.45rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 0.7rem;
+    width: 0.7rem;
+    height: 0.7rem;
+  }
 }
 
 .w2f-verified {

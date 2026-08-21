@@ -162,6 +162,7 @@ export class SocialFeedService {
   readonly comments = signal<Record<string, SocialComment[]>>({});
   readonly commentsLoading = signal(false);
   readonly commentPosting = signal(false);
+  readonly commentsSheet = signal<Pod | null>(null);
 
   readonly creators = signal<SocialCreator[]>([]);
   readonly creatorsLoading = signal(false);
@@ -713,6 +714,15 @@ export class SocialFeedService {
 
   commentsFor(podId: string): SocialComment[] {
     return this.comments()[podId] || [];
+  }
+
+  openCommentsSheet(pod: Pod): void {
+    this.commentsSheet.set(pod);
+    if (pod) this.loadComments(pod.id);
+  }
+
+  closeCommentsSheet(): void {
+    this.commentsSheet.set(null);
   }
 
   async loadComments(podId: string): Promise<void> {

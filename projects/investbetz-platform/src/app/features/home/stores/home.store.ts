@@ -140,6 +140,7 @@ export class HomeStore implements OnDestroy {
   });
 
   private readonly PAGE_SIZE = 12;
+  private hydrateSig = '';
 
   constructor() {
     this.searchSub = this.search$.pipe(
@@ -161,7 +162,11 @@ export class HomeStore implements OnDestroy {
 
     effect(() => {
       const pods = this.activePods();
-      if (pods.length > 0) this._social.hydrateSocial(pods);
+      const sig = pods.map(p => p.id).join(',');
+      if (sig && sig !== this.hydrateSig) {
+        this.hydrateSig = sig;
+        if (pods.length > 0) this._social.hydrateSocial(pods);
+      }
     });
   }
 

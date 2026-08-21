@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, computed, input, inject, signal, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, Output, EventEmitter, computed, input, inject, signal, OnDestroy, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -36,20 +36,15 @@ export class PodCardComponent implements OnDestroy {
   private snackBar = inject(MatSnackBar);
   private router = inject(Router);
   readonly socialFeed = inject(SocialFeedService);
-  private cdr = inject(ChangeDetectorRef);
   private ngZone = inject(NgZone);
 
   private readonly now = signal(Date.now());
   private nowTimer: ReturnType<typeof setInterval> | undefined;
 
   constructor() {
-    this.nowTimer = this.ngZone.run(() => setInterval(() => {
-      this.ngZone.run(() => {
-        this.now.set(Date.now());
-        this.cdr.markForCheck();
-        this.cdr.detectChanges();
-      });
-    }, 1000));
+    this.nowTimer = setInterval(() => {
+      this.ngZone.run(() => this.now.set(Date.now()));
+    }, 1000);
   }
 
   ngOnDestroy() {

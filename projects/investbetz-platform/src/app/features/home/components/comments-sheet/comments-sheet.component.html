@@ -1,0 +1,64 @@
+@if (pod(); as p) {
+  <div class="cs-overlay" (click)="close()">
+    <div class="cs-panel" (click)="$event.stopPropagation()">
+      <div class="cs-header">
+        <span class="cs-title">Comments</span>
+        <span class="cs-count">{{ count() }}</span>
+        <button class="cs-close" (click)="close()" aria-label="Close comments">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="cs-context">
+        <span class="cs-teams">{{ p.homeTeam }} vs {{ p.awayTeam }}</span>
+        <span class="cs-pick">{{ p.selection }}</span>
+      </div>
+
+      <div class="cs-body">
+        @if (socialFeed.commentsLoading() && commentsFor().length === 0) {
+          <div class="cs-empty">
+            <mat-spinner diameter="22" />
+          </div>
+        } @else if (commentsFor().length === 0) {
+          <div class="cs-empty">
+            <mat-icon>chat_bubble_outline</mat-icon>
+            <p>No comments yet — be the first to drop one.</p>
+          </div>
+        } @else {
+          @for (c of commentsFor(); track c.id) {
+            <div class="comment-row" [class.temp]="c.id.startsWith('temp-')">
+              <span class="comment-avatar">{{ initialOf(c.authorName) }}</span>
+              <div class="comment-main">
+                <div class="comment-head">
+                  <span class="comment-name">{{ c.authorName }}</span>
+                  <span class="comment-time">{{ timeAgo(c.createdAt) }}</span>
+                </div>
+                <p class="comment-text">{{ c.text }}</p>
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      <div class="cs-footer">
+        @if (socialFeed.isLoggedIn()) {
+          <input
+            class="cs-input"
+            [placeholder]="'Comment on ' + socialFeed.creatorNameFor(p) + '’s pick…'"
+            [(ngModel)]="draft"
+            (keydown.enter)="send()"
+            maxlength="500" />
+          <button class="cs-send" [disabled]="!draft.trim() || socialFeed.commentPosting()" (click)="send()">
+            @if (socialFeed.commentPosting()) {
+              <mat-spinner diameter="16" />
+            } @else {
+              <mat-icon>send</mat-icon>
+            }
+          </button>
+        } @else {
+          <button class="cs-signin" (click)="close()">Sign in to join the conversation</button>
+        }
+      </div>
+    </div>
+  </div>
+}

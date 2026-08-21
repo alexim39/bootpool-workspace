@@ -26,6 +26,7 @@
           <h2>{{ p.user.fullName }}</h2>
           @if (p.user.isOra) {
             <mat-icon class="verified">verified</mat-icon>
+            <span class="ora-badge"><mat-icon>auto_awesome</mat-icon> AI Curator</span>
           }
           @if (p.virality && p.virality.badge && p.virality.badge !== 'Rookie') {
             <span class="creator-badge" [title]="'Creator score â‚¦' + (p.virality.score | number)">{{ p.virality.badge }}</span>
@@ -62,14 +63,16 @@
             <span class="stat-val">{{ p.stats.codes }}</span>
             <span class="stat-lbl">Codes</span>
           </button>
-          <button class="stat" (click)="store.loadTab('followers')">
-            <span class="stat-val">{{ p.stats.followers }}</span>
-            <span class="stat-lbl">Followers</span>
-          </button>
-          <button class="stat" (click)="store.loadTab('following')">
-            <span class="stat-val">{{ p.stats.following }}</span>
-            <span class="stat-lbl">Following</span>
-          </button>
+          @if (!p.user.isOra) {
+            <button class="stat" (click)="store.loadTab('followers')">
+              <span class="stat-val">{{ p.stats.followers }}</span>
+              <span class="stat-lbl">Followers</span>
+            </button>
+            <button class="stat" (click)="store.loadTab('following')">
+              <span class="stat-val">{{ p.stats.following }}</span>
+              <span class="stat-lbl">Following</span>
+            </button>
+          }
           <div class="stat">
             <span class="stat-val">{{ p.stats.likesReceived }}</span>
             <span class="stat-lbl">Likes</span>
@@ -105,12 +108,14 @@
         <button class="tab" [class.active]="store.tab() === 'codes'" (click)="store.loadTab('codes')">
           Codes <span class="tab-count">{{ store.codesTotal() }}</span>
         </button>
-        <button class="tab" [class.active]="store.tab() === 'followers'" (click)="store.loadTab('followers')">
-          Followers <span class="tab-count">{{ store.followersTotal() }}</span>
-        </button>
-        <button class="tab" [class.active]="store.tab() === 'following'" (click)="store.loadTab('following')">
-          Following <span class="tab-count">{{ store.followingTotal() }}</span>
-        </button>
+        @if (!p.user.isOra) {
+          <button class="tab" [class.active]="store.tab() === 'followers'" (click)="store.loadTab('followers')">
+            Followers <span class="tab-count">{{ store.followersTotal() }}</span>
+          </button>
+          <button class="tab" [class.active]="store.tab() === 'following'" (click)="store.loadTab('following')">
+            Following <span class="tab-count">{{ store.followingTotal() }}</span>
+          </button>
+        }
       </div>
 
       <div class="tab-body">

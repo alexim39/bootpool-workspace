@@ -19,8 +19,8 @@
             <span class="creator-time">{{ creatorTime() }}</span>
           </div>
         </div>
-        @if (!isMyPod()) {
-          <button class="follow-btn" [class.following]="following()" [class.locked]="isOra()" (click)="toggleFollow()">
+        @if (!isMyPod() && !isOra()) {
+          <button class="follow-btn" [class.following]="following()" (click)="toggleFollow()">
             <mat-icon>{{ following() ? 'check' : 'add' }}</mat-icon>
             {{ following() ? 'Following' : 'Follow' }}
           </button>
@@ -148,7 +148,7 @@
           <span class="rail-label">Like</span>
           @if (likeCount() > 0) { <span class="rail-count">{{ likeCount() }}</span> }
         </button>
-        <button class="rail-btn" [class.active]="showComments()" (click)="showComments.set(true)" [matTooltip]="'View comments'">
+        <button class="rail-btn" [class.active]="showComments()" (click)="showComments.set(!showComments())" [matTooltip]="showComments() ? 'Hide comments' : 'View comments'">
           <mat-icon class="rail-icon">chat_bubble_outline</mat-icon>
           <span class="rail-label">Comment</span>
           @if (commentCount() > 0) { <span class="rail-count">{{ commentCount() }}</span> }
@@ -184,6 +184,8 @@
   </mat-card-content>
 
   @if (social()) {
-    <app-pod-comments [pod]="pod()" [open]="showComments()" (close)="showComments.set(false)" />
+    @if (showComments()) {
+      <app-pod-comments [pod]="pod()" />
+    }
   }
 </mat-card>
