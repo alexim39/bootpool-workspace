@@ -166,4 +166,23 @@ describe('PodCardComponent', () => {
     expect(testFixture.componentInstance.whyText()).toBe('Ora analysis says high confidence.');
     testFixture.destroy();
   });
+
+  it('shows the Ora predicts callout with pick and confidence on Ora pods', () => {
+    const oraPod = createPod({ createdBy: 'ora', metadata: { oraConfidence: 82 } });
+    const testFixture = TestBed.createComponent(PodCardComponent);
+    testFixture.componentRef.setInput('pod', oraPod);
+    testFixture.detectChanges();
+    expect(testFixture.componentInstance.isOra()).toBeTrue();
+    const callout = testFixture.nativeElement.querySelector('.ora-callout');
+    expect(callout).toBeTruthy();
+    expect(callout.textContent).toContain('Ora predicts');
+    expect(callout.textContent).toContain('Home Win');
+    expect(callout.textContent).toContain('82%');
+    testFixture.destroy();
+  });
+
+  it('hides the Ora predicts callout on non-Ora creator pods', () => {
+    expect(component.isOra()).toBeFalse();
+    expect(fixture.nativeElement.querySelector('.ora-callout')).toBeFalsy();
+  });
 });

@@ -391,6 +391,61 @@ mat-card-content {
   line-height: 1.35;
 }
 
+// Premium Ora verdict callout — one hero statement (eyebrow + pick +
+// confidence) shared with the mobile feed's grammar. Sits right after the
+// title; the recommend-row below it reads as supporting reasoning.
+.ora-callout {
+  padding: 0.6rem 0.8rem 0.65rem;
+  background: linear-gradient(135deg, rgba($emerald, 0.12), rgba($emerald, 0.04));
+  border: 1px solid rgba($emerald, 0.28);
+  border-radius: $radius-md;
+  box-shadow: 0 4px 20px rgba($emerald, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.ora-callout-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $emerald;
+}
+
+.ora-callout-eyebrow mat-icon {
+  font-size: 0.8rem;
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+.ora-callout-line {
+  margin: 0.25rem 0 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.45rem;
+}
+
+.ora-callout-pick {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: $white;
+}
+
+.ora-callout-conf {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: $white-dim;
+}
+
+.ora-callout-conf b {
+  color: $emerald;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
 .selection-refund-row {
   display: flex;
   align-items: center;

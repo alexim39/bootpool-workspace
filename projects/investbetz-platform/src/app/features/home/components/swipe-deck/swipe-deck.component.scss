@@ -465,12 +465,63 @@
   flex-shrink: 0;
 }
 
-.deck-title {
-  margin: 0.5rem 0 0;
+// Premium Ora prediction callout — the hero statement of the card.
+.ora-callout {
+  margin: 0.7rem auto 0;
+  max-width: 19rem;
   text-align: center;
-  font-size: 0.75rem;
+  padding: 0.6rem 1rem 0.7rem;
+  background: linear-gradient(135deg, rgba($emerald, 0.12), rgba($emerald, 0.04));
+  border: 1px solid rgba($emerald, 0.28);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba($emerald, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.ora-callout-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $emerald;
+}
+
+.ora-callout-eyebrow mat-icon {
+  font-size: 0.8rem;
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+.ora-callout-line {
+  margin: 0.3rem 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.ora-callout-pick {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: $white;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+}
+
+.ora-callout-conf {
+  font-size: 0.72rem;
   font-weight: 600;
   color: $white-dim;
+}
+
+.ora-callout-conf b {
+  color: $emerald;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 
 .card-rail {
