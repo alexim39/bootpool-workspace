@@ -31,7 +31,7 @@
     @if (socialFeed.isLoggedIn()) {
       <input
         class="comment-input"
-        [placeholder]="'Comment on ' + socialFeed.creatorNameFor(pod()) + '’s pick…'"
+        placeholder="Add a comment…"
         [(ngModel)]="draft"
         (keydown.enter)="send(pod())"
         maxlength="500" />

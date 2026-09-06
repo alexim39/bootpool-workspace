@@ -181,11 +181,11 @@
         </ng-container>
       }
     </button>
-  </mat-card-content>
 
-  @if (social()) {
-    @if (showComments()) {
-      <app-pod-comments [pod]="pod()" />
+    @if (social()) {
+      @if (showComments()) {
+        <app-pod-comments [pod]="pod()" />
+      }
     }
-  }
+  </mat-card-content>
 </mat-card>

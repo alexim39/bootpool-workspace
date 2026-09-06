@@ -81,6 +81,9 @@
               <button class="rail-btn" [class.active]="socialFeed.isLiked(pod.id)" (click)="toggleLike(pod)" aria-label="Like">
                 <mat-icon class="rail-icon" [class.liked]="socialFeed.isLiked(pod.id)">{{ socialFeed.isLiked(pod.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
                 <span class="rail-label">Like</span>
+                @if (socialFeed.likeCount(pod) > 0) {
+                  <span class="rail-count">{{ socialFeed.likeCount(pod) }}</span>
+                }
               </button>
               <button class="rail-btn" [class.active]="socialFeed.commentsSheet()?.id === pod.id" (click)="socialFeed.openCommentsSheet(pod)" aria-label="View comments">
                 <mat-icon class="rail-icon">chat_bubble_outline</mat-icon>
