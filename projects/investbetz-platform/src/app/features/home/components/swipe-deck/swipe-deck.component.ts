@@ -40,6 +40,9 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
   readonly dragging = signal(false);
   readonly searchOpen = signal(false);
   readonly hasSwiped = signal(false);
+  // Big-heart burst overlay for double-tap-to-like (TikTok-style).
+  readonly heart = signal<{ podId: string; n: number } | null>(null);
+  private heartSeq = 0;
 
   // Full-screen feed: every card is exactly one viewport tall (TikTok-style
   // paging). No content measuring — the card layout flexes to fill the space.
@@ -172,11 +175,29 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
   // ----- gestures -----
   private startY = 0;
   private moved = false;
+  private tapX = 0;
+  private tapY = 0;
+  private tapIsInteractive = false;
+  private lastTapTime = 0;
+  private lastTapX = 0;
+  private lastTapY = 0;
+  private static readonly DOUBLE_TAP_MS = 320;
+  private static readonly DOUBLE_TAP_PX = 48;
 
   onTouchStart(e: TouchEvent) {
     this.startY = e.touches[0].clientY;
     this.moved = false;
     this.dragging.set(true);
+    // Double-tap must never fire from buttons/inputs/tabs (e.g. double-tapping
+    // Stake must not like) nor from multi-touch.
+    if (e.touches.length > 1) {
+      this.tapIsInteractive = true;
+      return;
+    }
+    this.tapX = e.touches[0].clientX;
+    this.tapY = e.touches[0].clientY;
+    const t = e.target as HTMLElement | null;
+    this.tapIsInteractive = !!t?.closest?.('button, a, input, textarea, select, [role="tab"]');
   }
 
   onTouchMove(e: TouchEvent) {
@@ -189,10 +210,50 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
   onTouchEnd() {
     this.dragging.set(false);
     const delta = this.dragOffset();
+    // A clean tap (no drag, not on a control) feeds double-tap detection.
+    if (!this.moved && !this.tapIsInteractive) this.handleTap();
     if (delta < -60) this.next();
     else if (delta > 60) this.prev();
     else this.dragOffset.set(0);
     this.moved = false;
+  }
+
+  private handleTap() {
+    const now = Date.now();
+    const dt = now - this.lastTapTime;
+    const dist = Math.hypot(this.tapX - this.lastTapX, this.tapY - this.lastTapY);
+    if (dt < SwipeDeckComponent.DOUBLE_TAP_MS && dist < SwipeDeckComponent.DOUBLE_TAP_PX) {
+      this.lastTapTime = 0;
+      this.doubleTapLike();
+    } else {
+      this.lastTapTime = now;
+      this.lastTapX = this.tapX;
+      this.lastTapY = this.tapY;
+    }
+  }
+
+  /** Desktop fallback for verification (mobile uses touch). */
+  onCardDblClick(e: MouseEvent) {
+    const t = e.target as HTMLElement | null;
+    if (t?.closest?.('button, a, input, textarea, select, [role="tab"]')) return;
+    this.doubleTapLike();
+  }
+
+  private doubleTapLike() {
+    const pod = this.current();
+    if (!pod) return;
+    // Restart the burst animation even on rapid repeats: destroy then recreate.
+    const n = ++this.heartSeq;
+    this.heart.set(null);
+    setTimeout(() => {
+      if (this.heartSeq !== n) return;
+      this.heart.set({ podId: pod.id, n });
+      setTimeout(() => {
+        if (this.heartSeq === n) this.heart.set(null);
+      }, 950);
+    }, 30);
+    // TikTok semantics: double-tap ensures liked, never unlikes.
+    if (!this.socialFeed.isLiked(pod.id)) this.toggleLike(pod);
   }
 
   onKeyDown(e: KeyboardEvent) {

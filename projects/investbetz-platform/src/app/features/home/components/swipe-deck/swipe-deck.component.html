@@ -42,12 +42,18 @@
   <div class="deck-stage" [class.dragging]="dragging()" [style.transform]="'translateY(' + dragOffset() + 'px)'">
     @for (pod of pods(); track pod.id; let i = $index) {
       @if (visible(i)) {
-        <article class="deck-card" [class.live]="pod.isLive" [style.top.px]="cardTop(i)" [style.height.px]="viewportH()">
+        <article class="deck-card" [class.live]="pod.isLive" [style.top.px]="cardTop(i)" [style.height.px]="viewportH()" (dblclick)="onCardDblClick($event)">
           <div class="card-backdrop" aria-hidden="true">
             <div class="backdrop-orb orb-a"></div>
             <div class="backdrop-orb orb-b"></div>
             <div class="backdrop-scrim"></div>
           </div>
+
+          @if (heart()?.podId === pod.id) {
+            <div class="heart-burst" aria-hidden="true">
+              <mat-icon>favorite</mat-icon>
+            </div>
+          }
 
           <div class="card-top-meta">
             <span class="deck-league"><mat-icon>sports_soccer</mat-icon> {{ pod.league || pod.sport }}</span>

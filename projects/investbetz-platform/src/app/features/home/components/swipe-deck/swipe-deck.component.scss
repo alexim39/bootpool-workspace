@@ -314,6 +314,33 @@
     linear-gradient(180deg, #101d38 0%, #0A1428 45%, #070f20 100%);
 }
 
+// Double-tap-to-like heart burst (TikTok-style).
+.heart-burst {
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  z-index: 4;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: heart-burst 0.9s ease-out forwards;
+}
+
+.heart-burst mat-icon {
+  font-size: 6rem;
+  width: 6rem;
+  height: 6rem;
+  color: $error;
+  filter: drop-shadow(0 4px 24px rgba($error, 0.55));
+}
+
+@keyframes heart-burst {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+  18% { opacity: 1; transform: translate(-50%, -50%) scale(1.25); }
+  35% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  70% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -62%) scale(1.1); }
+}
+
 .card-top-meta {
   position: relative;
   display: flex;
