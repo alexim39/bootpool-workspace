@@ -103,8 +103,11 @@ export class OraChatComponent implements OnInit {
 
     this.setActionState(msgIndex, actionIndex, 'executing');
 
+    if (action.type === 'confirm_accumulator' && !action.data.idempotencyKey) {
+      action.data.idempotencyKey = this._stake.generateIdempotencyKey();
+    }
     const request = action.type === 'confirm_accumulator'
-      ? this._stake.placeAccumulator({ podIds: action.data.legs.map(l => l.podId), stakeAmount: action.data.stakeAmount })
+      ? this._stake.placeAccumulator({ podIds: action.data.legs.map(l => l.podId), stakeAmount: action.data.stakeAmount, idempotencyKey: action.data.idempotencyKey })
       : this._stake.placeStake({ podId: action.data.podId, stakeAmount: action.data.amount });
 
     request.subscribe({

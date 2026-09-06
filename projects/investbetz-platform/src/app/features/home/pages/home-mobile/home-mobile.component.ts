@@ -250,9 +250,16 @@ export class HomeMobileComponent implements OnInit, AfterViewInit, OnDestroy {
     this.store.toggleSelection(pod);
   }
 
-  onPlaceAccumulator(data: { podIds: string[]; stakeAmount: number }) {
+  private placingBet = false;
+
+  onPlaceAccumulator(data: { podIds: string[]; stakeAmount: number; idempotencyKey?: string }) {
+    // In-flight guard: a second emit while a request is pending is a double-tap,
+    // not a new intent — drop it so it can never mint a duplicate stake.
+    if (this.placingBet) return;
+    this.placingBet = true;
     this.store.placeAccumulator(data).subscribe({
       next: (res) => {
+        this.placingBet = false;
         if (res.success) {
           this.store.clearSelections();
           this.store.onStakePlaced();
@@ -263,6 +270,7 @@ export class HomeMobileComponent implements OnInit, AfterViewInit, OnDestroy {
         this.slipResult.set({ success: res.success, message: res.message });
       },
       error: (err) => {
+        this.placingBet = false;
         this._snackBar.open(err.error?.message || 'Failed to place accumulator', 'OK', { duration: 3000, verticalPosition: 'top' });
         this.slipResult.set({ success: false, message: err.error?.message });
       }

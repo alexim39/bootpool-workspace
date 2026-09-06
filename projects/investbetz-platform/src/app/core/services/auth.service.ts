@@ -32,6 +32,8 @@ export interface AccumulatorAction {
     potentialPayout: number;
     platformFee: number;
     netPayout: number;
+    /** Client-side idempotency key, set on first confirm — stable across retries. */
+    idempotencyKey?: string;
   };
 }
 

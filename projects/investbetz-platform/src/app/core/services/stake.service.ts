@@ -143,6 +143,8 @@ export interface PlaceAccumulatorRequest {
   podIds: string[];
   stakeAmount: number;
   bookingCode?: string;
+  /** Client-generated key, stable across retries of the same slip — server dedupes on it. */
+  idempotencyKey?: string;
 }
 
 export interface BookingCodeLeg {
@@ -354,6 +356,14 @@ export class StakeService {
     return this.http.post<PlaceStakeResponse>(`${environment.apiUrl}/stakes`, data, {
       headers: this.getHeaders()
     });
+  }
+
+  /** UUID per betslip — stable across retries of the same slip so the server can dedupe. */
+  generateIdempotencyKey(): string {
+    try {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+    } catch { /* fall through */ }
+    return `${Date.now()}-${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`;
   }
 
   calculatePayout(podId: string, stakeAmount: number) {

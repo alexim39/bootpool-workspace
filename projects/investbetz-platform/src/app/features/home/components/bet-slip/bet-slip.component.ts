@@ -36,14 +36,34 @@ export class BetSlipComponent {
   clearAllSelections = output<void>();
   closePanel = output<void>();
   togglePanel = output<void>();
-  placeBetRequest = output<{ podIds: string[]; stakeAmount: number }>();
+  placeBetRequest = output<{ podIds: string[]; stakeAmount: number; idempotencyKey: string }>();
 
   stakeAmount = signal<number>(0);
   submitting = signal(false);
   bookingCodeInput = signal('');
 
+  /**
+   * Idempotency key for the current slip — created on first submit, kept across
+   * retries of the SAME slip so the server dedupes, rotated when the slip empties.
+   */
+  private slipKey: string | null = null;
+  /** Synchronous re-entrancy guard: blocks double-taps within the same tick, before CD disables the button. */
+  private emitGuard = false;
+
+  private keyWatcher = effect(() => {
+    if (this.selections().length === 0) {
+      this.slipKey = null;
+      this.emitGuard = false;
+    }
+  });
+
   private resultWatcher = effect(() => {
-    if (this.placeBetResult()) this.submitting.set(false);
+    if (this.placeBetResult()) {
+      this.submitting.set(false);
+      // Release the tap guard so a genuine failure can be retried
+      // (same slipKey → server dedupes; success clears selections → key rotates).
+      this.emitGuard = false;
+    }
   });
 
   stakeError = signal<string | null>(null);
@@ -104,14 +124,26 @@ export class BetSlipComponent {
     this.stakeAmount.set(0);
     this.stakeError.set(null);
     this.submitting.set(false);
+    this.slipKey = null;
+    this.emitGuard = false;
   }
 
   placeBet() {
-    if (!this.canPlace()) return;
+    if (!this.canPlace() || this.emitGuard) return;
+    this.emitGuard = true;
 
     const podIds = this.selections().map(s => s.id);
+    if (!this.slipKey) {
+      try {
+        this.slipKey = (typeof crypto !== 'undefined' && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      } catch {
+        this.slipKey = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      }
+    }
     this.submitting.set(true);
-    this.placeBetRequest.emit({ podIds, stakeAmount: this.stakeAmount() });
+    this.placeBetRequest.emit({ podIds, stakeAmount: this.stakeAmount(), idempotencyKey: this.slipKey });
   }
 
   formatCurrency(amount: number): string {

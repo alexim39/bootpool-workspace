@@ -54,7 +54,8 @@ describe('OraChatComponent', () => {
 
   beforeEach(async () => {
     authMock = jasmine.createSpyObj('AuthService', ['chatWithOra']);
-    stakeMock = jasmine.createSpyObj('StakeService', ['placeStake', 'placeAccumulator']);
+    stakeMock = jasmine.createSpyObj('StakeService', ['placeStake', 'placeAccumulator', 'generateIdempotencyKey']);
+    stakeMock.generateIdempotencyKey.and.returnValue('key-1');
     walletMock = jasmine.createSpyObj('WalletService', ['fetchBalance'], {
       balance: signal<WalletBalance>({ balance: 0, locked: 0, available: 0, currency: 'NGN' }),
     });
@@ -113,7 +114,7 @@ describe('OraChatComponent', () => {
 
     component.confirmStake(msgIdx, 0);
 
-    expect(stakeMock.placeAccumulator).toHaveBeenCalledWith({ podIds: ['pod-1', 'pod-2'], stakeAmount: 500 });
+    expect(stakeMock.placeAccumulator).toHaveBeenCalledWith({ podIds: ['pod-1', 'pod-2'], stakeAmount: 500, idempotencyKey: 'key-1' });
     expect(component.messages()[msgIdx].actionStates?.[0]).toBe('done');
     const last = component.messages()[component.messages().length - 1];
     expect(last.content).toContain('2-leg accumulator');
