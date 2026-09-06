@@ -90,7 +90,9 @@ export class HomeMobileComponent implements OnInit, AfterViewInit, OnDestroy {
       const fraction = rect.height > 0 ? visible / rect.height : 0;
       if (this.immersive()) {
         if (fraction <= 0.15) this.ngZone.run(() => this.immersive.set(false));
-      } else if (fraction >= 0.4) {
+      } else if (fraction >= 0.4 && this.store.feedMode() !== 'foryou') {
+        // For You is a fixed full-screen feed with its own topbar — immersive
+        // would hide the bottom nav + bet-slip handle, which must stay usable.
         this.ngZone.run(() => this.immersive.set(true));
       }
     });

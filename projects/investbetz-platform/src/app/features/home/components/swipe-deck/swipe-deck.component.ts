@@ -8,6 +8,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Pod } from '../../../../core/services';
 import { SocialFeedService } from '../../../../core/services';
+import { HomeStore } from '../../stores/home.store';
 
 @Component({
   selector: 'app-swipe-deck',
@@ -30,19 +31,27 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
   private el = inject(ElementRef);
   private router = inject(Router);
   readonly socialFeed = inject(SocialFeedService);
+  readonly store = inject(HomeStore);
 
   private nowTimer: ReturnType<typeof setInterval> | undefined;
 
   readonly index = signal(0);
   readonly dragOffset = signal(0);
   readonly dragging = signal(false);
+  readonly searchOpen = signal(false);
+  readonly hasSwiped = signal(false);
 
-  readonly deckMinHeight = signal(360);
-  private rafPending = false;
-  private lastIndex = -1;
+  // Full-screen feed: every card is exactly one viewport tall (TikTok-style
+  // paging). No content measuring — the card layout flexes to fill the space.
+  readonly viewportH = signal(typeof window !== 'undefined' ? window.innerHeight : 800);
   private lastFirstId = '';
-  private lastPodsLength = -1;
   private readonly destroyFns: (() => void)[] = [];
+
+  readonly progressPct = computed(() => {
+    const total = this.pods().length;
+    if (!total) return 0;
+    return Math.min(100, ((this.index() + 1) / total) * 100);
+  });
 
   constructor() {
     effect(() => {
@@ -52,22 +61,6 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
         this.lastFirstId = first;
         this.index.set(0);
         this.dragOffset.set(0);
-      }
-    });
-
-    effect(() => {
-      const i = this.index();
-      if (i !== this.lastIndex && this.el.nativeElement.isConnected) {
-        this.lastIndex = i;
-        this.measure();
-      }
-    });
-
-    effect(() => {
-      const pods = this.pods();
-      if (pods.length !== this.lastPodsLength) {
-        this.lastPodsLength = pods.length;
-        this.measureThrottled();
       }
     });
   }
@@ -87,71 +80,35 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
         }
       }
     }, 1000);
-    this.measure();
-    setTimeout(() => this.measure(), 400);
-    if (typeof document !== 'undefined' && 'fonts' in document) {
-      document.fonts.ready.then(() => this.measure());
+    // The deck is a fixed full-screen overlay: lock the page behind it.
+    this.updateViewportH();
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = 'hidden';
     }
-    const onViewportChange = () => this.measureThrottled();
-    const onLoad = () => this.measure();
-    window.addEventListener('scroll', onViewportChange, { passive: true });
-    window.addEventListener('resize', onViewportChange);
-    window.addEventListener('load', onLoad);
+    const vv = (window as any).visualViewport;
+    window.addEventListener('resize', this.updateViewportH);
+    window.addEventListener('orientationchange', this.updateViewportH);
+    if (vv) vv.addEventListener('resize', this.updateViewportH);
     this.destroyFns.push(() => {
-      window.removeEventListener('scroll', onViewportChange);
-      window.removeEventListener('resize', onViewportChange);
-      window.removeEventListener('load', onLoad);
+      window.removeEventListener('resize', this.updateViewportH);
+      window.removeEventListener('orientationchange', this.updateViewportH);
+      if (vv) vv.removeEventListener('resize', this.updateViewportH);
     });
   }
 
   ngOnDestroy() {
     if (this.nowTimer) clearInterval(this.nowTimer);
     this.destroyFns.forEach(fn => fn());
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = '';
+    }
   }
 
-  private measureThrottled() {
-    if (this.rafPending) return;
-    this.rafPending = true;
-    requestAnimationFrame(() => {
-      this.rafPending = false;
-      this.measure();
-    });
-  }
-
-  private measure() {
-    const host = this.el.nativeElement as HTMLElement;
-    // Measure every rendered card (not just the current one) so the deck is
-    // always tall enough for the tallest card — no overflow, no overlap.
-    const cards = host.querySelectorAll('.deck-card');
-    let content = 0;
-    for (let i = 0; i < cards.length; i++) {
-      const c = cards.item(i);
-      if (!c) continue;
-      let h = 0;
-      const hero = c.querySelector('.deck-hero');
-      const body = c.querySelector('.deck-body');
-      const rail = c.querySelector('.deck-rail');
-      const creator = c.querySelector('.deck-creator');
-      if (hero) h += hero.getBoundingClientRect().height;
-      if (body) h += body.scrollHeight;
-      if (rail) h += rail.getBoundingClientRect().height;
-      if (creator) h += creator.getBoundingClientRect().height;
-      content = Math.max(content, h);
-    }
-    // The stage is (deck height − progress row), so the deck must be at least
-    // content + progress tall for the tallest card to fit without clipping.
-    // The deck is always sized to its full content — never capped by the
-    // viewport — so the centre content and counters are complete on load and
-    // the page scrolls to reveal the whole card.
-    let progress = 0;
-    const progressEl = host.querySelector('.deck-progress');
-    if (progressEl) {
-      const pr = progressEl.getBoundingClientRect().height;
-      if (pr > 0) progress = pr;
-    }
-    const needed = Math.ceil(content + progress);
-    this.deckMinHeight.set(Math.max(360, needed));
-  }
+  private updateViewportH = () => {
+    const vv = (window as any).visualViewport;
+    const h = Math.round(vv?.height || window.innerHeight || 800);
+    if (h > 0) this.viewportH.set(h);
+  };
 
   readonly current = computed(() => this.pods()[this.index()] ?? null);
 
@@ -168,6 +125,7 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
       if (this.hasMore()) this.loadMore.emit();
       return;
     }
+    this.hasSwiped.set(true);
     this.index.update(i => i + 1);
     this.dragOffset.set(0);
   }
@@ -179,7 +137,32 @@ export class SwipeDeckComponent implements AfterViewInit, OnDestroy {
   }
 
   cardTop(i: number): number {
-    return (i - this.index()) * this.deckMinHeight();
+    return (i - this.index()) * this.viewportH();
+  }
+
+  // ----- feed chrome (tabs / search / create) -----
+  setMode(mode: 'foryou' | 'following' | 'saved') {
+    this.store.setFeedMode(mode);
+  }
+
+  toggleSearch() {
+    this.searchOpen.update(v => !v);
+  }
+
+  onSearchInput(value: string) {
+    this.store.onSearchInput(value);
+  }
+
+  clearSearch() {
+    this.store.clearSearch();
+  }
+
+  openBuildCode() {
+    if (!this.store.auth.isAuthenticated()) {
+      this.snackBar.open('Please log in to create a booking code', 'OK', { duration: 3000 });
+      return;
+    }
+    this.store.openBuildCode();
   }
 
   visible(i: number): boolean {

@@ -1,30 +1,124 @@
-<div class="deck" [style.min-height.px]="deckMinHeight()" (touchstart)="onTouchStart($event)" (touchmove)="onTouchMove($event)" (touchend)="onTouchEnd()" (keydown)="onKeyDown($event)" tabindex="0" role="feed" aria-label="For You betting picks">
+<div class="deck" [class.searching]="searchOpen()" [style.height.px]="viewportH()" (touchstart)="onTouchStart($event)" (touchmove)="onTouchMove($event)" (touchend)="onTouchEnd()" (keydown)="onKeyDown($event)" tabindex="0" role="feed" aria-label="For You betting picks">
+  <div class="deck-topbar">
+    <div class="deck-tabs" role="tablist" aria-label="Feed">
+      <button class="deck-tab active" role="tab" [attr.aria-selected]="true">For You</button>
+      <button class="deck-tab" role="tab" [attr.aria-selected]="false" (click)="setMode('following')">Following</button>
+      <button class="deck-tab" role="tab" [attr.aria-selected]="false" (click)="setMode('saved')">Saved</button>
+    </div>
+    <div class="deck-top-actions">
+      @if (pods().length > 0) {
+        <span class="deck-counter">{{ index() + 1 }} / {{ pods().length }}</span>
+      }
+      <button class="deck-icon-btn" (click)="toggleSearch()" aria-label="Search picks">
+        <mat-icon>{{ searchOpen() ? 'close' : 'search' }}</mat-icon>
+      </button>
+      <button class="deck-create-btn" (click)="openBuildCode()" aria-label="Create a booking code">
+        <mat-icon>qr_code_2</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  @if (searchOpen()) {
+    <div class="deck-search">
+      <mat-icon class="deck-search-icon">search</mat-icon>
+      <input
+        class="deck-search-input"
+        [value]="store.searchQuery()"
+        (input)="onSearchInput($any($event.target).value)"
+        placeholder="Search teams, leagues..."
+        aria-label="Search teams, leagues" />
+      @if (store.isSearching()) {
+        <button class="deck-icon-btn" (click)="clearSearch()" aria-label="Clear search">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </div>
+  }
+
+  <div class="deck-progress" aria-hidden="true">
+    <span class="deck-progress-fill" [style.width.%]="progressPct()"></span>
+  </div>
+
   <div class="deck-stage" [class.dragging]="dragging()" [style.transform]="'translateY(' + dragOffset() + 'px)'">
     @for (pod of pods(); track pod.id; let i = $index) {
       @if (visible(i)) {
-        <article class="deck-card" [class.live]="pod.isLive" [style.top.px]="cardTop(i)">
-          <div class="deck-hero">
-            <div class="hero-orb"></div>
-            <div class="deck-head">
-              <span class="deck-league"><mat-icon>sports_soccer</mat-icon> {{ pod.league || pod.sport }}</span>
-              <span class="deck-ora-badge">Ora AI</span>
-              @if (pod.isLive) {
-                <span class="deck-live"><span class="live-dot"></span> LIVE</span>
-              } @else {
-                <span class="deck-kickoff"><mat-icon>schedule</mat-icon> {{ kickoffLabel(pod) }}</span>
-              }
-            </div>
-            <div class="deck-teams">
-              <span class="deck-team">{{ pod.homeTeam }}</span>
-              <span class="deck-vs">VS</span>
-              <span class="deck-team">{{ pod.awayTeam }}</span>
-            </div>
-            @if (pod.title) {
-              <h3 class="deck-title">{{ pod.title }}</h3>
+        <article class="deck-card" [class.live]="pod.isLive" [style.top.px]="cardTop(i)" [style.height.px]="viewportH()">
+          <div class="card-backdrop" aria-hidden="true">
+            <div class="backdrop-orb orb-a"></div>
+            <div class="backdrop-orb orb-b"></div>
+            <div class="backdrop-scrim"></div>
+          </div>
+
+          <div class="card-top-meta">
+            <span class="deck-league"><mat-icon>sports_soccer</mat-icon> {{ pod.league || pod.sport }}</span>
+            <span class="deck-ora-badge">Ora AI</span>
+            @if (pod.isLive) {
+              <span class="deck-live"><span class="live-dot"></span> LIVE</span>
+            } @else {
+              <span class="deck-kickoff"><mat-icon>schedule</mat-icon> {{ kickoffLabel(pod) }}</span>
             }
           </div>
 
-          <div class="deck-body">
+          <div class="card-mid">
+            <div class="card-hero">
+              <div class="deck-teams">
+                <span class="deck-team">{{ pod.homeTeam }}</span>
+                <span class="deck-vs">VS</span>
+                <span class="deck-team">{{ pod.awayTeam }}</span>
+              </div>
+              @if (pod.title) {
+                <h3 class="deck-title">{{ pod.title }}</h3>
+              }
+            </div>
+
+            <aside class="card-rail" aria-label="Pick actions">
+              <button class="rail-btn" [class.active]="socialFeed.isLiked(pod.id)" (click)="toggleLike(pod)" aria-label="Like">
+                <mat-icon class="rail-icon" [class.liked]="socialFeed.isLiked(pod.id)">{{ socialFeed.isLiked(pod.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
+                <span class="rail-label">Like</span>
+              </button>
+              <button class="rail-btn" [class.active]="socialFeed.commentsSheet()?.id === pod.id" (click)="socialFeed.openCommentsSheet(pod)" aria-label="View comments">
+                <mat-icon class="rail-icon">chat_bubble_outline</mat-icon>
+                <span class="rail-label">Comment</span>
+                @if (socialFeed.commentCount(pod) > 0) {
+                  <span class="rail-count">{{ socialFeed.commentCount(pod) }}</span>
+                }
+              </button>
+              <button class="rail-btn" (click)="share(pod)" aria-label="Share">
+                <mat-icon class="rail-icon">share</mat-icon>
+                <span class="rail-label">Share</span>
+              </button>
+              <button class="rail-btn" [class.active]="socialFeed.isSaved(pod.id)" (click)="toggleSave(pod)" aria-label="Save">
+                <mat-icon class="rail-icon" [class.saved]="socialFeed.isSaved(pod.id)">{{ socialFeed.isSaved(pod.id) ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+                <span class="rail-label">{{ socialFeed.isSaved(pod.id) ? 'Saved' : 'Save' }}</span>
+              </button>
+              @if (isMyPodOf(pod)) {
+                <span class="rail-label you-label"><mat-icon>person</mat-icon> You</span>
+              } @else if (!isOraOf(pod)) {
+                <button class="rail-btn follow" [class.following]="isFollowing(pod)" (click)="toggleFollow(pod)" [attr.aria-label]="isFollowing(pod) ? 'Unfollow' : 'Follow'">
+                  <mat-icon>{{ isFollowing(pod) ? 'check' : 'add' }}</mat-icon>
+                  <span class="rail-label">{{ isFollowing(pod) ? 'Following' : 'Follow' }}</span>
+                </button>
+              }
+            </aside>
+
+            @if (i === 0 && index() === 0 && !hasSwiped()) {
+              <div class="swipe-hint" aria-hidden="true">
+                <mat-icon>expand_less</mat-icon>
+                <span>Swipe up for next pick</span>
+              </div>
+            }
+          </div>
+
+          <div class="card-caption">
+            <div class="deck-creator" (click)="openCreator(pod)">
+              <span class="creator-avatar"><mat-icon>{{ isOraOf(pod) ? 'auto_awesome' : 'person' }}</mat-icon></span>
+              <span class="creator-name">{{ creatorNameOf(pod) }}
+                @if (isOraOf(pod)) {
+                  <mat-icon class="verified">verified</mat-icon>
+                }
+                {{ isOraOf(pod) ? 'AI Curator' : 'Creator' }}</span>
+            </div>
+
             <div class="pick-row">
               <div class="pick-left">
                 <span class="pick-badge">PICK: {{ pod.selection }}</span>
@@ -91,45 +185,10 @@
                 </button>
               </div>
             </div>
-          </div>
 
-          <div class="deck-rail">
-            <button class="rail-btn" [class.active]="socialFeed.isLiked(pod.id)" (click)="toggleLike(pod)" [matTooltip]="'Like'">
-              <mat-icon class="rail-icon" [class.liked]="socialFeed.isLiked(pod.id)">{{ socialFeed.isLiked(pod.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
-              <span class="rail-label">Like</span>
-            </button>
-            <button class="rail-btn" (click)="share(pod)" [matTooltip]="'Share'">
-              <mat-icon class="rail-icon">share</mat-icon>
-              <span class="rail-label">Share</span>
-            </button>
-            <button class="rail-btn" [class.active]="socialFeed.commentsSheet()?.id === pod.id" (click)="socialFeed.openCommentsSheet(pod)" [matTooltip]="'View comments'">
-              <mat-icon class="rail-icon">chat_bubble_outline</mat-icon>
-              <span class="rail-label">Comment</span>
-              @if (socialFeed.commentCount(pod) > 0) {
-                <span class="rail-count">{{ socialFeed.commentCount(pod) }}</span>
-              }
-            </button>
-            <button class="rail-btn" [class.active]="socialFeed.isSaved(pod.id)" (click)="toggleSave(pod)" [matTooltip]="'Save'">
-              <mat-icon class="rail-icon" [class.saved]="socialFeed.isSaved(pod.id)">{{ socialFeed.isSaved(pod.id) ? 'bookmark' : 'bookmark_border' }}</mat-icon>
-              <span class="rail-label">{{ socialFeed.isSaved(pod.id) ? 'Saved' : 'Save' }}</span>
-            </button>
-            @if (isMyPodOf(pod)) {
-              <span class="rail-label you-label"><mat-icon>person</mat-icon> You</span>
-            } @else if (!isOraOf(pod)) {
-              <button class="rail-btn follow" [class.following]="isFollowing(pod)" (click)="toggleFollow(pod)" [matTooltip]="isFollowing(pod) ? 'Unfollow' : 'Follow'">
-                <mat-icon>{{ isFollowing(pod) ? 'check' : 'add' }}</mat-icon>
-                <span class="rail-label">{{ isFollowing(pod) ? 'Following' : 'Follow' }}</span>
-              </button>
+            @if (atEnd() && !hasMore() && i === index()) {
+              <p class="caught-up">You're all caught up — check Following for more</p>
             }
-          </div>
-
-          <div class="deck-creator" (click)="openCreator(pod)">
-            <span class="creator-avatar"><mat-icon>{{ isOraOf(pod) ? 'auto_awesome' : 'person' }}</mat-icon></span>
-            <span class="creator-name">{{ creatorNameOf(pod) }}
-              @if (isOraOf(pod)) {
-                <mat-icon class="verified">verified</mat-icon>
-              }
-              {{ isOraOf(pod) ? 'AI Curator' : 'Creator' }}</span>
           </div>
         </article>
       }
