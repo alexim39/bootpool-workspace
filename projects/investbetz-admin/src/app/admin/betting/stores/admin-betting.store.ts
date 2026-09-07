@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
-import { AdminService, AdminPod, SettlementCheckResult } from '../../services';
+import { AdminService, AdminPod, SettlementCheckResult, StuckStake } from '../../services';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -45,6 +45,10 @@ export class AdminBettingStore {
   readonly batchResolveTarget = signal<{ podIds: string[]; result: string; note: string } | null>(null);
   readonly showStuckPanel = signal(false);
   readonly stuckPods = signal<AdminPod[]>([]);
+  readonly showStuckStakesPanel = signal(false);
+  readonly stuckStakes = signal<StuckStake[]>([]);
+  readonly sweepingStakes = signal(false);
+  readonly sweepResult = signal<{ scanned: number; resolved: number; errors: string[] } | null>(null);
 
   readonly bookedCount = computed(() => this.pods().filter(p => p.bookedExternally).length);
   readonly totalExposure = computed(() => this.pods().reduce((sum, p) => sum + (p.currentExposure || 0), 0));
@@ -422,6 +426,36 @@ export class AdminBettingStore {
   dismissStuckPanel() {
     this.showStuckPanel.set(false);
     this.stuckPods.set([]);
+  }
+
+  loadStuckStakes() {
+    this.showStuckStakesPanel.set(true);
+    this.sweepResult.set(null);
+    this.admin.listStuckStakes().subscribe({
+      next: res => { if (res.success) this.stuckStakes.set(res.data); }
+    });
+  }
+
+  dismissStuckStakesPanel() {
+    this.showStuckStakesPanel.set(false);
+    this.stuckStakes.set([]);
+    this.sweepResult.set(null);
+  }
+
+  runStuckSweep() {
+    if (this.sweepingStakes()) return;
+    this.sweepingStakes.set(true);
+    this.admin.sweepStaleStakes().subscribe({
+      next: res => {
+        this.sweepingStakes.set(false);
+        if (res.success) {
+          this.sweepResult.set({ scanned: res.scanned, resolved: res.resolved, errors: res.errors || [] });
+          this.stuckStakes.set(res.stillStuck || []);
+          this.loadPods();
+        }
+      },
+      error: () => this.sweepingStakes.set(false)
+    });
   }
 
   selectPodAndSettle(pod: AdminPod) {

@@ -521,6 +521,14 @@ export class AdminService {
     return this.http.get<{ success: boolean; data: AdminPod[]; count: number }>(`${this.baseUrl}/ai/settlement/stuck`);
   }
 
+  listStuckStakes(olderThanDays = 7): Observable<{ success: boolean; data: StuckStake[]; count: number }> {
+    return this.http.get<{ success: boolean; data: StuckStake[]; count: number }>(`${this.baseUrl}/ai/settlement/stuck-stakes?olderThanDays=${olderThanDays}`);
+  }
+
+  sweepStaleStakes(olderThanDays = 7): Observable<{ success: boolean; scanned: number; resolved: number; stillStuck: StuckStake[]; errors: string[] }> {
+    return this.http.post<{ success: boolean; scanned: number; resolved: number; stillStuck: StuckStake[]; errors: string[] }>(`${this.baseUrl}/ai/sweep-stale-stakes`, { olderThanDays });
+  }
+
   getPendingReviewCount(): Observable<{ success: boolean; data: { disputed: number; stuck: number } }> {
     return this.http.get<{ success: boolean; data: { disputed: number; stuck: number } }>(`${this.baseUrl}/ai/settlement/pending-count`);
   }
@@ -882,6 +890,23 @@ export interface KycReviewResult {
   confidence: number;
   riskFlags: string[];
   reasoning: string;
+}
+
+export interface StuckStakeLeg {
+  index: number;
+  podId: string | null;
+  podTitle: string;
+  podStatus: string | null;
+  matchDate: string | null;
+  reason: string;
+}
+
+export interface StuckStake {
+  stakeId: string;
+  user: string;
+  ageDays: number;
+  status: string;
+  legs: StuckStakeLeg[];
 }
 
 export interface SettlementCheckResult {

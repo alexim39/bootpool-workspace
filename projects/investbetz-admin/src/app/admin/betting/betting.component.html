@@ -405,6 +405,9 @@
             <button mat-stroked-button class="btn-stuck-review" *ngIf="store.settleAllResult()!.stuck > 0" (click)="store.loadStuck()">
               <mat-icon>help_outline</mat-icon> Review {{ store.settleAllResult()!.stuck }} Stuck
             </button>
+            <button mat-stroked-button class="btn-stuck-review" (click)="store.loadStuckStakes()">
+              <mat-icon>hourglass_empty</mat-icon> Stuck Stakes
+            </button>
           </div>
         </div>
       </div>
@@ -453,6 +456,31 @@
             <div class="stuck-actions">
               <button mat-stroked-button class="btn-settle-manual" (click)="store.selectPodAndSettle(p)">Manual Settle</button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stuck-panel" *ngIf="store.showStuckStakesPanel()">
+        <div class="stuck-header">
+          <mat-icon style="color:#90CAF9">hourglass_empty</mat-icon>
+          <span>Stuck Stakes &#x2014; active bets on long-concluded fixtures ({{ store.stuckStakes().length }})</span>
+          <div class="disputed-header-actions">
+            <button mat-stroked-button class="btn-stuck-review" (click)="store.runStuckSweep()" [disabled]="store.sweepingStakes()">
+              <mat-icon>cleaning_services</mat-icon> {{ store.sweepingStakes() ? 'Sweeping…' : 'Run Sweep' }}
+            </button>
+            <button mat-icon-button (click)="store.dismissStuckStakesPanel()"><mat-icon>close</mat-icon></button>
+          </div>
+        </div>
+        <div class="stuck-body">
+          <div class="stuck-empty" *ngIf="store.stuckStakes().length === 0 && !store.sweepResult()">No stakes stuck on old fixtures.</div>
+          <div class="settle-all-error" *ngIf="store.sweepResult() && store.sweepResult()!.resolved > 0">Sweep resolved {{ store.sweepResult()!.resolved }} of {{ store.sweepResult()!.scanned }} stuck stake(s).</div>
+          <div class="settle-all-error" *ngFor="let e of (store.sweepResult()?.errors || [])">{{ e }}</div>
+          <div class="stuck-item" *ngFor="let s of store.stuckStakes()">
+            <div class="stuck-item-header">
+              <span class="stuck-teams">{{ s.user }}</span>
+              <span class="stuck-selection">{{ s.ageDays }}d old &#xB7; {{ s.status }}</span>
+            </div>
+            <div class="stuck-reason" *ngFor="let leg of s.legs">Leg {{ leg.index + 1 }} ({{ leg.podTitle }}): {{ leg.reason }}</div>
           </div>
         </div>
       </div>
