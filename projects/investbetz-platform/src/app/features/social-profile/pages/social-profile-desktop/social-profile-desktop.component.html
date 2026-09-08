@@ -31,9 +31,6 @@
                 <mat-icon class="verified">verified</mat-icon>
                 <span class="ora-badge"><mat-icon>auto_awesome</mat-icon> AI Curator</span>
               }
-              @if (p.virality && p.virality.badge && p.virality.badge !== 'Rookie') {
-                <span class="creator-badge" [title]="'Creator score â‚¦' + (p.virality.score | number)">{{ p.virality.badge }}</span>
-              }
               <app-creator-badge [badge]="p.tipsterBadge" />
             </div>
             @if (p.user.username) {
@@ -56,11 +53,21 @@
                   {{ p.isFollowing ? 'Following' : 'Follow' }}
                 </button>
               }
-              <button mat-stroked-button class="share-btn" (click)="store.shareProfile()">
+              <button mat-stroked-button class="share-btn" (click)="showShare.set(true)">
                 <mat-icon>share</mat-icon>
                 Share profile
               </button>
             </div>
+
+            @if (isGuest) {
+              <div class="guest-cta">
+                <div class="guest-cta-text">
+                  <strong>Join BetPool to follow {{ p.user.fullName }} and copy their slips in one tap</strong>
+                  <span>See verified badges, track records and live codes — then log in to act.</span>
+                </div>
+                <a mat-flat-button class="guest-cta-btn" routerLink="/auth/login" [queryParams]="{ returnUrl: '/social/' + p.user.id }">Log in / Sign up</a>
+              </div>
+            }
 
             <div class="stats-row">
           <button class="stat" (click)="store.loadTab('codes')">
@@ -275,5 +282,9 @@
       <span>{{ store.error() }}</span>
       <button mat-stroked-button (click)="store.retry()">Try again</button>
     </div>
+  }
+
+  @if (store.profile(); as sp) {
+    <app-share-sheet [profile]="{ id: sp.user.id, name: sp.user.fullName, username: sp.user.username, isOra: sp.user.isOra, badge: sp.virality?.badge || null, tipsterBadge: sp.tipsterBadge || null }" [open]="showShare()" (closed)="showShare.set(false)" />
   }
 </div>

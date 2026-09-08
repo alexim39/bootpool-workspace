@@ -132,6 +132,11 @@ export class SocialProfileStore {
   async toggleFollow(): Promise<void> {
     const p = this.profile();
     if (!p || p.isSelf || p.user.isOra) return;
+    if (!this._social.isLoggedIn()) {
+      this.router.navigate(['/auth/login'], { queryParams: { returnUrl: '/social/' + p.user.id } });
+      this.snackBar.open('Log in to follow creators', 'OK', { duration: 2500 });
+      return;
+    }
     const was = p.isFollowing;
     this.profile.update(cur => (cur ? { ...cur, isFollowing: !was } : cur));
     try {
@@ -145,6 +150,11 @@ export class SocialProfileStore {
 
   async followRow(row: SocialUserRow): Promise<void> {
     if (row.isSelf || row.isOra) return;
+    if (!this._social.isLoggedIn()) {
+      this.router.navigate(['/auth/login'], { queryParams: { returnUrl: '/social/' + row.id } });
+      this.snackBar.open('Log in to follow creators', 'OK', { duration: 2500 });
+      return;
+    }
     const was = row.isFollowing;
     this.updateRow(row.id, { isFollowing: !was });
     try {

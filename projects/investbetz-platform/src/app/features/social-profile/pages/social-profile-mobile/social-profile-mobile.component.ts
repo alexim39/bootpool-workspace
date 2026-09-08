@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,8 +6,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SocialProfileStore } from '../../social-profile.store';
 import { CodePostCardComponent } from '../../../home/components/code-post-card/code-post-card.component';
-import { SocialUserRow } from '../../../../core/services/social-feed.service';
+import { SocialUserRow, SocialFeedService } from '../../../../core/services/social-feed.service';
 import { MobileNavComponent, CreatorBadgeComponent } from '../../../../core/components';
+import { ShareSheetComponent } from '../../components/share-sheet/share-sheet.component';
 
 export interface AchievementDef {
   id: string;
@@ -31,14 +32,21 @@ export const ACHIEVEMENTS: AchievementDef[] = [
 @Component({
   selector: 'app-social-profile-mobile',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule, CodePostCardComponent, MobileNavComponent, CreatorBadgeComponent],
+  imports: [CommonModule, RouterModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule, CodePostCardComponent, MobileNavComponent, CreatorBadgeComponent, ShareSheetComponent],
   templateUrl: './social-profile-mobile.component.html',
   styleUrls: ['./social-profile-mobile.component.scss']
 })
 export class SocialProfileMobileComponent {
   readonly store = inject(SocialProfileStore);
+  readonly social = inject(SocialFeedService);
   readonly achievements = ACHIEVEMENTS;
   private route = inject(ActivatedRoute);
+
+  readonly showShare = signal(false);
+
+  get isGuest(): boolean {
+    return !this.social.isLoggedIn();
+  }
 
   constructor() {
     this.route.paramMap.subscribe(params => {

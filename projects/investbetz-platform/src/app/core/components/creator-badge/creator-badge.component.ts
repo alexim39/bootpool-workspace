@@ -24,10 +24,23 @@ export class CreatorBadgeComponent {
     return !!tier && tier !== 'Rookie';
   };
 
+  readonly icon = () => {
+    const tier = this.badge()?.tier;
+    if (tier === 'Legend') return 'workspace_premium';
+    if (tier === 'Pro') return 'military_tech';
+    return 'trending_up';
+  };
+
   readonly tooltip = () => {
     const b = this.badge();
     if (!b || b.tier === 'Rookie') return '';
     const sample = `${b.settled} settled ${b.settled === 1 ? 'copy' : 'copies'}`;
-    return `${b.tier} tipster — ${b.winRate}% win rate over ${sample}`;
+    const explainer =
+      b.tier === 'Legend'
+        ? ' — Top 500+ settled copies, highest follower ROI'
+        : b.tier === 'Pro'
+          ? ' — 100+ settled copies, proven follower ROI'
+          : ' — 20+ settled copies, rising follower ROI';
+    return `${b.tier} Tipster${explainer} — ${b.winRate}% win rate over ${sample}`;
   };
 }

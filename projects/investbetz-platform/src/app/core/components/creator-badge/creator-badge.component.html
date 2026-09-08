@@ -1,6 +1,12 @@
 @if (show()) {
   <span class="creator-badge" [class]="'tier-' + badge()!.tier.toLowerCase()" [matTooltip]="tooltip()" matTooltipPosition="above">
-    <mat-icon>military_tech</mat-icon>
-    {{ badge()!.tier }}
+    <span class="badge-icon">
+      <mat-icon>{{ icon() }}</mat-icon>
+    </span>
+    <span class="badge-text">
+      <span class="badge-tier">{{ badge()!.tier }}</span>
+      <span class="badge-sep">·</span>
+      <span class="badge-role">Tipster</span>
+    </span>
   </span>
 }

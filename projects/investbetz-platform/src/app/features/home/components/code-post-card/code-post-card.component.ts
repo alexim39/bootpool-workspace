@@ -1,6 +1,6 @@
 import { Component, inject, input, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -20,6 +20,7 @@ export class CodePostCardComponent {
   post = input.required<CodePost>();
 
   private snackBar = inject(MatSnackBar);
+  private router = inject(Router);
   readonly social = inject(SocialFeedService);
   readonly store = inject(HomeStore);
 
@@ -116,7 +117,8 @@ export class CodePostCardComponent {
    */
   copyStake() {
     if (!this.social.isLoggedIn()) {
-      this.snackBar.open('Please log in to stake', 'OK', { duration: 2500 });
+      this.snackBar.open('Log in to copy and stake this slip', 'OK', { duration: 3000 });
+      this.router.navigate(['/auth/login'], { queryParams: { returnUrl: '/social/' + this.post().creatorId } });
       return;
     }
     if (this.staking()) return;

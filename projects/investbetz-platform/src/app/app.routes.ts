@@ -70,7 +70,6 @@ export const routes: Routes = [
   {
     path: 'social/:id',
     loadComponent: () => import('./features/social-profile/social-profile.component').then(m => m.SocialProfileComponent),
-    canActivate: [authGuard]
   },
   {
     path: 'ora-record',

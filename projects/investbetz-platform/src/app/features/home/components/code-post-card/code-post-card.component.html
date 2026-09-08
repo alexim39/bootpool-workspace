@@ -9,8 +9,10 @@
         }
       </span>
       <div class="creator-meta">
-        <a class="creator-name" [routerLink]="'/social/' + post().creatorId">{{ creatorName() }}</a>
-        <app-creator-badge [badge]="post().creatorBadge" />
+        <div class="creator-title">
+          <a class="creator-name" [routerLink]="'/social/' + post().creatorId">{{ creatorName() }}</a>
+          <app-creator-badge [badge]="post().creatorBadge" />
+        </div>
         @if (post().creatorUsername) {
           <span class="creator-username">{{ '@' + post().creatorUsername }}</span>
         }

@@ -556,53 +556,55 @@ export class SocialFeedService {
   }
 
   async fetchProfile(userId: string): Promise<SocialProfile | null> {
-    if (!this.isLoggedIn()) return null;
+    if (this.isLoggedIn()) {
+      try {
+        const res: any = await lastValueFrom(this.http.get(`${this.API_URL}/social/profile/${userId}`, this.headers() as any) as any);
+        if (res?.success && res.data) return res.data;
+      } catch {
+        // fall through to public
+      }
+    }
+    // Guest / fallback: public read-only profile (no auth required)
     try {
-      const res = await lastValueFrom(this.http.get<{ success: boolean; data: SocialProfile }>(
-        `${this.API_URL}/social/profile/${userId}`,
-        this.headers()
-      ));
-      return res.success ? res.data : null;
+      const res: any = await lastValueFrom(this.http.get(`${this.API_URL}/social/public/profile/${userId}`) as any);
+      return res?.success ? res.data : null;
     } catch {
       return null;
     }
   }
 
   async fetchFollowers(userId: string, page = 1, limit = 20): Promise<{ items: SocialUserRow[]; total: number }> {
-    if (!this.isLoggedIn()) return { items: [], total: 0 };
+    const url = this.isLoggedIn()
+      ? `${this.API_URL}/social/followers?userId=${userId}&page=${page}&limit=${limit}`
+      : `${this.API_URL}/social/public/followers?userId=${userId}&page=${page}&limit=${limit}`;
     try {
-      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: SocialUserRow[]; total: number } }>(
-        `${this.API_URL}/social/followers?userId=${userId}&page=${page}&limit=${limit}`,
-        this.headers()
-      ));
-      return res.success ? res.data : { items: [], total: 0 };
+      const res: any = await lastValueFrom(this.http.get(url, (this.isLoggedIn() ? this.headers() : {}) as any) as any);
+      return res?.success ? res.data : { items: [], total: 0 };
     } catch {
       return { items: [], total: 0 };
     }
   }
 
   async fetchFollowingUsers(userId: string, page = 1, limit = 20): Promise<{ items: SocialUserRow[]; total: number }> {
-    if (!this.isLoggedIn()) return { items: [], total: 0 };
+    const url = this.isLoggedIn()
+      ? `${this.API_URL}/social/following-list?userId=${userId}&page=${page}&limit=${limit}`
+      : `${this.API_URL}/social/public/following-list?userId=${userId}&page=${page}&limit=${limit}`;
     try {
-      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: SocialUserRow[]; total: number } }>(
-        `${this.API_URL}/social/following-list?userId=${userId}&page=${page}&limit=${limit}`,
-        this.headers()
-      ));
-      return res.success ? res.data : { items: [], total: 0 };
+      const res: any = await lastValueFrom(this.http.get(url, (this.isLoggedIn() ? this.headers() : {}) as any) as any);
+      return res?.success ? res.data : { items: [], total: 0 };
     } catch {
       return { items: [], total: 0 };
     }
   }
 
   async fetchCreatorCodes(userId: string, page = 1, limit = 12): Promise<{ items: CodePost[]; total: number }> {
-    if (!this.isLoggedIn()) return { items: [], total: 0 };
+    const url = this.isLoggedIn()
+      ? `${this.API_URL}/social/creator-codes?userId=${userId}&page=${page}&limit=${limit}`
+      : `${this.API_URL}/social/public/creator-codes?userId=${userId}&page=${page}&limit=${limit}`;
     try {
-      const res = await lastValueFrom(this.http.get<{ success: boolean; data: { items: CodePost[]; total: number } }>(
-        `${this.API_URL}/social/creator-codes?userId=${userId}&page=${page}&limit=${limit}`,
-        this.headers()
-      ));
-      if (!res.success) return { items: [], total: 0 };
-      return { items: res.data.items || [], total: res.data.total || 0 };
+      const res: any = await lastValueFrom(this.http.get(url, (this.isLoggedIn() ? this.headers() : {}) as any) as any);
+      if (!res?.success) return { items: [], total: 0 };
+      return { items: res.data?.items || [], total: res.data?.total || 0 };
     } catch {
       return { items: [], total: 0 };
     }
