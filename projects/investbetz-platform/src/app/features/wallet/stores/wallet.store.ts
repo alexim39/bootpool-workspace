@@ -232,7 +232,7 @@ export class WalletStore {
   }
 
   isCredit(type: string): boolean {
-    return ['deposit', 'payout', 'refund', 'bonus', 'winnings', 'cashout'].includes(type);
+    return ['deposit', 'payout', 'refund', 'bonus', 'commission', 'winnings', 'cashout'].includes(type);
   }
 
   isDebit(type: string): boolean {
@@ -242,7 +242,7 @@ export class WalletStore {
   getTransactionIcon(type: string): string {
     const icons: Record<string, string> = {
       deposit: 'account_balance_wallet', withdrawal: 'money_off', stake: 'casino',
-      payout: 'emoji_events', refund: 'undo', bonus: 'card_giftcard', fee: 'receipt_long',
+      payout: 'emoji_events', refund: 'undo', bonus: 'card_giftcard', commission: 'handshake', fee: 'receipt_long',
       winnings: 'emoji_events', cashout: 'currency_exchange'
     };
     return icons[type] || 'help';

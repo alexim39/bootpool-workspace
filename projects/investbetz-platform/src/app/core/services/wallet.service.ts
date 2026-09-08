@@ -17,7 +17,7 @@ export interface WalletBalance {
 export interface Transaction {
   id: string;
   _id?: string;
-  type: 'deposit' | 'withdrawal' | 'stake' | 'payout' | 'refund' | 'bonus' | 'fee' | 'transfer';
+  type: 'deposit' | 'withdrawal' | 'stake' | 'payout' | 'refund' | 'bonus' | 'commission' | 'fee' | 'transfer';
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled' | 'reversed';
   amount: number;
   fee: number;
@@ -429,6 +429,7 @@ export class WalletService {
       payout: 'emoji_events',
       refund: 'undo',
       bonus: 'card_giftcard',
+      commission: 'handshake',
       fee: 'receipt_long',
       transfer: 'swap_horiz'
     };
@@ -443,6 +444,7 @@ export class WalletService {
       payout: '#4caf50',
       refund: '#2196f3',
       bonus: '#9c27b0',
+      commission: '#E8B923',
       fee: '#795548',
       transfer: '#00B8D9'
     };

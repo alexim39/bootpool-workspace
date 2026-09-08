@@ -206,7 +206,7 @@
                         <span class="ref-code">{{ txn.reference }}</span>
                       </td>
                       <td>
-                        <span class="type-badge" [class.type-deposit]="txn.type === 'deposit'" [class.type-withdrawal]="txn.type === 'withdrawal'" [class.type-stake]="txn.type === 'stake'" [class.type-payout]="txn.type === 'payout'" [class.type-bonus]="txn.type === 'bonus'">
+                        <span class="type-badge" [class.type-deposit]="txn.type === 'deposit'" [class.type-withdrawal]="txn.type === 'withdrawal'" [class.type-stake]="txn.type === 'stake'" [class.type-payout]="txn.type === 'payout'" [class.type-bonus]="txn.type === 'bonus'" [class.type-commission]="txn.type === 'commission'">
                           <mat-icon class="type-icon">{{ store.getTransactionIcon(txn.type) }}</mat-icon>
                           {{ store.formatType(txn.type) }}
                         </span>

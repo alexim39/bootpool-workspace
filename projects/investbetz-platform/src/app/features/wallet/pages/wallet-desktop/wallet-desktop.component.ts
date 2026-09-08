@@ -20,6 +20,7 @@ const TYPE_CHIPS: { key: string; label: string }[] = [
   { key: 'payout', label: 'Payouts' },
   { key: 'refund', label: 'Refunds' },
   { key: 'bonus', label: 'Bonuses' },
+  { key: 'commission', label: 'Commissions' },
   { key: 'fee', label: 'Fees' }
 ];
 

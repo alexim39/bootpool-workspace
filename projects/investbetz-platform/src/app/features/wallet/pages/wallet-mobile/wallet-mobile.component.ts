@@ -27,7 +27,7 @@ export class WalletMobileComponent implements OnInit, OnDestroy {
   readonly store = inject(WalletStore);
   readonly pageSizes = WALLET_PAGE_SIZES;
 
-  readonly TYPE_CHIPS = ['all', 'deposit', 'withdrawal', 'stake', 'payout', 'refund', 'bonus', 'fee'] as const;
+  readonly TYPE_CHIPS = ['all', 'deposit', 'withdrawal', 'stake', 'payout', 'refund', 'bonus', 'commission', 'fee'] as const;
   readonly STATUS_CHIPS = ['all', 'completed', 'pending', 'processing', 'failed', 'cancelled'] as const;
   readonly SORT_CHIPS = [
     { field: 'createdAt', order: 'desc', label: 'Newest' },
