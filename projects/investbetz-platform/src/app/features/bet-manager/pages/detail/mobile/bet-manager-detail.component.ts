@@ -68,4 +68,11 @@ export class BetManagerDetailComponent implements OnInit {
   setSort(sortField: string, sortOrder: 'asc' | 'desc') { this.store.setHistoryFilters({ sortField, sortOrder }); }
   setPageSize(size: number) { this.store.setHistoryPageSize(size); }
   clearFilters() { this.searchTerm = ''; this.store.clearHistoryFilters(); }
+
+  setBetStatus(status: string) { this.store.setBetFilters({ status }); }
+  setBetSort(sortField: string, sortOrder: 'asc' | 'desc') { this.store.setBetFilters({ sortField, sortOrder }); }
+
+  betStatusLabel(status: string): string {
+    return status === 'active' ? 'Running' : status.charAt(0).toUpperCase() + status.slice(1);
+  }
 }

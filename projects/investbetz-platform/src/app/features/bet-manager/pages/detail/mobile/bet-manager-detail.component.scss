@@ -46,6 +46,61 @@
 .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .history-count { font-size: 12px; color: rgba(255,255,255,0.4); }
 
+.history-tabs { display: inline-flex; gap: 4px; padding: 3px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 999px; margin-bottom: 12px; }
+.history-tab {
+  padding: 6px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  color: rgba(255,255,255,0.55);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.history-tab:hover { color: #fff; }
+.history-tab.on { color: #00E676; background: rgba(0,230,118,0.1); }
+
+.deposit-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: rgba(0,230,118,0.06);
+  border: 1px solid rgba(0,230,118,0.25);
+  border-radius: 12px;
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.85);
+}
+.deposit-cta-btn {
+  flex-shrink: 0;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #00E676, #00C853);
+  color: #06220F;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.bet-stats { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; font-size: 12px; color: rgba(255,255,255,0.65); }
+.bet-stat { display: inline-flex; align-items: center; gap: 5px; }
+.bet-stat .status-dot { width: 7px; height: 7px; border-radius: 50%; }
+.status-dot.running { background: #E8B923; box-shadow: 0 0 8px rgba(232,185,35,0.7); }
+.status-dot.won { background: #00E676; }
+.status-dot.lost { background: #f44336; }
+.status-dot.void { background: #64B5F6; }
+
+.bet-game { font-size: 13px; font-weight: 600; color: #fff; }
+.bet-returns { font-size: 11px; font-weight: 700; color: #00E676; }
+.chip-running { background: rgba(232,185,35,0.15); color: #E8B923; }
+.chip-won { background: rgba(0,230,118,0.15); color: #00E676; }
+.chip-lost { background: rgba(244,67,54,0.15); color: #f44336; }
+.chip-void { background: rgba(100,181,246,0.15); color: #64B5F6; }
+
 .filter-deck {
   display: flex;
   flex-direction: column;

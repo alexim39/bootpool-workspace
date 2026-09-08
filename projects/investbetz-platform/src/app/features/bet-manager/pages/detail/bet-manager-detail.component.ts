@@ -68,6 +68,27 @@ export class BetManagerDetailComponent implements OnInit {
   setPageSize(size: number) { this.store.setHistoryPageSize(size); }
   clearFilters() { this.searchTerm = ''; this.store.clearHistoryFilters(); }
 
+  setBetStatus(status: string) { this.store.setBetFilters({ status }); }
+  setBetSort(sortField: string, sortOrder: 'asc' | 'desc') { this.store.setBetFilters({ sortField, sortOrder }); }
+
+  get betRangeStart(): number {
+    return ((this.store.betPage() - 1) * this.store.betLimit()) + 1;
+  }
+
+  get betRangeEnd(): number {
+    const end = this.store.betPage() * this.store.betLimit();
+    return end > this.store.betTotal() ? this.store.betTotal() : end;
+  }
+
+  betStatusLabel(status: string): string {
+    return status === 'active' ? 'Running' : status.charAt(0).toUpperCase() + status.slice(1);
+  }
+
+  get betVoidCount(): number {
+    const stats = this.store.betStats();
+    return (stats['void'] || 0) + (stats['refunded'] || 0);
+  }
+
   unlockDate(rec: { withdrawableAt: string | null; status: string }): string | null {
     if (rec.status !== 'locked' || !rec.withdrawableAt) return null;
     const d = new Date(rec.withdrawableAt);

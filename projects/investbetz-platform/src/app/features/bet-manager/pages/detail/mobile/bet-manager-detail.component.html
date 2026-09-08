@@ -172,9 +172,22 @@
       <div class="section-card">
         <div class="section-head">
           <h3>History</h3>
-          <span class="history-count">{{ store.historyTotal() | number }}</span>
+          <span class="history-count">{{ store.historyTab() === 'bets' ? (store.betTotal() | number) : (store.historyTotal() | number) }}</span>
         </div>
 
+        <div class="history-tabs" role="tablist" aria-label="History">
+          <button class="history-tab" [class.on]="store.historyTab() === 'funds'" (click)="store.setHistoryTab('funds')" role="tab" [attr.aria-selected]="store.historyTab() === 'funds'">Funds</button>
+          <button class="history-tab" [class.on]="store.historyTab() === 'bets'" (click)="store.setHistoryTab('bets')" role="tab" [attr.aria-selected]="store.historyTab() === 'bets'">Bets placed</button>
+        </div>
+
+        @if (store.historyTab() === 'bets' && !store.summary()?.account) {
+          <div class="deposit-cta">
+            <span>Every game this plan plays is listed here — deposit to share in these returns.</span>
+            <button class="deposit-cta-btn" (click)="goDeposit()">Deposit</button>
+          </div>
+        }
+
+        @if (store.historyTab() === 'funds') {
         <div class="filter-deck">
           <input
             class="filter-input"
@@ -231,6 +244,68 @@
               <p class="no-data">No history yet.</p>
             }
           </div>
+        }
+        }
+
+        @if (store.historyTab() === 'bets') {
+        <div class="bet-stats">
+          <span class="bet-stat"><i class="status-dot running"></i>{{ store.betStats()['active'] | number }} running</span>
+          <span class="bet-stat"><i class="status-dot won"></i>{{ store.betStats()['won'] | number }} won</span>
+          <span class="bet-stat"><i class="status-dot lost"></i>{{ store.betStats()['lost'] | number }} lost</span>
+        </div>
+
+        <div class="filter-deck">
+          <div class="filter-scroll">
+            <button class="chip-btn" [class.on]="!store.betStatus()" (click)="setBetStatus('')">All</button>
+            <button class="chip-btn" [class.on]="store.betStatus() === 'active'" (click)="setBetStatus('active')">Running</button>
+            <button class="chip-btn" [class.on]="store.betStatus() === 'won'" (click)="setBetStatus('won')">Won</button>
+            <button class="chip-btn" [class.on]="store.betStatus() === 'lost'" (click)="setBetStatus('lost')">Lost</button>
+            <button class="chip-btn" [class.on]="store.betStatus() === 'void'" (click)="setBetStatus('void')">Void</button>
+            <button class="chip-btn" [class.on]="store.betSortField() === 'placedAt' && store.betSortOrder() === 'desc'" (click)="setBetSort('placedAt', 'desc')">Newest</button>
+            <button class="chip-btn" [class.on]="store.betSortField() === 'placedAt' && store.betSortOrder() === 'asc'" (click)="setBetSort('placedAt', 'asc')">Oldest</button>
+          </div>
+          @if (store.betStatus() || store.betFrom() || store.betTo()) {
+            <button class="clear-filters" (click)="store.clearBetFilters()">Clear filters</button>
+          }
+        </div>
+
+        @if (store.betLoading()) {
+          <div class="history-empty"><p class="no-data">Loading bets…</p></div>
+        } @else if (store.betHistory().length > 0) {
+          @for (bet of store.betHistory(); track bet._id) {
+            <div class="history-row">
+              <div class="history-left">
+                <span class="bet-game">{{ bet.homeTeam || '—' }} vs {{ bet.awayTeam || '—' }}</span>
+                <span class="history-date">{{ bet.selection || '' }}{{ bet.selection ? ' · ' : '' }}{{ bet.odds | number:'1.2-2' }}x · {{ bet.placedAt | date:'shortDate' }}</span>
+                @if (bet.homeScore != null && bet.awayScore != null) {
+                  <span class="history-ref">{{ bet.homeScore }}–{{ bet.awayScore }}</span>
+                }
+              </div>
+              <div class="history-right">
+                <span class="history-amount">₦{{ bet.amount | number }}</span>
+                <span class="chip" [class.chip-running]="bet.status === 'active'" [class.chip-won]="bet.status === 'won'" [class.chip-lost]="bet.status === 'lost'" [class.chip-void]="bet.status === 'void' || bet.status === 'refunded'">{{ betStatusLabel(bet.status) }}</span>
+                @if (bet.returns > 0) {
+                  <span class="bet-returns">+₦{{ bet.returns | number }}</span>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="pagination">
+            <button (click)="store.loadBetPage(store.betPage() - 1)" [disabled]="store.betPage() <= 1 || store.betLoading()" class="page-btn">← Prev</button>
+            <span class="page-info">Page {{ store.betPage() }}/{{ store.betTotalPages() }}</span>
+            <button (click)="store.loadBetPage(store.betPage() + 1)" [disabled]="store.betPage() >= store.betTotalPages() || store.betLoading()" class="page-btn">Next →</button>
+          </div>
+        } @else {
+          <div class="history-empty">
+            @if (store.betStatus() || store.betFrom() || store.betTo()) {
+              <p>No bets match your filters.</p>
+              <button class="clear-filters inline" (click)="store.clearBetFilters()">Clear filters</button>
+            } @else {
+              <p class="no-data">No bets placed with pool funds yet.</p>
+            }
+          </div>
+        }
         }
       </div>
     }

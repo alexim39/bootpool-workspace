@@ -67,6 +67,33 @@ export interface HistoryPage {
   limit: number;
 }
 
+export interface BetHistoryRecord {
+  _id: string;
+  podId: string;
+  homeTeam: string | null;
+  awayTeam: string | null;
+  league: string | null;
+  selection: string | null;
+  marketType: string | null;
+  homeScore: number | null;
+  awayScore: number | null;
+  matchDate: string | null;
+  odds: number;
+  amount: number;
+  status: 'active' | 'won' | 'lost' | 'void' | 'refunded';
+  returns: number;
+  placedAt: string;
+  settledAt: string | null;
+}
+
+export interface BetHistoryPage {
+  bets: BetHistoryRecord[];
+  total: number;
+  page: number;
+  limit: number;
+  stats: Record<string, number>;
+}
+
 @Injectable({ providedIn: 'root' })
 export class BetManagerService {
   private readonly API_URL = environment.apiUrl;
@@ -132,5 +159,24 @@ export class BetManagerService {
 
   getPerformance(tier: string): Observable<{ success: boolean; data: PerformanceData }> {
     return this.http.get<{ success: boolean; data: PerformanceData }>(`${this.API_URL}/bet-manager/${tier}/performance`, { headers: this.getHeaders() });
+  }
+
+  getBetHistory(tier: string, query: HistoryQuery = {}): Observable<{ success: boolean; data: BetHistoryPage }> {
+    let params = new HttpParams();
+    const set = (key: string, value: unknown) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params = params.set(key, String(value));
+      }
+    };
+    set('page', query.page);
+    set('limit', query.limit);
+    set('status', query.status);
+    set('from', query.from);
+    set('to', query.to);
+    set('sortField', query.sortField);
+    set('sortOrder', query.sortOrder);
+    return this.http.get<{ success: boolean; data: BetHistoryPage }>(
+      `${this.API_URL}/bet-manager/${tier}/bets`, { params, headers: this.getHeaders() }
+    );
   }
 }

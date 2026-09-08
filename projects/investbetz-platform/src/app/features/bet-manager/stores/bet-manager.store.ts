@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { finalize } from 'rxjs/operators';
-import { BetManagerService, BetManagerAccount, BetManagerSummary, NavData, PerformanceData, DepositRecord, HistoryQuery } from '../services/bet-manager.service';
+import { BetManagerService, BetManagerAccount, BetManagerSummary, NavData, PerformanceData, DepositRecord, HistoryQuery, BetHistoryRecord } from '../services/bet-manager.service';
 
 export interface HistoryFilterPatch {
   type?: string;
@@ -39,6 +39,21 @@ export class BetManagerStore {
   historySortOrder = signal<'asc' | 'desc'>('desc');
 
   historyTotalPages = computed(() => Math.max(1, Math.ceil(this.historyTotal() / this.historyLimit())));
+
+  historyTab = signal<'funds' | 'bets'>('funds');
+  betHistory = signal<BetHistoryRecord[]>([]);
+  betTotal = signal(0);
+  betLoading = signal(false);
+  betPage = signal(1);
+  betLimit = signal(10);
+  betStatus = signal('');
+  betFrom = signal('');
+  betTo = signal('');
+  betSortField = signal('placedAt');
+  betSortOrder = signal<'asc' | 'desc'>('desc');
+  betStats = signal<Record<string, number>>({ active: 0, won: 0, lost: 0, void: 0, refunded: 0 });
+
+  betTotalPages = computed(() => Math.max(1, Math.ceil(this.betTotal() / this.betLimit())));
   activeFilterCount = computed(() => {
     let n = 0;
     if (this.historyType()) n++;
@@ -64,6 +79,15 @@ export class BetManagerStore {
     this.loading.set(true);
     this.error.set(null);
     this.selectedTier.set(tier);
+    this.historyTab.set('funds');
+    this.betHistory.set([]);
+    this.betTotal.set(0);
+    this.betPage.set(1);
+    this.betStatus.set('');
+    this.betFrom.set('');
+    this.betTo.set('');
+    this.betSortField.set('placedAt');
+    this.betSortOrder.set('desc');
     this._api.getAccount(tier).pipe(finalize(() => this.loading.set(false))).subscribe({
       next: (res) => {
         if (res.success) {
@@ -158,6 +182,70 @@ export class BetManagerStore {
     this.historyLimit.set(size);
     this.historyPage.set(1);
     this.fetchDepositHistory();
+  }
+
+  setHistoryTab(tab: 'funds' | 'bets') {
+    if (tab === this.historyTab()) return;
+    this.historyTab.set(tab);
+    if (tab === 'bets' && this.betHistory().length === 0 && !this.betLoading()) {
+      this.fetchBetHistory();
+    }
+  }
+
+  fetchBetHistory() {
+    const tier = this.selectedTier();
+    if (!tier) return;
+    this.betLoading.set(true);
+    const query: HistoryQuery = {
+      page: this.betPage(),
+      limit: this.betLimit(),
+      sortField: this.betSortField(),
+      sortOrder: this.betSortOrder(),
+    };
+    if (this.betStatus()) query.status = this.betStatus();
+    if (this.betFrom()) query.from = this.betFrom();
+    if (this.betTo()) query.to = this.betTo();
+    this._api.getBetHistory(tier, query).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.betHistory.set(res.data.bets);
+          this.betTotal.set(res.data.total);
+          this.betStats.set({ active: 0, won: 0, lost: 0, void: 0, refunded: 0, ...(res.data.stats || {}) });
+        }
+      },
+      error: () => {
+        this.betHistory.set([]);
+        this.betTotal.set(0);
+      },
+      complete: () => this.betLoading.set(false),
+    });
+  }
+
+  setBetFilters(patch: HistoryFilterPatch) {
+    if (patch.status !== undefined) this.betStatus.set(patch.status);
+    if (patch.from !== undefined) this.betFrom.set(patch.from);
+    if (patch.to !== undefined) this.betTo.set(patch.to);
+    if (patch.sortField !== undefined) this.betSortField.set(patch.sortField);
+    if (patch.sortOrder !== undefined) this.betSortOrder.set(patch.sortOrder as 'asc' | 'desc');
+    this.betPage.set(1);
+    this.fetchBetHistory();
+  }
+
+  clearBetFilters() {
+    this.betStatus.set('');
+    this.betFrom.set('');
+    this.betTo.set('');
+    this.betSortField.set('placedAt');
+    this.betSortOrder.set('desc');
+    this.betPage.set(1);
+    this.fetchBetHistory();
+  }
+
+  loadBetPage(page: number) {
+    const clamped = Math.max(1, Math.min(page, this.betTotalPages()));
+    if (clamped === this.betPage()) return;
+    this.betPage.set(clamped);
+    this.fetchBetHistory();
   }
 
   deposit(tier: string, amount: number, onSuccess: () => void) {
