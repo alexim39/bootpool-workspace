@@ -26,6 +26,18 @@ export interface SocialCreator {
   followerCount: number;
   isOra: boolean;
   isFollowing: boolean;
+  /** Settled-data tipster badge (absent when unqualified / unavailable). */
+  tipsterBadge?: TipsterBadge | null;
+}
+
+/** Settled-data creator badge: earned on copied-slip outcomes, never vibes. */
+export interface TipsterBadge {
+  tier: 'Rookie' | 'Rising' | 'Pro' | 'Legend';
+  settled: number;
+  won: number;
+  winRate: number;
+  roi: number;
+  computedAt: string | null;
 }
 
 export interface CodePostLeg {
@@ -52,6 +64,10 @@ export interface CodePost {
   legs: CodePostLeg[];
   totalLegs: number;
   stakeAmount: number | null;
+  /** Distinct copiers (excluding the creator). Absent when counts unavailable. */
+  copies?: number | null;
+  /** Settled-data tipster badge of the creator. Absent when unqualified. */
+  creatorBadge?: TipsterBadge | null;
 }
 
 export interface CreatorViralityProfile {
@@ -80,6 +96,8 @@ export interface SocialProfile {
   stats: { codes: number; followers: number; following: number; likesReceived: number; stakers: number };
   achievements: string[];
   virality?: CreatorViralityProfile;
+  /** Settled-data tipster badge (absent when unqualified / unavailable). */
+  tipsterBadge?: TipsterBadge | null;
   isSelf: boolean;
   isFollowing: boolean;
 }

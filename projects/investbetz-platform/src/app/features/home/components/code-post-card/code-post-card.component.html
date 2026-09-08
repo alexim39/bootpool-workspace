@@ -10,6 +10,7 @@
       </span>
       <div class="creator-meta">
         <a class="creator-name" [routerLink]="'/social/' + post().creatorId">{{ creatorName() }}</a>
+        <app-creator-badge [badge]="post().creatorBadge" />
         @if (post().creatorUsername) {
           <span class="creator-username">{{ '@' + post().creatorUsername }}</span>
         }
@@ -39,6 +40,9 @@
   @if (post().stakeAmount) {
     <div class="code-sub">Followers have staked {{ formatMoney(post().stakeAmount!) }} on this code</div>
   }
+  @if ((post().copies ?? 0) > 0) {
+    <div class="code-sub">{{ post().copies }} {{ post().copies === 1 ? 'person has' : 'people have' }} copied this slip</div>
+  }
 
   <div class="legs-list">
     @for (leg of legsPreview(); track leg.podId) {
@@ -52,12 +56,12 @@
     }
   </div>
 
-  <button class="stake-now" (click)="stakeNow()" [disabled]="staking()">
+  <button class="stake-now" (click)="copyStake()" [disabled]="staking()">
     @if (staking()) {
       <mat-spinner diameter="16" />
       Applying…
     } @else {
-      Stake now
+      Copy &amp; Stake
     }
   </button>
 

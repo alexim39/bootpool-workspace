@@ -7,7 +7,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SocialProfileStore } from '../../social-profile.store';
 import { CodePostCardComponent } from '../../../home/components/code-post-card/code-post-card.component';
 import { SocialUserRow } from '../../../../core/services/social-feed.service';
-import { MobileNavComponent } from '../../../../core/components';
+import { MobileNavComponent, CreatorBadgeComponent } from '../../../../core/components';
 
 export interface AchievementDef {
   id: string;
@@ -31,7 +31,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
 @Component({
   selector: 'app-social-profile-mobile',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule, CodePostCardComponent, MobileNavComponent],
+  imports: [CommonModule, RouterModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule, CodePostCardComponent, MobileNavComponent, CreatorBadgeComponent],
   templateUrl: './social-profile-mobile.component.html',
   styleUrls: ['./social-profile-mobile.component.scss']
 })

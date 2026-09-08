@@ -29,6 +29,9 @@
             @if (c.isOra) {
               <span class="w2f-curator-badge"><mat-icon>auto_awesome</mat-icon> AI Curator</span>
             }
+            @if (!c.isOra) {
+              <app-creator-badge [badge]="c.tipsterBadge" />
+            }
           </div>
             @if (c.username) {
               <span class="w2f-handle">{{ '@' + c.username }}</span>

@@ -27,6 +27,7 @@ describe('CashoutModalComponent', () => {
       profit: 0,
       isActive: true,
       isSettled: false,
+      canCashOut: false,
       pod: {
         id: 'pod-1',
         title: 'Test Match',

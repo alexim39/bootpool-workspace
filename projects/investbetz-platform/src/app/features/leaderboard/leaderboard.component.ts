@@ -11,13 +11,14 @@ import { DeviceService, LeaderboardService, LeaderboardPeriod, LeaderboardPage, 
 import { SocialFeedService } from '../../core/services/social-feed.service';
 import { AppNavComponent, MobileNavComponent } from '../../core/components';
 import { CreatorsBoardComponent } from './creators-board/creators-board.component';
+import { TipstersBoardComponent } from './tipsters-board/tipsters-board.component';
 
 export type LeaderboardSortField = 'totalStaked' | 'stakeCount' | 'totalWon' | 'lastWinAt';
 
 @Component({
   selector: 'app-leaderboard',
   standalone: true,
-  imports: [RouterModule, CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule, MatTooltipModule, MatSnackBarModule, AppNavComponent, MobileNavComponent, CreatorsBoardComponent],
+  imports: [RouterModule, CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule, MatTooltipModule, MatSnackBarModule, AppNavComponent, MobileNavComponent, CreatorsBoardComponent, TipstersBoardComponent],
   templateUrl: './leaderboard.component.html',
   styleUrls: ['./leaderboard.component.scss']
 })
@@ -30,7 +31,7 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private search$ = new Subject<string>();
 
-  view = signal<'stakers' | 'creators'>('stakers');
+  view = signal<'stakers' | 'creators' | 'tipsters'>('stakers');
   period = signal<LeaderboardPeriod>('month');
   page = signal(1);
   pageSize = signal(25);
@@ -102,7 +103,7 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
     this.search$.next('');
   }
 
-  setView(v: 'stakers' | 'creators') {
+  setView(v: 'stakers' | 'creators' | 'tipsters') {
     this.view.set(v);
     if (v === 'stakers' && !this.board()) this.load();
   }

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { BetCardComponent } from './bet-card.component';
 import { Stake } from '../../../../core/services';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -22,6 +23,7 @@ describe('BetCardComponent', () => {
       profit: 0,
       isActive: true,
       isSettled: false,
+      canCashOut: true,
       pod: {
         id: 'pod-1',
         title: 'Test Match',
@@ -46,7 +48,7 @@ describe('BetCardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BetCardComponent],
+      imports: [BetCardComponent, HttpClientTestingModule],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     fixture = TestBed.createComponent(BetCardComponent);

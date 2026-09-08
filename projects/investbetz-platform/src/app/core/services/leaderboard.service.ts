@@ -31,6 +31,30 @@ export interface LastWin {
   settledAt: string;
 }
 
+export type TipsterSortField = 'roi' | 'winRate' | 'settled' | 'profit';
+
+export interface TipsterBoardEntry {
+  rank: number;
+  userId: string;
+  displayName: string;
+  tier: 'Rookie' | 'Rising' | 'Pro' | 'Legend';
+  settled: number;
+  won: number;
+  winRate: number;
+  roi: number;
+  profit: number;
+  totalStaked: number;
+}
+
+export interface TipsterBoardPage {
+  period: LeaderboardPeriod;
+  page: number;
+  limit: number;
+  total: number;
+  minSettled: number;
+  items: TipsterBoardEntry[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class LeaderboardService {
   private http = inject(HttpClient);
@@ -41,6 +65,10 @@ export class LeaderboardService {
   lastWin = signal<LastWin | null>(null);
   loading = signal(false);
   error = signal<string | null>(null);
+
+  tipsterBoard = signal<TipsterBoardPage | null>(null);
+  tipsterLoading = signal(false);
+  tipsterError = signal<string | null>(null);
 
   private getHeaders() {
     return { Authorization: `Bearer ${this.auth.token()}` };
@@ -97,5 +125,37 @@ export class LeaderboardService {
       `${environment.apiUrl}/leaderboard/me/last-win`,
       { headers: this.getHeaders() }
     );
+  }
+
+  fetchTipsterBoard(
+    period: LeaderboardPeriod = 'month',
+    page = 1,
+    limit = 25,
+    sortField: TipsterSortField = 'roi',
+    sortOrder: 'asc' | 'desc' = 'desc'
+  ) {
+    this.tipsterLoading.set(true);
+    this.tipsterError.set(null);
+
+    const params = new HttpParams()
+      .set('period', period)
+      .set('page', String(page))
+      .set('limit', String(limit))
+      .set('sortField', sortField)
+      .set('sortOrder', sortOrder);
+
+    this.http.get<{ success: boolean; data: TipsterBoardPage }>(
+      `${environment.apiUrl}/leaderboard/tipsters`,
+      { headers: this.getHeaders(), params }
+    ).subscribe({
+      next: (res) => {
+        if (res.success) this.tipsterBoard.set(res.data);
+        this.tipsterLoading.set(false);
+      },
+      error: (err) => {
+        this.tipsterError.set(err.error?.message || 'Failed to load tipster board');
+        this.tipsterLoading.set(false);
+      }
+    });
   }
 }

@@ -275,6 +275,46 @@
     }
   }
 
+  .track-record {
+    .track-record-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-top: 0.6rem;
+
+      .tr-stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.15rem;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 0.9rem;
+        padding: 0.6rem 0.2rem;
+      }
+
+      .tr-val {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #fff;
+      }
+
+      .tr-lbl {
+        font-size: 0.68rem;
+        color: rgba(255, 255, 255, 0.55);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+    }
+
+    .track-record-empty {
+      font-size: 12px;
+      color: #8ea3c8;
+      padding: 4px 2px 8px;
+      margin: 0;
+    }
+  }
+
   .achievements {
     margin: 0 1rem;
 

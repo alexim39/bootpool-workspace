@@ -38,7 +38,6 @@ export class BetSlipComponent {
   togglePanel = output<void>();
   placeBetRequest = output<{ podIds: string[]; stakeAmount: number; idempotencyKey: string }>();
 
-  stakeAmount = signal<number>(0);
   submitting = signal(false);
   bookingCodeInput = signal('');
 
@@ -79,7 +78,7 @@ export class BetSlipComponent {
   });
 
   potentialPayout = computed(() => {
-    return Math.floor(this.stakeAmount() * this.combinedMultiplier());
+    return Math.floor(this.store.slipStakeAmount() * this.combinedMultiplier());
   });
 
   platformFee = computed(() => {
@@ -96,19 +95,19 @@ export class BetSlipComponent {
 
   canPlace = computed(() => {
     return this.selections().length >= 2
-      && this.stakeAmount() >= 100
-      && this.stakeAmount() <= 5000
+      && this.store.slipStakeAmount() >= 100
+      && this.store.slipStakeAmount() <= 5000
       && !this.stakeError()
       && !this.submitting();
   });
 
   setAmount(amount: number) {
-    this.stakeAmount.set(amount);
+    this.store.setSlipStakeAmount(amount);
     this.validateStake();
   }
 
   validateStake() {
-    const amt = this.stakeAmount();
+    const amt = this.store.slipStakeAmount();
     if (amt < 100) {
       this.stakeError.set('Minimum accumulator stake is ₦100');
     } else if (amt > 5000) {
@@ -121,7 +120,7 @@ export class BetSlipComponent {
   }
 
   clearAll() {
-    this.stakeAmount.set(0);
+    this.store.setSlipStakeAmount(0);
     this.stakeError.set(null);
     this.submitting.set(false);
     this.slipKey = null;
@@ -143,7 +142,7 @@ export class BetSlipComponent {
       }
     }
     this.submitting.set(true);
-    this.placeBetRequest.emit({ podIds, stakeAmount: this.stakeAmount(), idempotencyKey: this.slipKey });
+    this.placeBetRequest.emit({ podIds, stakeAmount: this.store.slipStakeAmount(), idempotencyKey: this.slipKey });
   }
 
   formatCurrency(amount: number): string {

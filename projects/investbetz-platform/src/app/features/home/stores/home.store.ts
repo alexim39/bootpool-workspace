@@ -382,9 +382,20 @@ export class HomeStore implements OnDestroy {
     return this.betSlipSelections().length >= this.maxAccumulatorLegs();
   }
 
+  /** Slip stake amount (NGN), lifted here so copy flows can preset it. */
+  readonly slipStakeAmount = signal<number>(0);
+  /** Default preset applied by one-tap Copy & Stake (inside min/max bounds). */
+  readonly defaultCopyStake = 500;
+
+  setSlipStakeAmount(amount: number) {
+    const v = Number(amount);
+    this.slipStakeAmount.set(Number.isFinite(v) && v >= 0 ? v : 0);
+  }
+
   clearSelections() {
     this.betSlipSelections.set([]);
     this.betSlipOpen.set(false);
+    this.slipStakeAmount.set(0);
     this.clearBookingCode();
     this.clearBookingCodeSelections();
   }

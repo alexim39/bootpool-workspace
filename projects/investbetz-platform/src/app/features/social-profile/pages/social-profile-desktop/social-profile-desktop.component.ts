@@ -7,13 +7,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SocialProfileStore } from '../../social-profile.store';
 import { CodePostCardComponent } from '../../../home/components/code-post-card/code-post-card.component';
 import { SocialUserRow } from '../../../../core/services/social-feed.service';
-import { AppNavComponent } from '../../../../core/components';
+import { AppNavComponent, CreatorBadgeComponent } from '../../../../core/components';
 import { ACHIEVEMENTS } from '../social-profile-mobile/social-profile-mobile.component';
 
 @Component({
   selector: 'app-social-profile-desktop',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule, CodePostCardComponent, AppNavComponent],
+  imports: [CommonModule, RouterModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule, CodePostCardComponent, AppNavComponent, CreatorBadgeComponent],
   templateUrl: './social-profile-desktop.component.html',
   styleUrls: ['./social-profile-desktop.component.scss']
 })

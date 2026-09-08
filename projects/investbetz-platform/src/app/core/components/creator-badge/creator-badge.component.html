@@ -1,0 +1,6 @@
+@if (show()) {
+  <span class="creator-badge" [class]="'tier-' + badge()!.tier.toLowerCase()" [matTooltip]="tooltip()" matTooltipPosition="above">
+    <mat-icon>military_tech</mat-icon>
+    {{ badge()!.tier }}
+  </span>
+}

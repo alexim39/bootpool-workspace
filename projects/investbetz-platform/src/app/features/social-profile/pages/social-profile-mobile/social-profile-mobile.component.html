@@ -31,6 +31,7 @@
           @if (p.virality && p.virality.badge && p.virality.badge !== 'Rookie') {
             <span class="creator-badge" [title]="'Creator score â‚¦' + (p.virality.score | number)">{{ p.virality.badge }}</span>
           }
+          <app-creator-badge [badge]="p.tipsterBadge" />
         </div>
         @if (p.user.username) {
           <div class="username-row">{{ '@' + p.user.username }}</div>
@@ -80,6 +81,36 @@
         </div>
       </div>
     </section>
+
+    @if (!p.user.isOra) {
+      <section class="achievements track-record">
+        <div class="section-head">
+          <mat-icon>insights</mat-icon>
+          <h3>Track record</h3>
+          @if (p.tipsterBadge && p.tipsterBadge.tier !== 'Rookie') {
+            <app-creator-badge [badge]="p.tipsterBadge" />
+          }
+        </div>
+        @if (p.tipsterBadge && p.tipsterBadge.tier !== 'Rookie') {
+          <div class="track-record-stats">
+            <div class="tr-stat">
+              <span class="tr-val">{{ p.tipsterBadge.settled }}</span>
+              <span class="tr-lbl">Settled copies</span>
+            </div>
+            <div class="tr-stat">
+              <span class="tr-val">{{ p.tipsterBadge.winRate }}%</span>
+              <span class="tr-lbl">Win rate</span>
+            </div>
+            <div class="tr-stat">
+              <span class="tr-val">{{ p.tipsterBadge.roi }}%</span>
+              <span class="tr-lbl">Follower ROI</span>
+            </div>
+          </div>
+        } @else {
+          <p class="track-record-empty">No settled track record yet — badges need 20+ settled copies.</p>
+        }
+      </section>
+    }
 
     <section class="achievements">
       <div class="section-head">

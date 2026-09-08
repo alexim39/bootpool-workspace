@@ -1,0 +1,40 @@
+@use '../../styles/brand' as *;
+
+.creator-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: $radius-full;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.creator-badge mat-icon {
+  font-size: 0.8rem;
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+.creator-badge.tier-rising {
+  background: rgba($info, 0.12);
+  border-color: rgba($info, 0.35);
+  color: $info;
+}
+
+.creator-badge.tier-pro {
+  background: rgba($emerald, 0.12);
+  border-color: rgba($emerald, 0.35);
+  color: $emerald;
+}
+
+.creator-badge.tier-legend {
+  background: linear-gradient(135deg, rgba($gold, 0.22), rgba($warning, 0.12));
+  border-color: rgba($gold, 0.5);
+  color: $gold;
+}

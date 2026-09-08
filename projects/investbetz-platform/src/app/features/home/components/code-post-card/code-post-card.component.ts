@@ -7,11 +7,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SocialFeedService, CodePost } from '../../../../core/services/social-feed.service';
 import { HomeStore } from '../../stores/home.store';
+import { CreatorBadgeComponent } from '../../../../core/components';
 
 @Component({
   selector: 'app-code-post-card',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, MatIconModule, MatProgressSpinnerModule],
+  imports: [CommonModule, RouterModule, FormsModule, MatIconModule, MatProgressSpinnerModule, CreatorBadgeComponent],
   templateUrl: './code-post-card.component.html',
   styleUrls: ['./code-post-card.component.scss']
 })
@@ -108,25 +109,47 @@ export class CodePostCardComponent {
     }
   }
 
-  stakeNow() {
+  /**
+   * One-tap Copy & Stake: loads the creator's legs into the slip with a
+   * preset amount (same redeem path + partial-fill handling as manual apply,
+   * so attribution is preserved) and follows the creator on first copy.
+   */
+  copyStake() {
     if (!this.social.isLoggedIn()) {
       this.snackBar.open('Please log in to stake', 'OK', { duration: 2500 });
       return;
     }
     if (this.staking()) return;
     this.staking.set(true);
-    this.store.redeemBookingCode(this.post().code).subscribe({
+    const post = this.post();
+    this.store.redeemBookingCode(post.code).subscribe({
       next: (ok) => {
-        if (ok) {
-          this.snackBar.open('Code applied — set your stake and confirm', 'OK', { duration: 3000 });
-        }
         this.staking.set(false);
+        if (!ok) return;
+        this.store.setSlipStakeAmount(this.store.defaultCopyStake);
+        this.followOnFirstCopy(post.creatorId, post.creatorName);
+        this.snackBar.open(
+          `Copied ${this.creatorName()}'s slip — confirm to stake ₦${this.store.defaultCopyStake}`,
+          'OK',
+          { duration: 3000 }
+        );
       },
       error: () => {
         this.staking.set(false);
         this.snackBar.open('Could not apply this code', 'OK', { duration: 2500 });
       }
     });
+  }
+
+  private followOnFirstCopy(creatorId: string, creatorName: string) {
+    if (this.isMine() || !creatorId || this.social.isFollowing(creatorId)) return;
+    this.social.toggleFollow(creatorId).catch(() => {});
+    this.snackBar
+      .open(`Following ${creatorName} — you'll see their codes here`, 'Undo', { duration: 4000 })
+      .onAction()
+      .subscribe(() => {
+        this.social.toggleFollow(creatorId).catch(() => {});
+      });
   }
 
   formatMoney(amount: number): string {

@@ -1,0 +1,71 @@
+<div class="tipster-controls">
+  <div class="period-tabs" role="tablist" aria-label="Time window">
+    @for (p of periods; track p) {
+      <button class="period-tab" [class.active]="period() === p" (click)="setPeriod(p)" role="tab" [attr.aria-selected]="period() === p">
+        {{ p === 'week' ? '7D' : p === 'month' ? '30D' : 'All' }}
+      </button>
+    }
+  </div>
+  <div class="sort-tabs" role="tablist" aria-label="Sort by">
+    <button class="sort-tab" [class.active]="sortField() === 'roi'" (click)="setSort('roi')">ROI</button>
+    <button class="sort-tab" [class.active]="sortField() === 'winRate'" (click)="setSort('winRate')">Win %</button>
+    <button class="sort-tab" [class.active]="sortField() === 'settled'" (click)="setSort('settled')">Settled</button>
+  </div>
+</div>
+
+@if (loading() && !entries()) {
+  <div class="skel-page">
+    @for (item of skeletonRows(); track item) {
+      <div class="skel-tipster-row"></div>
+    }
+  </div>
+} @else if (!entries() || entries()!.items.length === 0) {
+  <div class="empty-state">
+    <mat-icon>military_tech</mat-icon>
+    <h3>No ranked tipsters yet</h3>
+    <p>Tipsters appear here once their codes have 20+ settled copies. Share a code to start climbing.</p>
+  </div>
+} @else {
+  <section class="tipster-board">
+    <div class="tipster-row tipster-head">
+      <span>#</span>
+      <span>Tipster</span>
+      <span class="num-col">Settled</span>
+      <span class="num-col">Win %</span>
+      <span class="num-col">ROI</span>
+      <span class="num-col">Profit</span>
+      <span class="num-col">Follow</span>
+    </div>
+    @for (entry of entries()!.items; track entry.userId) {
+      <a class="tipster-row" [class.self-row]="isMe(entry)" [routerLink]="'/social/' + entry.userId">
+        <span class="rank-cell">
+          <span class="rank-emblem" [class]="rankClass(entry.rank)">{{ rankEmblem(entry.rank) }}</span>
+          <span class="rank-no" [class]="rankClass(entry.rank)">{{ entry.rank }}</span>
+        </span>
+        <span class="creator-name">
+          {{ entry.displayName }}
+          <app-creator-badge [badge]="{ tier: entry.tier, settled: entry.settled, won: entry.won, winRate: entry.winRate, roi: entry.roi, computedAt: null }" />
+          @if (isMe(entry)) {
+            <span class="me-pill">You</span>
+          }
+        </span>
+        <span class="num-col">{{ entry.settled }}</span>
+        <span class="num-col">{{ entry.winRate }}%</span>
+        <span class="num-col strong" [class.negative]="entry.roi < 0">{{ entry.roi }}%</span>
+        <span class="num-col">{{ formatMoney(entry.profit) }}</span>
+        <span class="num-col follow-cell">
+          @if (!isMe(entry) && !isOraEntry(entry)) {
+            <button
+              class="follow-btn"
+              [class.following]="isFollowingEntry(entry)"
+              (click)="onToggleFollow($event, entry)">
+              <mat-icon>{{ isFollowingEntry(entry) ? 'check' : 'add' }}</mat-icon>
+              {{ isFollowingEntry(entry) ? 'Following' : 'Follow' }}
+            </button>
+          }
+        </span>
+      </a>
+    }
+  </section>
+  <p class="board-footnote">Ranked by follower ROI on settled copies (min {{ entries()!.minSettled }} settled). Voids and refunds excluded.</p>
+}

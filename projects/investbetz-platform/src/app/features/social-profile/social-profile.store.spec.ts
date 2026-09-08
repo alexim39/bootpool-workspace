@@ -28,6 +28,7 @@ describe('SocialProfileStore', () => {
 
   function codePost(id: string, code: string): CodePost {
     return {
+      kind: 'code',
       id,
       codeId: id,
       code,

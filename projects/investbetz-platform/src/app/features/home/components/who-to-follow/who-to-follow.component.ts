@@ -4,11 +4,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router, RouterModule } from '@angular/router';
 import { SocialFeedService, SocialCreator } from '../../../../core/services/social-feed.service';
+import { CreatorBadgeComponent } from '../../../../core/components';
 
 @Component({
   selector: 'app-who-to-follow',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatSnackBarModule, RouterModule],
+  imports: [CommonModule, MatIconModule, MatSnackBarModule, RouterModule, CreatorBadgeComponent],
   templateUrl: './who-to-follow.component.html',
   styleUrls: ['./who-to-follow.component.scss']
 })

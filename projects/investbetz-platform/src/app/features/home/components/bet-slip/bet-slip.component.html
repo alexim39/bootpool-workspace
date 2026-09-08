@@ -81,7 +81,8 @@
               <input
                 type="number"
                 class="stake-input"
-                [(ngModel)]="stakeAmount"
+                [ngModel]="store.slipStakeAmount()"
+                (ngModelChange)="store.setSlipStakeAmount($event)"
                 (input)="validateStake()"
                 placeholder="Enter amount"
                 min="100"
@@ -90,7 +91,7 @@
           </div>
           <div class="quick-picks">
             @for (amt of quickAmounts(); track amt) {
-              <button class="quick-pick" [class.active]="stakeAmount() === amt" (click)="setAmount(amt)">
+              <button class="quick-pick" [class.active]="store.slipStakeAmount() === amt" (click)="setAmount(amt)">
                 ₦{{ amt | number }}
               </button>
             }
@@ -161,7 +162,7 @@
             <span>Placing...</span>
           } @else {
             <span>Place Bet</span>
-            <span class="btn-sub">₦{{ stakeAmount() | number }}</span>
+            <span class="btn-sub">₦{{ store.slipStakeAmount() | number }}</span>
           }
         </button>
       }

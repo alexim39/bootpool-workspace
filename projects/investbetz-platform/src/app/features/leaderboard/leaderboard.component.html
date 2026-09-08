@@ -23,6 +23,9 @@
         <button class="view-tab" [class.active]="view() === 'creators'" (click)="setView('creators')">
           <mat-icon>qr_code_2</mat-icon> Top Creators
         </button>
+        <button class="view-tab" [class.active]="view() === 'tipsters'" (click)="setView('tipsters')">
+          <mat-icon>military_tech</mat-icon> Tipsters
+        </button>
       </div>
 
       @if (view() === 'stakers') {
@@ -185,8 +188,10 @@
           </button>
         </div>
       }
-      } @else {
+      } @else if (view() === 'creators') {
         <app-creators-board />
+      } @else {
+        <app-tipsters-board />
       }
     </div>
 
@@ -213,6 +218,9 @@
       </button>
       <button class="view-tab" [class.active]="view() === 'creators'" (click)="setView('creators')">
         <mat-icon>qr_code_2</mat-icon> Top Creators
+      </button>
+      <button class="view-tab" [class.active]="view() === 'tipsters'" (click)="setView('tipsters')">
+        <mat-icon>military_tech</mat-icon> Tipsters
       </button>
     </div>
 
@@ -390,8 +398,10 @@
         </button>
       </div>
     }
-    } @else {
+    } @else if (view() === 'creators') {
       <app-creators-board />
+    } @else {
+      <app-tipsters-board />
     }
   </div>
 }
